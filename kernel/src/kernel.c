@@ -4,7 +4,7 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <utils/hello.h>
-#include <utils/sockets.h>
+#include <sockets.h>
 #include <config.h>
 #define SERVERNAME "KERNEL"
 
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     t_config_kernel *kernel_config;
     kernel_config = malloc(sizeof(t_config_kernel));
 
-    char *config_path = "/home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel/cfg/kernel-ejemplo.config";
+    char *config_path = "../cfg/kernel-ejemplo.config";
 
     t_config *cfg_aux = config_create(config_path);
 
