@@ -6,7 +6,7 @@
 #include <commons/log.h>
 #include <commons/config.h>
 #include <commons/string.h>
-#include "sockets.h"
+#include <utils/sockets.h>
 #include "inicializar_memoria.h"
 
 #define SERVERNAME "MEMORIA"
