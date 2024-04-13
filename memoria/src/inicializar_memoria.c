@@ -20,3 +20,21 @@ void _iniciar_logger(){
         //exit(EXIT_FAILURE);
     }
 }
+
+void _iniciar_config(){
+    config_memoria = config_create("/home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria/cfg/memoria.config");
+
+    if(config_memoria == NULL){
+        perror("No se pudo crear el archivo de configuracion para el modulo de memoria");
+        //exit(EXIT_FAILURE);
+    }
+
+    //Creo la estructura para guardar los datos del archivo de configuracion
+    memoria_config = crear_memoria_config();
+
+    if(memoria_config == NULL){
+        log_error(logger_memoria, "Error al crear la estructura t_memoria_config");
+    }
+
+    cargar_memoria_config(memoria_config, config_memoria);
+}
