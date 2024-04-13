@@ -5,6 +5,12 @@ t_log* logger_memoria_debug;
 t_config* config_memoria;
 t_memoria_config* memoria_config;
 
+void init(){
+    _iniciar_logger();
+    _iniciar_config();
+    imprimir_config();
+}
+
 void _iniciar_logger(){
     logger_memoria = log_create("memoria.log", "MEMORIA_LOG", 1, LOG_LEVEL_INFO);
 
