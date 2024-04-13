@@ -9,9 +9,6 @@
 #include<string.h>
 #include<commons/log.h>
 
-
-
-
 typedef struct
 {
 	int size;

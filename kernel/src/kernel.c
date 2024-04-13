@@ -1,16 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <commons/log.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <utils/hello.h>
-#include <sockets.h>
-#include <config.h>
-#define SERVERNAME "KERNEL"
+#include <kernel.h>
 
 int main(int argc, char *argv[])
 {
-    decir_hola("Kernel");
+   
 
     t_log *kernel_logger;
 

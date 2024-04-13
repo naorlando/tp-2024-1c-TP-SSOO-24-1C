@@ -7,9 +7,10 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
-#include <sockets.h>
+#include <utils/sockets.h>
+#include "cpu_config.h"
 
-/* incluir .h files del kernel*/
-#include "config.h"
+/* incluir .h files del cpu*/
+
 
 #endif
