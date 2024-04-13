@@ -38,3 +38,7 @@ void _iniciar_config(){
 
     cargar_memoria_config(memoria_config, config_memoria);
 }
+
+void imprimir_config() {
+    log_trace(logger_memoria_debug, "PUERTO DE ESCUCHA DE LA MEMORIA: %d", memoria_config->PUERTO_ESCUCHA);
+}
