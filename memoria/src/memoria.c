@@ -14,6 +14,11 @@ int main(void){
         log_error(logger_memoria, "Error al iniciar %s server en puerto %s", SERVERNAME, server_port);
     }
 
+    // ############## Espera de Clientes ###################
+    int fd_cliente = esperar_cliente(logger_memoria, NULL, fd_server);
+
+    liberar_conexion(fd_cliente);
+
     free(server_port);
 
     return EXIT_SUCCESS;
