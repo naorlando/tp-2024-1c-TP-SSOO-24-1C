@@ -9,6 +9,7 @@
 #include <commons/log.h>
 #include <utils/sockets.h>
 #include "cpu_config.h"
+#include "inicializar_cpu.h"
 
 /* incluir .h files del cpu*/
 
