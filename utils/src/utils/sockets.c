@@ -77,8 +77,9 @@ int esperar_cliente(t_log *logger, const char *name, int socket_servidor)
     socklen_t tam_direccion = sizeof(struct sockaddr_in);
 
     // Aceptamos un nuevo cliente
-    int socket_cliente = accept(socket_servidor, NULL, NULL);
-    log_info(logger, "Se conecto un cliente!");
+    int socket_cliente = accept(socket_servidor, (void *)&dir_cliente, &tam_direccion);
+
+    log_info(logger, "Cliente (%s:%d) conectado a %s", inet_ntoa(dir_cliente.sin_addr), dir_cliente.sin_port, name);
 
     return socket_cliente;
 }
@@ -120,7 +121,7 @@ int crear_conexion(t_log *logger, const char *server_name, char *ip, char *puert
         log_error(logger, "Error creando el socket para %s:%s", ip, puerto);
         return 0;
     }
-   
+
     // Ahora que tenemos el socket, vamos a conectarlo
     // connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen); Se modifica validando la conexion
     if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1)
@@ -138,7 +139,8 @@ int crear_conexion(t_log *logger, const char *server_name, char *ip, char *puert
 }
 
 // CERRAR CONEXION
-void liberar_conexion(int socket_cliente) {
+void liberar_conexion(int socket_cliente)
+{
     close(socket_cliente);
     socket_cliente = -1;
 }

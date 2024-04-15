@@ -11,6 +11,8 @@
 #include "cpu_config.h"
 #include "inicializar_cpu.h"
 
+#define SERVERNAME "CPU"
+
 /* incluir .h files del cpu*/
 
 

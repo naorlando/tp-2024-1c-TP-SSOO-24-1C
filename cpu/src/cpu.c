@@ -1,7 +1,6 @@
 
 #include "cpu.h"
 
-#define SERVERNAME "CPU"
 
 int main(int argc, char *argv[])
 {
@@ -24,6 +23,8 @@ int main(int argc, char *argv[])
     {
         log_error(logger_cpu, "Error al iniciar %s server en puerto %s", SERVERNAME, server_port);
     }
+
+    esperar_cliente(logger_cpu,"KERNEL",fd_server);
 
     free(server_port);
 
