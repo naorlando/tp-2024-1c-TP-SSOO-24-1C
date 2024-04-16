@@ -1,29 +1,28 @@
 #ifndef BUFFER_H_
 #define BUFFER_H_
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<signal.h>
-#include<unistd.h>
-#include<netdb.h>
-#include<string.h>
-#include<commons/log.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <string.h>
+#include <commons/log.h>
+#include <utils/sockets.h>
 
+// Message buffer
 typedef struct
 {
-	int size;
-	void* stream;
+    uint32_t size; // Payload size
+    void *stream;  // Payload
 } t_buffer;
 
-t_buffer *buffer_create(uint32_t size);
-
-// Libera la memoria asociada al buffer
+// Buffer
+t_buffer *buffer_create();
 void buffer_destroy(t_buffer *buffer);
-
-// Agrega un stream al buffer en la posición actual y avanza el offset
-void buffer_add(t_buffer *buffer, void *data, uint32_t size);
-
-// Guarda size bytes del principio del buffer en la dirección data y avanza el offset
-void buffer_read(t_buffer *buffer, void *data, uint32_t size);
+void buffer_add(t_buffer *buffer, void *stream, uint32_t size);
+void * extract_data_from_buffer(t_buffer *buffer);
+char * extract_string_buffer (t_buffer* buffer) ;
+t_buffer* recive_full_buffer (int socket);
 
 #endif

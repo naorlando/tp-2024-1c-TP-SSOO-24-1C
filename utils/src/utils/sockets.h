@@ -12,9 +12,12 @@
 #include<string.h>
 #include<assert.h>
 
+
+
 int iniciar_servidor(t_log* logger, const char* name, char* ip, char* puerto);
 int esperar_cliente(t_log* logger, const char* name, int socket_servidor);
 int crear_conexion(t_log* logger, const char* server_name, char* ip, char* puerto);
+int recibir_operacion(t_log *logger,int socket_cliente);
 void liberar_conexion(int socket_cliente);
 
 

@@ -83,13 +83,18 @@ int esperar_cliente(t_log *logger, const char *name, int socket_servidor)
     return socket_cliente;
 }
 
-int recibir_operacion(int socket_cliente)
+int recibir_operacion(t_log *logger, int socket_cliente)
 {
+
     int cod_op;
     if (recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
+    {
+
         return cod_op;
+    }
     else
     {
+        log_info(logger, "Hello from downtown 3");
         close(socket_cliente);
         return -1;
     }
@@ -120,7 +125,7 @@ int crear_conexion(t_log *logger, const char *server_name, char *ip, char *puert
         log_error(logger, "Error creando el socket para %s:%s", ip, puerto);
         return 0;
     }
-   
+
     // Ahora que tenemos el socket, vamos a conectarlo
     // connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen); Se modifica validando la conexion
     if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen) == -1)
@@ -138,7 +143,8 @@ int crear_conexion(t_log *logger, const char *server_name, char *ip, char *puert
 }
 
 // CERRAR CONEXION
-void liberar_conexion(int socket_cliente) {
+void liberar_conexion(int socket_cliente)
+{
     close(socket_cliente);
     socket_cliente = -1;
 }
