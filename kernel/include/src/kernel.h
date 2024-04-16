@@ -3,10 +3,16 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <pthread.h>
+#include <commons/string.h>
+#include <commons/config.h>
 #include <commons/log.h>
 #include <utils/sockets.h>
+#include <utils/protocolo.h>
 #include "kernel_config.h"
 #include "inicializar_kernel.h"
+#include "kernel_dispatch.h"
 
 #define SERVERNAME "KERNEL"
 
