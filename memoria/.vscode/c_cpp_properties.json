@@ -6,7 +6,8 @@
       "name": "Linux",
       "includePath": [
         "${workspaceFolder}/src",
-        "${workspaceFolder}/../utils/src"
+        "${workspaceFolder}/../utils/src",
+        "${workspaceFolder}/include/src"
       ],
       "defines": [],
       "compilerPath": "/usr/bin/gcc",

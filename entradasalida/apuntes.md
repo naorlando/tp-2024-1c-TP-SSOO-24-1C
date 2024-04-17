@@ -1,13 +1,18 @@
 # NOTAS tincho:
     -   cada modulo va a crear su propio logger.
-    -   cada modulo va a crear su propia conecciond e cliente si la necesita.
+    -   cada modulo va a crear su propia conexion de cliente si la necesita.
 
 ## logs:
- van cambiando de color:
+- van cambiando de color:
 log_info()
 log_warning()
 log_debug()
 log_trace()
+
+## CONSEJOS:
+- evitar referencia circular.
+- para ordenar y hacer prolijo el codeo: funciones STATIC: no visibles por el IDE, sirve para no sobre referenciar las cosas. En el archivo las STATIC van arriba de las funciones "normales". Y SE BORRAN LAS REFERENCIAS DEL .h .
+podemos lograr el mismo efecto empezando las funciones con un _ , esto trae la ventaja de poder ordernar el archivo como tengamos
 
 # codigo borrado:
 

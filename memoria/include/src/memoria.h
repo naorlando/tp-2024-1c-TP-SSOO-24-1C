@@ -11,4 +11,7 @@
 
 #define SERVERNAME "MEMORIA"
 
+int fd_server;
+int fd_entradasalida;
+
 #endif /*MEMORIA_H*/
