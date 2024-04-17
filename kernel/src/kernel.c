@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
     char *ip_cpu = string_itoa(kernel_config->IP_CPU);
     char *puerto_cpu_dispatch = string_itoa(kernel_config->PUERTO_CPU_DISPATCH);
-    crear_conexion(logger_kernel, "CPU", ip_cpu, puerto_cpu_dispatch)
+    crear_conexion(logger_kernel, "CPU", ip_cpu, puerto_cpu_dispatch);
 
         return EXIT_SUCCESS;
 }
