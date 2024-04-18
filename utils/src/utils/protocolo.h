@@ -45,6 +45,11 @@ typedef struct {
 } t_package;
 
 
+
+typedef struct {
+    t_msg_header        msg_header;     // Message header 
+    t_buffer*           buffer;         // Buffer
+} t_message_string;
 /*
  *  package functions
  */

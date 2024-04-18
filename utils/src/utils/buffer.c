@@ -59,51 +59,93 @@ t_buffer *recive_full_buffer(int socket)
     }
 }
 
-void *extract_data_from_buffer(t_buffer * buffer)
+// void *extract_data_from_buffer(t_buffer *buffer)
+// {
+//     if (buffer->stream == NULL)
+//     {
+//         printf("ERROR , buffer->stream");
+//         exit(EXIT_FAILURE);
+//     }
+//     if (buffer->size == 0)
+//     {
+//         printf("ERROR , buffer = 0");
+//         exit(EXIT_FAILURE);
+//         // log error
+//     }
+//     if (buffer->size < 0)
+//     {
+//         printf("ERROR , buffer < 0");
+//         // log another error
+//         exit(EXIT_FAILURE);
+//     }
+
+//     uint32_t size_full_buffer;
+//     memcpy(&size_full_buffer, buffer->stream, sizeof(uint32_t));
+
+//     void *full_buffer = malloc(size_full_buffer);
+
+//     if (size_full_buffer <= 0)
+//     {
+//         printf("ERROR , size_full_buffer");
+//         exit(EXIT_FAILURE);
+//     }
+
+//     memcpy(full_buffer, buffer->stream + sizeof(uint32_t), size_full_buffer);
+
+//      if (full_buffer != NULL)
+//     {
+//         uint32_t * f_B = full_buffer;
+//         printf("ERROR , full_buffer %ls \n",f_B);
+//         exit(EXIT_FAILURE);
+//     }
+
+//     uint32_t nuevo_size = buffer->size - sizeof(uint32_t) - size_full_buffer;
+//     if (nuevo_size == 0)
+//     {
+//         buffer->size = 0;
+//         free(buffer->stream);
+
+//         buffer->stream = NULL;
+//         return full_buffer;
+//     }
+//     if (nuevo_size < 0)
+//     {
+//         perror("\n[ERROR] BUFFER con tamaño negativo");
+//         exit(EXIT_FAILURE);
+//     }
+
+//     void *nuevo_stream = malloc(nuevo_size);
+
+//     memcpy(nuevo_stream, buffer->stream + sizeof(uint32_t) + size_full_buffer, nuevo_size);
+//     free(buffer->stream);
+
+//     buffer->size = nuevo_size;
+//     buffer->stream = nuevo_stream;
+
+//     return full_buffer;
+// }
+
+void *extract_data_from_buffer(t_buffer *buffer)
 {
-    if (buffer->size == 0)
-    {
-        printf("ERROR , buffer = 0")
-        exit(EXIT_FAILURE);
-        // log error
-    }
-    if (buffer->size < 0)
-    {
-        ("ERROR , buffer < 0")
-        // log another error
-        exit(EXIT_FAILURE);
-    }
 
-    int size_full_buffer;
-    memcpy(&size_full_buffer, buffer->stream, sizeof(int));
+    void * generico = malloc(sizeof(t_persona));
 
-    void * full_buffer = malloc(size_full_buffer);
-    memcpy(full_buffer, buffer->stream + sizeof(int), size_full_buffer);
+    void *stream = buffer->stream;
+    // Deserializamos los campos que tenemos en el buffer
+    memcpy(&(persona->dni), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    memcpy(&(persona->edad), stream, sizeof(uint8_t));
+    stream += sizeof(uint8_t);
+    memcpy(&(persona->pasaporte), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
 
-    int nuevo_size = buffer->size - sizeof(int) - size_full_buffer;
-    if (nuevo_size == 0)
-    {
-        buffer->size = 0;
-        free(buffer->stream);
+    // Por último, para obtener el nombre, primero recibimos el tamaño y luego el texto en sí:
+    memcpy(&(persona->nombre_length), stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    persona->nombre = malloc(persona->nombre_length);
+    memcpy(persona->nombre, stream, persona->nombre_length);
 
-        buffer->stream = NULL;
-        return full_buffer;
-    }
-    if (nuevo_size < 0)
-    {
-        perror("\n[ERROR] BUFFER con tamaño negativo");
-        exit(EXIT_FAILURE);
-    }
-
-    void *nuevo_stream = malloc(nuevo_size);
-
-    memcpy(nuevo_stream, buffer->stream + sizeof(int) + size_full_buffer, nuevo_size);
-    free(buffer->stream);
-
-    buffer->size = nuevo_size;
-    buffer->stream = nuevo_stream;
-
-    return full_buffer;
+    return persona;
 }
 
 char *extract_string_buffer(t_buffer *buffer)

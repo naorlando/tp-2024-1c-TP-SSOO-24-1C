@@ -20,9 +20,10 @@ void atender_cpu_kernel_dispatch()
             
             new_buffer = recive_full_buffer(fd_kernel_dispatch);
             printf("%.*s\n", new_buffer->size, (char *)new_buffer->stream);
-            //char * lcontent = extract_string_buffer(new_buffer); // error segmentation revisar
+            char * content = extract_string_buffer(new_buffer); // error segmentation revisar
             
-            //log_info(logger_cpu,content);
+            log_info(logger_cpu,">>CONTENT:%s",content);
+            free(content);
             // package_destroy(package);
             log_info(logger_cpu, "Se recibio un mje del KERNEL");
             break;
