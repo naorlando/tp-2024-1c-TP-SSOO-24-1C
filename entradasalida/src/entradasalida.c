@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     init();
     //Conexion como cliente a MEMORIA:
 
-    conexion_io_memoria = crear_conexion(logger_entradasalida,"MEMORIA",IP_MEMORIA, PUERTO_MEMORIA);
+    conexion_io_memoria = crear_conexion(logger_entradasalida,"MEMORIA", IP_MEMORIA, PUERTO_MEMORIA);
     
     if (conexion_io_memoria != -1) {
         log_info(logger_entradasalida,"CONEXION establecida con memoria");
