@@ -146,17 +146,16 @@ void liberar_conexion(int socket_cliente)
 }
 
 // Esto es parte del TP0 pero esta libreria solo se encarga de lo relacionado al socket
+void *recibir_buffer(int *size, int socket_cliente)
+{
+    void *buffer;
 
-// void *recibir_buffer(int *size, int socket_cliente)
-// {
-//     void *buffer;
+    recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
+    buffer = malloc(*size);
+    recv(socket_cliente, buffer, *size, MSG_WAITALL);
 
-//     recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
-//     buffer = malloc(*size);
-//     recv(socket_cliente, buffer, *size, MSG_WAITALL);
-
-//     return buffer;
-// }
+    return buffer;
+}
 
 void recibir_mensaje(t_log* logger, int socket_cliente)
 {
