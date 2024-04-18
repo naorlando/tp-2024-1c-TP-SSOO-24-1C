@@ -5,18 +5,31 @@ int main(int argc, char *argv[]) {
     
     // CONEXIONES: nos vamos a conectar a Memoria y a Kernel.
     int conexion_io_memoria;
-    
-    //Conexion como cliente a MEMORIA:
-    
 
     init();
+    //Conexion como cliente a MEMORIA:
 
-    conexion_io_memoria = crear_conexion(logger_entradasalida,"MEMORIA",IP_MEMORIA, PUERTO_MEMORIA);
-    log_info(logger_entradasalida,"Conexion establecida con memoria");
     
 
+    conexion_io_memoria = crear_conexion(logger_entradasalida,"MEMORIA",IP_MEMORIA, PUERTO_MEMORIA);
+    
+    if (conexion_io_memoria != -1) {
+        log_info(logger_entradasalida,"CONEXION establecida con memoria");
+    } else {
+        log_error(logger_entradasalida,"ERROR EN LA Conexion establecida con memoria");
+    }
+
+    // char *puerto_cpu_dispatch = string_itoa(kernel_config->PUERTO_CPU_DISPATCH);
+    // char *cpu_client = "CPU";
+    // int conexion = crear_conexion(logger_kernel, cpu_client, kernel_config->IP_CPU, puerto_cpu_dispatch);
+
     liberar_conexion(conexion_io_memoria);
-    log_info(logger_entradasalida,"libero memoria io");
+    if (conexion_io_memoria == -1) {
+        log_info(logger_entradasalida,"CONEXION LIBERADA con memoria");
+    } else {
+        log_error(logger_entradasalida,"ERROR EN LA LIBERACION de la conexion establecida con memoria");
+    }
+
     return EXIT_SUCCESS;
 }
 
