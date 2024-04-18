@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
+#include <utils/utils.h>
 #include <commons/string.h>
 #include <commons/config.h>
-
 
 typedef struct
 {
@@ -21,10 +22,10 @@ typedef struct
 
     // KERNEL
     char *ALGORITMO_PLANIFICACION;
-    uint16_t QUANTUM_RR;
-    char **DISPOSITIVOS_IO;
-    uint32_t *TIEMPOS_IO;
-    uint16_t GRADO_MAX_MULTIPROGRAMACION;
+    uint16_t QUANTUM;
+    char **RECURSOS;
+    uint32_t *INSTANCIAS_RECURSOS;
+    uint16_t GRADO_MULTIPROGRAMACION;
 
 } t_kernel_config;
 

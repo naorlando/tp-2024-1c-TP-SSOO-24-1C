@@ -84,13 +84,18 @@ int esperar_cliente(t_log *logger, const char *name, int socket_servidor)
     return socket_cliente;
 }
 
-int recibir_operacion(int socket_cliente)
+int recibir_operacion(t_log *logger, int socket_cliente)
 {
+
     int cod_op;
     if (recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
+    {
+
         return cod_op;
+    }
     else
     {
+        log_info(logger, "Hello from downtown 3");
         close(socket_cliente);
         return -1;
     }

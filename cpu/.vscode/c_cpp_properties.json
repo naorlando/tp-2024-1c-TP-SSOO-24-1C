@@ -7,7 +7,9 @@
       "includePath": [
         "${workspaceFolder}/src",
         "${workspaceFolder}/../utils/src",
-        "${workspaceFolder}/include/src"
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/../utils/src/utils"
+
       ],
       "defines": [],
       "compilerPath": "/usr/bin/gcc",
