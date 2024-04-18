@@ -35,7 +35,7 @@ void solicitudes_kernel(int fd_kernel, t_log* logger) {
         switch(cod_operacion){
             case MENSAJE:
                 // Se procesa el request
-                recibir_mensaje(logger, fd_cpu);
+                recibir_mensaje(logger, fd_kernel);
             break;
             //TODO:
             /*
@@ -61,7 +61,7 @@ void solicitudes_entradasalida(int fd_entradasalida, t_log* logger) {
         switch(cod_operacion){
             case MENSAJE:
                 // Se procesa el request
-                recibir_mensaje(logger, fd_cpu);
+                recibir_mensaje(logger, fd_entradasalida);
             break;
             //TODO:
             /*
