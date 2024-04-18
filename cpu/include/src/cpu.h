@@ -13,6 +13,8 @@
 #include "utils/sockets.h"
 
 
+#define SERVERNAME "CPU"
+
 /* incluir .h files del cpu*/
 
 #include "cpu_config.h"

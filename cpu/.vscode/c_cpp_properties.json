@@ -7,8 +7,7 @@
       "includePath": [
         "${workspaceFolder}/src",
         "${workspaceFolder}/../utils/src",
-        "${workspaceFolder}/include",
-        "${workspaceFolder}/../utils/src/utils"
+        "${workspaceFolder}/include"
 
       ],
       "defines": [],

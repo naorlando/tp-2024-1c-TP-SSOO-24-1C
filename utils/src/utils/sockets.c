@@ -77,8 +77,9 @@ int esperar_cliente(t_log *logger, const char *name, int socket_servidor)
     socklen_t tam_direccion = sizeof(struct sockaddr_in);
 
     // Aceptamos un nuevo cliente
-    int socket_cliente = accept(socket_servidor, NULL, NULL);
-    log_info(logger, "Se conecto un cliente!");
+    int socket_cliente = accept(socket_servidor, (void *)&dir_cliente, &tam_direccion);
+
+    log_info(logger, "Cliente (%s:%d) conectado a %s", inet_ntoa(dir_cliente.sin_addr), dir_cliente.sin_port, name);
 
     return socket_cliente;
 }
@@ -150,25 +151,24 @@ void liberar_conexion(int socket_cliente)
 }
 
 // Esto es parte del TP0 pero esta libreria solo se encarga de lo relacionado al socket
+void *recibir_buffer(int *size, int socket_cliente)
+{
+    void *buffer;
 
-// void *recibir_buffer(int *size, int socket_cliente)
-// {
-//     void *buffer;
+    recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
+    buffer = malloc(*size);
+    recv(socket_cliente, buffer, *size, MSG_WAITALL);
 
-//     recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
-//     buffer = malloc(*size);
-//     recv(socket_cliente, buffer, *size, MSG_WAITALL);
+    return buffer;
+}
 
-//     return buffer;
-// }
-
-// void recibir_mensaje(int socket_cliente)
-// {
-//     int size;
-//     char *buffer = recibir_buffer(&size, socket_cliente);
-//     log_info(logger, "Me llego el mensaje: %s", buffer);
-//     free(buffer);
-// }
+void recibir_mensaje(t_log* logger, int socket_cliente)
+{
+    int size;
+    char *buffer = recibir_buffer(&size, socket_cliente);
+    log_info(logger, "Me llego el mensaje: %s", buffer);
+    free(buffer);
+}
 
 // t_list *recibir_paquete(int socket_cliente)
 // {
