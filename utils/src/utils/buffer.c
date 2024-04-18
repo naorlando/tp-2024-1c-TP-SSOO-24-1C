@@ -63,13 +63,13 @@ void *extract_data_from_buffer(t_buffer * buffer)
 {
     if (buffer->size == 0)
     {
-        printf("ERROR , buffer = 0")
+        printf("ERROR , buffer = 0");
         exit(EXIT_FAILURE);
         // log error
     }
     if (buffer->size < 0)
     {
-        ("ERROR , buffer < 0")
+        ("ERROR , buffer < 0");
         // log another error
         exit(EXIT_FAILURE);
     }

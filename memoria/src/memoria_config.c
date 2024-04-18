@@ -1,4 +1,5 @@
 #include "memoria_config.h"
+#include <stdbool.h>
 
 t_memoria_config* crear_memoria_config(){
     t_memoria_config* mc = malloc(sizeof(t_memoria_config));

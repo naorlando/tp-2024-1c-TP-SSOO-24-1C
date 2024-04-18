@@ -42,7 +42,14 @@ void _iniciar_config(){
         log_error(logger_memoria, "Error al crear la estructura t_memoria_config");
     }
 
-    cargar_memoria_config(memoria_config, config_memoria);
+    bool cargo = cargar_memoria_config(memoria_config, config_memoria);
+
+    // chequeo si el segmentation fault es por la carga del config de memoria
+    if(!cargo){
+        log_error(logger_memoria, "Error al cargar memoria config");
+    }else{
+        log_info(logger_memoria, "Se cargo correctamente MEMORIA.CONFIG");
+    }
 }
 
 void imprimir_config() {
