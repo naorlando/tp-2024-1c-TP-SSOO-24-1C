@@ -8,6 +8,7 @@
 #include <commons/string.h>
 #include <utils/sockets.h>
 #include "inicializar_memoria.h"
+#include "procesar_solicitudes.h"
 
 #define SERVERNAME "MEMORIA"
 
