@@ -4,12 +4,9 @@
 int main(int argc, char *argv[]) {
     
     // CONEXIONES: nos vamos a conectar a Memoria y a Kernel.
-    int conexion_io_memoria;
 
     init();
     //Conexion como cliente a MEMORIA:
-
-    
 
     conexion_io_memoria = crear_conexion(logger_entradasalida,"MEMORIA",IP_MEMORIA, PUERTO_MEMORIA);
     

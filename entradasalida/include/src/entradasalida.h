@@ -18,6 +18,7 @@
  VARIABLES GLOBALES: ir agregando al gesto_entradasalida.h
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 */
+int conexion_io_memoria;
 int conexion_io_kernel;
 int fd_entradasalida;
 int fd_memoria;

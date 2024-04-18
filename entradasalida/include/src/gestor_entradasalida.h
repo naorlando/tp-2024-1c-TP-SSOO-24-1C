@@ -13,6 +13,7 @@
 // Aca agregamos las variables globales.
 
 // VARIABLES GLOBALES:
+extern int conexion_io_memoria;
 extern int conexion_io_kernel;
 extern int fd_entradasalida;
 extern int fd_memoria;
