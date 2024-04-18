@@ -14,14 +14,10 @@ int main(void){
         log_error(logger_memoria, "Error al iniciar %s server en puerto %s", SERVERNAME, server_port);
     }
 
-    // escucha para entradaSalida:
+    // ############## Espera de Clientes ###################
+    int fd_cliente = esperar_cliente(logger_memoria, NULL, fd_server);
 
-
-    esperar_cliente(logger_memoria, "MEMORIA", fd_server);
-    
-    log_info(logger_memoria,"Conexion establecida con io");
-
-
+    liberar_conexion(fd_cliente);
 
     free(server_port);
     log_info(logger_memoria,"server liberado");
