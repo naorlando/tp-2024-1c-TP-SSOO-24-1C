@@ -8,7 +8,7 @@ void atender_cpu_kernel_dispatch()
     bool control_key = 1;
     while (control_key)
     {
-        int cod_op = recibir_operacion(logger_cpu, fd_kernel_dispatch);
+        int cod_op = recibir_operacion(fd_kernel_dispatch);
         // log_info(logger_cpu, string_itoa(cod_op));
         // t_package *package = package_create(NULL_HEADER);
         // package_recv(package, fd_kernel_dispatch);

@@ -84,7 +84,7 @@ int esperar_cliente(t_log *logger, const char *name, int socket_servidor)
     return socket_cliente;
 }
 
-int recibir_operacion(t_log *logger, int socket_cliente)
+int recibir_operacion(int socket_cliente)
 {
 
     int cod_op;
@@ -95,7 +95,7 @@ int recibir_operacion(t_log *logger, int socket_cliente)
     }
     else
     {
-        log_info(logger, "Hello from downtown 3");
+    
         close(socket_cliente);
         return -1;
     }
