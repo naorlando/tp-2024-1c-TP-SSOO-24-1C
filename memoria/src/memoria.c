@@ -15,10 +15,18 @@ int main(void){
     }
 
     // ############## Espera de Clientes ###################
-    int fd_cliente = esperar_cliente(logger_memoria, NULL, fd_server);
+    // Espera conexion del Kernel
+    int fd_kernel = esperar_cliente(logger_memoria, NULL, fd_server);
+    
+    // Espera conexion de la CPU
+    int fd_cpu = esperar_cliente(logger_memoria, NULL, fd_server);
 
-    liberar_conexion(fd_cliente);
+    // Espera conexion de la Interfaz I/O
+    int fd_entradasalida = esperar_cliente(logger_memoria, NULL, fd_server);
 
+    liberar_conexion(fd_kernel);
+    liberar_conexion(fd_cpu);
+    liberar_conexion(fd_entradasalida);
     free(server_port);
 
     return EXIT_SUCCESS;
