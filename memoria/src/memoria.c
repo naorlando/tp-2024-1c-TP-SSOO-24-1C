@@ -6,7 +6,7 @@ int main(void){
     // ############## Socket ###################
 
     char* server_port = string_itoa(memoria_config->PUERTO_ESCUCHA);
-    fd_server = iniciar_servidor(logger_memoria, SERVERNAME, NULL, server_port);
+    fd_server = iniciar_servidor(logger_memoria, NULL, NULL, server_port);
 
     if (fd_server != -1) {
         log_info(logger_memoria, "%s server listo escuchando en puerto %s", SERVERNAME, server_port);
@@ -15,12 +15,16 @@ int main(void){
     }
 
     // escucha para entradaSalida:
-    log_info(logger_memoria, "esperando EntradaSalida...");
 
-    fd_entradasalida = esperar_cliente(logger_memoria, SERVERNAME, fd_server);
+
+    esperar_cliente(logger_memoria, "MEMORIA", fd_server);
+    
+    log_info(logger_memoria,"Conexion establecida con io");
+
 
 
     free(server_port);
+    log_info(logger_memoria,"server liberado");
 
     return EXIT_SUCCESS;
 }

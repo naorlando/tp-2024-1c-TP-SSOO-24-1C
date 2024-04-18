@@ -12,9 +12,11 @@ int main(int argc, char *argv[]) {
     init();
 
     conexion_io_memoria = crear_conexion(logger_entradasalida,"MEMORIA",IP_MEMORIA, PUERTO_MEMORIA);
+    log_info(logger_entradasalida,"Conexion establecida con memoria");
     
 
     liberar_conexion(conexion_io_memoria);
+    log_info(logger_entradasalida,"libero memoria io");
     return EXIT_SUCCESS;
 }
 
