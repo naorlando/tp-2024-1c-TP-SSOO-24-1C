@@ -19,11 +19,12 @@ int main(void)
     }
 
     // ############## Espera de Clientes ###################
-    // Espera conexion del Kernel
-    int fd_kernel = esperar_cliente(logger_memoria, "KERNEL", fd_server);
 
     // Espera conexion de la CPU
-    int fd_cpu = esperar_cliente(logger_memoria, "CPU", fd_server);
+    fd_cpu = esperar_cliente(logger_memoria, "CPU", fd_server);
+
+    // Espera conexion del Kernel
+    int fd_kernel = esperar_cliente(logger_memoria, "KERNEL", fd_server);
 
     // Espera conexion de la Interfaz I/O
     int fd_entradasalida = esperar_cliente(logger_memoria, "Interfaces de I/O", fd_server);
@@ -39,7 +40,7 @@ int main(void)
     // solicitudes_entradasalida(fd_entradasalida, logger_memoria);
 
     pthread_t hilo_keep_alive;
-    pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, NULL);
+    pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, logger_memoria);
     // pthread_detach(hilo_kernel_dispatch);
     pthread_join(hilo_keep_alive, NULL);
 
