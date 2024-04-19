@@ -10,23 +10,20 @@ int main(int argc, char *argv[]) {
     
     conexion_io_memoria = crear_conexion(logger_entradasalida,"MEMORIA",IP_MEMORIA, PUERTO_MEMORIA);
     
-    if (conexion_io_memoria != -1) {
-        log_info(logger_entradasalida,"CONEXION establecida con memoria");
-    } else {
-        log_error(logger_entradasalida,"ERROR EN LA Conexion establecida con memoria");
-    }
+    // if (conexion_io_memoria != -1) {
+    //     log_info(logger_entradasalida,"CONEXION establecida con memoria");
+    // } else {
+    //     log_error(logger_entradasalida,"ERROR EN LA Conexion establecida con memoria");
+    // }
 
-    // char *puerto_cpu_dispatch = string_itoa(kernel_config->PUERTO_CPU_DISPATCH);
-    // char *cpu_client = "CPU";
-    // int conexion = crear_conexion(logger_kernel, cpu_client, kernel_config->IP_CPU, puerto_cpu_dispatch);
 
-    conexion_io_memoria = crear_conexion(logger_entradasalida,"KERNEL",IP_KERNEL, PUERTO_KERNEL);
+    // conexion_io_memoria = crear_conexion(logger_entradasalida,"KERNEL",IP_KERNEL, PUERTO_KERNEL);
     
-    if (conexion_io_memoria != -1) {
-        log_info(logger_entradasalida,"CONEXION establecida con kernel");
-    } else {
-        log_error(logger_entradasalida,"ERROR EN LA Conexion establecida con kernel");
-    }
+    // if (conexion_io_memoria != -1) {
+    //     log_info(logger_entradasalida,"CONEXION establecida con kernel");
+    // } else {
+    //     log_error(logger_entradasalida,"ERROR EN LA Conexion establecida con kernel");
+    // }
  
     return EXIT_SUCCESS;
 }

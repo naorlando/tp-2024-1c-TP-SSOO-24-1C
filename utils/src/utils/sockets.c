@@ -79,7 +79,8 @@ int esperar_cliente(t_log *logger, const char *name, int socket_servidor)
     // Aceptamos un nuevo cliente
     int socket_cliente = accept(socket_servidor, (void *)&dir_cliente, &tam_direccion);
 
-    log_info(logger, "Cliente (%s:%d) conectado a %s", inet_ntoa(dir_cliente.sin_addr), dir_cliente.sin_port, name);
+    //log_info(logger, "Cliente (%s:%d) conectado a %s", inet_ntoa(dir_cliente.sin_addr), dir_cliente.sin_port, name);
+    log_info(logger, "cliente conectado");
 
     return socket_cliente;
 }

@@ -65,8 +65,6 @@ void _iniciar_config() {
 }
 
 void _imprimir_config() {    
-    log_info(logger_entradasalida, "TIPO_INTERFAZ: %s", TIPO_INTERFAZ);
-    log_debug(logger_entradasalida_debug, "tiempo de unidad de trabajo: %d", TIEMPO_UNIDAD_TRABAJO);
-    log_trace(logger_entradasalida_debug, "PUERTO_MEMORIA : %s", PUERTO_MEMORIA);
+    log_info(logger_entradasalida, "Entrada/salida inicializado");
 }
 
