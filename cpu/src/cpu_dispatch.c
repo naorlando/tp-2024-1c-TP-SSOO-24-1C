@@ -37,11 +37,12 @@ void atender_cpu_kernel_dispatch()
             //package_recv(package, fd_kernel_dispatch);
             new_buffer = recive_full_buffer(fd_kernel_dispatch);
             printf("%.*s\n", new_buffer->size, (char *)new_buffer->stream);
-            //example_deserialize_msg(new_buffer, new_msg);
+            example_deserialize_msg(new_buffer, new_msg);
             
-            //log_info(logger_cpu, "%s", new_msg->cadena);
-            //  free(new_msg->cadena);
-            //  free(new_msg);
+            log_info(logger_cpu, "%s", new_msg->cadena);
+            log_info(logger_cpu, "%d", new_msg->entero);
+             free(new_msg->cadena);
+             free(new_msg);
             buffer_destroy(new_buffer);
             package_destroy(package);
             break;

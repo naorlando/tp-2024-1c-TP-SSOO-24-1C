@@ -52,7 +52,7 @@ typedef struct
 typedef struct
 {
     char *cadena;   
-    uint32_t entero; 
+    uint8_t entero; 
 } t_message_example;
 /*
  *  package functions
