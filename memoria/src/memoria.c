@@ -21,6 +21,7 @@ int main(void){
     
     log_info(logger_memoria,"Conexion establecida con io");
 
+    while (1) {}
 
 
     free(server_port);
