@@ -85,7 +85,7 @@ int esperar_cliente(t_log *logger, const char *name, int socket_servidor)
     return socket_cliente;
 }
 
-int recibir_operacion(t_log *logger, int socket_cliente)
+int recibir_operacion(int socket_cliente)
 {
 
     int cod_op;
@@ -96,7 +96,7 @@ int recibir_operacion(t_log *logger, int socket_cliente)
     }
     else
     {
-        log_info(logger, "Hello from downtown 3");
+    
         close(socket_cliente);
         return -1;
     }
@@ -152,25 +152,24 @@ void liberar_conexion(int socket_cliente)
 }
 
 // Esto es parte del TP0 pero esta libreria solo se encarga de lo relacionado al socket
+void *recibir_buffer(int *size, int socket_cliente)
+{
+    void *buffer;
 
-// void *recibir_buffer(int *size, int socket_cliente)
-// {
-//     void *buffer;
+    recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
+    buffer = malloc(*size);
+    recv(socket_cliente, buffer, *size, MSG_WAITALL);
 
-//     recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
-//     buffer = malloc(*size);
-//     recv(socket_cliente, buffer, *size, MSG_WAITALL);
+    return buffer;
+}
 
-//     return buffer;
-// }
-
-// void recibir_mensaje(int socket_cliente)
-// {
-//     int size;
-//     char *buffer = recibir_buffer(&size, socket_cliente);
-//     log_info(logger, "Me llego el mensaje: %s", buffer);
-//     free(buffer);
-// }
+void recibir_mensaje(t_log* logger, int socket_cliente)
+{
+    int size;
+    char *buffer = recibir_buffer(&size, socket_cliente);
+    log_info(logger, "Me llego el mensaje: %s", buffer);
+    free(buffer);
+}
 
 // t_list *recibir_paquete(int socket_cliente)
 // {

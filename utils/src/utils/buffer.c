@@ -59,8 +59,13 @@ t_buffer *recive_full_buffer(int socket)
     }
 }
 
-void *extract_data_from_buffer(t_buffer * buffer)
+void *extract_data_from_buffer(t_buffer *buffer)
 {
+    if (buffer->stream == NULL)
+    {
+        printf("ERROR , buffer->stream");
+        exit(EXIT_FAILURE);
+    }
     if (buffer->size == 0)
     {
         printf("ERROR , buffer = 0");
@@ -69,18 +74,32 @@ void *extract_data_from_buffer(t_buffer * buffer)
     }
     if (buffer->size < 0)
     {
-        ("ERROR , buffer < 0");
+        printf("ERROR , buffer < 0");
         // log another error
         exit(EXIT_FAILURE);
     }
 
-    int size_full_buffer;
-    memcpy(&size_full_buffer, buffer->stream, sizeof(int));
+    uint32_t size_full_buffer;
+    memcpy(&size_full_buffer, buffer->stream, sizeof(uint32_t));
 
-    void * full_buffer = malloc(size_full_buffer);
-    memcpy(full_buffer, buffer->stream + sizeof(int), size_full_buffer);
+    void *full_buffer = malloc(size_full_buffer);
 
-    int nuevo_size = buffer->size - sizeof(int) - size_full_buffer;
+    if (size_full_buffer <= 0)
+    {
+        printf("ERROR , size_full_buffer");
+        exit(EXIT_FAILURE);
+    }
+
+    memcpy(full_buffer, buffer->stream + sizeof(uint32_t), size_full_buffer);
+
+     if (full_buffer != NULL)
+    {
+        uint32_t * f_B = full_buffer;
+        printf("ERROR , full_buffer %ls \n",f_B);
+        exit(EXIT_FAILURE);
+    }
+
+    uint32_t nuevo_size = buffer->size - sizeof(uint32_t) - size_full_buffer;
     if (nuevo_size == 0)
     {
         buffer->size = 0;
@@ -97,7 +116,7 @@ void *extract_data_from_buffer(t_buffer * buffer)
 
     void *nuevo_stream = malloc(nuevo_size);
 
-    memcpy(nuevo_stream, buffer->stream + sizeof(int) + size_full_buffer, nuevo_size);
+    memcpy(nuevo_stream, buffer->stream + sizeof(uint32_t) + size_full_buffer, nuevo_size);
     free(buffer->stream);
 
     buffer->size = nuevo_size;
@@ -105,6 +124,7 @@ void *extract_data_from_buffer(t_buffer * buffer)
 
     return full_buffer;
 }
+
 
 char *extract_string_buffer(t_buffer *buffer)
 {

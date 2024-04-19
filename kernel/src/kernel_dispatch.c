@@ -6,7 +6,7 @@ void atender_kernel_cpu_dispatch(){
         bool control_key = 1;
     while (control_key)
     {
-        int cod_op = recibir_operacion(logger_kernel, fd_cpu_dispatch);
+        int cod_op = recibir_operacion(fd_cpu_dispatch);
         t_package *package = package_create(NULL_HEADER);
         package_recv(package, fd_cpu_dispatch);
 
