@@ -12,7 +12,7 @@ void atender_cpu_kernel_dispatch()
         // log_info(logger_cpu, string_itoa(cod_op));
 
         // package_recv(package, fd_kernel_dispatch);
-        t_buffer *new_buffer = malloc(sizeof(t_buffer));
+        t_buffer *new_buffer ;//malloc(sizeof(t_buffer));
 
         switch (cod_op)
         {
@@ -36,12 +36,12 @@ void atender_cpu_kernel_dispatch()
             t_message_example * new_msg = malloc(sizeof(t_message_example));
             //package_recv(package, fd_kernel_dispatch);
             new_buffer = recive_full_buffer(fd_kernel_dispatch);
-            //printf("%.*s\n", new_buffer->size, (char *)new_buffer->stream);
-            example_deserialize_msg(new_buffer, new_msg);
+            printf("%.*s\n", new_buffer->size, (char *)new_buffer->stream);
+            //example_deserialize_msg(new_buffer, new_msg);
             
-            log_info(logger_cpu, "%s", new_msg->cadena);
-             free(new_msg->cadena);
-             free(new_msg);
+            //log_info(logger_cpu, "%s", new_msg->cadena);
+            //  free(new_msg->cadena);
+            //  free(new_msg);
             buffer_destroy(new_buffer);
             package_destroy(package);
             break;

@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
     // ###########################
 
-    fd_cpu_dispatch = esperar_cliente(logger_kernel, "CPU", fd_server);
+ 
 
     pthread_t hilo_cpu_dispatch;
     pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_cpu_dispatch, NULL);
