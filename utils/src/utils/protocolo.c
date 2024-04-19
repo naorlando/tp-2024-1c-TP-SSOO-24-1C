@@ -127,14 +127,14 @@ void example_serialize_msg(t_buffer *buffer, t_message_example *msg)
     buffer->size = sizeof(uint8_t) * 2 + size_cadena ;
     buffer->stream = malloc(buffer->size);
     void *stream = malloc(buffer->size);
-    uint32_t offset = 0;
+    uint8_t offset = 0;
     // Serialize the message content into the buffer
     // void *stream_ptr = malloc(total_size);
     memcpy(stream, &size_cadena, sizeof(uint8_t));
     offset += sizeof(uint8_t);
     memcpy(stream + offset, msg->cadena, size_cadena);
-    offset += sizeof(uint8_t);
-    memcpy(stream + offset, &(msg->entero), sizeof(msg->entero));
+    offset += size_cadena;
+    memcpy(stream + offset, &(msg->entero), sizeof(uint8_t));
     offset += sizeof(uint8_t);
 
     // Update buffer size with the actual serialized data size
