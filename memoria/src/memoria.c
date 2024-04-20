@@ -21,37 +21,33 @@ int main(void)
     // ############## Espera de Clientes ###################
 
     // Espera conexion de la CPU
-    //fd_cpu = esperar_cliente(logger_memoria, CLIENTE_CPU, fd_server);
+    fd_cpu = esperar_cliente(logger_memoria, CLIENTE_CPU, fd_server);
 
     // Espera conexion del Kernel
     fd_kernel = esperar_cliente(logger_memoria, CLIENTE_KERNEL, fd_server);
 
     // Espera conexion de la Interfaz I/O
-    //fd_entradasalida = esperar_cliente(logger_memoria, CLIENTE_ENTRADASALIDA, fd_server);
+    fd_entradasalida = esperar_cliente(logger_memoria, CLIENTE_ENTRADASALIDA, fd_server);
 
     // ############## Escucha de Mensajes ###################
     // Escucha de mensaje Kernel
-    // solicitudes_kernel(fd_kernel, logger_memoria);
+    requests_kernel();
 
-    // // Escucha de mensaje CPU
-    // solicitudes_cpu(fd_cpu, logger_memoria);
+    // Escucha de mensaje CPU
+    requests_cpu();
 
-    // // Escucha de mensaje EntradaSalida
-    // solicitudes_entradasalida(fd_entradasalida, logger_memoria);
+    // Escucha de mensaje EntradaSalida
+    requests_entradasalida();
 
     //pthread_t hilo_keep_alive;
     //pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, NULL);
     // pthread_detach(hilo_kernel_dispatch);
     //pthread_join(hilo_keep_alive, NULL);
 
-    //solicitudes_cpu();
-
-    solicitudes_kernel();
-
     // Libero recursos
     liberar_conexion(fd_kernel);
-    //liberar_conexion(fd_cpu);
-    //liberar_conexion(fd_entradasalida);
+    liberar_conexion(fd_cpu);
+    liberar_conexion(fd_entradasalida);
 
     free(server_port);
 
