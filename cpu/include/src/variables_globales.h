@@ -11,7 +11,7 @@
 #define CLIENTE_KERNEL "CLIENTE KERNEL"
 
 // VARIABLES GLOBALES
-extern t_log *cpu_kernel;
+extern t_log *logger_cpu;
 extern t_log *cpu_kernel_debug;
 
 // CONFIG

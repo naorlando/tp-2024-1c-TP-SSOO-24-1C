@@ -5,5 +5,6 @@
 #include <variables_globales.h>
 
 int send_example_memoria();
+void atender_cpu_kernel_dispatch();
 
 #endif
