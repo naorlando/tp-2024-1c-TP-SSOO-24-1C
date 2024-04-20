@@ -11,9 +11,4 @@
 #include "inicializar_memoria.h"
 #include "procesar_solicitudes.h"
 
-#define SERVERNAME "MEMORIA"
-
-int fd_server;
-int fd_entradasalida;
-
 #endif /*MEMORIA_H*/
