@@ -16,7 +16,7 @@ void requests_cpu() {
             /*
                 Agregar operaciones a las que dara servicio el modulo
             */ 
-            case ERROR:
+            case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
                 esperar = false; //Cortamos la espera de solicitudes
             break;
@@ -43,7 +43,7 @@ void requests_kernel() {
             /*
                 Agregar operaciones a las que dara servicio el modulo
             */ 
-            case ERROR:
+            case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
                 esperar = false; //Cortamos la espera de solicitudes
             break;
@@ -70,7 +70,7 @@ void requests_entradasalida() {
             /*
                 Agregar operaciones a las que dara servicio el modulo
             */ 
-            case ERROR:
+            case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
                 esperar = false; //Cortamos la espera de solicitudes
             break;
