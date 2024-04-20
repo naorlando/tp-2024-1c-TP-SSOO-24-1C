@@ -1,6 +1,6 @@
 #include "procesar_solicitudes.h"
 
-void solicitudes_cpu(t_log* logger) {
+void solicitudes_cpu() {
     bool esperar = true;
 
     while(esperar) {
@@ -26,7 +26,7 @@ void solicitudes_cpu(t_log* logger) {
     }
 }
 
-void solicitudes_kernel(int fd_kernel, t_log* logger) {
+void solicitudes_kernel() {
     bool esperar = true;
 
     while(esperar) {
@@ -52,7 +52,7 @@ void solicitudes_kernel(int fd_kernel, t_log* logger) {
     }
 }
 
-void solicitudes_entradasalida(int fd_entradasalida, t_log* logger) {
+void solicitudes_entradasalida() {
     bool esperar = true;
 
     while(esperar) {
