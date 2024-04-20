@@ -7,9 +7,9 @@ void requests_cpu() {
         int cod_operacion = recibir_operacion(fd_cpu);
 
         switch(cod_operacion){
-            case MENSAJE:
+            case EXAMPLE:
                 // Se procesa el request
-                recibir_mensaje(logger_memoria, fd_cpu);
+                recv_example_msg_cpu();
             break;
             //TODO:
             /*
@@ -33,9 +33,9 @@ void requests_kernel() {
         int cod_operacion = recibir_operacion(fd_kernel);
 
         switch(cod_operacion){
-            case MENSAJE:
+            case EXAMPLE:
                 // Se procesa el request
-                recibir_mensaje(logger_memoria, fd_kernel);
+                recv_example_msg_kernel();
             break;
             //TODO:
             /*
@@ -59,9 +59,9 @@ void requests_entradasalida() {
         int cod_operacion = recibir_operacion(fd_entradasalida);
 
         switch(cod_operacion){
-            case MENSAJE:
+            case EXAMPLE:
                 // Se procesa el request
-                recibir_mensaje(logger_memoria, fd_entradasalida);
+                recv_example_msg_entradasalida();
             break;
             //TODO:
             /*
