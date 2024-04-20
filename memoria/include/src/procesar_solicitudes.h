@@ -9,10 +9,10 @@
 #define MENSAJE 0
 #define ERROR -1
 
-void solicitudes_cpu(t_log *);
+void solicitudes_cpu();
 
-void solicitudes_kernel(int, t_log *);
+void solicitudes_kernel();
 
-void solicitudes_entradasalida(int, t_log *);
+void solicitudes_entradasalida();
 
 #endif
