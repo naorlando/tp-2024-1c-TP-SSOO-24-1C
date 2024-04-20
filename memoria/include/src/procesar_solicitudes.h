@@ -3,6 +3,7 @@
 
 #include <commons/log.h>
 #include <utils/sockets.h>
+#include "variables_globales.h"
 
 // Agrego DEFINES que despues voy a eliminar
 #define MENSAJE 0
