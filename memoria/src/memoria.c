@@ -46,8 +46,8 @@ int main(void)
 
     // Libero recursos
     liberar_conexion(fd_kernel);
-    //liberar_conexion(fd_cpu);
-    //liberar_conexion(fd_entradasalida);
+    liberar_conexion(fd_cpu);
+    liberar_conexion(fd_entradasalida);
 
     free(server_port);
 
