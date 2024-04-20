@@ -24,21 +24,23 @@ int main(int argc, char *argv[])
     }
 
     // Conectamos CPU -> Memoria
-    char *memoria_client = "MEMORIA";
+
     char *puerto_memoria = string_itoa(cpu_config->PUERTO_MEMORIA);
-    int conexion_memoria = crear_conexion(logger_cpu, memoria_client, cpu_config->IP_MEMORIA, puerto_memoria);
+    fd_memoria = crear_conexion(logger_cpu, SERVER_MEMORIA, cpu_config->IP_MEMORIA, puerto_memoria);
+    fd_memoria > 0 ? send_example_memoria() : log_error(logger_cpu, "Error al intentar enviar mensaje a %s", SERVER_MEMORIA);
 
     // Esperamos al Kernel
-    fd_kernel_dispatch = esperar_cliente(logger_cpu, "KERNEL", fd_server);
+    fd_kernel_dispatch = esperar_cliente(logger_cpu, CLIENTE_KERNEL, fd_server);
 
     // Atendemos mensaje del Kernel
     pthread_t hilo_kernel_dispatch;
     pthread_create(&hilo_kernel_dispatch, NULL, (void *)atender_cpu_kernel_dispatch, NULL);
-    // pthread_detach(hilo_kernel_dispatch);
     pthread_join(hilo_kernel_dispatch, NULL);
-    // atender_cpu_kernel_interrupt(logger_cpu);
 
-    // free(server_port);
+    free(server_port);
+    liberar_conexion(fd_server);
+    liberar_conexion(fd_memoria);
+    liberar_conexion(fd_kernel_dispatch);    
 
-    // return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

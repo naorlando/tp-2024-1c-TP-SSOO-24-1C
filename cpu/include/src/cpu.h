@@ -9,7 +9,7 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
-
+#include <protocolo_cpu.h>
 #include "utils/sockets.h"
 
 
