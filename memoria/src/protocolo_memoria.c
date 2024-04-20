@@ -10,6 +10,7 @@ void requests_cpu() {
             case EXAMPLE:
                 // Se procesa el request
                 recv_example_msg_cpu();
+                esperar = false; //Cortamos la espera de solicitudes
             break;
             //TODO:
             /*
@@ -36,6 +37,7 @@ void requests_kernel() {
             case EXAMPLE:
                 // Se procesa el request
                 recv_example_msg_kernel();
+                esperar = false; //Cortamos la espera de solicitudes
             break;
             //TODO:
             /*
@@ -62,6 +64,7 @@ void requests_entradasalida() {
             case EXAMPLE:
                 // Se procesa el request
                 recv_example_msg_entradasalida();
+                esperar = false; //Cortamos la espera de solicitudes
             break;
             //TODO:
             /*
@@ -79,10 +82,8 @@ void requests_entradasalida() {
 }
 
 int recv_example_msg_cpu(){
-    log_info(logger_memoria, "<<<<< EXAMPLE >>>>");
-    t_package *package = package_create(NULL_HEADER);
+    log_info(logger_memoria, "<<<<< EXAMPLE RECIVE MESSAGE FROM CPU>>>>");
     t_message_example * new_msg = malloc(sizeof(t_message_example));
-    //package_recv(package, fd_kernel_dispatch);
     t_buffer* new_buffer = recive_full_buffer(fd_cpu);
 
     example_deserialize_msg(new_buffer, new_msg);
@@ -92,16 +93,13 @@ int recv_example_msg_cpu(){
     free(new_msg->cadena);
     free(new_msg);
     buffer_destroy(new_buffer);
-    package_destroy(package);
 
     return 0;
 }
 
 int recv_example_msg_kernel(){
-    log_info(logger_memoria, "<<<<< EXAMPLE >>>>");
-    t_package *package = package_create(NULL_HEADER);
+    log_info(logger_memoria, "<<<<< EXAMPLE RECIVE MESSAGE FROM KERNEL>>>>");
     t_message_example * new_msg = malloc(sizeof(t_message_example));
-    //package_recv(package, fd_kernel_dispatch);
     t_buffer* new_buffer = recive_full_buffer(fd_kernel);
 
     example_deserialize_msg(new_buffer, new_msg);
@@ -111,16 +109,13 @@ int recv_example_msg_kernel(){
     free(new_msg->cadena);
     free(new_msg);
     buffer_destroy(new_buffer);
-    package_destroy(package);
 
     return 0;
 }
 
 int recv_example_msg_entradasalida(){
-    log_info(logger_memoria, "<<<<< EXAMPLE >>>>");
-    t_package *package = package_create(NULL_HEADER);
+    log_info(logger_memoria, "<<<<< EXAMPLE RECIVE MESSAGE FROM ENTRADASALIDA>>>>");
     t_message_example * new_msg = malloc(sizeof(t_message_example));
-    //package_recv(package, fd_kernel_dispatch);
     t_buffer* new_buffer = recive_full_buffer(fd_entradasalida);
 
     example_deserialize_msg(new_buffer, new_msg);
@@ -130,7 +125,6 @@ int recv_example_msg_entradasalida(){
     free(new_msg->cadena);
     free(new_msg);
     buffer_destroy(new_buffer);
-    package_destroy(package);
 
     return 0;
 }
