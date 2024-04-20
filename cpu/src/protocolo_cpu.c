@@ -37,7 +37,7 @@ int send_example_memoria()
     char *cadena = "CPU ENVIO MENSAJE A MEMORIA";
     example->cadena = malloc(strlen(cadena) + 1);
     strcpy(example->cadena, cadena);
-    example->entero = 8;
+    example->entero = 10;
 
     example_serialize_msg(package_example->buffer, example);
 
