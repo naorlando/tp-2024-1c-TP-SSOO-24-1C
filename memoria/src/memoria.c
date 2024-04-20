@@ -28,14 +28,13 @@ int main(void)
     requests_kernel();
     // Espera conexion de la Interfaz I/O
     fd_entradasalida = esperar_cliente(logger_memoria, CLIENTE_ENTRADASALIDA, fd_server);
-
+    requests_entradasalida();
     // ############## Escucha de Mensajes ###################
     // Escucha de mensaje Kernel
 
     // Escucha de mensaje CPU
 
     // Escucha de mensaje EntradaSalida
-    // requests_entradasalida();
 
     // pthread_t hilo_keep_alive;
     // pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, NULL);
