@@ -31,22 +31,18 @@ int main(void)
 
     // ############## Escucha de Mensajes ###################
     // Escucha de mensaje Kernel
-    // solicitudes_kernel(fd_kernel, logger_memoria);
+    requests_kernel();
 
-    // // Escucha de mensaje CPU
-    // solicitudes_cpu(fd_cpu, logger_memoria);
+    // Escucha de mensaje CPU
+    requests_cpu();
 
-    // // Escucha de mensaje EntradaSalida
-    // solicitudes_entradasalida(fd_entradasalida, logger_memoria);
+    // Escucha de mensaje EntradaSalida
+    requests_entradasalida();
 
     //pthread_t hilo_keep_alive;
     //pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, NULL);
     // pthread_detach(hilo_kernel_dispatch);
     //pthread_join(hilo_keep_alive, NULL);
-
-    //solicitudes_cpu();
-
-    //solicitudes_kernel();
 
     // Libero recursos
     liberar_conexion(fd_kernel);
