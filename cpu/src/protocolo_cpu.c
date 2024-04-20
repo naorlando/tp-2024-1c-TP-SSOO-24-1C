@@ -16,15 +16,7 @@ void atender_cpu_kernel_dispatch()
             break;
 
         case EXAMPLE:
-            log_info(logger_cpu, "<<<<< EXAMPLE >>>>");
-            t_message_example *new_msg = malloc(sizeof(t_message_example));
-            t_buffer *new_buffer = recive_full_buffer(fd_kernel_dispatch);
-            example_deserialize_msg(new_buffer, new_msg);
-            log_info(logger_cpu, "MENSAJE => %s", new_msg->cadena);
-            log_info(logger_cpu, "ENTERO => %d", new_msg->entero);
-            free(new_msg->cadena);
-            free(new_msg);
-            buffer_destroy(new_buffer);
+            recv_example_msg_kernel();
             break;
 
         case -1:
@@ -45,7 +37,7 @@ int send_example_memoria()
     char *cadena = "CPU ENVIO MENSAJE A MEMORIA";
     example->cadena = malloc(strlen(cadena) + 1);
     strcpy(example->cadena, cadena);
-    example->entero = 5;
+    example->entero = 8;
 
     example_serialize_msg(package_example->buffer, example);
 
@@ -54,5 +46,20 @@ int send_example_memoria()
     free(example->cadena);
     free(example);
     package_destroy(package_example);
+    return 0;
+}
+
+int recv_example_msg_kernel()
+{
+    log_info(logger_cpu, "<<<<< EXAMPLE RECIVE MESSAGE FROM KERNEL >>>>");
+    t_message_example *new_msg = malloc(sizeof(t_message_example));
+    t_buffer *new_buffer = recive_full_buffer(fd_kernel_dispatch);
+    example_deserialize_msg(new_buffer, new_msg);
+    log_info(logger_cpu, "MENSAJE => %s", new_msg->cadena);
+    log_info(logger_cpu, "ENTERO => %d", new_msg->entero);
+    free(new_msg->cadena);
+    free(new_msg);
+    buffer_destroy(new_buffer);
+
     return 0;
 }
