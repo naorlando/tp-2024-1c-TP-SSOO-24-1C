@@ -8,8 +8,6 @@
 #define MENSAJE 0
 #define ERROR -1
 
-extern int fd_cpu;
-
 void solicitudes_cpu(t_log *);
 
 void solicitudes_kernel(int, t_log *);
