@@ -10,5 +10,6 @@
 #include <utils/sockets.h>
 #include "inicializar_memoria.h"
 #include "procesar_solicitudes.h"
+#include "variables_globales.h"
 
 #endif /*MEMORIA_H*/
