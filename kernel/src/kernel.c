@@ -30,9 +30,18 @@ int main(int argc, char *argv[])
     fd_kernel_memoria > 0 ? send_example_memoria() : log_error(logger_kernel, "Error al intentar enviar mensaje a %s", SERVER_MEMORIA);
 
     fd_kernel_IO = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, fd_server);
+    fd_kernel_IO > 0 ? requests_entradasalida() : log_error(logger_kernel, "Error al intentar recibir mensaje a %s", CLIENTE_ENTRADASALIDA);
 
-    pthread_t hilo_cpu_dispatch;
-    pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_IO, NULL);
+    // pthread_t hilo_cpu_dispatch;
+    // pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_IO, NULL);
     // pthread_detach(hilo_kernel_dispatch);
-    pthread_join(hilo_cpu_dispatch, NULL);
+    // pthread_join(hilo_cpu_dispatch, NULL);
+
+    free(server_port);
+    liberar_conexion(fd_server);
+    liberar_conexion(fd_kernel_memoria);
+    liberar_conexion(fd_cpu_dispatch);
+    liberar_conexion(fd_kernel_IO);
+
+    return EXIT_SUCCESS;
 }

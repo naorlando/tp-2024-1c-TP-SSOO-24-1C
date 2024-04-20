@@ -6,5 +6,7 @@
 
 int send_example_cpu();
 int send_example_memoria();
+void requests_entradasalida();
+int recv_example_msg_entradasalida();
 
 #endif

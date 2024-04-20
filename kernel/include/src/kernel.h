@@ -12,13 +12,9 @@
 #include <utils/protocolo.h>
 #include "kernel_config.h"
 #include "inicializar_kernel.h"
-#include "kernel_IO.h"
-#include  <variables_globales.h>
+#include <variables_globales.h>
 #include "protocolo_kernel.h"
 
-
-
 /* incluir .h files del kernel*/
-
 
 #endif
