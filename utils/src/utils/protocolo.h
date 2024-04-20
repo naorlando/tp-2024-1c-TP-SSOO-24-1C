@@ -27,13 +27,13 @@ typedef enum
 
     // KERNEL <-> CPU
     MSG_KERNEL_CPU_DISPATCH,
-    MSG_CPU_KERNEL_DISPATCH,
+    MSG_IO_KERNEL,
     // KERNEL <-> MEMORIA
     MSG_KERNEL_MEMORIA,
     EXAMPLE,
 
-        //
-        NULL_HEADER
+    //Empty package
+    NULL_HEADER
 } t_msg_header;
 
 // Message package
@@ -45,15 +45,10 @@ typedef struct
 
 typedef struct
 {
-    t_msg_header msg_header; // Message header
-    t_buffer *buffer;        // Buffer
-} t_message_string;
-
-typedef struct
-{
-    char *cadena;   
-    uint8_t entero; 
+    char *cadena;
+    uint8_t entero;
 } t_message_example;
+
 /*
  *  package functions
  */
@@ -68,9 +63,9 @@ int package_recv(t_package *package, int fd);
 void *serializar_paquete(t_package *paquete, int bytes);
 void example_serialize_msg(t_buffer *buffer, t_message_example *msg);
 
-
-//deserialize
+// deserialize
 void example_deserialize_msg(t_buffer *buffer, t_message_example *msg);
 
+//send
 
 #endif

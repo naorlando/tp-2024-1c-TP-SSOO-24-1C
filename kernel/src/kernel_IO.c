@@ -1,25 +1,24 @@
-#include "kernel_dispatch.h"
+#include "kernel_IO.h"
  
-int fd_cpu_dispatch;
 
-void atender_kernel_cpu_dispatch(){
+void atender_kernel_IO(){
         bool control_key = 1;
     while (control_key)
     {
-        int cod_op = recibir_operacion(fd_cpu_dispatch);
+        int cod_op = recibir_operacion(fd_kernel_IO);
         t_package *package = package_create(NULL_HEADER);
-        package_recv(package, fd_cpu_dispatch);
+        package_recv(package, fd_kernel_IO);
 
         switch (cod_op)
         {
 
-        case MSG_CPU_KERNEL_DISPATCH:
+        case MSG_IO_KERNEL:
             package_destroy(package);
-            log_info(logger_kernel, "Se recibio un mje del CPU");
+            log_info(logger_kernel, "Se recibio un mje del IO");
             break;
    
         case -1:
-            log_error(logger_kernel, "el CPU se desconecto. Terminando servidor");
+            log_error(logger_kernel, "el IO se desconecto. Terminando servidor");
             control_key = 0;
             break;
         default:

@@ -1,8 +1,5 @@
 #include "cpu_dispatch.h"
 
-int fd_server_dispatch;
-int fd_kernel_dispatch;
-
 void atender_cpu_kernel_dispatch()
 {
     bool control_key = 1;
@@ -12,7 +9,7 @@ void atender_cpu_kernel_dispatch()
         // log_info(logger_cpu, string_itoa(cod_op));
 
         // package_recv(package, fd_kernel_dispatch);
-        t_buffer *new_buffer ;//malloc(sizeof(t_buffer));
+        t_buffer *new_buffer; // malloc(sizeof(t_buffer));
 
         switch (cod_op)
         {
@@ -32,19 +29,15 @@ void atender_cpu_kernel_dispatch()
             break;
         case EXAMPLE:
             log_info(logger_cpu, "<<<<< EXAMPLE >>>>");
-            t_package *package = package_create(NULL_HEADER);
-            t_message_example * new_msg = malloc(sizeof(t_message_example));
-            //package_recv(package, fd_kernel_dispatch);
+            t_message_example *new_msg = malloc(sizeof(t_message_example));
             new_buffer = recive_full_buffer(fd_kernel_dispatch);
-            printf("%.*s\n", new_buffer->size, (char *)new_buffer->stream);
             example_deserialize_msg(new_buffer, new_msg);
-            
-            log_info(logger_cpu, "%s", new_msg->cadena);
-            log_info(logger_cpu, "%d", new_msg->entero);
-             free(new_msg->cadena);
-             free(new_msg);
+            log_info(logger_cpu, "MENSAJE => %s", new_msg->cadena);
+            log_info(logger_cpu, "ENTERO => %d", new_msg->entero);
+            free(new_msg->cadena);
+            free(new_msg);
             buffer_destroy(new_buffer);
-            package_destroy(package);
+
             break;
         case -1:
             log_error(logger_cpu, "el KERNEL se desconecto. Terminando servidor");

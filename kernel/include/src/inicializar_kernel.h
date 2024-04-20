@@ -6,12 +6,9 @@
 #include <commons/log.h>
 #include <commons/config.h>
 #include "kernel_config.h"
+#include <variables_globales.h>
 
-// VARIABLES GLOBALES
-extern t_log* logger_kernel;
-extern t_log* logger_kernel_debug;
-extern t_config* config_kernel;
-extern t_kernel_config* kernel_config;
+
 
 void init();
 void _iniciar_logger();

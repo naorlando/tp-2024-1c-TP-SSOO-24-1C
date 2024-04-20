@@ -6,9 +6,7 @@
 #include "utils/buffer.h"
 #include "utils/protocolo.h"
 #include "cpu.h"
-
-extern int fd_server_dispatch;
-extern int fd_kernel_dispatch;
+#include "variables_globales.h"
 
 
 void atender_cpu_kernel_dispatch();
