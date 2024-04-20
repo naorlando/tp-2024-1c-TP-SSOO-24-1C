@@ -1,7 +1,7 @@
 #ifndef ENTRADASALIDA_H_
 #define ENTRADASALIDA_H_
 
-#include<gestor_entradasalida.h>
+#include<variables_globales.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +10,7 @@
 #include <commons/string.h>
 
 #include<inicializar_entradasalida.h>
+#include <protocolo_entrada.h>
 #include<utils/sockets.h>
 
 

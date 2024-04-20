@@ -1,14 +1,14 @@
 #ifndef INICIALIZAR_ENTRADASALIDA_H_
 #define INICIALIZAR_ENTRADASALIDA_H_
 
-#include <gestor_entradasalida.h>
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <commons/log.h>
 #include <commons/config.h>
 #include <commons/string.h>
-
+#include <variables_globales.h>
 
 void init();
 

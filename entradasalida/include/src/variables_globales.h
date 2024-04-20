@@ -1,11 +1,14 @@
-#ifndef GESTOR_ENTRADASALIDA_H_
-#define GESTOR_ENTRADASALIDA_H_
+#ifndef VARIABLES_GLOBALES_H_
+#define VARIABLES_GLOBALES_H_
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <commons/log.h>
 #include <commons/config.h>
 #include <commons/string.h>
+
+#define SERVER_MEMORIA "SERVER MEMORIA"
+#define SERVER_KERNEL "SERVER KERNEL"
 
 // @@@@@ IMPORTANTE: @@@@@
 // el EXTERN nos ayuda a que las librerias que importen este .h no vuelvan a declarar las variables,
