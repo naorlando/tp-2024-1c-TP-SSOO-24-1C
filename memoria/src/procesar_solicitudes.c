@@ -1,7 +1,5 @@
 #include "procesar_solicitudes.h"
 
-int fd_cpu;
-
 void solicitudes_cpu(t_log* logger) {
     bool esperar = true;
 
