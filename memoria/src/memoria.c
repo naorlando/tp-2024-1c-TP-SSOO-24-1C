@@ -22,27 +22,25 @@ int main(void)
 
     // Espera conexion de la CPU
     fd_cpu = esperar_cliente(logger_memoria, CLIENTE_CPU, fd_server);
-
+    requests_cpu();
     // Espera conexion del Kernel
     fd_kernel = esperar_cliente(logger_memoria, CLIENTE_KERNEL, fd_server);
-
+    requests_kernel();
     // Espera conexion de la Interfaz I/O
     fd_entradasalida = esperar_cliente(logger_memoria, CLIENTE_ENTRADASALIDA, fd_server);
 
     // ############## Escucha de Mensajes ###################
     // Escucha de mensaje Kernel
-    requests_kernel();
 
     // Escucha de mensaje CPU
-    requests_cpu();
 
     // Escucha de mensaje EntradaSalida
-    requests_entradasalida();
+    // requests_entradasalida();
 
-    //pthread_t hilo_keep_alive;
-    //pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, NULL);
-    // pthread_detach(hilo_kernel_dispatch);
-    //pthread_join(hilo_keep_alive, NULL);
+    // pthread_t hilo_keep_alive;
+    // pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, NULL);
+    //  pthread_detach(hilo_kernel_dispatch);
+    // pthread_join(hilo_keep_alive, NULL);
 
     // Libero recursos
     liberar_conexion(fd_kernel);
