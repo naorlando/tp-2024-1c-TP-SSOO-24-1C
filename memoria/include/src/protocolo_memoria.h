@@ -6,11 +6,11 @@
 #include "variables_globales.h"
 #include "utils/protocolo.h"
 
-void solicitudes_cpu();
+void requests_cpu();
 
-void solicitudes_kernel();
+void requests_kernel();
 
-void solicitudes_entradasalida();
+void requests_entradasalida();
 
 int recv_example_msg_cpu();
 
