@@ -1,6 +1,6 @@
-#include "procesar_solicitudes.h"
+#include "protocolo_memoria.h"
 
-void solicitudes_cpu() {
+void requests_cpu() {
     bool esperar = true;
 
     while(esperar) {
@@ -26,7 +26,7 @@ void solicitudes_cpu() {
     }
 }
 
-void solicitudes_kernel() {
+void requests_kernel() {
     bool esperar = true;
 
     while(esperar) {
@@ -52,7 +52,7 @@ void solicitudes_kernel() {
     }
 }
 
-void solicitudes_entradasalida() {
+void requests_entradasalida() {
     bool esperar = true;
 
     while(esperar) {
@@ -76,4 +76,61 @@ void solicitudes_entradasalida() {
             break;
         }
     }
+}
+
+int recv_example_msg_cpu(){
+    log_info(logger_memoria, "<<<<< EXAMPLE >>>>");
+    t_package *package = package_create(NULL_HEADER);
+    t_message_example * new_msg = malloc(sizeof(t_message_example));
+    //package_recv(package, fd_kernel_dispatch);
+    t_buffer* new_buffer = recive_full_buffer(fd_cpu);
+
+    example_deserialize_msg(new_buffer, new_msg);
+            
+    log_info(logger_memoria, "%s", new_msg->cadena);
+    log_info(logger_memoria, "%d", new_msg->entero);
+    free(new_msg->cadena);
+    free(new_msg);
+    buffer_destroy(new_buffer);
+    package_destroy(package);
+
+    return 0;
+}
+
+int recv_example_msg_kernel(){
+    log_info(logger_memoria, "<<<<< EXAMPLE >>>>");
+    t_package *package = package_create(NULL_HEADER);
+    t_message_example * new_msg = malloc(sizeof(t_message_example));
+    //package_recv(package, fd_kernel_dispatch);
+    t_buffer* new_buffer = recive_full_buffer(fd_kernel);
+
+    example_deserialize_msg(new_buffer, new_msg);
+            
+    log_info(logger_memoria, "%s", new_msg->cadena);
+    log_info(logger_memoria, "%d", new_msg->entero);
+    free(new_msg->cadena);
+    free(new_msg);
+    buffer_destroy(new_buffer);
+    package_destroy(package);
+
+    return 0;
+}
+
+int recv_example_msg_entradasalida(){
+    log_info(logger_memoria, "<<<<< EXAMPLE >>>>");
+    t_package *package = package_create(NULL_HEADER);
+    t_message_example * new_msg = malloc(sizeof(t_message_example));
+    //package_recv(package, fd_kernel_dispatch);
+    t_buffer* new_buffer = recive_full_buffer(fd_entradasalida);
+
+    example_deserialize_msg(new_buffer, new_msg);
+            
+    log_info(logger_memoria, "%s", new_msg->cadena);
+    log_info(logger_memoria, "%d", new_msg->entero);
+    free(new_msg->cadena);
+    free(new_msg);
+    buffer_destroy(new_buffer);
+    package_destroy(package);
+
+    return 0;
 }
