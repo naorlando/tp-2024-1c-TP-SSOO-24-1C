@@ -21,13 +21,13 @@ int main(void)
     // ############## Espera de Clientes ###################
 
     // Espera conexion de la CPU
-    fd_cpu = esperar_cliente(logger_memoria, CLIENTE_CPU, fd_server);
+    //fd_cpu = esperar_cliente(logger_memoria, CLIENTE_CPU, fd_server);
 
     // Espera conexion del Kernel
     fd_kernel = esperar_cliente(logger_memoria, CLIENTE_KERNEL, fd_server);
 
     // Espera conexion de la Interfaz I/O
-    fd_entradasalida = esperar_cliente(logger_memoria, CLIENTE_ENTRADASALIDA, fd_server);
+    //fd_entradasalida = esperar_cliente(logger_memoria, CLIENTE_ENTRADASALIDA, fd_server);
 
     // ############## Escucha de Mensajes ###################
     // Escucha de mensaje Kernel
@@ -46,8 +46,8 @@ int main(void)
 
     // Libero recursos
     liberar_conexion(fd_kernel);
-    liberar_conexion(fd_cpu);
-    liberar_conexion(fd_entradasalida);
+    //liberar_conexion(fd_cpu);
+    //liberar_conexion(fd_entradasalida);
 
     free(server_port);
 
