@@ -9,11 +9,7 @@
 #include <commons/string.h>
 #include <utils/sockets.h>
 #include "inicializar_memoria.h"
-#include "procesar_solicitudes.h"
-
-#define SERVERNAME "MEMORIA"
-
-int fd_server;
-int fd_entradasalida;
+#include "protocolo_memoria.h"
+#include "variables_globales.h"
 
 #endif /*MEMORIA_H*/

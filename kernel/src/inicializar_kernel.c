@@ -4,6 +4,9 @@ t_log* logger_kernel;
 t_log* logger_kernel_debug;
 t_config* config_kernel;
 t_kernel_config* kernel_config;
+int fd_kernel_IO;
+int fd_cpu_dispatch;
+int fd_kernel_memoria;
 
 void init(){
     _iniciar_logger();
@@ -48,3 +51,4 @@ void _iniciar_config(){
 void imprimir_config() {
     log_trace(logger_kernel_debug, "PUERTO DE ESCUCHA DE LA KERNEL: %d", kernel_config->PUERTO_ESCUCHA);
 }
+

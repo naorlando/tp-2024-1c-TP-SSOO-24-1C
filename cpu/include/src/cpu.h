@@ -1,5 +1,5 @@
-#ifndef CPU_H_
-#define CPU_H_
+#ifndef CPU_H
+#define CPU_H
 #define SERVERNAME "CPU"
 
 #include <stdio.h>
@@ -9,7 +9,7 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
-
+#include <protocolo_cpu.h>
 #include "utils/sockets.h"
 
 

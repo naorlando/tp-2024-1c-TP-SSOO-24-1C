@@ -43,9 +43,6 @@ void package_destroy(t_package *package)
 // Package send
 int package_send(t_package *package, int fd)
 {
-
-    printf("SIZE BUFFER %d", package->buffer->size);
-
     size_t size = sizeof(t_msg_header)     // Message header
                   + sizeof(uint32_t)       // Buffer size
                   + package->buffer->size; // Buffer
@@ -117,42 +114,43 @@ void *serializar_paquete(t_package *paquete, int bytes)
     return stream;
 }
 
-// size_t * size, char *cadena, uint8_t entero
+
 void example_serialize_msg(t_buffer *buffer, t_message_example *msg)
 {
-    // Check for invalid input (empty cadena or zero buffer size)
 
-    // Calculate total serialized message size
-    uint32_t size_cadena = strlen(msg->cadena) + 1; // Include null terminator
-    buffer->size = sizeof(uint32_t) + size_cadena + sizeof(uint32_t);
+    uint8_t size_cadena = strlen(msg->cadena) + 1; // Include null terminator
+    buffer->size = sizeof(uint8_t) * 2 + size_cadena ;
     buffer->stream = malloc(buffer->size);
     void *stream = malloc(buffer->size);
-    uint32_t offset = 0;
-    // Serialize the message content into the buffer
-    // void *stream_ptr = malloc(total_size);
-    memcpy(stream + offset, &size_cadena, sizeof(size_cadena));
-    offset += sizeof(uint32_t);
-    memcpy(stream, msg->cadena, size_cadena);
-    offset += sizeof(uint32_t);
-    memcpy(buffer->stream, &(msg->entero), sizeof(msg->entero));
-    offset += sizeof(uint32_t);
+    uint8_t offset = 0;
 
-    // Update buffer size with the actual serialized data size
+    memcpy(stream, &size_cadena, sizeof(uint8_t));
+    offset += sizeof(uint8_t);
+    memcpy(stream + offset, msg->cadena, size_cadena);
+    offset += size_cadena;
+    memcpy(stream + offset, &(msg->entero), sizeof(uint8_t));
+    offset += sizeof(uint8_t);
+
+
 
     buffer->stream = stream;
 }
 
 void example_deserialize_msg(t_buffer *buffer, t_message_example *msg)
 {
-    void *stream = buffer->stream;
-   
-    uint32_t size_cadena = 0;
-    memcpy(&size_cadena, stream, sizeof(uint32_t)); //COPIA VALOR LARGO DE LA CADENA TAM
-    stream += sizeof(size_cadena);
 
-    msg->cadena = malloc(size_cadena); 
+    uint8_t offset = 0;
 
-    memcpy(msg->cadena, stream + sizeof(uint32_t), size_cadena); // Se copia la cadena desde el buffer al área de memoria asignada //ERROR
+    // Copiar el tamaño de la cadena desde el stream al buffer
+    uint8_t size_cadena = 0;
+    memcpy(&size_cadena, buffer->stream, sizeof(uint8_t));
+    offset += sizeof(uint8_t);
 
-    memcpy(&(msg->entero), stream + sizeof(uint32_t) + size_cadena, sizeof(uint32_t));
+    // Reservar memoria para la cadena y copiarla desde el stream al buffer
+    msg->cadena = malloc(size_cadena);
+    memcpy(msg->cadena, buffer->stream + offset, size_cadena);
+    offset += size_cadena;
+
+    // Copiar el entero desde el stream al buffer
+    memcpy(&(msg->entero), buffer->stream + offset, sizeof(uint8_t));
 }

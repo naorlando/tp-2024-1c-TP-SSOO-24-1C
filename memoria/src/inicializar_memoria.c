@@ -5,6 +5,11 @@ t_log* logger_memoria_debug;
 t_config* config_memoria;
 t_memoria_config* memoria_config;
 
+int fd_server;
+int fd_entradasalida;
+int fd_cpu;
+int fd_kernel;
+
 void init(){
     _iniciar_logger();
     _iniciar_config();

@@ -8,7 +8,8 @@
 			"string_view": "c",
 			"initializer_list": "c",
 			"utility": "c",
-			"random": "c"
+			"random": "c",
+			"*.tcc": "c"
 		},
 		"C_Cpp.errorSquiggles": "disabled",
 	},

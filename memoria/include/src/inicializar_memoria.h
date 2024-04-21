@@ -3,15 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <commons/log.h>
-#include <commons/config.h>
-#include "memoria_config.h"
-
-// VARIABLES GLOBALES
-extern t_log* logger_memoria;
-extern t_log* logger_memoria_debug;
-extern t_config* config_memoria;
-extern t_memoria_config* memoria_config;
+#include "variables_globales.h"
 
 void init();
 void _iniciar_logger();
