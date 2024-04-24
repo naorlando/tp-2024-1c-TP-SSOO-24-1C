@@ -16,7 +16,7 @@
 
 /*
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- VARIABLES GLOBALES: ir agregando al gesto_entradasalida.h
+ VARIABLES GLOBALES: ir agregando al variables_globales.h
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 */
 int conexion_io_memoria;

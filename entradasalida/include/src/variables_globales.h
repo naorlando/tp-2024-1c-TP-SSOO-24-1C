@@ -6,6 +6,7 @@
 #include <commons/log.h>
 #include <commons/config.h>
 #include <commons/string.h>
+#include <pthread.h>
 
 #define SERVER_MEMORIA "SERVER MEMORIA"
 #define SERVER_KERNEL "SERVER KERNEL"
