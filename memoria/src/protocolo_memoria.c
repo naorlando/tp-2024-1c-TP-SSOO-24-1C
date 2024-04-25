@@ -10,7 +10,7 @@ void requests_cpu() {
             case EXAMPLE:
                 // Se procesa el request
                 recv_example_msg_cpu();
-                esperar = false; //Cortamos la espera de solicitudes
+                //esperar = false; //Cortamos la espera de solicitudes
             break;
             //TODO:
             /*
@@ -37,7 +37,7 @@ void requests_kernel() {
             case EXAMPLE:
                 // Se procesa el request
                 recv_example_msg_kernel();
-                esperar = false; //Cortamos la espera de solicitudes
+                //esperar = false; //Cortamos la espera de solicitudes
             break;
             //TODO:
             /*
@@ -64,7 +64,7 @@ void requests_entradasalida() {
             case EXAMPLE:
                 // Se procesa el request
                 recv_example_msg_entradasalida();
-                esperar = false; //Cortamos la espera de solicitudes
+                //esperar = false; //Cortamos la espera de solicitudes
             break;
             //TODO:
             /*

@@ -30,7 +30,9 @@ int main(int argc, char *argv[])
     fd_memoria > 0 ? send_example_memoria() : log_error(logger_cpu, "Error al intentar enviar mensaje a %s", SERVER_MEMORIA);
 
     // Esperamos al Kernel
+    log_info(logger_cpu, "esperando a que se conecte %s",CLIENTE_KERNEL);
     fd_kernel_dispatch = esperar_cliente(logger_cpu, CLIENTE_KERNEL, fd_server);
+
 
     // Atendemos mensaje del Kernel
     pthread_t hilo_kernel_dispatch;

@@ -6,8 +6,10 @@
 #include "variables_globales.h"
 #include "utils/protocolo.h"
 
-int send_example_kernel();
+void requests_kernel();
 
+int send_example_kernel();
+int recv_example_msg_kernel();
 int send_example_memoria();
 
 #endif
