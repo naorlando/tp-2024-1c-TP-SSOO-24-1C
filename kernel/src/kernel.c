@@ -32,10 +32,22 @@ int main(int argc, char *argv[])
     fd_kernel_IO = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, fd_server);
     fd_kernel_IO > 0 ? requests_entradasalida() : log_error(logger_kernel, "Error al intentar recibir mensaje a %s", CLIENTE_ENTRADASALIDA);
 
-    // pthread_t hilo_cpu_dispatch;
-    // pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_IO, NULL);
-    // pthread_detach(hilo_kernel_dispatch);
-    // pthread_join(hilo_cpu_dispatch, NULL);
+   
+    // Atendemos mensaje CPU DISPATCH
+    pthread_t hilo_cpu_dispatch;
+    pthread_create(&hilo_cpu_dispatch, NULL,(void *)atender_kernel_cpu_dispatch, NULL);
+    pthread_detach(hilo_cpu_dispatch);
+
+    // Atendemos mensaje del Entradasalida
+    pthread_t hilo_entradasalida;
+    pthread_create(&hilo_entradasalida, NULL,(void *)atender_kernel_IO, NULL);
+    pthread_detach(hilo_entradasalida);
+
+    //Atender los mensajes de la memoria
+
+    pthread_t hilo_memoria;
+    pthread_create(&hilo_memoria,NULL,(void *)atender_kernel_memoria,NULL);
+    pthread_join(hilo_memoria,NULL);
 
     free(server_port);
     liberar_conexion(fd_server);

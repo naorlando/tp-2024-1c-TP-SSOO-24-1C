@@ -3,15 +3,17 @@
 
 #include<variables_globales.h>
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <commons/log.h>
-#include <commons/config.h>
+#include <stdio.h>
+#include <string.h>
+#include <pthread.h>
 #include <commons/string.h>
-
+#include <commons/config.h>
+#include <commons/log.h>
+#include <utils/sockets.h>
+#include <utils/protocolo.h>
 #include<inicializar_entradasalida.h>
 #include <protocolo_entrada.h>
-#include<utils/sockets.h>
 
 
 /*

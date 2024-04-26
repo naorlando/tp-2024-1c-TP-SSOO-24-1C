@@ -27,9 +27,17 @@ typedef enum
 
     // KERNEL <-> CPU
     MSG_KERNEL_CPU_DISPATCH,
+    MSG_CPU_DISPATCH_KERNEL,
     MSG_IO_KERNEL,
+    MSG_KERNEL_IO,
     // KERNEL <-> MEMORIA
     MSG_KERNEL_MEMORIA,
+    MSG_MEMORIA_KERNEL,
+    //CPU <-> MEMORIA
+    MSG_MEMORIA_CPU,
+    MSG_CPU_MEMORIA,
+    //IO <-> MEMORIA
+    MSG_IO_MEMORIA,
     EXAMPLE,
 
     //Empty package

@@ -18,4 +18,10 @@ int recv_example_msg_kernel();
 
 int recv_example_msg_entradasalida();
 
+void atender_memoria_cpu();
+
+void atender_memoria_kernel();
+
+void atender_memoria_io();
+
 #endif /*PROTOCOLO_MEMORIA_H_*/

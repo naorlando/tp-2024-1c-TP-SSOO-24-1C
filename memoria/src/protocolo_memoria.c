@@ -128,3 +128,81 @@ int recv_example_msg_entradasalida(){
 
     return 0;
 }
+
+void atender_memoria_cpu()
+{
+    bool control_key = 1;
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(fd_cpu);
+
+        switch (cod_op)
+        {
+
+        case MSG_CPU_MEMORIA:
+
+            log_info(logger_memoria, "Se recibio un mje del cpu");
+            break;
+
+        case -1:
+            log_error(logger_memoria, "la cpu se desconecto. Terminando servidor");
+            control_key = 0;
+            break;
+        default:
+            log_warning(logger_memoria, "Operacion desconocida en dispatch. No quieras meter la pata");
+            break;
+        }
+    }
+}
+
+void atender_memoria_kernel()
+{
+    bool control_key = 1;
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(fd_kernel);
+
+        switch (cod_op)
+        {
+
+        case MSG_KERNEL_MEMORIA:
+
+            log_info(logger_memoria, "Se recibio un mje del Kernel");
+            break;
+
+        case -1:
+            log_error(logger_memoria, "KERNEL se desconecto. Terminando servidor");
+            control_key = 0;
+            break;
+        default:
+            log_warning(logger_memoria, "Operacion desconocida en dispatch. No quieras meter la pata");
+            break;
+        }
+    }
+}
+
+void atender_memoria_io()
+{
+    bool control_key = 1;
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(fd_entradasalida);
+
+        switch (cod_op)
+        {
+
+        case MSG_IO_MEMORIA:
+
+            log_info(logger_memoria, "Se recibio un mje del IO");
+            break;
+
+        case -1:
+            log_error(logger_memoria, "IO se desconecto. Terminando servidor");
+            control_key = 0;
+            break;
+        default:
+            log_warning(logger_memoria, "Operacion desconocida en dispatch. No quieras meter la pata");
+            break;
+        }
+    }
+}

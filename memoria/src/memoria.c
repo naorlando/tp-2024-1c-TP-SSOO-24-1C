@@ -30,16 +30,23 @@ int main(void)
     fd_entradasalida = esperar_cliente(logger_memoria, CLIENTE_ENTRADASALIDA, fd_server);
     requests_entradasalida();
     // ############## Escucha de Mensajes ###################
-    // Escucha de mensaje Kernel
 
-    // Escucha de mensaje CPU
+   // Atendemos mensaje CPU DISPATCH
+    pthread_t hilo_cpu;
+    pthread_create(&hilo_cpu, NULL,(void *)atender_memoria_cpu, NULL);
+    pthread_detach(hilo_cpu);
 
-    // Escucha de mensaje EntradaSalida
+    // Atendemos mensaje del Kernel
 
-    // pthread_t hilo_keep_alive;
-    // pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, NULL);
-    //  pthread_detach(hilo_kernel_dispatch);
-    // pthread_join(hilo_keep_alive, NULL);
+    pthread_t hilo_kernel;
+    pthread_create(&hilo_kernel, NULL, (void *)atender_memoria_kernel, NULL);
+    pthread_detach(hilo_kernel);
+
+    //Atender los mensajes de la memoria
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io,NULL,(void *)atender_memoria_io,NULL);
+    pthread_join(hilo_io,NULL);
 
     // Libero recursos
     liberar_conexion(fd_kernel);

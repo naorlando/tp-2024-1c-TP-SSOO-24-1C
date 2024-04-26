@@ -38,3 +38,50 @@ int send_example_memoria()
     package_destroy(package_example);
     return 0;
 }
+
+void atender_io_memoria()
+{
+    bool control_key = 1;
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(fd_memoria);
+
+        switch (cod_op)
+        {
+
+        case -1:
+            log_error(logger_entradasalida, "la memoria se desconecto. Terminando servidor");
+            control_key = 0;
+            break;
+        default:
+            log_warning(logger_entradasalida, "Operacion desconocida en dispatch. No quieras meter la pata");
+            break;
+        }
+    }
+}
+
+void atender_io_kernel()
+{
+    bool control_key = 1;
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(fd_kernel);
+
+        switch (cod_op)
+        {
+
+        case MSG_KERNEL_IO:
+
+            log_info(logger_entradasalida, "Se recibio un mje del KERNEL");
+            break;
+
+        case -1:
+            log_error(logger_entradasalida, "el KERNEL se desconecto. Terminando servidor");
+            control_key = 0;
+            break;
+        default:
+            log_warning(logger_entradasalida, "Operacion desconocida en dispatch. No quieras meter la pata");
+            break;
+        }
+    }
+}
