@@ -15,13 +15,38 @@ void requests_kernel() {
             //TODO:
             /*
                 Agregar operaciones a las que dara servicio el modulo
-            */ 
+            */
+            case MSG_KERNEL_IO:
+
+                log_info(logger_entradasalida, "Se recibio un mje del KERNEL");
+            break;
             case -1:
                 log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de entradaSalida.");
                 esperar = false; //Cortamos la espera de solicitudes
             break;
             default:
                 log_warning(logger_entradasalida, "WARNING: El modulo de entradaSalida ha recibido una solicitud con una operacion desconocida");
+            break;
+        }
+    }
+}
+
+void requests_memoria()
+{
+    bool control_key = 1;
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(fd_memoria);
+
+        switch (cod_op)
+        {
+
+        case -1:
+            log_error(logger_entradasalida, "la memoria se desconecto. Terminando servidor");
+            control_key = 0;
+            break;
+        default:
+            log_warning(logger_entradasalida, "Operacion desconocida en dispatch. No quieras meter la pata");
             break;
         }
     }

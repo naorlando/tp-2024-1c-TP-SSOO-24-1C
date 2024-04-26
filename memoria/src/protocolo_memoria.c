@@ -12,10 +12,15 @@ void requests_cpu() {
                 recv_example_msg_cpu();
                 //esperar = false; //Cortamos la espera de solicitudes
             break;
+
             //TODO:
             /*
                 Agregar operaciones a las que dara servicio el modulo
-            */ 
+            */             
+            case MSG_CPU_MEMORIA:
+
+                log_info(logger_memoria, "Se recibio un mje del cpu");
+            break;
             case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
                 esperar = false; //Cortamos la espera de solicitudes
@@ -39,10 +44,15 @@ void requests_kernel() {
                 recv_example_msg_kernel();
                 //esperar = false; //Cortamos la espera de solicitudes
             break;
+
             //TODO:
             /*
                 Agregar operaciones a las que dara servicio el modulo
-            */ 
+            */             
+            case MSG_KERNEL_MEMORIA:
+
+                log_info(logger_memoria, "Se recibio un mje del Kernel");
+            break;
             case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
                 esperar = false; //Cortamos la espera de solicitudes
@@ -69,7 +79,12 @@ void requests_entradasalida() {
             //TODO:
             /*
                 Agregar operaciones a las que dara servicio el modulo
-            */ 
+            */
+            case MSG_IO_MEMORIA:
+
+                log_info(logger_memoria, "Se recibio un mje del IO");
+            break;
+ 
             case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
                 esperar = false; //Cortamos la espera de solicitudes

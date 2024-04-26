@@ -30,6 +30,32 @@ void atender_cpu_kernel_dispatch()
     }
 }
 
+void atender_cpu_memoria()
+{
+    bool control_key = 1;
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(fd_memoria);
+
+        switch (cod_op)
+        {
+
+        case MSG_MEMORIA_CPU:
+
+            log_info(logger_cpu, "Se recibio un mje del memoria");
+            break;
+
+        case -1:
+            log_error(logger_cpu, "la memoria se desconecto. Terminando servidor");
+            control_key = 0;
+            break;
+        default:
+            log_warning(logger_cpu, "Operacion desconocida en dispatch. No quieras meter la pata");
+            break;
+        }
+    }
+}
+
 int send_example_memoria()
 {
     t_package *package_example = package_create(EXAMPLE);

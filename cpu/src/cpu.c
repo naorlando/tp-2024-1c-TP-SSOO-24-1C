@@ -37,7 +37,14 @@ int main(int argc, char *argv[])
     // Atendemos mensaje del Kernel
     pthread_t hilo_kernel_dispatch;
     pthread_create(&hilo_kernel_dispatch, NULL, (void *)atender_cpu_kernel_dispatch, NULL);
-    pthread_join(hilo_kernel_dispatch, NULL);
+    pthread_detach(hilo_kernel_dispatch);
+
+    //Atender los mensajes de la memoria
+
+    pthread_t hilo_memoria;
+    pthread_create(&hilo_memoria,NULL,(void *)atender_cpu_memoria,NULL);
+    pthread_join(hilo_memoria,NULL);
+
 
     free(server_port);
     liberar_conexion(fd_server);

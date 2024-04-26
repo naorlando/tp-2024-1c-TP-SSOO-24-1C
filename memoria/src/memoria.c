@@ -54,11 +54,6 @@ int main(void)
     pthread_create(&hilo_entradaSalida, NULL, (void *)requests_entradasalida, NULL);
     pthread_join(hilo_entradaSalida, NULL);
 
-    // pthread_t hilo_keep_alive;
-    // pthread_create(&hilo_keep_alive, NULL, (void *)solicitudes_cpu, NULL);
-    //  pthread_detach(hilo_kernel_dispatch);
-    // pthread_join(hilo_keep_alive, NULL);
-
     // Libero recursos
     liberar_conexion(fd_kernel);
     liberar_conexion(fd_cpu);

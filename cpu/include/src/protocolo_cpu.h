@@ -6,6 +6,7 @@
 
 int send_example_memoria();
 void atender_cpu_kernel_dispatch();
+void atender_cpu_memoria();
 int recv_example_msg_kernel();
 
 #endif
