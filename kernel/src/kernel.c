@@ -55,6 +55,10 @@ int main(int argc, char *argv[])
     pthread_create(&hilo_memoria,NULL,(void *)atender_kernel_memoria,NULL);
     pthread_join(hilo_memoria,NULL);
 
+    //CONSOLA INTERACTIVA:
+    //iniciar_consola_interactiva();
+
+
     free(server_port);
     liberar_conexion(fd_server);
     liberar_conexion(fd_kernel_memoria);

@@ -1,5 +1,31 @@
 #include <protocolo_kernel.h>
 
+#include <stdlib.h>
+#include <string.h>
+
+void *serializar_pcb(t_PCB *pcb, int *size) {
+    int total_size = sizeof(pcb->pid) + sizeof(pcb->program_counter) + sizeof(pcb->estado) + sizeof(pcb->registros);
+    *size = total_size;  // Set the size of the serialized data
+
+    void *buffer = malloc(total_size);
+    int offset = 0;
+
+    memcpy(buffer + offset, &(pcb->pid), sizeof(pcb->pid));
+    offset += sizeof(pcb->pid);
+
+    memcpy(buffer + offset, &(pcb->program_counter), sizeof(pcb->program_counter));
+    offset += sizeof(pcb->program_counter);
+
+    memcpy(buffer + offset, &(pcb->estado), sizeof(pcb->estado));
+    offset += sizeof(pcb->estado);
+
+    memcpy(buffer + offset, pcb->registros, sizeof(pcb->registros));
+    offset += sizeof(pcb->registros);
+
+    return buffer;
+}
+
+
 int send_example_cpu()
 {
     t_package *package_example = package_create(EXAMPLE);
