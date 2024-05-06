@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <commons/collections/list.h>
 
+#include "estructuras.h"
 #include "buffer.h"
 
 /*
@@ -70,9 +71,14 @@ int package_recv(t_package *package, int fd);
 // serialize
 void *serializar_paquete(t_package *paquete, int bytes);
 void example_serialize_msg(t_buffer *buffer, t_message_example *msg);
+void serialize_pcb(t_buffer *buffer, t_PCB *pcb);
+void serialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers);
 
 // deserialize
 void example_deserialize_msg(t_buffer *buffer, t_message_example *msg);
+
+void deserialize_pcb(t_buffer *buffer, t_PCB *pcb);
+void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers);
 
 //send
 
