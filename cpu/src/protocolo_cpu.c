@@ -12,7 +12,7 @@ void atender_cpu_kernel_dispatch()
 
         case MSG_KERNEL_CPU_DISPATCH:
 
-            log_info(logger_cpu, "Se recibio un mje del KERNEL");
+            recv_pcb_cpu();
             break;
 
         case EXAMPLE:
@@ -85,6 +85,22 @@ int recv_example_msg_kernel()
     log_info(logger_cpu, "ENTERO => %d", new_msg->entero);
     free(new_msg->cadena);
     free(new_msg);
+    buffer_destroy(new_buffer);
+
+    return 0;
+}
+
+int recv_pcb_cpu()
+{
+
+    t_PCB *pcb = malloc(sizeof(t_PCB));
+    t_buffer *new_buffer = recive_full_buffer(fd_kernel_dispatch);
+    deserialize_pcb(new_buffer, pcb);
+    log_info(logger_cpu, "PCB pc => %d", pcb->program_counter);
+    log_info(logger_cpu, "PCB Quantum => %d", pcb->quantum);
+    log_info(logger_cpu, "PCB cpu_registers AX => %d", pcb->cpu_registers->ax);
+
+    pcb_destroy(pcb);
     buffer_destroy(new_buffer);
 
     return 0;

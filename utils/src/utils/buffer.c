@@ -19,7 +19,7 @@ t_buffer *buffer_create()
 // Buffer destroy
 void buffer_destroy(t_buffer *buffer)
 {
-    if (buffer->stream != 0)
+    if (buffer->stream != NULL)
     {
         free(buffer->stream);
     }
