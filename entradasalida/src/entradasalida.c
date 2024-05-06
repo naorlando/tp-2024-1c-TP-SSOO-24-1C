@@ -20,19 +20,25 @@ int main(int argc, char *argv[])
                   : log_error(logger_entradasalida, "Error al conectar con kernel");
 
     // Atendemos mensaje del Kernel
+
     pthread_t hilo_kernel;
     pthread_create(&hilo_kernel, NULL, (void *)requests_kernel, NULL);
     pthread_detach(hilo_kernel);
 
-    //Atender los mensajes de la memoria
+    //Atender los mensajes de la memoria (comentado), no lo necesitamos para la interfaz genérica
 
-    pthread_t hilo_memoria;
-    pthread_create(&hilo_memoria, NULL, (void *)requests_memoria,NULL);
-    pthread_join(hilo_memoria,NULL);
+    // pthread_t hilo_memoria;
+    // pthread_create(&hilo_memoria, NULL, (void *)requests_memoria,NULL);
+    // pthread_join(hilo_memoria,NULL);
+
+    // Agrego un hilo para esperar indefinidamente a recibir solicitudes del kernel (no es necesario un hilo para atender memoria)
+    
+    pthread_join(hilo_kernel, NULL);
 
     // Liberamos Conexiones
-
-    liberar_conexion(fd_memoria);
+    
+    // comento la liberación de la conexión con memoria
+    // liberar_conexion(fd_memoria);
     liberar_conexion(fd_kernel);
     return EXIT_SUCCESS;
 }
