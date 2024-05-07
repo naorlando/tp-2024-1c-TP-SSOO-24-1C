@@ -6,6 +6,7 @@
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <readline/readline.h>
+#include <pthread.h>
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"

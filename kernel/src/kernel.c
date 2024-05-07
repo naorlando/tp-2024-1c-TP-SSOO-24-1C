@@ -52,10 +52,12 @@ int main(int argc, char *argv[])
 
     pthread_t hilo_memoria;
     pthread_create(&hilo_memoria, NULL, (void *)atender_kernel_memoria, NULL);
-    pthread_join(hilo_memoria, NULL);
+    pthread_detach(hilo_memoria);
+    //pthread_join(hilo_memoria, NULL);
 
     // CONSOLA INTERACTIVA:
-    // iniciar_consola_interactiva();
+    // ejecuto la consola en el hilo principal del programa.
+    iniciar_consola_interactiva();
 
     free(server_port);
     liberar_conexion(fd_server);

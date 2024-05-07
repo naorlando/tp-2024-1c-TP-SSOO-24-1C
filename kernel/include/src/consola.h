@@ -4,11 +4,16 @@
 #include <kernel.h>
 #include <variables_globales.h>
 
-void inicial_consola_interactiva();
-void _validacion_de_instrucciones_consola();
-void _atender_instruccion();
-void _iniciar_proceso();
+// TODO: mover de lugar:
+pthread_mutex_t  mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 
-//void _asignar_pid();
+int identificador_PID = 1;
+
+void iniciar_consola_interactiva();
+bool _validacion_de_instrucciones_consola(char *leido);
+void _atender_instruccion(char *leido);
+void f_iniciar_proceso(t_buffer* un_buffer);
+
+int asignar_pid();
 
 #endif //CONSOLA_H_
