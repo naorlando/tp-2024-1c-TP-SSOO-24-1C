@@ -16,6 +16,8 @@
 // VARIABLES GLOBALES
 extern t_log* logger_kernel;
 extern t_log* logger_kernel_debug;
+pthread_mutex_t  mutex_pid = PTHREAD_MUTEX_INITIALIZER;
+int identificador_PID = 1;
 
 //CONFIG
 extern t_config* config_kernel;
