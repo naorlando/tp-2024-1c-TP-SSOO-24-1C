@@ -24,7 +24,7 @@ t_package *package_create(t_msg_header msg_header)
     t_package *package = malloc(sizeof(t_package));
 
     package->msg_header = msg_header;
-    package->buffer = buffer_create();
+    package->buffer = buffer_create(sizeof(package->buffer));// cambio
 
     return package;
 }
@@ -156,7 +156,7 @@ void serialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
 {
 
     // CPU registers: AX, BX, CX, DX
-    buffer->size = sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7;
+    //buffer->size = sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7; // cambio
     buffer->stream = malloc(buffer->size);
 
     memcpy(buffer->stream, &(cpu_registers->pc), sizeof(uint32_t));
@@ -202,7 +202,7 @@ void serialize_pcb(t_buffer *buffer, t_PCB *pcb)
     offset += sizeof(uint32_t);
 
     // CPU registers
-    t_buffer *buffer_cpu_registers = buffer_create();
+    t_buffer *buffer_cpu_registers = buffer_create(sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7); // cambio
 
     serialize_cpu_registers(buffer_cpu_registers, pcb->cpu_registers);
 
