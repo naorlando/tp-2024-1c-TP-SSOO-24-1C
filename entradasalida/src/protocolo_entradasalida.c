@@ -21,7 +21,7 @@ void requests_kernel() {
                 log_info(logger_entradasalida, "Se recibio un mje del KERNEL");
             break;
             //Agrego la operacion para el caso de que el kernel solicite un sleep
-            case IO_GEN_SLEEP:
+            case MSG_IO_KERNEL_GEN_SLEEP:
                 log_info(logger_entradasalida, "Se recibio una instruccion IO_GEN_SLEEP");
                 atender_instruccion_sleep();
             break;

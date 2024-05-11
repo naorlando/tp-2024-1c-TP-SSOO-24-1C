@@ -39,6 +39,8 @@ typedef enum
     //IO <-> MEMORIA
     MSG_IO_MEMORIA,
     EXAMPLE,
+    //IO <-> KERNEL
+    MSG_IO_KERNEL_GEN_SLEEP,
 
     //Empty package
     NULL_HEADER
