@@ -51,6 +51,10 @@ void requests_kernel() {
             */             
             case MSG_KERNEL_MEMORIA:
 
+            case CREAR_PROCESO_KERNEL:
+                recv_crear_proceso_kernel();
+                break;
+
                 log_info(logger_memoria, "Se recibio un mje del Kernel");
             break;
             case -1:
@@ -142,4 +146,28 @@ int recv_example_msg_entradasalida(){
     buffer_destroy(new_buffer);
 
     return 0;
+}
+
+void recv_crear_proceso_kernel() {
+    t_buffer* buffer = recive_full_buffer(fd_kernel);
+    t_PCB* pcb = malloc(sizeof(t_PCB));
+
+    deserialize_pcb(buffer, pcb);
+
+    // Crear estructuras administrativas necesarias
+    t_proceso* proceso = malloc(sizeof(t_proceso));
+    proceso->pid = pcb->pid;
+    proceso->path = strdup(pcb->path);
+
+    log_info(logger_memoria,"pid del proceso:%s",proceso->pid);
+    log_info(logger_memoria,"path del proceso:%s",proceso->path);
+
+    // // Agregar proceso a la lista de procesos
+    // pthread_mutex_lock(&mutex_lista_procesos);
+    // list_add(lista_procesos, proceso);
+    // pthread_mutex_unlock(&mutex_lista_procesos);
+
+    free(pcb->path);
+    free(pcb);
+    buffer_destroy(buffer);
 }

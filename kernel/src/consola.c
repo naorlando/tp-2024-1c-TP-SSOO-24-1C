@@ -94,26 +94,36 @@ void _atender_instruccion(char *leido) {
 
 void f_iniciar_proceso(t_buffer* un_buffer) {
     char* path = extract_string_buffer(un_buffer);
-    char* size = extract_string_buffer(un_buffer);
-    char* prioridad = extract_string_buffer(un_buffer);
-    log_trace(logger_kernel, "BUFFER[%d]: [PATH:%s][SIZE:%s][PRIO:%s]", un_buffer->size, path, size, prioridad);
-    buffer_destroy(un_buffer);
-
     int pid = asignar_pid();
-    int size_num = atoi(size);
 
-    // Avisar a Memoria [int pid][char* path][int size]
+    // Crear el PCB
+    log_info(logger_kernel, "KERNEL CREA PCB");
+    t_PCB* pcb = malloc(sizeof(t_PCB));
+    pcb->pid = pid;
+    pcb->path = strdup(path);
+    pcb->program_counter = 0;  // Inicializar el program counter
+
+    log_info(logger_kernel,"pid del pcb: %s",pcb->pid);
+    log_info(logger_kernel,"path del pcb: %s",pcb->path);
     
-    // t_buffer* a_enviar = crear_buffer();
-    // cargar_int_al_buffer(a_enviar, pid);
-    // cargar_string_al_buffer(a_enviar, path);
-    // cargar_int_al_buffer(a_enviar, size_num);
-    // t_package* un_paquete = package_create(CREAR_PROCESO_KM, a_enviar);
-    // enviar_paquete(un_paquete, fd_memoria);
-    // destruir_paquete(un_paquete);
 
-    // [FALTA] Hacer el resto de la lógica para el funcionamiento del KERNEL
+    // Serializar el PCB y enviar a la memoria
+    log_info(logger_kernel, "KERNEL SERIALIZA PCB Y ENVIA A MEMORIA");
+    t_package *package = package_create(CREAR_PROCESO_KERNEL);
+    serialize_pcb(package->buffer, pcb);
+    package_send(package, fd_kernel_memoria);
+    package_destroy(package);
+
+    // // Agregar PCB a la cola de NEW
+    // pthread_mutex_lock(&mutex_new_queue);
+    // queue_push(new_queue, pcb);
+    // pthread_mutex_unlock(&mutex_new_queue);
+
+    // Liberar memoria
+    free(path);
+    buffer_destroy(un_buffer);
 }
+
 
 
 int asignar_pid() {

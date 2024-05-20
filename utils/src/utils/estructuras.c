@@ -53,3 +53,17 @@ void cpu_registers_destroy(t_cpu_registers *cpu_registers)
     free(cpu_registers);
     }
 }
+
+
+t_proceso* crear_proceso(int pid, const char* path) {
+    t_proceso* proceso = malloc(sizeof(t_proceso));
+    proceso->pid = pid;
+    proceso->path = strdup(path);
+    return proceso;
+}
+
+void destruir_proceso(t_proceso* proceso) {
+    free(proceso->path);
+    list_destroy(proceso->tabla_paginas);
+    free(proceso);
+}

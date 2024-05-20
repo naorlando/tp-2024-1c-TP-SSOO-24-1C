@@ -32,6 +32,10 @@ typedef struct
     t_cpu_registers* cpu_registers; 
 } t_PCB;
 
+typedef struct {
+    int pid;
+    char* path;
+} t_proceso;
 
 // t_dictionary
 
