@@ -60,16 +60,16 @@ void requests_kernel() {
 
 //Agrego la función para atender la instrucción de sleep
 void atender_instruccion_sleep() {
-    int unidades_trabajo;
-    if (recibir_instruccion(fd_kernel, &unidades_trabajo) == 0) {
-        int tiempo_espera = unidades_trabajo * TIEMPO_UNIDAD_TRABAJO;
-        log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
-        sleep(tiempo_espera);
-        log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
-        enviar_confirmacion(fd_kernel, MSG_KERNEL_IO);
-    } else {
-        log_error(logger_entradasalida, "Error al recibir la instruccion IO_GEN_SLEEP");
-    }
+    // int unidades_trabajo;
+    // if (recibir_instruccion(fd_kernel, &unidades_trabajo) == 0) {
+    //     int tiempo_espera = unidades_trabajo * TIEMPO_UNIDAD_TRABAJO;
+    //     log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
+    //     sleep(tiempo_espera);
+    //     log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
+    //     enviar_confirmacion(fd_kernel, MSG_KERNEL_IO);
+    // } else {
+    //     log_error(logger_entradasalida, "Error al recibir la instruccion IO_GEN_SLEEP");
+    // }
 }
 
 int recv_example_msg_kernel(){

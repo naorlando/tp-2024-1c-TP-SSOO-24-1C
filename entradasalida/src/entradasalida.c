@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
     pthread_t hilo_kernel;
     pthread_create(&hilo_kernel, NULL, (void *)requests_kernel, NULL);
-    pthread_detach(hilo_kernel);
+    //pthread_detach(hilo_kernel);
 
     //Atender los mensajes de la memoria (comentado), no lo necesitamos para la interfaz genérica
 
