@@ -68,8 +68,8 @@ void _atender_instruccion(char *leido) {
 
     if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0) { // [path][size][prioridad]
         buffer_add_string(un_buffer, comando_consola[1]); // [path]
-        buffer_add_string(un_buffer, comando_consola[2]); // [size]
-        buffer_add_string(un_buffer, comando_consola[3]); // [prioridad]
+        // buffer_add_string(un_buffer, comando_consola[2]); // [size]
+        // buffer_add_string(un_buffer, comando_consola[3]); // [prioridad]
         f_iniciar_proceso(un_buffer);
         pthread_create(&un_hilo, NULL, (void*)f_iniciar_proceso, un_buffer);
         pthread_detach(un_hilo);
@@ -120,7 +120,6 @@ void f_iniciar_proceso(t_buffer* un_buffer) {
 
     // Liberar memoria
     free(path);
-    free(pid);   
     free(nuevo_proceso->path);
     free(nuevo_proceso);
     buffer_destroy(un_buffer);
