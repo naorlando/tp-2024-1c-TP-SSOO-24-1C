@@ -28,14 +28,19 @@ typedef struct
 {
     uint32_t pid;
     uint32_t program_counter;
-    uint32_t quantum;             
+    uint32_t quantum;                
     t_cpu_registers* cpu_registers; 
 } t_PCB;
 
 typedef struct {
-    int pid;
+    uint32_t pid;
     char* path;
 } t_proceso;
+
+typedef struct {
+    uint32_t pid;
+    char* path;
+} t_nuevo_proceso;
 
 // t_dictionary
 
@@ -46,6 +51,11 @@ void pcb_destroy(t_PCB* pcb);
 
 t_cpu_registers* cpu_registers_create();
 void cpu_registers_destroy(t_cpu_registers* cpu_registers);
+
+t_proceso* crear_proceso(uint32_t pid, const char* path);
+void destruir_proceso(t_proceso* proceso);
+
+t_nuevo_proceso* create_new_process(uint32_t pid,const char* path);
 
 
 #endif

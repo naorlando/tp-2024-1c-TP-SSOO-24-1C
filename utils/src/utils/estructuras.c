@@ -18,6 +18,7 @@ t_PCB *pcb_create(uint32_t pid, uint32_t quantum)
     return pcb;
 }
 
+
 void pcb_destroy(t_PCB *pcb)
 {
 
@@ -55,7 +56,7 @@ void cpu_registers_destroy(t_cpu_registers *cpu_registers)
 }
 
 
-t_proceso* crear_proceso(int pid, const char* path) {
+t_proceso* crear_proceso(uint32_t pid, const char* path) {
     t_proceso* proceso = malloc(sizeof(t_proceso));
     proceso->pid = pid;
     proceso->path = strdup(path);
@@ -66,4 +67,15 @@ void destruir_proceso(t_proceso* proceso) {
     free(proceso->path);
     list_destroy(proceso->tabla_paginas);
     free(proceso);
+}
+
+t_nuevo_proceso* create_new_process(uint32_t pid,const char* path){
+    
+     t_nuevo_proceso *t_nuevo_proceso = malloc(sizeof(t_nuevo_proceso));
+
+    t_nuevo_proceso->pid = pid;
+    t_nuevo_proceso->path;
+
+    return t_nuevo_proceso;
+    
 }

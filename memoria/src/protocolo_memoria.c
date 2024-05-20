@@ -150,9 +150,9 @@ int recv_example_msg_entradasalida(){
 
 void recv_crear_proceso_kernel() {
     t_buffer* buffer = recive_full_buffer(fd_kernel);
-    t_PCB* pcb = malloc(sizeof(t_PCB));
+    t_proceso* proceso = malloc(sizeof(t_proceso));
 
-    deserialize_pcb(buffer, pcb);
+    deserialize_nuevo_proceso(buffer, proceso);
 
     // Crear estructuras administrativas necesarias
     t_proceso* proceso = malloc(sizeof(t_proceso));
@@ -167,7 +167,7 @@ void recv_crear_proceso_kernel() {
     // list_add(lista_procesos, proceso);
     // pthread_mutex_unlock(&mutex_lista_procesos);
 
-    free(pcb->path);
-    free(pcb);
+    free(proceso->path);
+    free(proceso);
     buffer_destroy(buffer);
 }

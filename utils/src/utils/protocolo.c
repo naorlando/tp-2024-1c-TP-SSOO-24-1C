@@ -282,3 +282,43 @@ void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
     stream += sizeof(uint32_t);
     memcpy(&(cpu_registers->di), stream, sizeof(uint32_t));
 }
+
+void serialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso) {
+    size_t path_length = strlen(nuevo_proceso->path) + 1; // Incluye el terminador nulo
+    size_t size = sizeof(uint32_t) + path_length + sizeof(uint32_t);
+
+    void *stream = malloc(size);
+    int offset = 0;
+
+    // Serializar PID
+    memcpy(stream + offset, &(nuevo_proceso->pid), sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    // Serializar longitud de path
+    memcpy(stream + offset, &path_length, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    // Serializar path
+    memcpy(stream + offset, nuevo_proceso->path, path_length);
+
+    buffer->stream = stream;
+    buffer->size = size;
+}
+
+void deserialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso) {
+    void *stream = buffer->stream;
+    int offset = 0;
+
+    // Deserializar PID
+    memcpy(&(nuevo_proceso->pid), stream + offset, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    // Deserializar longitud de path
+    uint32_t path_length;
+    memcpy(&path_length, stream + offset, sizeof(uint32_t));
+    offset += sizeof(uint32_t);
+
+    // Deserializar path
+    nuevo_proceso->path = malloc(path_length);
+    memcpy(nuevo_proceso->path, stream + offset, path_length);
+}

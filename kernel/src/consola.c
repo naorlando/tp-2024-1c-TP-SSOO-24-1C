@@ -98,19 +98,18 @@ void f_iniciar_proceso(t_buffer* un_buffer) {
 
     // Crear el PCB
     log_info(logger_kernel, "KERNEL CREA PCB");
-    t_PCB* pcb = malloc(sizeof(t_PCB));
-    pcb->pid = pid;
-    pcb->path = strdup(path);
-    pcb->program_counter = 0;  // Inicializar el program counter
+    t_PCB*  pcb = pcb_create(pid, 1);
+    t_nuevo_proceso* nuevo_proceso = create_new_process(pid,path);
 
-    log_info(logger_kernel,"pid del pcb: %s",pcb->pid);
-    log_info(logger_kernel,"path del pcb: %s",pcb->path);
+    log_info(logger_kernel,"pid del pcb: %d",pcb->pid);
+ 
+
     
 
     // Serializar el PCB y enviar a la memoria
     log_info(logger_kernel, "KERNEL SERIALIZA PCB Y ENVIA A MEMORIA");
     t_package *package = package_create(CREAR_PROCESO_KERNEL);
-    serialize_pcb(package->buffer, pcb);
+    serialize_nuevo_proceso(package->buffer, nuevo_proceso);
     package_send(package, fd_kernel_memoria);
     package_destroy(package);
 
