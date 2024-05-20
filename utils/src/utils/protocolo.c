@@ -220,7 +220,7 @@ void serialize_pcb(t_buffer *buffer, t_PCB *pcb)
 void deserialize_pcb(t_buffer *buffer, t_PCB *pcb)
 {
 
-    t_buffer *buffer_cpu_registers = buffer_create();
+    t_buffer *buffer_cpu_registers = buffer_create(sizepf(buffer)); //TODO: Revisar el tamaño del buffer
     uint32_t offset = 0;
 
     void *stream = buffer->stream;

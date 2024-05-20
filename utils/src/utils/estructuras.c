@@ -55,7 +55,7 @@ void cpu_registers_destroy(t_cpu_registers *cpu_registers)
     }
 }
 
-
+// lo usa memoria para crear un proceso
 t_proceso* crear_proceso(uint32_t pid, const char* path) {
     t_proceso* proceso = malloc(sizeof(t_proceso));
     proceso->pid = pid;
@@ -65,10 +65,10 @@ t_proceso* crear_proceso(uint32_t pid, const char* path) {
 
 void destruir_proceso(t_proceso* proceso) {
     free(proceso->path);
-    list_destroy(proceso->tabla_paginas);
+    // list_destroy(proceso->tabla_paginas);
     free(proceso);
 }
-
+// 
 t_nuevo_proceso* create_new_process(uint32_t pid,const char* path){
     
      t_nuevo_proceso *t_nuevo_proceso = malloc(sizeof(t_nuevo_proceso));

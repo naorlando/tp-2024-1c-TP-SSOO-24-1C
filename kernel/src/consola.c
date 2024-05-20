@@ -64,7 +64,7 @@ bool _validacion_de_instrucciones_consola(char *leido){
 void _atender_instruccion(char *leido) {
     char** comando_consola = string_split(leido, " ");
     pthread_t un_hilo;
-    t_buffer* un_buffer = buffer_create();
+    t_buffer* un_buffer = buffer_create(sizeof(leido)+1); //TODO: Revisar el tamaño del buffer
 
     if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0) { // [path][size][prioridad]
         buffer_add_string(un_buffer, comando_consola[1]); // [path]
@@ -120,6 +120,9 @@ void f_iniciar_proceso(t_buffer* un_buffer) {
 
     // Liberar memoria
     free(path);
+    free(pid);   
+    free(nuevo_proceso->path);
+    free(nuevo_proceso);
     buffer_destroy(un_buffer);
 }
 

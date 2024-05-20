@@ -150,16 +150,16 @@ int recv_example_msg_entradasalida(){
 
 void recv_crear_proceso_kernel() {
     t_buffer* buffer = recive_full_buffer(fd_kernel);
-    t_proceso* proceso = malloc(sizeof(t_proceso));
+    t_nuevo_proceso* nuevo_proceso = malloc(sizeof(t_proceso));
 
-    deserialize_nuevo_proceso(buffer, proceso);
+    deserialize_nuevo_proceso(buffer, nuevo_proceso);
 
     // Crear estructuras administrativas necesarias
     t_proceso* proceso = malloc(sizeof(t_proceso));
-    proceso->pid = pcb->pid;
-    proceso->path = strdup(pcb->path);
+    proceso->pid = nuevo_proceso->pid;
+    proceso->path = strdup(nuevo_proceso->path);
 
-    log_info(logger_memoria,"pid del proceso:%s",proceso->pid);
+    log_info(logger_memoria,"pid del proceso:%d",proceso->pid);
     log_info(logger_memoria,"path del proceso:%s",proceso->path);
 
     // // Agregar proceso a la lista de procesos
@@ -169,5 +169,7 @@ void recv_crear_proceso_kernel() {
 
     free(proceso->path);
     free(proceso);
+    free(nuevo_proceso->path);
+    free(nuevo_proceso);
     buffer_destroy(buffer);
 }

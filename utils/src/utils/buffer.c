@@ -181,9 +181,9 @@ bool buffer_is_end(t_buffer* buffer){
     return (buffer->offset == buffer->size);
 }
 
-bool buffer_can_read(t_buffer* buffer, uint32_t size) {
-    return buffer_can_advance(buffer, size);
-}
+// bool buffer_can_read(t_buffer* buffer, uint32_t size) {
+//     return buffer_can_advance(buffer, size);
+// }
 
 bool buffer_can_read(t_buffer* buffer, uint32_t size) {
     return buffer_can_advance(buffer, size);
@@ -237,17 +237,17 @@ char* buffer_read_string(t_buffer* buffer, uint32_t* length){
 
 //-----Funciones para escribir datos en el buffer-----
 void buffer_add_uint8(t_buffer* buffer, uint8_t data){
-    buffer_add_data(buffer, &data);
+    buffer_add_data(buffer, &data, sizeof(uint8_t));
 }
 
 void buffer_add_uint16(t_buffer* buffer, uint16_t data){
-    buffer_add_data(buffer, &data);
+    buffer_add_data(buffer, &data, sizeof(uint16_t));
 }
 
 void buffer_add_uint32(t_buffer* buffer, uint32_t data){
-    buffer_add_data(buffer, &data);
+    buffer_add_data(buffer, &data, sizeof(uint32_t));
 }
 
 void buffer_add_string(t_buffer* buffer, char* data){
-    buffer_add_data(buffer, data);
+    buffer_add_data(buffer, data, strlen(data));
 }

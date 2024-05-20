@@ -31,12 +31,12 @@ typedef struct
     uint32_t quantum;                
     t_cpu_registers* cpu_registers; 
 } t_PCB;
-
+// proceso completo.
 typedef struct {
     uint32_t pid;
     char* path;
 } t_proceso;
-
+// proceso que se envia a memoria.
 typedef struct {
     uint32_t pid;
     char* path;
