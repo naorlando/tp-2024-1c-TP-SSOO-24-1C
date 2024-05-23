@@ -9,6 +9,7 @@
 #define CLIENTE_CPU "CLIENTE CPU"
 #define CLIENTE_KERNEL "CLIENTE KERNEL"
 #define CLIENTE_ENTRADASALIDA "CLIENTE ENTRADASALIDA"
+#define MAX_LINE_LENGTH 256
 
 extern t_log* logger_memoria;
 extern t_log* logger_memoria_debug;
