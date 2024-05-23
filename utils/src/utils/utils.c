@@ -27,3 +27,18 @@ uint16_t intArrayLength(uint32_t* array){
     }
     return i;
 }
+
+char* uint8_to_string(uint8_t value) {
+    // Un valor uint8_t puede ser de 0 a 255, así que el máximo número de dígitos es 3
+    // Añadimos 1 para el terminador nulo '\0'
+    char* str = malloc(4 * sizeof(char));
+
+    if (str == NULL) {
+        return NULL;
+    }
+
+    // Convierte el valor uint8_t a una cadena de texto
+    snprintf(str, 4, "%u", value);
+
+    return str;
+}
