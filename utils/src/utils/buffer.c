@@ -185,7 +185,7 @@ bool buffer_can_read(t_buffer* buffer, uint32_t size) {
     return buffer_can_advance(buffer, size);
 }
 
-bool buffer_can_read(t_buffer* buffer, uint32_t size) {
+bool buffer_can_write(t_buffer* buffer, uint32_t size) {
     return buffer_can_advance(buffer, size);
 }
 
@@ -210,7 +210,7 @@ uint8_t buffer_read_uint8(t_buffer* buffer){
     return data;
 }
 
-uint16_t buffer_read_uint8(t_buffer* buffer){
+uint16_t buffer_read_uint16(t_buffer* buffer){
     uint16_t data;
 
     buffer_read_data(buffer, &data, sizeof(uint16_t));
