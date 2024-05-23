@@ -185,7 +185,6 @@ bool buffer_can_write(t_buffer* buffer, uint32_t size) {
     return buffer_can_advance(buffer, size);
 }
 
-
 bool buffer_can_read(t_buffer* buffer, uint32_t size) {
     return buffer_can_advance(buffer, size);
 }
