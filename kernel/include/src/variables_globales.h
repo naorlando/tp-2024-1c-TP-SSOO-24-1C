@@ -6,6 +6,7 @@
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <readline/readline.h>
+#include <pthread.h>
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"
@@ -15,6 +16,8 @@
 // VARIABLES GLOBALES
 extern t_log* logger_kernel;
 extern t_log* logger_kernel_debug;
+extern pthread_mutex_t  mutex_pid;
+extern int identificador_PID;
 
 //CONFIG
 extern t_config* config_kernel;

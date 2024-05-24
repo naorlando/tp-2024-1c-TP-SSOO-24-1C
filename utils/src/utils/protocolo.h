@@ -15,6 +15,7 @@
 #include <sys/socket.h>
 #include <commons/collections/list.h>
 
+#include "estructuras.h"
 #include "buffer.h"
 
 /*
@@ -33,6 +34,9 @@ typedef enum
     // KERNEL <-> MEMORIA
     MSG_KERNEL_MEMORIA,
     MSG_MEMORIA_KERNEL,
+    CREAR_PROCESO_KERNEL,
+    // KERNEL <-> IO
+    IO_GEN_SLEEP,
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
@@ -72,10 +76,17 @@ int package_recv(t_package *package, int fd);
 // serialize
 void *serializar_paquete(t_package *paquete, int bytes);
 void example_serialize_msg(t_buffer *buffer, t_message_example *msg);
+void serialize_pcb(t_buffer *buffer, t_PCB *pcb);
+void serialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers);
 
 // deserialize
 void example_deserialize_msg(t_buffer *buffer, t_message_example *msg);
 
+void deserialize_pcb(t_buffer *buffer, t_PCB *pcb);
+void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers);
+
+void serialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso);
+void deserialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso);
 //send
 
 #endif

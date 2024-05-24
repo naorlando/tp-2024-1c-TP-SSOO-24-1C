@@ -1,30 +1,26 @@
 #include <protocolo_kernel.h>
 
-#include <stdlib.h>
-#include <string.h>
+// void *serializar_pcb(t_PCB *pcb, int *size) {
+//     int total_size = sizeof(pcb->pid) + sizeof(pcb->program_counter) + sizeof(pcb->estado) + sizeof(pcb->registros);
+//     *size = total_size;  // Set the size of the serialized data
 
-void *serializar_pcb(t_PCB *pcb, int *size) {
-    int total_size = sizeof(pcb->pid) + sizeof(pcb->program_counter) + sizeof(pcb->estado) + sizeof(pcb->registros);
-    *size = total_size;  // Set the size of the serialized data
+//     void *buffer = malloc(total_size);
+//     int offset = 0;
 
-    void *buffer = malloc(total_size);
-    int offset = 0;
+//     memcpy(buffer + offset, &(pcb->pid), sizeof(pcb->pid));
+//     offset += sizeof(pcb->pid);
 
-    memcpy(buffer + offset, &(pcb->pid), sizeof(pcb->pid));
-    offset += sizeof(pcb->pid);
+//     memcpy(buffer + offset, &(pcb->program_counter), sizeof(pcb->program_counter));
+//     offset += sizeof(pcb->program_counter);
 
-    memcpy(buffer + offset, &(pcb->program_counter), sizeof(pcb->program_counter));
-    offset += sizeof(pcb->program_counter);
+//     memcpy(buffer + offset, &(pcb->estado), sizeof(pcb->estado));
+//     offset += sizeof(pcb->estado);
 
-    memcpy(buffer + offset, &(pcb->estado), sizeof(pcb->estado));
-    offset += sizeof(pcb->estado);
+//     memcpy(buffer + offset, pcb->registros, sizeof(pcb->registros));
+//     offset += sizeof(pcb->registros);
 
-    memcpy(buffer + offset, pcb->registros, sizeof(pcb->registros));
-    offset += sizeof(pcb->registros);
-
-    return buffer;
-}
-
+//     return buffer;
+// }
 
 int send_example_cpu()
 {
@@ -42,6 +38,20 @@ int send_example_cpu()
     free(example->cadena);
     free(example);
     package_destroy(package_example);
+    return 0;
+}
+
+int send_pcb_cpu()
+{
+    t_package *package = package_create(MSG_KERNEL_CPU_DISPATCH);
+    t_PCB*  pcb = pcb_create(0, 1);
+
+    serialize_pcb(package->buffer, pcb);
+    package_send(package, fd_cpu_dispatch);
+
+    //pcb_destroy(pcb); no eliminar hasta que termine de ejecutar 
+    package_destroy(package);
+
     return 0;
 }
 
@@ -64,13 +74,14 @@ int send_example_memoria()
     return 0;
 }
 
-int recv_example_msg_entradasalida(){
+int recv_example_msg_entradasalida()
+{
     log_info(logger_kernel, "<<<<< EXAMPLE RECIVE MESSAGE FROM ENTRADASALIDA >>>>");
-    t_message_example * new_msg = malloc(sizeof(t_message_example));
-    t_buffer* new_buffer = recive_full_buffer(fd_kernel_IO);
+    t_message_example *new_msg = malloc(sizeof(t_message_example));
+    t_buffer *new_buffer = recive_full_buffer(fd_kernel_IO);
 
     example_deserialize_msg(new_buffer, new_msg);
-            
+
     log_info(logger_kernel, "%s", new_msg->cadena);
     log_info(logger_kernel, "%d", new_msg->entero);
     free(new_msg->cadena);
@@ -118,12 +129,12 @@ void atender_kernel_IO()
         case EXAMPLE:
             // Se procesa el request
             recv_example_msg_entradasalida();
-            control_key = false; //Cortamos la espera de solicitudes
-        break;
-        //TODO:
+            control_key = false; // Cortamos la espera de solicitudes
+            break;
+        // TODO:
         /*
             Agregar operaciones a las que dara servicio el modulo
-        */ 
+        */
         case MSG_IO_KERNEL:
 
             log_info(logger_kernel, "Se recibio un mje de IO");

@@ -1,7 +1,6 @@
 #include <memoria.h>
 
-int main(void)
-{
+int main(void){
     init();
 
     // ############## Socket ###################
