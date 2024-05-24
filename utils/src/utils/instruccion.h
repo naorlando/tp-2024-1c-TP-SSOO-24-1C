@@ -6,6 +6,33 @@
 #include <string.h>
 #include <commons/string.h>
 
+typedef enum {
+    SET,
+    SUM,
+    SUB,
+    MOV_IN,
+    MOV_OUT,
+    RESIZE,
+    WAIT ,
+    SIGNAL ,
+    JNZ,
+    COPY_STRING,
+    IO_GEN_SLEEP ,
+    IO_STDIN_READ ,
+    IO_STDOUT_WRITE ,
+    IO_FS_CREATE ,
+    IO_FS_DELETE ,
+    IO_FS_TRUNCATE ,
+    IO_FS_WRITE ,
+    IO_FS_READ ,
+    EXIT
+}t_name_instruct;
+
+typedef struct {
+    t_name_instruct name,
+    t_list * params
+}t_instruction;
+
 typedef struct {
     char* linea_instruccion;
 } t_instruccion;

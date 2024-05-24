@@ -11,7 +11,7 @@ void atender_cpu_kernel_dispatch()
         {
 
         case MSG_KERNEL_CPU_DISPATCH:
-
+            // atender_cpu_kernel_dispatch();
             recv_pcb_cpu();
             break;
 
