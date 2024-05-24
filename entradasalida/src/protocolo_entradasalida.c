@@ -59,49 +59,68 @@ void requests_kernel() {
 
 //Agrego la función para atender la instrucción de IO_GEN_SLEEP
 void atender_instruccion_sleep() {
-    // int unidades_trabajo;
-    // if (recibir_instruccion(fd_kernel, &unidades_trabajo) == 0) {
-    //     int tiempo_espera = unidades_trabajo * TIEMPO_UNIDAD_TRABAJO;
-    //     log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
-    //     sleep(tiempo_espera);
-    //     log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
-    //     enviar_confirmacion(fd_kernel, MSG_KERNEL_IO);
-    // } else {
-    //     log_error(logger_entradasalida, "Error al recibir la instruccion IO_GEN_SLEEP");
-    // }
-}
-
-// Función para recibir una instrucción desde el Kernel
-t_instruccion* recibir_instruccion(int socket_kernel) {
-    t_instruccion* instruccion = malloc(sizeof(t_instruccion));
-    
-    // Recibir el tipo de instrucción
-    if (recv(socket_kernel, &instruccion->tipo_instruccion, sizeof(int), 0) <= 0) {
-        log_error(logger_entradasalida, "Error al recibir tipo de instrucción");
-        free(instruccion);
-        return NULL;
-    }
-    
-    // Recibir el número de unidades de trabajo
-    if (recv(socket_kernel, &instruccion->unidades_trabajo, sizeof(int), 0) <= 0) {
-        log_error(logger_entradasalida, "Error al recibir unidades de trabajo");
-        free(instruccion);
-        return NULL;
-    }
-
-    log_info(logger_entradasalida, "Instrucción recibida: tipo=%d, unidades de trabajo=%d", instruccion->tipo_instruccion, instruccion->unidades_trabajo);
-    
-    return instruccion;
-}
-
-// Función para enviar una confirmación al Kernel
-void enviar_confirmacion(int socket_kernel, int resultado) {
-    // Enviar el resultado de la confirmación
-    if (send(socket_kernel, &resultado, sizeof(int), 0) <= 0) {
-        log_error(logger_entradasalida, "Error al enviar confirmación al Kernel");
+    int unidades_trabajo;
+    if (recibir_instruccion(fd_kernel, &unidades_trabajo) == 0) {
+        int tiempo_espera = unidades_trabajo * TIEMPO_UNIDAD_TRABAJO;
+        log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
+        sleep(tiempo_espera);
+        log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
+        enviar_confirmacion(fd_kernel, MSG_KERNEL_IO);
     } else {
-        log_info(logger_entradasalida, "Confirmación enviada al Kernel: resultado=%d", resultado);
+        log_error(logger_entradasalida, "Error al recibir la instruccion IO_GEN_SLEEP");
     }
+}
+
+//Agrego la función para recibir una instrucción, que realiza el proceso de deserialización
+/* La función recibir_instruccion() deserializa el mensaje recibido del kernel y crea una estructura 
+t_instruction que contiene el nombre de la instrucción y sus parámetros. Esta estructura es pasada 
+por referencia a atender_instruccion_sleep().*/
+int recibir_instruccion(int fd, t_instruction **instruccion) {
+    t_package *package = package_create(NULL_HEADER);
+    if (package_recv(package, fd) != EXIT_SUCCESS) {
+        log_error(logger_entradasalida, "Error al recibir instrucción");
+        package_destroy(package);
+        return -1;
+    }
+
+    t_buffer *buffer = package->buffer;
+    void *stream = buffer->stream;
+
+    // Deserializar el nombre de la instrucción
+    uint32_t instruccion_id;
+    memcpy(&instruccion_id, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    (*instruccion)->name = (t_name_instruct)instruccion_id;
+
+    // Deserializar los parámetros
+    uint32_t cant_params;
+    memcpy(&cant_params, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+    (*instruccion)->params = list_create();
+    for (uint32_t i = 0; i < cant_params; i++) {
+        uint32_t param_size;
+        memcpy(&param_size, stream, sizeof(uint32_t));
+        stream += sizeof(uint32_t);
+        void *param = malloc(param_size);
+        memcpy(param, stream, param_size);
+        stream += param_size;
+        list_add((*instruccion)->params, param);
+    }
+
+    package_destroy(package);
+    return 0;
+}
+
+//Agrego la función para enviar una confirmación al Kernel después de procesar una instrucción
+int enviar_confirmacion(int fd, t_msg_header header) {
+    t_package *package = package_create(header);
+    if (package_send(package, fd) != EXIT_SUCCESS) {
+        log_error(logger_entradasalida, "Error al enviar confirmación");
+        package_destroy(package);
+        return -1;
+    }
+    package_destroy(package);
+    return 0;
 }
 
 // Comento las funciones de ejemplo, ya que no se utilizan en la Interfaz Genérica
