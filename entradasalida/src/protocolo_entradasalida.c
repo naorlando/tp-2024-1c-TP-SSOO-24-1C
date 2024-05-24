@@ -71,6 +71,38 @@ void atender_instruccion_sleep() {
     }
 }
 
+// Función para recibir una instrucción desde el Kernel
+t_instruccion* recibir_instruccion(int socket_kernel) {
+    t_instruccion* instruccion = malloc(sizeof(t_instruccion));
+    
+    // Recibir el tipo de instrucción
+    if (recv(socket_kernel, &instruccion->tipo_instruccion, sizeof(int), 0) <= 0) {
+        log_error(logger_entradasalida, "Error al recibir tipo de instrucción");
+        free(instruccion);
+        return NULL;
+    }
+    
+    // Recibir el número de unidades de trabajo
+    if (recv(socket_kernel, &instruccion->unidades_trabajo, sizeof(int), 0) <= 0) {
+        log_error(logger_entradasalida, "Error al recibir unidades de trabajo");
+        free(instruccion);
+        return NULL;
+    }
+
+    log_info(logger_entradasalida, "Instrucción recibida: tipo=%d, unidades de trabajo=%d", instruccion->tipo_instruccion, instruccion->unidades_trabajo);
+    
+    return instruccion;
+}
+
+// Función para enviar una confirmación al Kernel
+void enviar_confirmacion(int socket_kernel, int resultado) {
+    // Enviar el resultado de la confirmación
+    if (send(socket_kernel, &resultado, sizeof(int), 0) <= 0) {
+        log_error(logger_entradasalida, "Error al enviar confirmación al Kernel");
+    } else {
+        log_info(logger_entradasalida, "Confirmación enviada al Kernel: resultado=%d", resultado);
+    }
+}
 
 // Comento las funciones de ejemplo, ya que no se utilizan en la Interfaz Genérica
 /*
