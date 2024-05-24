@@ -71,19 +71,19 @@ void atender_instruccion_sleep() {
     }
 }
 
+
+// Comento las funciones de ejemplo, ya que no se utilizan en la Interfaz Genérica
+/*
 int recv_example_msg_kernel(){
     log_info(logger_entradasalida, "<<<<< EXAMPLE RECIVE MESSAGE FROM KERNEL>>>>");
     t_message_example * new_msg = malloc(sizeof(t_message_example));
     t_buffer* new_buffer = recive_full_buffer(fd_kernel);
-
     example_deserialize_msg(new_buffer, new_msg);
-            
     log_info(logger_entradasalida, "%s", new_msg->cadena);
     log_info(logger_entradasalida, "%d", new_msg->entero);
     free(new_msg->cadena);
     free(new_msg);
     buffer_destroy(new_buffer);
-
     return 0;
 }
 
@@ -95,11 +95,8 @@ int send_example_kernel()
     example->cadena = malloc(strlen(cadena) + 1);
     strcpy(example->cadena, cadena);
     example->entero = 7;
-
     example_serialize_msg(package_example->buffer, example);
-
     package_send(package_example, fd_kernel);
-
     free(example->cadena);
     free(example);
     package_destroy(package_example);
@@ -114,13 +111,11 @@ int send_example_memoria()
     example->cadena = malloc(strlen(cadena) + 1);
     strcpy(example->cadena, cadena);
     example->entero = 9;
-
     example_serialize_msg(package_example->buffer, example);
-
     package_send(package_example, fd_memoria);
-
     free(example->cadena);
     free(example);
     package_destroy(package_example);
     return 0;
 }
+*/
