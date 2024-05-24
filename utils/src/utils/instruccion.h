@@ -48,4 +48,11 @@ void eliminar_instruccion(t_instruction*);
 // Post: Retorna un puntero a la cadena de texto de la instrucción.
 char* obtener_instruccion(t_instruction*);
 
+// Obtiene el tipo de instrucción a partir de una cadena de caracteres.
+// Pre: El puntero a la cadena de caracteres 'linea' debe ser válido y no NULL.
+// Post: Retorna el valor correspondiente del enum t_name_instruction si la cadena
+// coincide con alguna instrucción válida. Si no coincide, retorna NULL e imprime
+// un mensaje de error en stderr.
+t_name_instruction _obtener_tipo_instruccion(char*); 
+
 #endif
