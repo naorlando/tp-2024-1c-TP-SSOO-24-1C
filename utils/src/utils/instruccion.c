@@ -29,3 +29,12 @@ void eliminar_instruccion(t_instruccion* instruccion) {
 char* obtener_instruccion(t_instruccion* instruccion) {
     return instruccion->linea_instruccion;
 }
+
+// deserializa una instrucción desde un buffer con un stream que tiene una estructura de t_instruction:
+// typedef struct {
+//     uint32_t pid;
+//     char* path;
+// } t_proceso;
+void deserialize_instruccion(t_buffer *buffer, t_instruction *instruccion) {
+
+}

@@ -40,6 +40,7 @@ typedef enum
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
+    INTRUCCION_MEMORIA_CPU,
     //IO <-> MEMORIA
     MSG_IO_MEMORIA,
     EXAMPLE,

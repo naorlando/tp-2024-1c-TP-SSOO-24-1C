@@ -52,4 +52,8 @@ void eliminar_instruccion(t_instruccion*);
 // Post: Retorna un puntero a la cadena de texto de la instrucción.
 char* obtener_instruccion(t_instruccion*);
 
+
+
+void deserialize_instruccion(t_buffer *buffer, t_instruction *instruccion);
+
 #endif
