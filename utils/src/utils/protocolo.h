@@ -63,7 +63,7 @@ typedef struct
  */
 
 // Package
-t_package *package_create(t_msg_header msg_header);
+t_package *package_create(t_msg_header msg_header , u_int32_t buffer_size);
 void package_destroy(t_package *package);
 int package_send(t_package *package, int fd);
 int package_recv(t_package *package, int fd);

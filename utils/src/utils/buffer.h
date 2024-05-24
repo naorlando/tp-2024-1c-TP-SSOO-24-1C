@@ -98,7 +98,7 @@ uint8_t buffer_read_uint8(t_buffer*);
 // Lee un entero de 16 bits del buffer.
 // Pre: El buffer ha sido creado previamente y contiene un entero de 16 bits.
 // Post: Se lee el entero de 16 bits del buffer y se devuelve.
-uint16_t buffer_read_uint8(t_buffer* buffer);
+uint16_t buffer_read_uint16(t_buffer* buffer);
 
 // Lee una cadena de caracteres del buffer.
 // Pre: El buffer ha sido creado previamente y contiene una cadena de caracteres.
