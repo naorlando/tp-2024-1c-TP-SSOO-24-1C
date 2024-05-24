@@ -14,13 +14,15 @@ int main(int argc, char *argv[])
     // fd_kernel > 0 ? send_example_kernel() : log_error(logger_entradasalida, "Error al intentar enviar mensaje a %s", SERVER_KERNEL);
 
     // Reemplazo el código anterior quitando la conexión con Memoria, ya que la Interfaz Genérica no la necesita
-    
     fd_kernel = crear_conexion(logger_entradasalida, SERVER_KERNEL, IP_KERNEL, PUERTO_KERNEL);
-    fd_kernel > 0 ? log_info(logger_entradasalida, "Conexión exitosa con kernel")
-                  : log_error(logger_entradasalida, "Error al conectar con kernel");
+    if (fd_kernel > 0) {
+        log_info(logger_entradasalida, "Conexión exitosa con kernel");
+    } else {
+        log_error(logger_entradasalida, "Error al conectar con kernel");
+        return EXIT_FAILURE;
+    }
 
     // Atendemos mensaje del Kernel
-
     pthread_t hilo_kernel;
     pthread_create(&hilo_kernel, NULL, (void *)requests_kernel, NULL);
     pthread_detach(hilo_kernel);
@@ -31,8 +33,7 @@ int main(int argc, char *argv[])
     // pthread_create(&hilo_memoria, NULL, (void *)requests_memoria,NULL);
     // pthread_join(hilo_memoria,NULL);
 
-    // Agrego un hilo para esperar indefinidamente a recibir solicitudes del kernel (no es necesario un hilo para atender memoria)
-    
+    // Agrego un hilo para esperar indefinidamente a recibir solicitudes del kernel
     pthread_join(hilo_kernel, NULL);
 
     // Liberamos Conexiones
@@ -40,5 +41,6 @@ int main(int argc, char *argv[])
     // comento la liberación de la conexión con memoria
     // liberar_conexion(fd_memoria);
     liberar_conexion(fd_kernel);
+    
     return EXIT_SUCCESS;
 }

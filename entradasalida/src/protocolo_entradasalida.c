@@ -1,8 +1,8 @@
 #include <protocolo_entrada.h>
 
+// Función principal que atiende las solicitudes del Kernel
 void requests_kernel() {
     bool esperar = true;
-
     while(esperar) {
         int cod_operacion = recibir_operacion(fd_kernel);
 
@@ -17,7 +17,6 @@ void requests_kernel() {
             //    esperar = false; //Cortamos la espera de solicitudes
             //break;
             case MSG_KERNEL_IO:
-
                 log_info(logger_entradasalida, "Se recibio un mje del KERNEL");
             break;
             //Agrego la operacion para el caso de que el kernel solicite un sleep
@@ -58,7 +57,7 @@ void requests_kernel() {
     }
 }*/
 
-//Agrego la función para atender la instrucción de sleep
+//Agrego la función para atender la instrucción de IO_GEN_SLEEP
 void atender_instruccion_sleep() {
     int unidades_trabajo;
     if (recibir_instruccion(fd_kernel, &unidades_trabajo) == 0) {
