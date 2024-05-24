@@ -9,7 +9,8 @@
 			"initializer_list": "c",
 			"utility": "c",
 			"random": "c",
-			"*.tcc": "c"
+			"*.tcc": "c",
+			"string": "c"
 		},
 		"C_Cpp.errorSquiggles": "disabled",
 	},

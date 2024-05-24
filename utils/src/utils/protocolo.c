@@ -1,12 +1,6 @@
 #include "protocolo.h"
 
 /*
- *      Buffer & package functions
- *
- *      Buffer create       t_buffer* buffer_create()
- *      Buffer destroy      void buffer_destroy(t_buffer* buffer)
- *      Buffer add          void buffer_add(t_buffer* buffer, void* stream, uint32_t size)
- *
  *      Package create      t_package* package_create(t_msg_header msg_header)
  *      Package destroy     void package_destroy(t_package* package)
  *      Package send        int package_send(t_package* package, int fd)
@@ -18,13 +12,13 @@
  */
 
 // Package create
-t_package *package_create(t_msg_header msg_header)
+t_package *package_create(t_msg_header msg_header, u_int32_t buffer_size)
 {
 
     t_package *package = malloc(sizeof(t_package));
 
     package->msg_header = msg_header;
-    package->buffer = buffer_create(sizeof(package->buffer));// cambio
+    package->buffer = buffer_create(buffer_size);
 
     return package;
 }
@@ -118,69 +112,64 @@ void example_serialize_msg(t_buffer *buffer, t_message_example *msg)
 {
 
     uint8_t size_cadena = strlen(msg->cadena) + 1; // Include null terminator
-    buffer->size = sizeof(uint8_t) * 2 + size_cadena;
     buffer->stream = malloc(buffer->size);
     void *stream = malloc(buffer->size);
-    uint8_t offset = 0;
+    
 
     memcpy(stream, &size_cadena, sizeof(uint8_t));
-    offset += sizeof(uint8_t);
-    memcpy(stream + offset, msg->cadena, size_cadena);
-    offset += size_cadena;
-    memcpy(stream + offset, &(msg->entero), sizeof(uint8_t));
-    offset += sizeof(uint8_t);
+    buffer->offset += sizeof(uint8_t);
+    memcpy(stream + buffer->offset, msg->cadena, size_cadena);
+    buffer->offset += size_cadena;
+    memcpy(stream + buffer->offset, &(msg->entero), sizeof(uint8_t));
+    buffer->offset += sizeof(uint8_t);
 
     buffer->stream = stream;
 }
 
 void example_deserialize_msg(t_buffer *buffer, t_message_example *msg)
 {
-
-    uint8_t offset = 0;
-
     // Copiar el tamaño de la cadena desde el stream al buffer
     uint8_t size_cadena = 0;
     memcpy(&size_cadena, buffer->stream, sizeof(uint8_t));
-    offset += sizeof(uint8_t);
+    buffer->offset += sizeof(uint8_t);
 
     // Reservar memoria para la cadena y copiarla desde el stream al buffer
     msg->cadena = malloc(size_cadena);
-    memcpy(msg->cadena, buffer->stream + offset, size_cadena);
-    offset += size_cadena;
+    memcpy(msg->cadena, buffer->stream + buffer->offset, size_cadena);
+    buffer->offset += size_cadena;
 
     // Copiar el entero desde el stream al buffer
-    memcpy(&(msg->entero), buffer->stream + offset, sizeof(uint8_t));
+    memcpy(&(msg->entero), buffer->stream + buffer->offset, sizeof(uint8_t));
 }
 // CPU registers
 void serialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
 {
 
     // CPU registers: AX, BX, CX, DX
-    //buffer->size = sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7; // cambio
     buffer->stream = malloc(buffer->size);
 
     memcpy(buffer->stream, &(cpu_registers->pc), sizeof(uint32_t));
-    int offset = sizeof(uint32_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->ax), sizeof(uint8_t));
-    offset += sizeof(uint8_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->bx), sizeof(uint8_t));
-    offset += sizeof(uint8_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->cx), sizeof(uint8_t));
-    offset += sizeof(uint8_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->dx), sizeof(uint8_t));
-    offset += sizeof(uint8_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->eax), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->ebx), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->ecx), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->edx), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->si), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
-    memcpy(buffer->stream + offset, &(cpu_registers->di), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
+    buffer->offset = sizeof(uint32_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->ax), sizeof(uint8_t));
+    buffer->offset += sizeof(uint8_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->bx), sizeof(uint8_t));
+    buffer->offset += sizeof(uint8_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->cx), sizeof(uint8_t));
+    buffer->offset += sizeof(uint8_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->dx), sizeof(uint8_t));
+    buffer->offset += sizeof(uint8_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->eax), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->ebx), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->ecx), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->edx), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->si), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
+    memcpy(buffer->stream + buffer->offset, &(cpu_registers->di), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
 }
 
 // PCB
@@ -191,37 +180,38 @@ void serialize_pcb(t_buffer *buffer, t_PCB *pcb)
 
     // PID
     memcpy(stream, &(pcb->pid), sizeof(uint32_t));
-    int offset = sizeof(uint32_t);
+    buffer->offset = sizeof(uint32_t);
 
     // PC
-    memcpy(stream + offset, &(pcb->program_counter), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
+    memcpy(stream + buffer->offset, &(pcb->program_counter), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
 
     // Quantum
-    memcpy(stream + offset, &(pcb->quantum), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
+    memcpy(stream + buffer->offset, &(pcb->quantum), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
 
     // CPU registers
-    t_buffer *buffer_cpu_registers = buffer_create(sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7); // cambio
+    u_int32_t aux_buffer_cpu_registers_size = sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7;
+    t_buffer *buffer_cpu_registers = buffer_create(aux_buffer_cpu_registers_size);
 
     serialize_cpu_registers(buffer_cpu_registers, pcb->cpu_registers);
 
-    memcpy(stream + offset, &(buffer_cpu_registers->size), sizeof(uint32_t));
-    offset += sizeof(uint32_t);
-    memcpy(stream + offset, buffer_cpu_registers->stream, sizeof(t_cpu_registers));
-    offset += sizeof(t_cpu_registers);
+    memcpy(stream + buffer->offset, &(buffer_cpu_registers->size), sizeof(uint32_t));
+    buffer->offset += sizeof(uint32_t);
+    memcpy(stream + buffer->offset, buffer_cpu_registers->stream, sizeof(t_cpu_registers));
+    buffer->offset += sizeof(t_cpu_registers);
 
     buffer->stream = stream;
-    buffer->size = offset;
+    buffer->size = buffer->offset;
 
     buffer_destroy(buffer_cpu_registers);
 }
 
 void deserialize_pcb(t_buffer *buffer, t_PCB *pcb)
 {
-
-    t_buffer *buffer_cpu_registers = buffer_create(sizeof(buffer)); //TODO: Revisar el tamaño del buffer
-    uint32_t offset = 0;
+    u_int32_t aux_buffer_cpu_registers_size = sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7;
+    t_buffer *buffer_cpu_registers = buffer_create(aux_buffer_cpu_registers_size);
+    
 
     void *stream = buffer->stream;
 
@@ -239,16 +229,16 @@ void deserialize_pcb(t_buffer *buffer, t_PCB *pcb)
 
     // CPU registers
 
-    memcpy(&(offset), stream, (sizeof(uint32_t)));
+    memcpy(&(buffer->offset), stream, (sizeof(uint32_t)));
     stream += sizeof(uint32_t);
 
-    void *stream_aux = malloc(offset);
+    void *stream_aux = malloc(buffer->offset);
 
-    memcpy(stream_aux, stream, offset);
-    stream += sizeof(offset);
+    memcpy(stream_aux, stream, buffer->offset);
+    stream += sizeof(buffer->offset);
 
     buffer_cpu_registers->stream = stream_aux;
-    buffer_cpu_registers->size = offset;
+    buffer_cpu_registers->size = buffer->offset;
 
     pcb->cpu_registers = malloc(sizeof(t_cpu_registers));
     deserialize_cpu_registers(buffer_cpu_registers, pcb->cpu_registers);

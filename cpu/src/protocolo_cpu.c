@@ -61,9 +61,12 @@ void atender_cpu_memoria()
 
 int send_example_memoria()
 {
-    t_package *package_example = package_create(EXAMPLE);
-    t_message_example *example = malloc(sizeof(t_message_example));
     char *cadena = "CPU ENVIO MENSAJE A MEMORIA";
+    uint8_t size_cadena = strlen(cadena) + 1; // Include null terminator
+    uint32_t buffer_size = sizeof(uint8_t) * 2 + size_cadena;
+    t_package *package_example = package_create(EXAMPLE, buffer_size);
+    t_message_example *example = malloc(sizeof(t_message_example));
+
     example->cadena = malloc(strlen(cadena) + 1);
     strcpy(example->cadena, cadena);
     example->entero = 10;
