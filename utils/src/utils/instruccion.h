@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <commons/string.h>
+#include <commons/collections/list.h>
 
 typedef enum {
     SET,
@@ -33,9 +34,9 @@ typedef struct {
     t_list * params
 }t_instruction;
 
-typedef struct {
-    char* linea_instruccion;
-} t_instruccion;
+
+
+
 
 // Crea una nueva instrucción a partir de una línea de texto.
 // Pre: La línea de texto debe ser válida y no NULL.
