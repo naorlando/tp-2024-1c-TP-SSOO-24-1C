@@ -24,9 +24,12 @@
 
 int send_example_cpu()
 {
-    t_package *package_example = package_create(EXAMPLE);
-    t_message_example *example = malloc(sizeof(t_message_example));
     char *cadena = "KERNEL ENVIO MENSAJE A CPU";
+    uint8_t size_cadena = strlen(cadena) + 1; // Include null terminator
+    uint32_t buffer_size = sizeof(uint8_t) * 2 + size_cadena;
+    t_package *package_example = package_create(EXAMPLE, buffer_size);
+    t_message_example *example = malloc(sizeof(t_message_example));
+
     example->cadena = malloc(strlen(cadena) + 1);
     strcpy(example->cadena, cadena);
     example->entero = 5;
@@ -43,13 +46,14 @@ int send_example_cpu()
 
 int send_pcb_cpu()
 {
-    t_package *package = package_create(MSG_KERNEL_CPU_DISPATCH);
-    t_PCB*  pcb = pcb_create(0, 1);
+    t_PCB *pcb = pcb_create(0, 1);
+    u_int32_t buffer_size = sizeof(pcb);
+    t_package *package = package_create(MSG_KERNEL_CPU_DISPATCH, buffer_size);
 
     serialize_pcb(package->buffer, pcb);
     package_send(package, fd_cpu_dispatch);
 
-    //pcb_destroy(pcb); no eliminar hasta que termine de ejecutar 
+    // pcb_destroy(pcb); no eliminar hasta que termine de ejecutar
     package_destroy(package);
 
     return 0;
@@ -57,9 +61,12 @@ int send_pcb_cpu()
 
 int send_example_memoria()
 {
-    t_package *package_example = package_create(EXAMPLE);
-    t_message_example *example = malloc(sizeof(t_message_example));
     char *cadena = "KERNEL ENVIO MENSAJE A MEMORIA";
+    uint8_t size_cadena = strlen(cadena) + 1; // Include null terminator
+    uint32_t buffer_size = sizeof(uint8_t) * 2 + size_cadena;
+    t_package *package_example = package_create(EXAMPLE, buffer_size);
+    t_message_example *example = malloc(sizeof(t_message_example));
+
     example->cadena = malloc(strlen(cadena) + 1);
     strcpy(example->cadena, cadena);
     example->entero = 5;
