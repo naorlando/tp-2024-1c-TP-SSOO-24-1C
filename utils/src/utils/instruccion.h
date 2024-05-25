@@ -52,6 +52,8 @@ t_name_instruction obtener_nombre_instruccion(t_instruction*);
 
 t_list* obtener_parametros(t_instruction*);
 
+void free_parametro(void*);
+
 /**********************FUNCIONES PRIVADAS**********************/
 
 // Obtiene el tipo de instrucción a partir de una cadena de caracteres.
