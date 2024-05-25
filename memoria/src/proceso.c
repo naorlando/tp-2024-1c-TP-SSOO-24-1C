@@ -1,6 +1,6 @@
 #include "proceso.h"
 
-t_proceso* crear_proceso(uint8_t pid, char* path) {
+t_proceso* crear_proceso(uint32_t pid, char* path) {
     t_proceso* proceso_nuevo = malloc(sizeof(t_proceso));
 
     if(proceso_nuevo == NULL) {
@@ -17,7 +17,7 @@ t_proceso* crear_proceso(uint8_t pid, char* path) {
     return proceso_nuevo;
 } 
 
-t_instruccion* obtener_siguiente_instruccion(t_proceso* proceso, uint8_t num_instruccion) {
+t_instruction* obtener_siguiente_instruccion(t_proceso* proceso, uint32_t num_instruccion) {
     FILE* codigo = fopen(obtener_path_absoluto(proceso), "r");
 
     if(codigo == NULL) {
@@ -40,14 +40,14 @@ t_instruccion* obtener_siguiente_instruccion(t_proceso* proceso, uint8_t num_ins
     }
 
     if (linea == NULL) {
-        fprintf(stderr, "Error: Línea %d no encontrada en el archivo %s\n", num_linea_actual, path);
+        fprintf(stderr, "Error: Línea %d no encontrada en el archivo %s\n", num_linea_actual, obtener_path_absoluto(proceso));
     }
 
     fclose(codigo);
     return crear_instruccion(linea);
 }
 
-void eliminar_proceso(t_proceso* proceso) {
+void liberar_proceso(t_proceso* proceso) {
     char* path_absoluto = obtener_path_absoluto(proceso);
 
     if(path_absoluto != NULL) {
