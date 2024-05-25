@@ -117,7 +117,7 @@ int atender_instruccion_memoria()
     //DECODE:
 
     t_buffer *new_buffer = recive_full_buffer(fd_memoria);
-    t_instruction *instruccion = malloc(sizeof(t_instruction));
+    t_instruccion *instruccion = malloc(sizeof(t_instruction));
     deserialize_instruccion(new_buffer, instruccion); //TODO
     log_info(logger_cpu, "INSTRUCCION => %d", instruccion->name);
     log_info(logger_cpu, "PARAMETROS => %s", instruccion->params);

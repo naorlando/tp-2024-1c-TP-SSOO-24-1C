@@ -10,7 +10,8 @@
 			"utility": "c",
 			"random": "c",
 			"*.tcc": "c",
-			"string": "c"
+			"string": "c",
+			"typeinfo": "c"
 		},
 		"C_Cpp.errorSquiggles": "disabled",
 	},

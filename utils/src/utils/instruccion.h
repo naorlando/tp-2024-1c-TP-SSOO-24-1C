@@ -32,7 +32,7 @@ typedef enum {
 typedef struct {
     t_name_instruct name,
     t_list * params
-}t_instruction;
+}t_instruccion;
 
 
 
@@ -53,8 +53,19 @@ void eliminar_instruccion(t_instruccion*);
 // Post: Retorna un puntero a la cadena de texto de la instrucción.
 char* obtener_instruccion(t_instruccion*);
 
+// Serializa una instrucción en el buffer.
+// pre: el buffer y la instrucción deben ser válidos y no NULL.
+// post: la instrucción es serializada en el buffer.
+void serialize_instruccion(t_buffer *buffer, t_instruccion *instruccion);
 
+// Deserializa una instrucción desde el buffer.
+// pre: el buffer y la instrucción deben ser válidos y no NULL.
+// post: la instrucción es deserializada desde el buffer.
+void deserialize_instruccion(t_buffer *buffer, t_instruccion *instruccion);
 
-void deserialize_instruccion(t_buffer *buffer, t_instruction *instruccion);
+// Destruye una instrucción.
+// pre: el puntero a la instrucción debe ser válido y no NULL.
+// post: la memoria asignada a la instrucción es liberada.
+void instruccion_destroy(t_instruccion *instruccion);
 
 #endif
