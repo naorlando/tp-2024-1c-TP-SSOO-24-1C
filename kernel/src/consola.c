@@ -1,4 +1,3 @@
-#include <kernel.h>
 #include <consola.h>
 
 
@@ -62,16 +61,19 @@ bool _validacion_de_instrucciones_consola(char *leido){
 }
 
 void _atender_instruccion(char *leido) {
-    char** comando_consola = string_split(leido, " ");
+    char * leido_aux = string_duplicate(leido);
+    
+    char** comando_consola = string_split(leido_aux, " ");
+    char* path = comando_consola[1];
     pthread_t un_hilo;
-    t_buffer* un_buffer = buffer_create(sizeof(leido)+1); //TODO: Revisar el tamaño del buffer
+    //t_buffer* un_buffer = buffer_create(strlen(comando_consola[1])+1); //TODO: Revisar el tamaño del buffer
 
     if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0) { // [path][size][prioridad]
-        buffer_add_string(un_buffer, comando_consola[1]); // [path]
+        //buffer_add_string(un_buffer, comando_consola[1]); // [path]
         // buffer_add_string(un_buffer, comando_consola[2]); // [size]
         // buffer_add_string(un_buffer, comando_consola[3]); // [prioridad]
         // f_iniciar_proceso(un_buffer);
-        pthread_create(&un_hilo, NULL, (void*)f_iniciar_proceso, un_buffer);
+        pthread_create(&un_hilo, NULL, (void*)f_iniciar_proceso, path);
         pthread_detach(un_hilo);
     } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0) {
         // código correspondiente
@@ -89,17 +91,18 @@ void _atender_instruccion(char *leido) {
     }
 
     string_array_destroy(comando_consola);
-    buffer_destroy(un_buffer);
+    free(leido_aux);
+    //buffer_destroy(un_buffer);
 }
 
-void f_iniciar_proceso(t_buffer* un_buffer) {
-    char* path = extract_string_buffer(un_buffer);
+void f_iniciar_proceso(char* path) {
+  //  char* path = buffer_read_string(un_buffer,un_buffer->size);
     int pid = asignar_pid();
 
     // Crear el PCB
     log_info(logger_kernel, "KERNEL CREA PCB");
     t_PCB*  pcb = pcb_create(pid, 1);
-    t_nuevo_proceso* nuevo_proceso = create_new_process(pid,path);
+    t_new_process* nuevo_proceso = create_new_process(pid,path);
 
     log_info(logger_kernel,"pid del pcb: %d",pcb->pid);
  
@@ -107,8 +110,10 @@ void f_iniciar_proceso(t_buffer* un_buffer) {
     
 
     // Serializar el PCB y enviar a la memoria
+    //TODO Estadarizar iguales lo uint
+    u_int32_t buffer_size = sizeof(uint32_t) + strlen(nuevo_proceso->path) + 1 + sizeof(uint32_t);
     log_info(logger_kernel, "KERNEL SERIALIZA PCB Y ENVIA A MEMORIA");
-    t_package *package = package_create(CREAR_PROCESO_KERNEL);
+    t_package *package = package_create(CREAR_PROCESO_KERNEL,buffer_size);
     serialize_nuevo_proceso(package->buffer, nuevo_proceso);
     package_send(package, fd_kernel_memoria);
     package_destroy(package);
@@ -122,7 +127,7 @@ void f_iniciar_proceso(t_buffer* un_buffer) {
     free(path);
     free(nuevo_proceso->path);
     free(nuevo_proceso);
-    buffer_destroy(un_buffer);
+   // buffer_destroy(un_buffer);
 }
 
 

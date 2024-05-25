@@ -112,31 +112,33 @@ int recv_pcb_cpu()
     return 0;
 }
 
-int atender_instruccion_memoria()
+void atender_instruccion_memoria()
 {
     //DECODE:
 
     t_buffer *new_buffer = recive_full_buffer(fd_memoria);
-    t_instruccion *instruccion = malloc(sizeof(t_instruction));
+    t_instruction *instruccion = malloc(sizeof(t_instruction));
     deserialize_instruccion(new_buffer, instruccion); //TODO
     log_info(logger_cpu, "INSTRUCCION => %d", instruccion->name);
-    log_info(logger_cpu, "PARAMETROS => %s", instruccion->params);
+    //TODO corregir para recorrer la lista y loggear los parametros
+    // log_info(logger_cpu, "PARAMETROS => %s", instruccion->params);
 
     // EXECUTE:
- 
+    //TODO crear variable global de los registros de la cpu 
+    t_cpu_registers* registros = NULL;
     ejecutar_instruccion(instruccion,registros);//TODO: antes implementar la logica de registros globales
 
 
     buffer_destroy(new_buffer);
     instruccion_destroy(instruccion); //TODO
-    return 0;
+    
 }
 
 //case de ejecucion de instrucciones:
-void ejecutar_instruccion(t_instruccion *instruccion, t_cpu_registers *cpu_registers)
+void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_registers)
 {
     log_info(logger_cpu, "EJECUTANDO INSTRUCCION");
-    log_info(logger_cpu, "INSTRUCCION => %s", instruccion->linea_instruccion);
+    log_info(logger_cpu, "INSTRUCCION => %d", instruccion->name);
  
  switch (instruccion->name) {
         case SET: {
@@ -192,12 +194,12 @@ void ejecutar_instruccion(t_instruccion *instruccion, t_cpu_registers *cpu_regis
             log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
             break;
         }
-        case IO_GEN_SLEEP: {
+        case MSG_IO_GEN_SLEEP: {
             char* interface = (char*)list_get(instruccion->params, 0);
             int units = atoi((char*)list_get(instruccion->params, 1));
             // Aquí iría la lógica para solicitar al Kernel la operación de I/O
             //TODO
-            log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
+            log_info(logger_cpu, "MSG_IO_GEN_SLEEP %s %d\n", interface, units);
             break;
         }
         default:

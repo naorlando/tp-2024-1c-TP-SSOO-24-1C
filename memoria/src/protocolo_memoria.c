@@ -149,27 +149,27 @@ int recv_example_msg_entradasalida(){
 }
 
 void recv_crear_proceso_kernel() {
-    t_buffer* buffer = recive_full_buffer(fd_kernel);
-    t_nuevo_proceso* nuevo_proceso = malloc(sizeof(t_proceso));
+    // t_buffer* buffer = recive_full_buffer(fd_kernel);
+    // t_new_process* nuevo_proceso = malloc(sizeof(t_proceso));
 
-    deserialize_nuevo_proceso(buffer, nuevo_proceso);
+    // deserialize_nuevo_proceso(buffer, nuevo_proceso);
 
-    // Crear estructuras administrativas necesarias
-    t_proceso* proceso = malloc(sizeof(t_proceso));
-    proceso->pid = nuevo_proceso->pid;
-    proceso->path = strdup(nuevo_proceso->path);
+    // // Crear estructuras administrativas necesarias
+    // t_proceso* proceso = malloc(sizeof(t_proceso));
+    // proceso->pid = nuevo_proceso->pid;
+    // proceso->path = strdup(nuevo_proceso->path);
 
-    log_info(logger_memoria,"pid del proceso:%d",proceso->pid);
-    log_info(logger_memoria,"path del proceso:%s",proceso->path);
+    // log_info(logger_memoria,"pid del proceso:%d",proceso->pid);
+    // log_info(logger_memoria,"path del proceso:%s",proceso->path);
 
-    // // Agregar proceso a la lista de procesos
-    // pthread_mutex_lock(&mutex_lista_procesos);
-    // list_add(lista_procesos, proceso);
-    // pthread_mutex_unlock(&mutex_lista_procesos);
+    // // // Agregar proceso a la lista de procesos
+    // // pthread_mutex_lock(&mutex_lista_procesos);
+    // // list_add(lista_procesos, proceso);
+    // // pthread_mutex_unlock(&mutex_lista_procesos);
 
-    free(proceso->path);
-    free(proceso);
-    free(nuevo_proceso->path);
-    free(nuevo_proceso);
-    buffer_destroy(buffer);
+    // free(proceso->path);
+    // free(proceso);
+    // free(nuevo_proceso->path);
+    // free(nuevo_proceso);
+    // buffer_destroy(buffer);
 }

@@ -14,7 +14,7 @@ int recv_pcb_cpu();
 
 // Instrucciones:
 void atender_instruccion_memoria();
-void ejecutar_instruccion(t_instruccion* instruccion, t_cpu_registers* cpu_registers);
+void ejecutar_instruccion(t_instruction* instruccion, t_cpu_registers* cpu_registers);
 
 
 

@@ -273,11 +273,12 @@ void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
     memcpy(&(cpu_registers->di), stream, sizeof(uint32_t));
 }
 
-void serialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso) {
+//TODO revisar aplicar funciones de buffer
+void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
     size_t path_length = strlen(nuevo_proceso->path) + 1; // Incluye el terminador nulo
-    size_t size = sizeof(uint32_t) + path_length + sizeof(uint32_t);
+    //size_t size = sizeof(uint32_t) + path_length + sizeof(uint32_t);
 
-    void *stream = malloc(size);
+    void *stream = malloc(buffer->size);
     int offset = 0;
 
     // Serializar PID
@@ -292,10 +293,10 @@ void serialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso) {
     memcpy(stream + offset, nuevo_proceso->path, path_length);
 
     buffer->stream = stream;
-    buffer->size = size;
+
 }
 
-void deserialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso) {
+void deserialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
     void *stream = buffer->stream;
     int offset = 0;
 

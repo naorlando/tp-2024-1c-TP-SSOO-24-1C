@@ -24,6 +24,6 @@ extern int fd_kernel_dispatch;
 extern int fd_memoria;
 
 // SEMAFOROS
-static pthread_mutex_t mutex_cpu_registers = PTHREAD_MUTEX_INITIALIZER;
+//static pthread_mutex_t mutex_cpu_registers = PTHREAD_MUTEX_INITIALIZER;
 
 #endif

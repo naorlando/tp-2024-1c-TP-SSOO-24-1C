@@ -7,6 +7,7 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include "utils/utils.h"
+#include "utils/buffer.h"
 
 typedef enum {
     SET,
@@ -37,16 +38,16 @@ typedef struct {
 
 // Crea una nueva instrucción a partir de una línea de texto.
 // Pre: La línea de texto debe ser válida y no NULL.
-// Post: Retorna un puntero a una estructura t_instruccion con la línea de instrucción duplicada.
+// Post: Retorna un puntero a una estructura t_instruction con la línea de instrucción duplicada.
 t_instruction* crear_instruccion(char*);
 
 // Elimina una instrucción.
-// Pre: El puntero a t_instruccion debe ser válido y no NULL.
+// Pre: El puntero a t_instruction debe ser válido y no NULL.
 // Post: La memoria asignada para la instrucción y su línea es liberada.
 void eliminar_instruccion(t_instruction*);
 
 // Obtiene la línea de la instrucción.
-// Pre: El puntero a t_instruccion debe ser válido y no NULL.
+// Pre: El puntero a t_instruction debe ser válido y no NULL.
 // Post: Retorna un puntero a la cadena de texto de la instrucción.
 t_name_instruction obtener_nombre_instruccion(t_instruction*);
 
@@ -70,16 +71,16 @@ char* _leer_parametro(char**, int);
 // Serializa una instrucción en el buffer.
 // pre: el buffer y la instrucción deben ser válidos y no NULL.
 // post: la instrucción es serializada en el buffer.
-void serialize_instruccion(t_buffer *buffer, t_instruccion *instruccion);
+void serialize_instruccion(t_buffer *buffer, t_instruction *instruccion);
 
 // Deserializa una instrucción desde el buffer.
 // pre: el buffer y la instrucción deben ser válidos y no NULL.
 // post: la instrucción es deserializada desde el buffer.
-void deserialize_instruccion(t_buffer *buffer, t_instruccion *instruccion);
+void deserialize_instruccion(t_buffer *buffer, t_instruction *instruccion);
 
 // Destruye una instrucción.
 // pre: el puntero a la instrucción debe ser válido y no NULL.
 // post: la memoria asignada a la instrucción es liberada.
-void instruccion_destroy(t_instruccion *instruccion);
+void instruccion_destroy(t_instruction *instruccion);
 
 #endif

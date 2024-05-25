@@ -102,7 +102,7 @@ void free_parametro(void* parametro) {
 
 // TODO: revisar implementación
 
-void serialize_instruccion(t_buffer *buffer, t_instruccion *instruccion) {
+void serialize_instruccion(t_buffer *buffer, t_instruction *instruccion) {
     // Serializar el nombre de la instrucción
     buffer_add_uint32(buffer, (uint32_t)instruccion->name);
 
@@ -120,25 +120,25 @@ void serialize_instruccion(t_buffer *buffer, t_instruccion *instruccion) {
 }
 
 // Deserializa una instrucción desde el buffer.
-void deserialize_instruccion(t_buffer *buffer, t_instruccion *instruccion) {
-    // Deserializar el nombre de la instrucción
-    instruccion->name = (t_name_instruct)buffer_read_uint32(buffer);
+void deserialize_instruccion(t_buffer *buffer, t_instruction *instruccion) {
+    // // Deserializar el nombre de la instrucción
+    // instruccion->name = (t_name_instruction) buffer_read_uint32(buffer);
 
-    // Deserializar el número de parámetros
-    uint32_t num_params = buffer_read_uint32(buffer);
-    instruccion->params = list_create();
+    // // Deserializar el número de parámetros
+    // uint32_t num_params = buffer_read_uint32(buffer);
+    // instruccion->params = list_create();
 
-    // Deserializar cada parámetro
-    for (uint32_t i = 0; i < num_params; i++) {
-        uint32_t param_length = buffer_read_uint32(buffer);
-        char* param = malloc(param_length);
-        buffer_read(buffer, param, param_length);
-        list_add(instruccion->params, param);
-    }
+    // // Deserializar cada parámetro
+    // for (uint32_t i = 0; i < num_params; i++) {
+    //     uint32_t param_length = buffer_read_uint32(buffer);
+    //     char* param = malloc(param_length);
+    //     buffer_read(buffer, param, param_length);
+    //     list_add(instruccion->params, param);
+    // }
 }
 
 // Libera la memoria asignada para una instrucción.
-void instruccion_destroy(t_instruccion *instruccion) {
+void instruccion_destroy(t_instruction *instruccion) {
     if (instruccion) {
         // Liberar cada parámetro
         void _destroy_param(char* param) {

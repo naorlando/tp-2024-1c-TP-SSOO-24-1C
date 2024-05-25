@@ -14,6 +14,8 @@
 #include "inicializar_kernel.h"
 #include <variables_globales.h>
 #include "protocolo_kernel.h"
+#include "consola.h"
+
 
 /* incluir .h files del kernel*/
 

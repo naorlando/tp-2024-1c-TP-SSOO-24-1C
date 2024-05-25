@@ -87,7 +87,7 @@ void *extract_data_from_buffer(t_buffer *buffer)
         exit(EXIT_FAILURE);
     }
 
-    uint32_t size_full_buffer;
+    uint32_t size_full_buffer = 0;
     memcpy(&size_full_buffer, buffer->stream, sizeof(uint32_t));
 
     void *full_buffer = malloc(size_full_buffer);
@@ -270,6 +270,6 @@ void buffer_add_uint32(t_buffer *buffer, uint32_t data)
 
 void buffer_add_string(t_buffer *buffer, char *data)
 {
-    uint32_t size_cadena = strlen(data);
+    uint32_t size_cadena = strlen(data)+1;
     buffer_add_data(buffer, data,size_cadena );
 }
