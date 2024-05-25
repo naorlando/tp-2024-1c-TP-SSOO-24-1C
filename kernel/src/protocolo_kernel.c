@@ -176,3 +176,55 @@ void atender_kernel_cpu_dispatch()
         }
     }
 }
+
+// Agrego la función que envía la instrucción IO_GEN_SLEEP al módulo de E/S
+int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
+    t_package *paquete = package_create(MSG_IO_KERNEL_GEN_SLEEP);
+
+    // Crear la instrucción
+    t_instruction *instruccion = malloc(sizeof(t_instruction));
+    instruccion->name = IO_GEN_SLEEP;
+    instruccion->params = list_create();
+
+    // Agregar los parámetros a la lista
+    int *param_pid = malloc(sizeof(int));
+    *param_pid = pid;
+    list_add(instruccion->params, param_pid);
+
+    int *param_unidades_trabajo = malloc(sizeof(int));
+    *param_unidades_trabajo = unidades_trabajo;
+    list_add(instruccion->params, param_unidades_trabajo);
+
+    // Serializar la instrucción
+    t_buffer *buffer = paquete->buffer;
+    buffer->size = sizeof(t_name_instruct) + sizeof(uint32_t) * 2 + sizeof(int) * 2;
+    buffer->stream = malloc(buffer->size);
+
+    void *stream = buffer->stream;
+    memcpy(stream, &(instruccion->name), sizeof(t_name_instruct));
+    stream += sizeof(t_name_instruct);
+
+    uint32_t cant_params = list_size(instruccion->params);
+    memcpy(stream, &cant_params, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    for (int i = 0; i < cant_params; i++) {
+        int *param = list_get(instruccion->params, i);
+        memcpy(stream, param, sizeof(int));
+        stream += sizeof(int);
+    }
+
+    if (package_send(paquete, fd) != EXIT_SUCCESS) {
+        log_error(logger_kernel, "Error al enviar la instrucción IO_GEN_SLEEP");
+        list_destroy_and_destroy_elements(instruccion->params, free);
+        free(instruccion);
+        package_destroy(paquete);
+        return -1;
+    }
+
+    log_info(logger_kernel, "Instrucción IO_GEN_SLEEP enviada con pid %d y %d unidades de trabajo", pid, unidades_trabajo);
+    list_destroy_and_destroy_elements(instruccion->params, free);
+    free(instruccion);
+    package_destroy(paquete);
+    return 0;
+}
