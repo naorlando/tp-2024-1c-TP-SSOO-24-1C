@@ -11,15 +11,19 @@
 
 bool agregar_proceso(t_proceso*);
 
-t_proceso* obtener_proceso(uint8_t);
+t_proceso* obtener_proceso(uint32_t);
 
-bool eliminar_proceso(uint8_t);
+bool eliminar_proceso(uint32_t);
+
+void free_proceso(void*);
 
 uint8_t cantidad_procesos_activos();
 
 void eliminar_tabla();
 
-bool _crear_tabla();
+void crear_tabla_procesos();
+
+/**********************FUNCIONES PRIVADAS**********************/
 
 bool _esta_vacia_tabla();
 
