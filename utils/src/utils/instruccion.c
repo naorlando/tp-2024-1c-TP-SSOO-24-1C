@@ -9,9 +9,12 @@ t_instruction* crear_instruccion(char* linea) {
 
     char** partes_instruccion = string_split(linea, " ");
 
-    instruccion_nueva->name = _obtener_tipo_instruccion(partes_instruccion[0]);
+    if(partes_instruccion == NULL) return NULL;
 
-    if(instruccion_nueva->linea_instruccion == NULL) {
+    instruccion_nueva->name = _obtener_tipo_instruccion(partes_instruccion[0]);
+    instruccion_nueva->params = _lista_parametros(partes_instruccion);
+
+    if(instruccion_nueva->name == NULL || instruccion_nueva->params == NULL) {
         return NULL;
     }
 
@@ -64,4 +67,27 @@ t_list* obtener_parametros(t_instruction* instruccion) {
     if(parametros == NULL) return NULL;
 
     return parametros;
+}
+
+t_list* _lista_parametros(char** parametros) {
+    t_list* parametros = malloc(sizeof(t_list));
+
+    if(parametros == NULL) return NULL;
+
+    //Se arranca de 1 porque la posicion 0 tiene la instruccion
+    for(int i = 1; i < arrayLength(parametros); i++) {
+        list_add(parametros, _leer_parametro(parametros, i));
+    }
+
+    return parametros;
+}
+
+char* _leer_parametro(char** parametros, int index) {
+    char* parametro = NULL;
+
+    if(index >= 0 && index < arrayLength(parametros)) {
+        parametro = parametros[index];
+    }
+
+    return parametro;
 }
