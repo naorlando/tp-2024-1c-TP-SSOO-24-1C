@@ -224,8 +224,7 @@ uint8_t buffer_read_uint8(t_buffer *buffer)
     return data;
 }
 
-uint16_t buffer_read_uint16(t_buffer *buffer)
-{
+uint16_t buffer_read_uint16(t_buffer* buffer){
     uint16_t data;
     uint32_t size = sizeof(uint16_t);
 
