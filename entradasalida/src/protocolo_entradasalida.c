@@ -23,9 +23,14 @@ void requests_kernel()
 
             log_info(logger_entradasalida, "Se recibio un mje del KERNEL");
             break;
-        case -1:
-            log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de entradaSalida.");
-            esperar = false; // Cortamos la espera de solicitudes
+            //Agrego la operacion para el caso de que el kernel solicite un sleep
+            case IO_GEN_SLEEP:
+                log_info(logger_entradasalida, "Se recibio una instruccion IO_GEN_SLEEP");
+                atender_instruccion_sleep();
+            break;
+            case -1:
+                log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de entradaSalida.");
+                esperar = false; //Cortamos la espera de solicitudes
             break;
         default:
             log_warning(logger_entradasalida, "WARNING: El modulo de entradaSalida ha recibido una solicitud con una operacion desconocida");
@@ -34,7 +39,8 @@ void requests_kernel()
     }
 }
 
-void requests_memoria()
+//Comento la lógica de la función requests_memoria, ya que no se utiliza
+/*void requests_memoria()
 {
     bool control_key = 1;
     while (control_key)
@@ -53,6 +59,20 @@ void requests_memoria()
             break;
         }
     }
+}*/
+
+//Agrego la función para atender la instrucción de sleep
+void atender_instruccion_sleep() {
+    // int unidades_trabajo;
+    // if (recibir_instruccion(fd_kernel, &unidades_trabajo) == 0) {
+    //     int tiempo_espera = unidades_trabajo * TIEMPO_UNIDAD_TRABAJO;
+    //     log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
+    //     sleep(tiempo_espera);
+    //     log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
+    //     enviar_confirmacion(fd_kernel, MSG_KERNEL_IO);
+    // } else {
+    //     log_error(logger_entradasalida, "Error al recibir la instruccion IO_GEN_SLEEP");
+    // }
 }
 
 int recv_example_msg_kernel()

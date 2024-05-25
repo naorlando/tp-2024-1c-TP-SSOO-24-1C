@@ -4,11 +4,18 @@
 #include "utils/protocolo.h"
 #include <variables_globales.h>
 #include "utils/estructuras.h"
+#include "utils/instruccion.h"
 
 int send_example_memoria();
 void atender_cpu_kernel_dispatch();
 void atender_cpu_memoria();
 int recv_example_msg_kernel();
 int recv_pcb_cpu();
+
+// Instrucciones:
+void atender_instruccion_memoria();
+void ejecutar_instruccion(t_instruccion* instruccion, t_cpu_registers* cpu_registers);
+
+
 
 #endif

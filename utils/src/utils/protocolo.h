@@ -34,9 +34,13 @@ typedef enum
     // KERNEL <-> MEMORIA
     MSG_KERNEL_MEMORIA,
     MSG_MEMORIA_KERNEL,
+    CREAR_PROCESO_KERNEL,
+    // KERNEL <-> IO
+    IO_GEN_SLEEP,
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
+    INTRUCCION_MEMORIA_CPU,
     //IO <-> MEMORIA
     MSG_IO_MEMORIA,
     EXAMPLE,
@@ -80,6 +84,8 @@ void example_deserialize_msg(t_buffer *buffer, t_message_example *msg);
 void deserialize_pcb(t_buffer *buffer, t_PCB *pcb);
 void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers);
 
+void serialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso);
+void deserialize_nuevo_proceso(t_buffer *buffer, t_nuevo_proceso *nuevo_proceso);
 //send
 
 #endif

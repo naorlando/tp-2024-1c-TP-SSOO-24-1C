@@ -4,10 +4,14 @@
 #include <kernel.h>
 #include <variables_globales.h>
 
-void inicial_consola_interactiva();
-void _validacion_de_instrucciones_consola();
-void _atender_instruccion();
-void _iniciar_proceso();
-void _asignar_pid();
 
-#endif
+
+void iniciar_consola_interactiva();
+bool _validacion_de_instrucciones_consola(char *leido);
+void _atender_instruccion(char *leido);
+
+// FORMAS DE ATENDER PROCESO:
+void f_iniciar_proceso(t_buffer* un_buffer);
+int asignar_pid();
+
+#endif //CONSOLA_H_

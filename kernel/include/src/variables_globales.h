@@ -7,6 +7,7 @@
 #include "kernel_config.h"
 #include <readline/readline.h>
 #include <commons/collections/dictionary.h>
+#include <pthread.h>
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"
@@ -17,6 +18,8 @@
 extern t_log* logger_kernel;
 extern t_log* logger_kernel_debug;
 extern t_dictionary* table_pcb;
+extern pthread_mutex_t  mutex_pid;
+extern int identificador_PID;
 
 //CONFIG
 extern t_config* config_kernel;

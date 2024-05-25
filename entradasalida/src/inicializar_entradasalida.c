@@ -40,15 +40,16 @@ void _iniciar_config() {
     }
 
         // mover a modulo que corresponda:
-    TIPO_INTERFAZ = config_get_string_value(config_entradasalida, "TIPO_INTERFAZ");
-    TIEMPO_UNIDAD_TRABAJO = config_get_int_value(config_entradasalida, "TIEMPO_UNIDAD_TRABAJO");
-    IP_KERNEL = config_get_string_value(config_entradasalida, "IP_KERNEL");
-    PUERTO_KERNEL = config_get_string_value(config_entradasalida, "PUERTO_KERNEL");
-    IP_MEMORIA = config_get_string_value(config_entradasalida, "IP_MEMORIA");
-    PUERTO_MEMORIA = config_get_string_value(config_entradasalida, "PUERTO_MEMORIA");
-    PATH_BASE_DIALFS = config_get_string_value(config_entradasalida, "PATH_BASE_DIALFS");
-    BLOCK_SIZE = config_get_int_value(config_entradasalida, "BLOCK_SIZE");
-    BLOCK_COUNT = config_get_int_value(config_entradasalida, "BLOCK_COUNT");
+    // TIPO_INTERFAZ = config_get_string_value(config_entradasalida, "TIPO_INTERFAZ");
+    // TIEMPO_UNIDAD_TRABAJO = config_get_int_value(config_entradasalida, "TIEMPO_UNIDAD_TRABAJO");
+    // IP_KERNEL = config_get_string_value(config_entradasalida, "IP_KERNEL");
+    // PUERTO_KERNEL = config_get_string_value(config_entradasalida, "PUERTO_KERNEL");
+    // IP_MEMORIA = config_get_string_value(config_entradasalida, "IP_MEMORIA");
+    // PUERTO_MEMORIA = config_get_string_value(config_entradasalida, "PUERTO_MEMORIA");
+    // PATH_BASE_DIALFS = config_get_string_value(config_entradasalida, "PATH_BASE_DIALFS");
+    // BLOCK_SIZE = config_get_int_value(config_entradasalida, "BLOCK_SIZE");
+    // BLOCK_COUNT = config_get_int_value(config_entradasalida, "BLOCK_COUNT");
+
     // ------------------------- para que? --------------------------------- //
 
     // Creo la estructura para guardar los datos del archivo de configuracion
@@ -62,9 +63,19 @@ void _iniciar_config() {
     // cargar_entradasalida_config(entradasalida_config, config_entradasalida);
 
     // ------------------------- para que? ---------------------------------//
+    
+    // Reemplazo el código anterior leyendo sólo los campos necesarios para Interfaz Genérica
+    TIPO_INTERFAZ = config_get_string_value(config_entradasalida, "TIPO_INTERFAZ"); 
+    TIEMPO_UNIDAD_TRABAJO = config_get_int_value(config_entradasalida, "TIEMPO_UNIDAD_TRABAJO");
+    IP_KERNEL = config_get_string_value(config_entradasalida, "IP_KERNEL");
+    PUERTO_KERNEL = config_get_string_value(config_entradasalida, "PUERTO_KERNEL");
 }
 
 void _imprimir_config() {    
-    log_info(logger_entradasalida, "Entrada/salida inicializado");
+    // Comento código anterior
+    // log_info(logger_entradasalida, "Entrada/salida inicializado");
+    
+    // Reemplazo el código anterior mostrando un mensaje de inicialización de Interfaz Genérica
+    log_info(logger_entradasalida, "Interfaz Genérica inicializada");
 }
 
