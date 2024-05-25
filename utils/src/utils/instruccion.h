@@ -30,8 +30,8 @@ typedef enum {
 }t_name_instruction;
 
 typedef struct {
-    t_name_instruction name,
-    t_list* params
+    t_name_instruction name;
+    t_list* params;
 }t_instruction;
 
 // Crea una nueva instrucción a partir de una línea de texto.

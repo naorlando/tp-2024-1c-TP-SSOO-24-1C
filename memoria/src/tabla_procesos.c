@@ -12,6 +12,7 @@ bool agregar_proceso(t_proceso* proceso) {
     }
 
     char* key = uint8_to_string(obtener_pid(proceso));
+    //TODO Cambiar a uint32 -> pid es de 32
 
     if(key == NULL) return false;
 
@@ -29,7 +30,7 @@ t_proceso* obtener_proceso(uint8_t pid) {
 
     t_proceso* proceso = (t_proceso*)dictionary_get(tabla_procesos, key);
     
-    return (proceso != NULL) proceso : NULL;
+    return (proceso != NULL) ? proceso : NULL;
 }
 
 bool eliminar_proceso(uint8_t pid) {

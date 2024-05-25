@@ -6,6 +6,7 @@
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <readline/readline.h>
+#include <commons/collections/dictionary.h>
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"
@@ -15,6 +16,7 @@
 // VARIABLES GLOBALES
 extern t_log* logger_kernel;
 extern t_log* logger_kernel_debug;
+extern t_dictionary* table_pcb;
 
 //CONFIG
 extern t_config* config_kernel;
