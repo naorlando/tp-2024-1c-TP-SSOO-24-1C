@@ -10,7 +10,29 @@ void init(){
     _iniciar_logger();
     _iniciar_config();
     imprimir_config();
+    init_cpu_registers();
 }
+
+void init_cpu_registers() {
+    pthread_mutex_lock(&mutex_cpu_registers);
+
+    cpu_registers.pc = 0;
+    cpu_registers.ax = 0;
+    cpu_registers.bx = 0;
+    cpu_registers.cx = 0;
+    cpu_registers.dx = 0;
+    cpu_registers.eax = 0;
+    cpu_registers.ebx = 0;
+    cpu_registers.ecx = 0;
+    cpu_registers.edx = 0;
+    cpu_registers.si = 0;
+    cpu_registers.di = 0;
+
+    pthread_mutex_unlock(&mutex_cpu_registers);
+
+    log_info(logger_cpu, "Se inicializaron los registros de la CPU");
+}
+
 
 void _iniciar_logger(){
     logger_cpu = log_create("cpu.log", "CPU_LOG", 1, LOG_LEVEL_INFO);
