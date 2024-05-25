@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <commons/string.h>
+#include <commons/collections/list.h>
 
 typedef enum {
     SET,
@@ -30,7 +31,7 @@ typedef enum {
 
 typedef struct {
     t_name_instruction name,
-    t_list * params
+    t_list* params
 }t_instruction;
 
 // Crea una nueva instrucción a partir de una línea de texto.
@@ -46,7 +47,7 @@ void eliminar_instruccion(t_instruction*);
 // Obtiene la línea de la instrucción.
 // Pre: El puntero a t_instruccion debe ser válido y no NULL.
 // Post: Retorna un puntero a la cadena de texto de la instrucción.
-char* obtener_instruccion(t_instruction*);
+t_name_instruction obtener_nombre_instruccion(t_instruction*);
 
 // Obtiene el tipo de instrucción a partir de una cadena de caracteres.
 // Pre: El puntero a la cadena de caracteres 'linea' debe ser válido y no NULL.
@@ -54,5 +55,7 @@ char* obtener_instruccion(t_instruction*);
 // coincide con alguna instrucción válida. Si no coincide, retorna NULL e imprime
 // un mensaje de error en stderr.
 t_name_instruction _obtener_tipo_instruccion(char*); 
+
+t_list* obtener_parametros(t_instruction*);
 
 #endif

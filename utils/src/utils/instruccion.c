@@ -9,7 +9,7 @@ t_instruction* crear_instruccion(char* linea) {
 
     char** partes_instruccion = string_split(linea, " ");
 
-    instruccion_nueva->linea_instruccion = string_duplicate(linea);
+    instruccion_nueva->name = _obtener_tipo_instruccion(partes_instruccion[0]);
 
     if(instruccion_nueva->linea_instruccion == NULL) {
         return NULL;
@@ -19,20 +19,20 @@ t_instruction* crear_instruccion(char* linea) {
 }
 
 void eliminar_instruccion(t_instruction* instruccion) {
-    char* linea_instruccion = obtener_instruccion(instruccion);
+    t_list* parametros = obtener_parametros(instruccion);
 
-    if(linea_instruccion != NULL) {
-        free(linea_instruccion);
+    if(parametros != NULL) {
+        list_destroy_and_destroy_elements(free);
     }
 
     free(instruccion);
 }
 
-char* obtener_instruccion(t_instruction* instruccion) {
-    return instruccion->linea_instruccion;
+t_name_instruction obtener_nombre_instruccion(t_instruction* instruccion) {
+    return instruccion->name;
 }
 
-t_name_instruction obtener_tipo_instruccion(char* linea) {
+t_name_instruction _obtener_tipo_instruccion(char* linea) {
     if (strcmp(instruccion, "SET") == 0) return SET;
     if (strcmp(instruccion, "SUM") == 0) return SUM;
     if (strcmp(instruccion, "SUB") == 0) return SUB;
@@ -56,4 +56,12 @@ t_name_instruction obtener_tipo_instruccion(char* linea) {
     // En caso de error
     fprintf(stderr, "Error: Instrucción desconocida '%s'\n", instruccion);
     return NULL; // Valor que no está en el enum
+}
+
+t_list* obtener_parametros(t_instruction* instruccion) {
+    t_list* parametros = instruccion->t_list;
+
+    if(parametros == NULL) return NULL;
+
+    return parametros;
 }
