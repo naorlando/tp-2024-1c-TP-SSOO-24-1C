@@ -6,6 +6,7 @@
 #include <string.h>
 #include <commons/string.h>
 #include <commons/collections/list.h>
+#include "utils/utils.h"
 
 typedef enum {
     SET,
@@ -49,6 +50,12 @@ void eliminar_instruccion(t_instruction*);
 // Post: Retorna un puntero a la cadena de texto de la instrucción.
 t_name_instruction obtener_nombre_instruccion(t_instruction*);
 
+t_list* obtener_parametros(t_instruction*);
+
+void free_parametro(void*);
+
+/**********************FUNCIONES PRIVADAS**********************/
+
 // Obtiene el tipo de instrucción a partir de una cadena de caracteres.
 // Pre: El puntero a la cadena de caracteres 'linea' debe ser válido y no NULL.
 // Post: Retorna el valor correspondiente del enum t_name_instruction si la cadena
@@ -56,6 +63,8 @@ t_name_instruction obtener_nombre_instruccion(t_instruction*);
 // un mensaje de error en stderr.
 t_name_instruction _obtener_tipo_instruccion(char*); 
 
-t_list* obtener_parametros(t_instruction*);
+t_list* _lista_parametros(char**); 
+
+char* _leer_parametro(char**, int);
 
 #endif
