@@ -27,7 +27,7 @@ bool _validacion_de_instrucciones_consola(char *leido){
     bool resultado_validacion = false;
 
     // TODO: Hacer más controles de validación
-    char** comando_consola = string_split(leido, " ");
+    char** comando_consola = string_split(leido, " "); // ROMPE LA SEGUNDA VEZ EN string_substring
 
     // en vez de strcmp para la comparacion podriamos usar:  string_equals_ignore_case(char * actual, char * expected)
     // la unica diferencia es que contempla escribir el comando en mayuscula o minuscula, le da igual.
@@ -74,7 +74,7 @@ void _atender_instruccion(char *leido) {
         // buffer_add_string(un_buffer, comando_consola[3]); // [prioridad]
         // f_iniciar_proceso(un_buffer);
         pthread_create(&un_hilo, NULL, (void *) f_iniciar_proceso, path);
-        pthread_join(un_hilo,NULL);
+        pthread_join(un_hilo, NULL);
     } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0) {
         // código correspondiente
     } else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0) {
