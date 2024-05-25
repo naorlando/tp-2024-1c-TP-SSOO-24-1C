@@ -69,12 +69,12 @@ void cpu_registers_destroy(t_cpu_registers *cpu_registers)
 //     free(proceso);
 // }
 // 
-t_new_process* create_new_process(uint32_t pid,const char* path){
+t_new_process* create_new_process(uint32_t pid,char* path){
     
      t_new_process *t_new_process = malloc(sizeof(t_new_process));
 
     t_new_process->pid = pid;
-    t_new_process->path;
+    t_new_process->path = path;
 
     return t_new_process;
     

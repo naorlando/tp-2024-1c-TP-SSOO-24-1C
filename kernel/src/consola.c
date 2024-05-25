@@ -73,8 +73,8 @@ void _atender_instruccion(char *leido) {
         // buffer_add_string(un_buffer, comando_consola[2]); // [size]
         // buffer_add_string(un_buffer, comando_consola[3]); // [prioridad]
         // f_iniciar_proceso(un_buffer);
-        pthread_create(&un_hilo, NULL, (void*)f_iniciar_proceso, path);
-        pthread_detach(un_hilo);
+        pthread_create(&un_hilo, NULL, (void *) f_iniciar_proceso, path);
+        pthread_join(un_hilo,NULL);
     } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0) {
         // código correspondiente
     } else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0) {
@@ -95,13 +95,16 @@ void _atender_instruccion(char *leido) {
     //buffer_destroy(un_buffer);
 }
 
-void f_iniciar_proceso(char* path) {
+void * f_iniciar_proceso(char* path) {
   //  char* path = buffer_read_string(un_buffer,un_buffer->size);
     int pid = asignar_pid();
 
     // Crear el PCB
     log_info(logger_kernel, "KERNEL CREA PCB");
     t_PCB*  pcb = pcb_create(pid, 1);
+    //TODO Cargar pcb en la tabla
+    add_pcb(pcb);
+
     t_new_process* nuevo_proceso = create_new_process(pid,path);
 
     log_info(logger_kernel,"pid del pcb: %d",pcb->pid);
@@ -125,9 +128,9 @@ void f_iniciar_proceso(char* path) {
 
     // Liberar memoria
     free(path);
-    free(nuevo_proceso->path);
     free(nuevo_proceso);
    // buffer_destroy(un_buffer);
+   return 0;
 }
 
 

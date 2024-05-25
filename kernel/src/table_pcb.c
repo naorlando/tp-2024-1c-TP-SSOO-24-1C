@@ -2,10 +2,7 @@
 
 bool add_pcb(t_PCB *new_pcb)
 {
-    if (_is_empty_table())
-    {
-        create_pcb_table();
-    }
+   
     char *key = uint32_to_string(new_pcb->pid);
     if (key == NULL)
         return false;

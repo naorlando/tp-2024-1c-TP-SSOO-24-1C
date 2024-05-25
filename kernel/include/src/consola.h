@@ -5,7 +5,7 @@
 #include "utils/buffer.h"
 #include "utils/estructuras.h"
 #include "utils/protocolo.h"
-
+#include "table_pcb.h"
 
 
 
@@ -14,7 +14,7 @@ bool _validacion_de_instrucciones_consola(char *leido);
 void _atender_instruccion(char *leido);
 
 // FORMAS DE ATENDER PROCESO:
-void f_iniciar_proceso(char*);
+void * f_iniciar_proceso(char*);
 int asignar_pid();
 
 #endif //CONSOLA_H_

@@ -13,6 +13,7 @@ void init()
 {
     _iniciar_logger();
     _iniciar_config();
+    _init_table_pcb();
     imprimir_config();
 }
 
@@ -59,4 +60,18 @@ void _iniciar_config()
 void imprimir_config()
 {
     log_trace(logger_kernel_debug, "PUERTO DE ESCUCHA DE LA KERNEL: %d", kernel_config->PUERTO_ESCUCHA);
+}
+
+void _init_table_pcb()
+{
+    create_pcb_table();
+
+    if (table_pcb != NULL)
+    {
+        log_info(logger_kernel, "Se creo correctamente la tabla de pcb.");
+    }
+    else
+    {
+        log_error(logger_kernel, "Error al crear la tabla de pcb.");
+    }
 }
