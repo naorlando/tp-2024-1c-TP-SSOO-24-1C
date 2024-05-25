@@ -74,7 +74,10 @@ void atender_instruccion_sleep() {
 //Agrego la función para recibir una instrucción, que realiza el proceso de deserialización
 /* La función recibir_instruccion() deserializa el mensaje recibido del kernel y crea una estructura 
 t_instruction que contiene el nombre de la instrucción y sus parámetros. Esta estructura es pasada 
-por referencia a atender_instruccion_sleep().*/
+por referencia a atender_instruccion_sleep().  Podría servir en el futuro para recibir más variedad de 
+instrucciones y parámetros.  Por el momento no la uso, y en su lugar, usaré otra función más acorde 
+a la instrucción IO_GEN_SLEEP*/
+/*
 int recibir_instruccion(int fd, t_instruction **instruccion) {
     t_package *package = package_create(NULL_HEADER);
     if (package_recv(package, fd) != EXIT_SUCCESS) {
@@ -110,6 +113,54 @@ int recibir_instruccion(int fd, t_instruction **instruccion) {
     package_destroy(package);
     return 0;
 }
+*/
+
+/*Agrego la función para recibir una instrucción IO_GEN_SLEEP, que realiza la deserialización 
+y devuelve el valor de las unidades de trabajo y el PID del proceso que solicita la instrucción*/
+int recibir_instruccion(int fd, int *unidades_trabajo) {
+    t_package *package = package_create(NULL_HEADER);
+    if (package_recv(package, fd) != EXIT_SUCCESS) {
+        log_error(logger_entradasalida, "Error al recibir instrucción");
+        package_destroy(package);
+        return -1;
+    }
+
+    t_buffer *buffer = package->buffer;
+    void *stream = buffer->stream;
+
+    // Deserializar el nombre de la instrucción
+    uint32_t instruccion_id;
+    memcpy(&instruccion_id, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    if (instruccion_id != IO_GEN_SLEEP) {
+        log_error(logger_entradasalida, "Instrucción no soportada");
+        package_destroy(package);
+        return -1;
+    }
+
+    // Deserializar los parámetros
+    uint32_t cant_params;
+    memcpy(&cant_params, stream, sizeof(uint32_t));
+    stream += sizeof(uint32_t);
+
+    if (cant_params != 2) {
+        log_error(logger_entradasalida, "Número incorrecto de parámetros");
+        package_destroy(package);
+        return -1;
+    }
+
+    // Deserializar los parámetros
+    int pid;
+    memcpy(&pid, stream, sizeof(int));
+    stream += sizeof(int);
+
+    memcpy(unidades_trabajo, stream, sizeof(int));
+
+    package_destroy(package);
+    return 0;
+}
+
 
 //Agrego la función para enviar una confirmación al Kernel después de procesar una instrucción
 int enviar_confirmacion(int fd, t_msg_header header) {
