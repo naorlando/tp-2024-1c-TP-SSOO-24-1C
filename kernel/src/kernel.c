@@ -57,7 +57,11 @@ int main(int argc, char *argv[])
 
     // CONSOLA INTERACTIVA:
     // ejecuto la consola en el hilo principal del programa.
-    iniciar_consola_interactiva();
+    //iniciar_consola_interactiva();
+
+    pthread_t hilo_consola;
+    pthread_create(&hilo_consola, NULL, (void *)iniciar_consola_interactiva, NULL);
+    pthread_join(hilo_consola, NULL);
 
     free(server_port);
     liberar_conexion(fd_server);
