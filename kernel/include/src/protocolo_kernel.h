@@ -17,6 +17,6 @@ void atender_kernel_memoria();
 void atender_kernel_IO();
 void atender_kernel_cpu_dispatch();
 int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo);
-
+int recibir_confirmacion_io();
 
 #endif

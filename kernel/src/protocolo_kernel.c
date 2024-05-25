@@ -138,6 +138,7 @@ void atender_kernel_IO()
         case MSG_IO_KERNEL:
 
             log_info(logger_kernel, "Se recibio un mje de IO");
+            recibir_confirmacion_io();
             break;
 
         case -1:
@@ -226,5 +227,30 @@ int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
     list_destroy_and_destroy_elements(instruccion->params, free);
     free(instruccion);
     package_destroy(paquete);
+    return 0;
+}
+
+// Agrego la función que recibe la confirmación de que la instrucción IO_GEN_SLEEP fue recibida y procesada
+int recibir_confirmacion_io() {
+    t_package *package = package_create(NULL_HEADER);
+    if (package_recv(package, fd_kernel_IO) != EXIT_SUCCESS) {
+        log_error(logger_kernel, "Error al recibir confirmación IO_GEN_SLEEP");
+        package_destroy(package);
+        return -1;
+    }
+
+    t_buffer *buffer = package->buffer;
+    void *stream = buffer->stream;
+
+    uint32_t mensaje_id;
+    memcpy(&mensaje_id, stream, sizeof(uint32_t));
+    
+    if (mensaje_id == MSG_KERNEL_IO) {
+        log_info(logger_kernel, "Confirmación de IO_GEN_SLEEP recibida");
+    } else {
+        log_warning(logger_kernel, "Se recibió un mensaje desconocido en confirmación IO_GEN_SLEEP");
+    }
+
+    package_destroy(package);
     return 0;
 }
