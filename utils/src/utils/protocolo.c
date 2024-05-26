@@ -287,20 +287,34 @@ void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
     buffer_add_string(buffer, nuevo_proceso->path);
 }
 
-void deserialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
-    void *stream = buffer->stream;
-    int offset = 0;
+void deserialize_nuevo_proceso(t_buffer* buffer, t_new_process* new_process) {
+    // void *stream = buffer->stream;
+    // int offset = 0;
 
-    // Deserializar PID
-    memcpy(&(nuevo_proceso->pid), stream + offset, sizeof(uint32_t));
-    offset += sizeof(uint32_t);
+    // // Deserializar PID
+    // memcpy(&(nuevo_proceso->pid), stream + offset, sizeof(uint32_t));
+    // offset += sizeof(uint32_t);
 
-    // Deserializar longitud de path
-    uint32_t path_length;
-    memcpy(&path_length, stream + offset, sizeof(uint32_t));
-    offset += sizeof(uint32_t);
+    // // Deserializar longitud de path
+    // uint32_t path_length;
+    // memcpy(&path_length, stream + offset, sizeof(uint32_t));
+    // offset += sizeof(uint32_t);
 
-    // Deserializar path
-    nuevo_proceso->path = malloc(path_length);
-    memcpy(nuevo_proceso->path, stream + offset, path_length);
+    // // Deserializar path
+    // nuevo_proceso->path = malloc(path_length);
+    // memcpy(nuevo_proceso->path, stream + offset, path_length);
+
+    if(buffer == NULL) return;
+
+    //Obtenemos el pid del nuevo proceso
+    uint32_t pid_new_process = buffer_read_uint32(buffer);
+
+    //Obtenemos el size del path relativo
+    uint32_t path_length= buffer_read_uint32(buffer);
+
+    //Obtenemos el path relativo del codigo
+    char* path_relative= malloc(length * sizeof(char));
+    path_relative = buffer_read_string(buffer);
+
+    new_process = create_new_process(pid_new_process, path_relative);
 }
