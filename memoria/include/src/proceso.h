@@ -34,7 +34,7 @@ t_instruction* obtener_siguiente_instruccion(t_proceso*, uint32_t);
 // Obtiene el ID del proceso.
 // Pre: El puntero a t_proceso debe ser válido y no NULL.
 // Post: Retorna el pid del proceso.
-uint8_t obtener_pid(t_proceso*);
+uint32_t obtener_pid(t_proceso*);
 
 // Obtiene la ruta absoluta del proceso.
 // Pre: El puntero a t_proceso debe ser válido y no NULL.

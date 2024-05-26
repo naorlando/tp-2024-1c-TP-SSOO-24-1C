@@ -57,7 +57,7 @@ void liberar_proceso(t_proceso* proceso) {
     free(proceso);
 }
 
-uint8_t obtener_pid(t_proceso* proceso) {
+uint32_t obtener_pid(t_proceso* proceso) {
     return proceso->pid;
 }
 
