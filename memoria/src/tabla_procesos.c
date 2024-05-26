@@ -3,8 +3,7 @@
 bool agregar_proceso(t_proceso* proceso) {
     if(_esta_vacia_tabla()) return false;
 
-    char* key = uint8_to_string(obtener_pid(proceso));
-    //TODO Cambiar a uint32 -> pid es de 32
+    char* key = uint32_to_string(obtener_pid(proceso));
 
     if(key == NULL) return false;
 
@@ -31,7 +30,7 @@ bool eliminar_proceso(uint32_t pid) {
 
     bool seElimino= true;
 
-    char* key = uint8_to_string(pid);
+    char* key = uint32_to_string(pid);
 
     if(key == NULL) return false;
 
