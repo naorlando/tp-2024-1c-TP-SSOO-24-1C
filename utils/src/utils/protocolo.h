@@ -85,7 +85,7 @@ void deserialize_pcb(t_buffer *buffer, t_PCB *pcb);
 void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers);
 
 void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso);
-void deserialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso);
+t_new_process* deserialize_nuevo_proceso(t_buffer *buffer);
 //send
 
 #endif
