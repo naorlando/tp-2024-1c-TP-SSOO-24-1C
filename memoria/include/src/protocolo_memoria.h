@@ -20,6 +20,6 @@ int recv_example_msg_kernel();
 
 int recv_example_msg_entradasalida();
 
-int recv_process_kernel(t_new_process*);
+t_new_process* recv_process_kernel();
 
 #endif /*PROTOCOLO_MEMORIA_H_*/

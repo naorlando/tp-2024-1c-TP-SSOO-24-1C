@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <commons/collections/dictionary.h>
 #include "variables_globales.h"
 #include "proceso.h"
 #include "utils/utils.h"
