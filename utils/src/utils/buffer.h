@@ -102,8 +102,8 @@ uint16_t buffer_read_uint16(t_buffer* buffer);
 
 // Lee una cadena de caracteres del buffer.
 // Pre: El buffer ha sido creado previamente y contiene una cadena de caracteres.
-// Post: Se lee la cadena de caracteres del buffer y se devuelve junto con su longitud.
-char* buffer_read_string(t_buffer*, uint32_t*);
+// Post: Se lee la cadena de caracteres del buffer y se devuelve.
+char* buffer_read_string(t_buffer*, uint32_t);
 
 // Agrega un entero de 8 bits al buffer.
 // Pre: El buffer ha sido creado previamente y tiene espacio suficiente.
