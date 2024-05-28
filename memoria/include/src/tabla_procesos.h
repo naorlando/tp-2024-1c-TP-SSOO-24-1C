@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <commons/collections/dictionary.h>
 #include "variables_globales.h"
 #include "proceso.h"
 #include "utils/utils.h"
@@ -26,5 +27,7 @@ void crear_tabla_procesos();
 /**********************FUNCIONES PRIVADAS**********************/
 
 bool _esta_vacia_tabla();
+
+bool _existe_tabla();
 
 #endif
