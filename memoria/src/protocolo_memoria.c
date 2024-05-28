@@ -51,11 +51,21 @@ void requests_kernel() {
             */             
             case MSG_KERNEL_MEMORIA:
 
-            case CREAR_PROCESO_KERNEL:
-                recv_crear_proceso_kernel();
-                break;
+            case MSG_KERNEL_CREATE_PROCESS:
 
-                log_info(logger_memoria, "Se recibio un mje del Kernel");
+                t_new_process* new_process= recv_process_kernel();
+
+                if(new_process == NULL) {
+                    log_error(logger_memoria, "ERROR: Ha surgido un problema al recibir el nuevo proceso.");
+                }
+                
+                if(add_process_to_memory(new_process)) {
+                    log_info(logger_memoria, "Se ha creado correctamente en memoria el proceso con pid %d", new_process->pid);
+                }else {
+                    log_warning(logger_memoria, "WARNING CREATE PROCESS: No se ha podido crear el proceso en memoria");
+                }
+
+                //TODO: Hacer funcion para eliminar un t_new_process
             break;
             case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
@@ -148,28 +158,34 @@ int recv_example_msg_entradasalida(){
     return 0;
 }
 
-void recv_crear_proceso_kernel() {
-    // t_buffer* buffer = recive_full_buffer(fd_kernel);
-    // t_new_process* nuevo_proceso = malloc(sizeof(t_proceso));
+t_new_process* recv_process_kernel() {
+    
+    log_info(logger_memoria, "Se recibio la solicitud de KERNEL para crear un proceso en memoria");
+    
+    t_buffer* buffer = recive_full_buffer(fd_kernel);
+    //t_new_process* nuevo_proceso= malloc(sizeof(t_new_process)); NO hace falta uso la funcion que crea
 
-    // deserialize_nuevo_proceso(buffer, nuevo_proceso);
+    if(buffer == NULL) return NULL;
 
-    // // Crear estructuras administrativas necesarias
-    // t_proceso* proceso = malloc(sizeof(t_proceso));
-    // proceso->pid = nuevo_proceso->pid;
-    // proceso->path = strdup(nuevo_proceso->path);
+    t_new_process* new_process= deserialize_nuevo_proceso(buffer);
 
-    // log_info(logger_memoria,"pid del proceso:%d",proceso->pid);
-    // log_info(logger_memoria,"path del proceso:%s",proceso->path);
+    // Crear estructuras administrativas necesarias
+    //t_proceso* proceso = malloc(sizeof(t_proceso));
+    //proceso->pid = nuevo_proceso->pid;
+    //proceso->path = strdup(nuevo_proceso->path);
 
-    // // // Agregar proceso a la lista de procesos
-    // // pthread_mutex_lock(&mutex_lista_procesos);
-    // // list_add(lista_procesos, proceso);
-    // // pthread_mutex_unlock(&mutex_lista_procesos);
+    log_info(logger_memoria,"\nNuevo proceso:\npid:%d\npath relativo: %s",new_process->pid, new_process->path);
 
-    // free(proceso->path);
-    // free(proceso);
-    // free(nuevo_proceso->path);
-    // free(nuevo_proceso);
-    // buffer_destroy(buffer);
+    // // Agregar proceso a la lista de procesos
+    // pthread_mutex_lock(&mutex_lista_procesos);
+    // list_add(lista_procesos, proceso);
+    // pthread_mutex_unlock(&mutex_lista_procesos);
+
+    //free(proceso->path);
+    //free(proceso);
+    //free(nuevo_proceso->path);
+    //free(nuevo_proceso);
+    buffer_destroy(buffer);
+
+    return new_process;
 }
