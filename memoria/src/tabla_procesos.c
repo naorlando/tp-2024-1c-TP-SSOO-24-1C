@@ -1,7 +1,7 @@
 #include "tabla_procesos.h"
 
 bool agregar_proceso(t_proceso* proceso) {
-    if(_esta_vacia_tabla()) return false;
+    if(!_existe_tabla()) return false;
 
     char* key = uint32_to_string(obtener_pid(proceso));
 
@@ -64,5 +64,9 @@ void crear_tabla_procesos(){
 
 bool _esta_vacia_tabla(){
     return dictionary_is_empty(tabla_procesos);
+}
+
+bool _existe_tabla(){
+    return tabla_procesos != NULL;
 }
 
