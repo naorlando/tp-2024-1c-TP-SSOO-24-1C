@@ -234,11 +234,12 @@ uint16_t buffer_read_uint16(t_buffer *buffer)
     return data;
 }
 
-char *buffer_read_string(t_buffer *buffer, uint32_t *length)
+char *buffer_read_string(t_buffer *buffer, uint32_t length)
 {
-    *length = buffer_read_uint32(buffer);
+    //*length = buffer_read_uint32(buffer);
+    uint32_t lenght_aux = length + 1; //add to '\0'
 
-    char *string = malloc(*length + 1);
+    char *string = malloc(lenght_aux * sizeof(char));
 
     if (string == NULL)
     {
@@ -246,8 +247,8 @@ char *buffer_read_string(t_buffer *buffer, uint32_t *length)
         return NULL;
     }
 
-    buffer_read_data(buffer, string, *length);
-    string[*length] = '\0'; // Añado fin de cadena
+    buffer_read_data(buffer, string, lenght_aux);
+    string[lenght_aux] = '\0'; // Añado fin de cadena
 
     return string;
 }
