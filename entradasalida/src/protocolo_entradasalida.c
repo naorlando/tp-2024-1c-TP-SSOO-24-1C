@@ -40,7 +40,7 @@ void requests_kernel()
 }
 
 // Comento la lógica de la función requests_memoria, ya que no se utiliza
-/*void requests_memoria()
+void requests_memoria()
 {
     bool control_key = 1;
     while (control_key)
@@ -59,7 +59,7 @@ void requests_kernel()
             break;
         }
     }
-}*/
+}
 
 // Agrego la función para atender la instrucción de sleep
 void atender_instruccion_sleep()

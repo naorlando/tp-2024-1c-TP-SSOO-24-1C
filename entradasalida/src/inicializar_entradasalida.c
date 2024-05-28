@@ -69,6 +69,8 @@ void _iniciar_config() {
     TIEMPO_UNIDAD_TRABAJO = config_get_int_value(config_entradasalida, "TIEMPO_UNIDAD_TRABAJO");
     IP_KERNEL = config_get_string_value(config_entradasalida, "IP_KERNEL");
     PUERTO_KERNEL = config_get_string_value(config_entradasalida, "PUERTO_KERNEL");
+    IP_MEMORIA = config_get_string_value(config_entradasalida, "IP_MEMORIA");
+    PUERTO_MEMORIA = config_get_string_value(config_entradasalida, "PUERTO_MEMORIA");
 }
 
 void _imprimir_config() {    
