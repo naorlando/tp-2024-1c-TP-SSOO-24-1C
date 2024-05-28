@@ -116,7 +116,7 @@ void * f_iniciar_proceso(char* path) {
     //TODO Estadarizar iguales lo uint
     u_int32_t buffer_size = sizeof(uint32_t) + strlen(nuevo_proceso->path) + 1 + sizeof(uint32_t);
     log_info(logger_kernel, "KERNEL SERIALIZA PCB Y ENVIA A MEMORIA");
-    t_package *package = package_create(CREAR_PROCESO_KERNEL,buffer_size);
+    t_package *package = package_create(MSG_KERNEL_CREATE_PROCESS,buffer_size);
     serialize_nuevo_proceso(package->buffer, nuevo_proceso);
     package_send(package, fd_kernel_memoria);
     package_destroy(package);
