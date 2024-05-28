@@ -287,7 +287,7 @@ void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
     buffer_add_string(buffer, nuevo_proceso->path);
 }
 
-void deserialize_nuevo_proceso(t_buffer* buffer, t_new_process* new_process) {
+t_new_process* deserialize_nuevo_proceso(t_buffer* buffer) {
     // void *stream = buffer->stream;
     // int offset = 0;
 
@@ -304,7 +304,7 @@ void deserialize_nuevo_proceso(t_buffer* buffer, t_new_process* new_process) {
     // nuevo_proceso->path = malloc(path_length);
     // memcpy(nuevo_proceso->path, stream + offset, path_length);
 
-    if(buffer == NULL) return;
+    if(buffer == NULL) return NULL;
 
     //Obtenemos el pid del nuevo proceso
     uint32_t pid_new_process = buffer_read_uint32(buffer);
@@ -313,8 +313,8 @@ void deserialize_nuevo_proceso(t_buffer* buffer, t_new_process* new_process) {
     uint32_t path_length= buffer_read_uint32(buffer);
 
     //Obtenemos el path relativo del codigo
-    char* path_relative= malloc(length * sizeof(char));
-    path_relative = buffer_read_string(buffer);
+    char* path_relative= malloc((path_length + 1)* sizeof(char));
+    path_relative = buffer_read_string(buffer, path_length);
 
-    new_process = create_new_process(pid_new_process, path_relative);
+    return create_new_process(pid_new_process, path_relative);
 }
