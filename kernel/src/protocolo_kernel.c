@@ -47,7 +47,10 @@ int send_example_cpu()
 int send_pcb_cpu()
 {
     t_PCB *pcb = pcb_create(0, 1);
-    uint32_t buffer_size = sizeof(pcb);
+    
+    // sumo el size de un uint_32, ya que voy a guardar un buffer auxiliar
+    // con su size para t_cpu_registers
+    uint32_t buffer_size = get_pcb_size(pcb) + sizeof(uint32_t);
     t_package *package = package_create(MSG_KERNEL_CPU_DISPATCH, buffer_size);
 
     serialize_pcb(get_buffer(package), pcb);
