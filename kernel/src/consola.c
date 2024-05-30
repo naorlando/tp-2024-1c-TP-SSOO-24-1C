@@ -27,10 +27,15 @@ bool _validacion_de_instrucciones_consola(char *leido){
     bool resultado_validacion = false;
 
     // TODO: Hacer más controles de validación
-    char** comando_consola = string_split(leido, " "); // ROMPE LA SEGUNDA VEZ EN string_substring
+    char** comando_consola = split(leido, " "); // ROMPE LA SEGUNDA VEZ EN string_substring
 
     // en vez de strcmp para la comparacion podriamos usar:  string_equals_ignore_case(char * actual, char * expected)
     // la unica diferencia es que contempla escribir el comando en mayuscula o minuscula, le da igual.
+
+    if (comando_consola == NULL) {
+        log_error(logger_kernel, "Error al dividir el comando de la consola.");
+        return false;
+    }
 
     if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0 && arrayLength(comando_consola) == 2) { // 2 son la cantidad de paramentros
         resultado_validacion = true;
@@ -55,26 +60,26 @@ bool _validacion_de_instrucciones_consola(char *leido){
         resultado_validacion = false;
     }
 
-    string_array_destroy(comando_consola);
+    array_string_destroy(comando_consola);
 
     return resultado_validacion;
 }
 
-void _atender_instruccion(char *leido) {
-    char * leido_aux = string_duplicate(leido);
-    
-    char** comando_consola = string_split(leido_aux, " ");
-    char* path = comando_consola[1];
-    pthread_t un_hilo;
-    //t_buffer* un_buffer = buffer_create(strlen(comando_consola[1])+1); //TODO: Revisar el tamaño del buffer
+void _atender_instruccion(char *leido) { 
+    char** comando_consola = split(leido, " ");
 
     if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0) { // [path][size][prioridad]
         //buffer_add_string(un_buffer, comando_consola[1]); // [path]
         // buffer_add_string(un_buffer, comando_consola[2]); // [size]
         // buffer_add_string(un_buffer, comando_consola[3]); // [prioridad]
         // f_iniciar_proceso(un_buffer);
+        char* path = string_duplicate(comando_consola[1]);
+
+        pthread_t un_hilo;
         pthread_create(&un_hilo, NULL, (void *) f_iniciar_proceso, path);
         pthread_join(un_hilo, NULL);
+
+        free(path);
     } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0) {
         // código correspondiente
     } else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0) {
@@ -90,8 +95,7 @@ void _atender_instruccion(char *leido) {
         exit(EXIT_FAILURE);
     }
 
-    string_array_destroy(comando_consola);
-    free(leido_aux);
+    array_string_destroy(comando_consola);
     //buffer_destroy(un_buffer);
 }
 
@@ -126,8 +130,6 @@ void * f_iniciar_proceso(char* path) {
     // queue_push(new_queue, pcb);
     // pthread_mutex_unlock(&mutex_new_queue);
 
-    // Liberar memoria
-    free(path);
     free(nuevo_proceso);
    // buffer_destroy(un_buffer);
    return 0;

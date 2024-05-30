@@ -5,6 +5,7 @@
 #include "utils/buffer.h"
 #include "utils/estructuras.h"
 #include "utils/protocolo.h"
+#include "utils/utils.h"
 #include "table_pcb.h"
 
 
