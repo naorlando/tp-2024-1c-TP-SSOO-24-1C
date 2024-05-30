@@ -96,7 +96,7 @@ t_buffer* get_buffer(t_package* package) {
     return package->buffer;
 }
 
-t_msg_header* get_message_header(t_package* package) {
+t_msg_header get_message_header(t_package* package) {
     return package->msg_header;
 }
 
@@ -183,34 +183,26 @@ void serialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
 // PCB
 void serialize_pcb(t_buffer *buffer, t_PCB *pcb)
 {
-    size_t size = sizeof(t_PCB) + sizeof(uint32_t);
-    void *stream = malloc(size);
+    //Agrego el pid
+    buffer_add_uint32(buffer, pcb->pid);
 
-    // PID
-    memcpy(stream, &(pcb->pid), sizeof(uint32_t));
-    buffer->offset = sizeof(uint32_t);
+    //Agrego el pc
+    buffer_add_uint32(buffer, pcb->program_counter);
 
-    // PC
-    memcpy(stream + buffer->offset, &(pcb->program_counter), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-
-    // Quantum
-    memcpy(stream + buffer->offset, &(pcb->quantum), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
+    //Agrego quantum
+    buffer_add_uint32(buffer, pcb->quantum);
 
     // CPU registers
-    u_int32_t aux_buffer_cpu_registers_size = sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7;
-    t_buffer *buffer_cpu_registers = buffer_create(aux_buffer_cpu_registers_size);
+    uint32_t buffer_cpu_registers_size = get_cpu_registers_size(get_cpu_registers(pcb));
+    t_buffer *buffer_cpu_registers = buffer_create(buffer_cpu_registers_size);
 
-    serialize_cpu_registers(buffer_cpu_registers, pcb->cpu_registers);
+    serialize_cpu_registers(buffer_cpu_registers, get_cpu_registers(pcb));
 
-    memcpy(stream + buffer->offset, &(buffer_cpu_registers->size), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-    memcpy(stream + buffer->offset, buffer_cpu_registers->stream, sizeof(t_cpu_registers));
-    buffer->offset += sizeof(t_cpu_registers);
+    //Agrego size del buffer_cpu_registers
+    buffer_add_uint32(buffer, buffer_cpu_registers_size);
 
-    buffer->stream = stream;
-    buffer->size = buffer->offset;
+    //Agrego el contenido de buffer_cpu_registers en buffer 
+    buffer_add_buffer(buffer, buffer_cpu_registers);
 
     buffer_destroy(buffer_cpu_registers);
 }
