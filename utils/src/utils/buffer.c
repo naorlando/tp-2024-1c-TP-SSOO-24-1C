@@ -24,6 +24,10 @@ t_buffer *buffer_create(uint32_t size)
     return buffer;
 }
 
+uint32_t get_size_buffer(t_buffer* buffer) {
+    return buffer->size;
+}
+
 // Buffer destroy
 void buffer_destroy(t_buffer *buffer)
 {
@@ -273,4 +277,8 @@ void buffer_add_string(t_buffer *buffer, char *data)
 {
     uint32_t size_cadena = strlen(data)+1;
     buffer_add_data(buffer, data,size_cadena );
+}
+
+void buffer_add_buffer(t_buffer* buffer_destination, t_buffer* buffer_source) {
+    buffer_add_data(buffer_destination, buffer_source->stream, buffer_source->size);   
 }
