@@ -44,9 +44,12 @@ typedef struct {
 
 t_PCB* pcb_create(uint32_t pid,  uint32_t quantum);
 void pcb_destroy(t_PCB* pcb);
+uint32_t get_pcb_size(t_PCB*);
+t_cpu_registers* get_cpu_registers(t_PCB*);
 
 t_cpu_registers* cpu_registers_create();
 void cpu_registers_destroy(t_cpu_registers* cpu_registers);
+uint32_t get_cpu_registers_size(t_cpu_registers*);
 
 //TODO Corregir
 //t_proceso* crear_proceso(uint32_t pid, const char* path);

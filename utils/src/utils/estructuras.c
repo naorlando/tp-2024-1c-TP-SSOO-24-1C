@@ -26,6 +26,16 @@ void pcb_destroy(t_PCB *pcb)
     free(pcb);
 }
 
+t_cpu_registers* get_cpu_registers(t_PCB* pcb)
+{
+    return pcb->cpu_registers;
+}
+
+uint32_t get_pcb_size(t_PCB* pcb)
+{
+    return (sizeof(uint32_t) * 3) + get_cpu_registers_size(get_cpu_registers(pcb));
+}
+
 // CPU registers
 t_cpu_registers *cpu_registers_create()
 {
@@ -53,6 +63,11 @@ void cpu_registers_destroy(t_cpu_registers *cpu_registers)
     if(cpu_registers != NULL){
     free(cpu_registers);
     }
+}
+
+uint32_t get_cpu_registers_size(t_cpu_registers *cpu_registers)
+{
+    return (sizeof(uint32_t) * 7) + (sizeof(uint8_t) * 4);
 }
 
 // lo usa memoria para crear un proceso
