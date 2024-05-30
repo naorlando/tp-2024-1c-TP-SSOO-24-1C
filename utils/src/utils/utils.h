@@ -5,6 +5,7 @@
 // Standard Library
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <inttypes.h> // Para las macros de formato como PRIu8, PRIu16, etc.
 #include <limits.h> // Para los valores máximos como UINT8_MAX, UINT16_MAX, etc.
@@ -15,6 +16,9 @@ uint16_t arrayLength(char** array);
 uint16_t intArrayLength(uint32_t* array);
 char* uint8_to_string(uint8_t);
 char* uint32_to_string(uint32_t);
+
+char** split(const char*, const char*);
+void array_string_destroy(char**);
 
 #define GET_MAX_LENGTH(type) get_max_length_uint(type##_MAX)
 

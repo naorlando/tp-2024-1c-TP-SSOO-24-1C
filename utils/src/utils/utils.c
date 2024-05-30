@@ -70,3 +70,43 @@ char* uint32_to_string(uint32_t value) {
 
     return str;
 }
+
+char** split(const char* str, const char* delimiter) {
+    if (str == NULL || delimiter == NULL) return NULL;
+
+    size_t count = 0;
+    char* temp_str = strdup(str);
+    char* token = strtok(temp_str, delimiter);
+
+    while (token != NULL) {
+        count++;
+        token = strtok(NULL, delimiter);
+    }
+
+    free(temp_str);
+
+    char** result = malloc((count + 1) * sizeof(char*));
+    if (result == NULL) return NULL;
+
+    temp_str = strdup(str);
+    token = strtok(temp_str, delimiter);
+    size_t idx = 0;
+    
+    while (token != NULL) {
+        result[idx++] = strdup(token);
+        token = strtok(NULL, delimiter);
+    }
+    result[idx] = NULL;
+
+    free(temp_str);
+    return result;
+}
+
+void array_string_destroy(char** array) {
+    if (array == NULL) return;
+
+    for (size_t i = 0; array[i] != NULL; i++) {
+        free(array[i]);
+    }
+    free(array);
+}
