@@ -273,7 +273,6 @@ void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
     memcpy(&(cpu_registers->di), stream, sizeof(uint32_t));
 }
 
-//TODO revisar aplicar funciones de buffer
 void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
     size_t path_length = strlen(nuevo_proceso->path); // Incluye el terminador nulo
 
@@ -288,22 +287,6 @@ void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
 }
 
 t_new_process* deserialize_nuevo_proceso(t_buffer* buffer) {
-    // void *stream = buffer->stream;
-    // int offset = 0;
-
-    // // Deserializar PID
-    // memcpy(&(nuevo_proceso->pid), stream + offset, sizeof(uint32_t));
-    // offset += sizeof(uint32_t);
-
-    // // Deserializar longitud de path
-    // uint32_t path_length;
-    // memcpy(&path_length, stream + offset, sizeof(uint32_t));
-    // offset += sizeof(uint32_t);
-
-    // // Deserializar path
-    // nuevo_proceso->path = malloc(path_length);
-    // memcpy(nuevo_proceso->path, stream + offset, path_length);
-
     if(buffer == NULL) return NULL;
 
     //Obtenemos el pid del nuevo proceso
