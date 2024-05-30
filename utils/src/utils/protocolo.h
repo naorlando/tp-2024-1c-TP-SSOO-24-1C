@@ -72,7 +72,7 @@ void package_destroy(t_package *package);
 int package_send(t_package *package, int fd);
 int package_recv(t_package *package, int fd);
 t_buffer* get_buffer(t_package*);
-t_msg_header* get_message_header(t_package*);
+t_msg_header get_message_header(t_package*);
 
 
 // serialize
