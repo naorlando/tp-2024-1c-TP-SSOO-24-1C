@@ -92,6 +92,14 @@ int package_recv(t_package *package, int fd)
     return EXIT_SUCCESS;
 }
 
+t_buffer* get_buffer(t_package* package) {
+    return package->buffer;
+}
+
+t_msg_header* get_message_header(t_package* package) {
+    return package->msg_header;
+}
+
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)
 {
