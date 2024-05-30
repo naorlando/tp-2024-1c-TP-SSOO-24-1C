@@ -47,10 +47,10 @@ int send_example_cpu()
 int send_pcb_cpu()
 {
     t_PCB *pcb = pcb_create(0, 1);
-    u_int32_t buffer_size = sizeof(pcb);
+    uint32_t buffer_size = sizeof(pcb);
     t_package *package = package_create(MSG_KERNEL_CPU_DISPATCH, buffer_size);
 
-    serialize_pcb(package->buffer, pcb);
+    serialize_pcb(get_buffer(package), pcb);
     package_send(package, fd_cpu_dispatch);
 
     // pcb_destroy(pcb); no eliminar hasta que termine de ejecutar
