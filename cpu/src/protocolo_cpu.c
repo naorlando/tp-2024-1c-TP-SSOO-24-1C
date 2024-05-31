@@ -98,10 +98,8 @@ int recv_example_msg_kernel()
 
 int recv_pcb_cpu()
 {
-
-    t_PCB *pcb = malloc(sizeof(t_PCB));
     t_buffer *new_buffer = recive_full_buffer(fd_kernel_dispatch);
-    deserialize_pcb(new_buffer, pcb);
+    t_PCB* pcb = deserialize_pcb(new_buffer);
     log_info(logger_cpu, "PCB pc => %d", pcb->program_counter);
     log_info(logger_cpu, "PCB Quantum => %d", pcb->quantum);
     log_info(logger_cpu, "PCB cpu_registers AX => %d", pcb->cpu_registers->ax);
