@@ -137,4 +137,11 @@ void buffer_add_string(t_buffer*, char*);
 // Post: Los datos de buffer_source se añaden al final de buffer_destination.
 void buffer_add_buffer(t_buffer*, t_buffer*);
 
+// Añade una parte del contenido de un buffer origen a un buffer destino.
+// Pre: Ambos buffers han sido creados previamente.
+//      buffer_destination es el buffer al que se añadirá el contenido.
+//      buffer_source es el buffer cuyo contenido será añadido.
+//      length es la cantidad de datos a copiar desde buffer_source.
+// Post: Los datos con el tamaño de length en buffer_source se añaden al final de buffer_destination.
+void buffer_add_partial_buffer(t_buffer*, t_buffer*, uint32_t);
 #endif

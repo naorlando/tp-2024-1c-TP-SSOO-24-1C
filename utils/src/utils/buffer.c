@@ -282,3 +282,20 @@ void buffer_add_string(t_buffer *buffer, char *data)
 void buffer_add_buffer(t_buffer* buffer_destination, t_buffer* buffer_source) {
     buffer_add_data(buffer_destination, buffer_source->stream, buffer_source->size);   
 }
+
+void buffer_add_partial_buffer(t_buffer* buffer_destination, t_buffer* buffer_source, uint32_t length) 
+{
+    
+    if(!buffer_can_write(buffer_destination, length)) return;
+
+    void* stream = malloc(length);
+    buffer_read_data(buffer_source, stream, length);
+
+    buffer_add_data(buffer_destination, stream, length);
+
+    // Reseteo el buffer_destination a su punto anterior antes que se añada
+    // el stream, para que se pueda leer en su siguiente llamado
+    buffer_destination->offset -= length;
+
+    free(stream);
+}
