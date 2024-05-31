@@ -152,32 +152,28 @@ void example_deserialize_msg(t_buffer *buffer, t_message_example *msg)
 // CPU registers
 void serialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
 {
-
-    // CPU registers: AX, BX, CX, DX
-    buffer->stream = malloc(buffer->size);
-
-    memcpy(buffer->stream, &(cpu_registers->pc), sizeof(uint32_t));
-    buffer->offset = sizeof(uint32_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->ax), sizeof(uint8_t));
-    buffer->offset += sizeof(uint8_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->bx), sizeof(uint8_t));
-    buffer->offset += sizeof(uint8_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->cx), sizeof(uint8_t));
-    buffer->offset += sizeof(uint8_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->dx), sizeof(uint8_t));
-    buffer->offset += sizeof(uint8_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->eax), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->ebx), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->ecx), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->edx), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->si), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
-    memcpy(buffer->stream + buffer->offset, &(cpu_registers->di), sizeof(uint32_t));
-    buffer->offset += sizeof(uint32_t);
+    //Agrego pc
+    buffer_add_uint32(buffer, cpu_registers->pc);
+    //Agrego ax
+    buffer_add_uint8(buffer, cpu_registers->ax);
+    //Agrego bx
+    buffer_add_uint8(buffer, cpu_registers->bx);
+    //Agrego cx
+    buffer_add_uint8(buffer, cpu_registers->cx);
+    //Agrego dx
+    buffer_add_uint8(buffer, cpu_registers->dx);
+    //Agrego eax
+    buffer_add_uint32(buffer, cpu_registers->eax);
+    //Agrego ebx
+    buffer_add_uint32(buffer, cpu_registers->ebx);
+    //Agrego ecx
+    buffer_add_uint32(buffer, cpu_registers->ecx);
+    //Agrego edx
+    buffer_add_uint32(buffer, cpu_registers->edx);
+    //Agrego si
+    buffer_add_uint32(buffer, cpu_registers->si);
+    //Agrego di
+    buffer_add_uint32(buffer, cpu_registers->di);
 }
 
 // PCB
@@ -186,11 +182,11 @@ void serialize_pcb(t_buffer *buffer, t_PCB *pcb)
     //Agrego el pid
     buffer_add_uint32(buffer, pcb->pid);
 
-    //Agrego el pc
-    buffer_add_uint32(buffer, pcb->program_counter);
-
     //Agrego quantum
     buffer_add_uint32(buffer, pcb->quantum);
+
+    //Agrego el pc
+    buffer_add_uint32(buffer, pcb->program_counter);
 
     // CPU registers
     uint32_t buffer_cpu_registers_size = get_cpu_registers_size(get_cpu_registers(pcb));
@@ -207,70 +203,50 @@ void serialize_pcb(t_buffer *buffer, t_PCB *pcb)
     buffer_destroy(buffer_cpu_registers);
 }
 
-void deserialize_pcb(t_buffer *buffer, t_PCB *pcb)
+t_PCB* deserialize_pcb(t_buffer *buffer)
 {
-    u_int32_t aux_buffer_cpu_registers_size = sizeof(uint8_t) * 4 + sizeof(uint32_t) * 7;
-    t_buffer *buffer_cpu_registers = buffer_create(aux_buffer_cpu_registers_size);
-    
+    // Obtengo pid
+    uint32_t pid = buffer_read_uint32(buffer);
 
-    void *stream = buffer->stream;
+    // Obtengo quantum 
+    uint32_t quantum = buffer_read_uint32(buffer);
 
-    // PID
-    memcpy(&(pcb->pid), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
+    // Creo pcb
+    t_PCB* pcb = pcb_create(pid, quantum);
 
-    // PC
-    memcpy(&(pcb->program_counter), stream, sizeof(uint32_t));
+    // Obtengo pc
+    pcb->program_counter = buffer_read_uint32(buffer);
 
-    stream += sizeof(uint32_t);
-    // Quantum
-    memcpy(&(pcb->quantum), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
+    // Obtengo el tamaño del sub-buffer de t_cpu_registers
+    uint32_t buffer_cpu_registers_size = buffer_read_uint32(buffer);
 
-    // CPU registers
+    // Creo sub-buffer de t_cpu_registers
+    t_buffer* buffer_cpu_registers = buffer_create(buffer_cpu_registers_size);
 
-    memcpy(&(buffer->offset), stream, (sizeof(uint32_t)));
-    stream += sizeof(uint32_t);
+    // Agrego parte del contenido de buffer en buffer_cpu_registers
+    buffer_add_partial_buffer(buffer_cpu_registers, buffer, buffer_cpu_registers_size);
 
-    void *stream_aux = malloc(buffer->offset);
-
-    memcpy(stream_aux, stream, buffer->offset);
-    stream += sizeof(buffer->offset);
-
-    buffer_cpu_registers->stream = stream_aux;
-    buffer_cpu_registers->size = buffer->offset;
-
-    pcb->cpu_registers = malloc(sizeof(t_cpu_registers));
+    // Obtengo los registros de la cpu
     deserialize_cpu_registers(buffer_cpu_registers, pcb->cpu_registers);
+    
     buffer_destroy(buffer_cpu_registers);
+
+    return pcb;
 }
 
 void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
 {
-
-    void *stream = buffer->stream;
-
-    memcpy(&(cpu_registers->pc), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    memcpy(&(cpu_registers->ax), stream, sizeof(uint8_t));
-    stream += sizeof(uint8_t);
-    memcpy(&(cpu_registers->bx), stream, sizeof(uint8_t));
-    stream += sizeof(uint8_t);
-    memcpy(&(cpu_registers->cx), stream, sizeof(uint8_t));
-    stream += sizeof(uint8_t);
-    memcpy(&(cpu_registers->dx), stream, sizeof(uint8_t));
-    stream += sizeof(uint8_t);
-    memcpy(&(cpu_registers->eax), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    memcpy(&(cpu_registers->ebx), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    memcpy(&(cpu_registers->ecx), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    memcpy(&(cpu_registers->edx), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    memcpy(&(cpu_registers->si), stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    memcpy(&(cpu_registers->di), stream, sizeof(uint32_t));
+    cpu_registers->pc= buffer_read_uint32(buffer);
+    cpu_registers->ax= buffer_read_uint8(buffer);
+    cpu_registers->bx= buffer_read_uint8(buffer);
+    cpu_registers->cx= buffer_read_uint8(buffer);
+    cpu_registers->dx= buffer_read_uint8(buffer);
+    cpu_registers->eax= buffer_read_uint32(buffer);
+    cpu_registers->ebx= buffer_read_uint32(buffer);
+    cpu_registers->ecx= buffer_read_uint32(buffer);
+    cpu_registers->edx= buffer_read_uint32(buffer);
+    cpu_registers->si= buffer_read_uint32(buffer);
+    cpu_registers->di= buffer_read_uint32(buffer);
 }
 
 void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
