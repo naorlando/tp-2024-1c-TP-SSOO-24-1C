@@ -7,7 +7,6 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include "utils/utils.h"
-#include "utils/buffer.h"
 
 typedef enum {
     SET,
@@ -41,6 +40,11 @@ typedef struct {
 // Post: Retorna un puntero a una estructura t_instruction con la línea de instrucción duplicada.
 t_instruction* crear_instruccion(char*);
 
+// Crea una nueva instrucción a partir de un nombre de instrucción y una lista de parámetros.
+// Pre: El nombre de instrucción y la lista de parámetros deben ser válidos y no NULL.
+// Post: Retorna un puntero a una estructura t_instruction con el nombre y los parámetros asignados.
+t_instruction* crear_instruccion_con_parametros(t_name_instruction, t_list*);
+
 // Elimina una instrucción.
 // Pre: El puntero a t_instruction debe ser válido y no NULL.
 // Post: La memoria asignada para la instrucción y su línea es liberada.
@@ -67,16 +71,6 @@ t_name_instruction _obtener_tipo_instruccion(char*);
 t_list* _lista_parametros(char**); 
 
 char* _leer_parametro(char**, int);
-
-// Serializa una instrucción en el buffer.
-// pre: el buffer y la instrucción deben ser válidos y no NULL.
-// post: la instrucción es serializada en el buffer.
-void serialize_instruccion(t_buffer *buffer, t_instruction *instruccion);
-
-// Deserializa una instrucción desde el buffer.
-// pre: el buffer y la instrucción deben ser válidos y no NULL.
-// post: la instrucción es deserializada desde el buffer.
-void deserialize_instruccion(t_buffer *buffer, t_instruction *instruccion);
 
 // Destruye una instrucción.
 // pre: el puntero a la instrucción debe ser válido y no NULL.

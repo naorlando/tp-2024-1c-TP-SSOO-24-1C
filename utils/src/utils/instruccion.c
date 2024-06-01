@@ -21,6 +21,19 @@ t_instruction* crear_instruccion(char* linea) {
     return instruccion_nueva;
 }
 
+t_instruction* crear_instruccion_con_parametros(t_name_instruction name, t_list* params) {
+    t_instruction* instruccion_nueva = malloc(sizeof(t_instruction));
+
+    if(instruccion_nueva == NULL || params == NULL) {
+        return NULL;
+    }
+
+    instruccion_nueva->name = name;
+    instruccion_nueva->params = params;
+
+    return instruccion_nueva;
+}
+
 void eliminar_instruccion(t_instruction* instruccion) {
     t_list* parametros = obtener_parametros(instruccion);
 
@@ -96,43 +109,6 @@ void free_parametro(void* parametro) {
     char* parametro_eliminar = (char*)parametro;
 
     free(parametro_eliminar);
-}
-
-// Serializa una instrucción en el buffer.
-
-// TODO: revisar implementación
-
-void serialize_instruccion(t_buffer *buffer, t_instruction *instruccion) {
-    // Serializar el nombre de la instrucción
-    buffer_add_uint32(buffer, (uint32_t)instruccion->name);
-
-    // Serializar el número de parámetros
-    uint32_t num_params = list_size(instruccion->params);
-    buffer_add_uint32(buffer, num_params);
-
-    // Serializar cada parámetro
-    for (int i = 0; i < num_params; i++) {
-        char* param = list_get(instruccion->params, i);
-        buffer_add_string(buffer, param);
-    }
-}
-
-// Deserializa una instrucción desde el buffer.
-void deserialize_instruccion(t_buffer *buffer, t_instruction *instruccion) {
-    // // Deserializar el nombre de la instrucción
-    // instruccion->name = (t_name_instruction) buffer_read_uint32(buffer);
-
-    // // Deserializar el número de parámetros
-    // uint32_t num_params = buffer_read_uint32(buffer);
-    // instruccion->params = list_create();
-
-    // // Deserializar cada parámetro
-    // for (uint32_t i = 0; i < num_params; i++) {
-    //     uint32_t param_length = buffer_read_uint32(buffer);
-    //     char* param = malloc(param_length);
-    //     buffer_read(buffer, param, param_length);
-    //     list_add(instruccion->params, param);
-    // }
 }
 
 // Libera la memoria asignada para una instrucción.
