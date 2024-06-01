@@ -12,11 +12,10 @@ void init(){
     _iniciar_logger();
     _iniciar_config();
     imprimir_config();
-    init_cpu_registers();
-    
+    _init_cpu_registers();
 }
 
-void init_cpu_registers() {
+void _init_cpu_registers() {
     cpu_registers = malloc(sizeof(t_cpu_registers));
     
     cpu_registers->pc = 0;
