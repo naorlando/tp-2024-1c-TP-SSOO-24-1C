@@ -268,8 +268,7 @@ t_new_process* deserialize_nuevo_proceso(t_buffer* buffer) {
     uint32_t path_length= buffer_read_uint32(buffer);
 
     //Obtenemos el path relativo del codigo
-    char* path_relative= malloc((path_length + 1)* sizeof(char));
-    path_relative = buffer_read_string(buffer, path_length);
+    char* path_relative = buffer_read_string(buffer, path_length);
 
     return create_new_process(pid_new_process, path_relative);
 }
