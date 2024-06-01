@@ -17,6 +17,7 @@
 
 #include "estructuras.h"
 #include "buffer.h"
+#include "instruccion.h"
 
 /*
  *  Messages: enum & structs
@@ -90,5 +91,17 @@ void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
 void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso);
 t_new_process* deserialize_nuevo_proceso(t_buffer *buffer);
 //send
+
+
+/*********** Serialize and Deserialize t_instruction ***********/
+// Serializa una instrucción en el buffer.
+// pre: el buffer y la instrucción deben ser válidos y no NULL.
+// post: la instrucción es serializada en el buffer.
+void serialize_instruction(t_buffer*, t_instruction*);
+
+// Deserializa una instrucción a partir de un buffer.
+// Pre: El buffer debe ser válido y no NULL, debe contener datos.
+// Post: Retorna un puntero a una estructura t_instruction con el nombre y los parámetros deserializados. 
+t_instruction* deserialize_instruction(t_buffer*);
 
 #endif

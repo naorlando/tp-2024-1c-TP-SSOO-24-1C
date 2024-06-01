@@ -273,3 +273,42 @@ t_new_process* deserialize_nuevo_proceso(t_buffer* buffer) {
 
     return create_new_process(pid_new_process, path_relative);
 }
+
+void serialize_instruction(t_buffer *buffer, t_instruction *instruccion) {
+    // Serializar el nombre de la instrucción
+    buffer_add_uint32(buffer, (uint32_t)instruccion->name);
+
+    // Serializar el número de parámetros
+    uint32_t num_params = list_size(instruccion->params);
+    buffer_add_uint32(buffer, num_params);
+
+    // Serializar cada parámetro
+    for (int i = 0; i < num_params; i++) {
+        char* param = list_get(instruccion->params, i);
+        buffer_add_string(buffer, param);
+    }
+}
+
+t_instruction* deserialize_instruction(t_buffer *buffer) {
+
+    // Obtengo el nombre de la instruccion
+    t_name_instruction name = buffer_read_uint32(buffer);
+
+    // Obtengo la cantidad de parametros
+    uint32_t count_params = buffer_read_uint32(buffer);
+
+    // Creo la lista donde se guardaran los parametros
+    t_list* params = list_create();
+
+    for(size_t i = 0; i < count_params; i++) {
+        uint32_t size_param = buffer_read_uint32(buffer);
+
+        // Leo el parametro
+        char* param = buffer_read_string(buffer, size_param);
+
+        // Agrego el parametro a la lista de parametros
+        list_add(params, param);
+    }
+
+    return crear_instruccion_con_parametros(name, params);
+}
