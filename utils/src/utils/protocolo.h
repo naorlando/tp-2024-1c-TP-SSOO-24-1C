@@ -18,6 +18,7 @@
 #include "estructuras.h"
 #include "buffer.h"
 #include "instruccion.h"
+#include "next_instruction.h"
 
 /*
  *  Messages: enum & structs
@@ -94,7 +95,7 @@ t_new_process* deserialize_nuevo_proceso(t_buffer *buffer);
 //send
 
 
-/*********** Serialize and Deserialize t_instruction ***********/
+/*********** Serialize and Deserialize 't_instruction' ***********/
 // Serializa una instrucción en el buffer.
 // pre: el buffer y la instrucción deben ser válidos y no NULL.
 // post: la instrucción es serializada en el buffer.
@@ -104,5 +105,17 @@ void serialize_instruction(t_buffer*, t_instruction*);
 // Pre: El buffer debe ser válido y no NULL, debe contener datos.
 // Post: Retorna un puntero a una estructura t_instruction con el nombre y los parámetros deserializados. 
 t_instruction* deserialize_instruction(t_buffer*);
+
+/*********** Serialize and Deserialize 't_next_instruction' ***********/
+// Serializa una estructura t_next_instruction en un buffer.
+// Pre: Los punteros a t_buffer y t_next_instruction deben ser válidos y no NULL.
+// Post: Los datos de la estructura t_next_instruction se añade al buffer.
+void serialize_next_instruction(t_buffer*, t_next_instruction*);
+
+// Deserializa una estructura t_next_instruction a partir de un buffer.
+// Pre: El puntero a t_buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_next_instruction creada a partir de los datos del buffer.
+//       Si ocurre un error en la deserialización, retorna NULL.
+t_next_instruction* deserialize_next_instruction(t_buffer*);
 
 #endif

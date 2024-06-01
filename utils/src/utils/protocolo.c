@@ -312,3 +312,21 @@ t_instruction* deserialize_instruction(t_buffer *buffer) {
 
     return crear_instruccion_con_parametros(name, params);
 }
+
+void serialize_next_instruction(t_buffer* buffer, t_next_instruction* next_instruction) {
+    // Serializar el pid del proceso
+    buffer_add_uint32(buffer, obtener_pid_process(next_instruction));
+
+    // Serializar el program counter que apunta a la siguiente instruccion
+    buffer_add_uint32(buffer, obtener_pc_process(next_instruction));
+}
+
+t_next_instruction* deserialize_next_instruction(t_buffer* buffer) {
+    // Obtengo el pid del proceso
+    uint32_t pid = buffer_read_uint32(buffer);
+
+    // Obtengo el program counter que apunta a la siguiente instruccion
+    uint32_t pc = buffer_read_uint32(buffer);
+
+    return crear_siguiente_instruccion(pid, pc);
+}
