@@ -70,32 +70,63 @@ typedef struct
  */
 
 // Package
-t_package *package_create(t_msg_header msg_header , u_int32_t buffer_size);
-void package_destroy(t_package *package);
-int package_send(t_package *package, int fd);
-int package_recv(t_package *package, int fd);
+t_package *package_create(t_msg_header, u_int32_t);
+void package_destroy(t_package*);
+int package_send(t_package*, int);
+int package_recv(t_package*, int);
 t_buffer* get_buffer(t_package*);
 t_msg_header get_message_header(t_package*);
 
 
-// serialize
-void *serializar_paquete(t_package *paquete, int bytes);
-void example_serialize_msg(t_buffer *buffer, t_message_example *msg);
-void serialize_pcb(t_buffer *buffer, t_PCB *pcb);
-void serialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers);
+/*********** SERIALIZE AND DESERIALIZE FUNCTIONS ***********/
 
-// deserialize
-void example_deserialize_msg(t_buffer *buffer, t_message_example *msg);
+void *serializar_paquete(t_package*, int);
 
-t_PCB* deserialize_pcb(t_buffer *buffer);
-void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers);
+/*********** SERIALIZE AND DESERIALIZE 'T_MESSAGE_EXAMPLE' ***********/
+// Serializa un mensaje de ejemplo.
+// Pre: El buffer y el mensaje deben ser válidos y no NULL.
+// Post: El mensaje se serializa en el buffer.
+void example_serialize_msg(t_buffer*, t_message_example*);
 
-void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso);
-t_new_process* deserialize_nuevo_proceso(t_buffer *buffer);
-//send
+// Deserializa un mensaje de ejemplo.
+// Pre: El buffer y el mensaje deben ser válidos y no NULL.
+// Post: El mensaje se deserializa desde el buffer y se almacena en la estructura t_message_example.
+void example_deserialize_msg(t_buffer*, t_message_example*);
 
+/*********** SERIALIZE AND DESERIALIZE 'T_PCB' ***********/
+// Serializa un t_PCB.
+// Pre: El buffer y el t_PCB deben ser válidos y no NULL.
+// Post: El t_PCB se serializa en el buffer.
+void serialize_pcb(t_buffer*, t_PCB*);
 
-/*********** Serialize and Deserialize 't_instruction' ***********/
+// Deserializa un t_PCB.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: El t_PCB se deserializa desde el buffer y se devuelve.
+t_PCB* deserialize_pcb(t_buffer*);
+
+/*********** SERIALIZE AND DESERIALIZE 'T_CPU_REGISTERS' ***********/
+// Serializa los registros de la CPU.
+// Pre: El buffer y los registros de la CPU deben ser válidos y no NULL.
+// Post: Los registros de la CPU se serializan en el buffer.
+void serialize_cpu_registers(t_buffer*, t_cpu_registers*);
+
+// Deserializa los registros de la CPU.
+// Pre: El buffer y los registros de la CPU deben ser válidos y no NULL.
+// Post: Los registros de la CPU se deserializan desde el buffer y se almacenan en la estructura t_cpu_registers.
+void deserialize_cpu_registers(t_buffer*, t_cpu_registers*);
+
+/*********** SERIALIZE AND DESERIALIZE 'T_NEW_PROCESS' ***********/
+// Serializa la información de un nuevo proceso.
+// Pre: El buffer y la estructura t_new_process deben ser válidos y no NULL.
+// Post: La información del t_new_process se serializa en el buffer.
+void serialize_nuevo_proceso(t_buffer*, t_new_process*);
+
+// Deserializa la información de un nuevo proceso.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: La información del nuevo proceso se deserializa desde el buffer y se devuelve.
+t_new_process* deserialize_nuevo_proceso(t_buffer*);
+
+/*********** SERIALIZE AND DESERIALIZE 'T_INSTRUCTION' ***********/
 // Serializa una instrucción en el buffer.
 // pre: el buffer y la instrucción deben ser válidos y no NULL.
 // post: la instrucción es serializada en el buffer.
@@ -106,7 +137,7 @@ void serialize_instruction(t_buffer*, t_instruction*);
 // Post: Retorna un puntero a una estructura t_instruction con el nombre y los parámetros deserializados. 
 t_instruction* deserialize_instruction(t_buffer*);
 
-/*********** Serialize and Deserialize 't_next_instruction' ***********/
+/*********** SERIALIZE AND DESERIALIZE 'T_NEXT_INSTRUCTION' ***********/
 // Serializa una estructura t_next_instruction en un buffer.
 // Pre: Los punteros a t_buffer y t_next_instruction deben ser válidos y no NULL.
 // Post: Los datos de la estructura t_next_instruction se añade al buffer.
