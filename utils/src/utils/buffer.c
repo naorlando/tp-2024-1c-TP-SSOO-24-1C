@@ -276,7 +276,10 @@ void buffer_add_uint32(t_buffer *buffer, uint32_t data)
 void buffer_add_string(t_buffer *buffer, char *data)
 {
     uint32_t size_cadena = strlen(data)+1;
-    buffer_add_data(buffer, data,size_cadena );
+
+    buffer_add_uint32(buffer, size_cadena);
+
+    buffer_add_data(buffer, data, size_cadena);
 }
 
 void buffer_add_buffer(t_buffer* buffer_destination, t_buffer* buffer_source) {
