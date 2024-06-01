@@ -20,6 +20,11 @@ char* uint32_to_string(uint32_t);
 char** split(const char*, const char*);
 void array_string_destroy(char**);
 
+// Concatena dos cadenas de texto con un separador en el medio.
+// Pre: Los punteros a str1, str2 y separator deben ser válidos y no NULL.
+// Post: Retorna un puntero a una nueva cadena que es la concatenación de str1, separator y str2. 
+char* join(const char*, const char*, const char*);
+
 #define GET_MAX_LENGTH(type) get_max_length_uint(type##_MAX)
 
 #endif

@@ -110,3 +110,29 @@ void array_string_destroy(char** array) {
     }
     free(array);
 }
+
+char* join(const char* str1, const char* str2, const char* separator) {
+    size_t len1 = strlen(str1);
+    size_t len2 = strlen(str2);
+    size_t len_sep = strlen(separator);
+
+    // Calcular el tamaño total de la nueva cadena
+    size_t total_len = len1 + len2 + len_sep + 1;
+
+    char* result = (char*)malloc(total_len * sizeof(char));
+
+    if (result == NULL) {
+        return NULL;
+    }
+
+    // Copiar la primera cadena al resultado
+    strcpy(result, str1);
+
+    // Añadir el separador al resultado
+    strcat(result, separator);
+
+    // Añadir la segunda cadena al resultado
+    strcat(result, str2);
+
+    return result;
+}
