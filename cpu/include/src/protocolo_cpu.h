@@ -5,6 +5,7 @@
 #include <variables_globales.h>
 #include "utils/estructuras.h"
 #include "utils/instruccion.h"
+#include "cpu_dispatch.h"
 
 int send_example_memoria();
 void atender_cpu_kernel_dispatch();
@@ -14,8 +15,5 @@ int recv_pcb_cpu();
 
 // Instrucciones:
 void atender_instruccion_memoria();
-void ejecutar_instruccion(t_instruction* instruccion, t_cpu_registers* cpu_registers);
-
-
 
 #endif
