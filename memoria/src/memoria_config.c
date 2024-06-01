@@ -24,3 +24,23 @@ bool cargar_memoria_config(t_memoria_config* mc, t_config* cf){
 
     return true;
 }
+
+char* obtener_path_instrucciones(t_memoria_config* mem_config) {
+    return mem_config->PATH_INSTRUCCIONES;
+}
+
+uint16_t obtener_tam_memoria(t_memoria_config* mem_config) {
+    return mem_config->TAM_MEMORIA;
+}
+
+uint16_t obtener_tam_pagina(t_memoria_config* mem_config) {
+    return mem_config->TAM_PAGINA;
+}
+
+uint16_t obtener_retardo_respuesta(t_memoria_config* mem_config) {
+    return mem_config->RETARDO_RESPUESTA;
+}
+
+uint16_t obtener_puerto_escucha(t_memoria_config* mem_config) {
+    return mem_config->PUERTO_ESCUCHA;
+}
