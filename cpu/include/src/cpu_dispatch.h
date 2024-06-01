@@ -7,4 +7,5 @@
 
 void ejecutar_instruccion(t_instruction*, t_cpu_registers*);
 
+void cargar_contexto_ejecucion(t_PCB*);
 #endif

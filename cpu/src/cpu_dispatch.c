@@ -73,3 +73,20 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             break;
     }
 }
+
+void cargar_contexto_ejecucion(t_PCB* pcb) {
+    t_cpu_registers* contexto = get_cpu_registers(pcb);
+
+    // Cargo el contexto de ejecucion del pcb en la CPU
+    cpu_registers->pc = contexto->pc;
+    cpu_registers->ax = contexto->ax;
+    cpu_registers->bx = contexto->bx;
+    cpu_registers->cx = contexto->cx;
+    cpu_registers->dx = contexto->dx;
+    cpu_registers->eax = contexto->eax;
+    cpu_registers->ebx = contexto->ebx;
+    cpu_registers->ecx = contexto->ecx;
+    cpu_registers->edx = contexto->edx;
+    cpu_registers->si = contexto->si;
+    cpu_registers->di = contexto->di;
+}
