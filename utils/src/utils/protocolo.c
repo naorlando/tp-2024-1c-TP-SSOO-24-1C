@@ -250,15 +250,11 @@ void deserialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
 }
 
 void serialize_nuevo_proceso(t_buffer *buffer, t_new_process *nuevo_proceso) {
-    size_t path_length = strlen(nuevo_proceso->path); // Incluye el terminador nulo
 
     //Agrego el pid del nuevo proceso
     buffer_add_uint32(buffer, nuevo_proceso->pid);
 
-    //Agrego el largo de la path
-    buffer_add_uint32(buffer, path_length);
-
-    //Agrego el path
+    //Agrego el largo de la cadena y el path
     buffer_add_string(buffer, nuevo_proceso->path);
 }
 
