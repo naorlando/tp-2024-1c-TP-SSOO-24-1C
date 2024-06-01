@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <commons/log.h>
+#include "utils/estructuras.h"
 #include "cpu_config.h"
 
 #define SERVERNAME "CPU"
@@ -12,14 +13,14 @@
 
 // VARIABLES GLOBALES
 extern t_log *logger_cpu;
-extern t_log *cpu_kernel_debug;
+extern t_log* logger_cpu_debug;
+extern t_cpu_registers* cpu_registers;
 
 // CONFIG
 extern t_config *config_cpu;
 extern t_cpu_config *cpu_config;
 
 // FD
-
 extern int fd_kernel_dispatch;
 extern int fd_memoria;
 
