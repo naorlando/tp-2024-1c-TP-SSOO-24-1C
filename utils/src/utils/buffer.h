@@ -125,7 +125,8 @@ void buffer_add_uint16(t_buffer*, uint16_t);
 // Post: Se agrega el entero de 32 bits al buffer.
 void buffer_add_uint32(t_buffer*, uint32_t);
 
-// Agrega una cadena de caracteres al buffer.
+// Agrega una cadena de caracteres al buffer, le añade a la cadena un caracter
+// para el caracter fin de cadena.
 // Pre: El buffer ha sido creado previamente y tiene espacio suficiente.
 // Post: Se agrega la cadena de caracteres al buffer.
 void buffer_add_string(t_buffer*, char*);
