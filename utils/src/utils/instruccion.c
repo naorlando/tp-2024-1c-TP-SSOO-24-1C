@@ -113,9 +113,7 @@ void serialize_instruccion(t_buffer *buffer, t_instruction *instruccion) {
     // Serializar cada parámetro
     for (int i = 0; i < num_params; i++) {
         char* param = list_get(instruccion->params, i);
-        uint32_t param_length = strlen(param) + 1;
-        buffer_add_uint32(buffer, param_length);
-        buffer_add(buffer, param, param_length);
+        buffer_add_string(buffer, param);
     }
 }
 
