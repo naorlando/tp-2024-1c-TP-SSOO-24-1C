@@ -18,8 +18,21 @@ typedef struct {
     uint16_t RETARDO_RESPUESTA;
 } t_memoria_config;
 
+// Crea una nueva estructura t_memoria_config.
+// Pre: Ninguna.
+// Post: Retorna un puntero a una estructura t_memoria_config.
+//       Si no se puede asignar memoria, retorna NULL.
 t_memoria_config* crear_memoria_config();
+
+// Destruye una estructura t_memoria_config, liberando su memoria.
+// Pre: El puntero a t_memoria_config debe ser válido y no NULL.
+// Post: La memoria asignada a la estructura t_memoria_config es liberada.
 void destruir(t_memoria_config*);
+
+// Carga la configuración de memoria desde una estructura t_config a una estructura t_memoria_config.
+// Pre: Los punteros a t_memoria_config y t_config deben ser válidos y no NULL.
+// Post: La estructura t_memoria_config es llenada con los valores de configuración de t_config.
+//       Retorna true si la configuración fue cargada correctamente.
 bool cargar_memoria_config(t_memoria_config*, t_config*);
 
 // Obtiene el path de instrucciones de un t_memoria_config.
