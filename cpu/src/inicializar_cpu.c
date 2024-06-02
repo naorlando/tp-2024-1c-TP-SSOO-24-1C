@@ -6,7 +6,7 @@ t_cpu_config* cpu_config;
 int fd_kernel_dispatch;
 int fd_memoria;
 t_cpu_registers* cpu_registers;
-
+bool interrupcion_pendiente= false;
 
 void init(){
     _iniciar_logger();
