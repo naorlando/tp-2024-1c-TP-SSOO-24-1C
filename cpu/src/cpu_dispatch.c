@@ -90,3 +90,20 @@ void cargar_contexto_ejecucion(t_PCB* pcb) {
     cpu_registers->si = contexto->si;
     cpu_registers->di = contexto->di;
 }
+
+t_instruction* solicitar_instruccion(int pid, int pc) {
+
+
+    char buffer[BUFFER_SIZE];
+    snprintf(buffer, sizeof(buffer), "REQUEST INSTRUCTION %d %d", pid, pc);
+
+    send(cpu.socket_memory, buffer, strlen(buffer), 0);
+
+    memset(buffer, 0, sizeof(buffer));
+    recv(cpu.socket_memory, buffer, sizeof(buffer), 0);
+
+    t_buffer *new_buffer = recive_full_buffer(fd_memoria);
+    t_instruction *instruccion = deserialize_instruction(new_buffer);
+
+    return strdup(buffer); // Retornar una copia de la instrucción
+}
