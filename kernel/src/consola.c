@@ -85,6 +85,10 @@ void _atender_instruccion(void *args) {
         // código correspondiente
     } else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0) {
         // código correspondiente
+    } else if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0) {
+        char* path = strdup(comando_consola[1]);
+        f_ejecutar_script(path);
+        free(path);
     } else {
         log_error(logger_kernel, "Comando no reconocido, pero que paso el filtro ???");
         exit(EXIT_FAILURE);
@@ -127,6 +131,28 @@ void f_iniciar_proceso(char* path) {
     // pthread_mutex_unlock(&mutex_new_queue);
 
     free(nuevo_proceso);
+}
+
+void f_ejecutar_script(const char* filename) {
+    FILE *file = fopen(filename, "r");
+
+    if (file == NULL) {
+        log_error(logger_kernel, "Error no se pudo abrir el archivo a ejecutar");
+        return;
+    }
+
+    char linea[256];
+    while (fgets(linea, sizeof(linea), file)) {
+        // Eliminar el salto de línea si existe
+        linea[strcspn(linea, "\n")] = '\0';
+        
+        log_info(logger_kernel,"Ejecutando comando: %s", linea);
+        
+        // Ejecutar el comando leído
+        // Aquí se debería llamar a la función correspondiente al comando leído
+    }
+
+    fclose(file);
 }
 
 int asignar_pid() {

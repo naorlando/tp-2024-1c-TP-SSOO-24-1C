@@ -16,6 +16,8 @@ void _atender_instruccion(void*);
 
 // FORMAS DE ATENDER PROCESO:
 void f_iniciar_proceso(char*);
+void f_ejecutar_script(const char*);
+
 int asignar_pid();
 
 #endif //CONSOLA_H_
