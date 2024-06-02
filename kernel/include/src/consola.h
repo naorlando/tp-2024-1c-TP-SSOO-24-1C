@@ -11,11 +11,11 @@
 
 
 void iniciar_consola_interactiva();
-bool _validacion_de_instrucciones_consola(char *leido);
-void _atender_instruccion(char *leido);
+bool _validacion_de_instrucciones_consola(char*);
+void _atender_instruccion(void*);
 
 // FORMAS DE ATENDER PROCESO:
-void * f_iniciar_proceso(char*);
+void f_iniciar_proceso(char*);
 int asignar_pid();
 
 #endif //CONSOLA_H_

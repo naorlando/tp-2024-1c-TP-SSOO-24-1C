@@ -4,10 +4,14 @@ t_log *logger_kernel;
 t_log *logger_kernel_debug;
 t_config *config_kernel;
 t_kernel_config *kernel_config;
+
 int fd_kernel_IO;
 int fd_cpu_dispatch;
 int fd_kernel_memoria;
+
 t_dictionary *table_pcb;
+pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
+int identificador_PID = 1;
 
 void init()
 {

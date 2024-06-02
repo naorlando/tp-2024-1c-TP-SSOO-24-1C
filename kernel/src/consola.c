@@ -6,8 +6,9 @@ void iniciar_consola_interactiva(){
     leido = readline("> ");
     bool validacion_leido;
 
-    while (strcmp(leido, "0") != 0) {
+    while (strcmp(leido, "") != 0) {
         validacion_leido = _validacion_de_instrucciones_consola(leido);
+
         if (!validacion_leido) {
             log_error(logger_kernel, "Comando de CONSOLA no reconocido.");
             free(leido);
@@ -15,7 +16,24 @@ void iniciar_consola_interactiva(){
             continue; // Saltar y continuar con el resto de la iteración
         }
 
-        _atender_instruccion(leido);
+        char* leido_copy = strdup(leido);
+        if (leido_copy == NULL) {
+            log_error(logger_kernel, "Error al duplicar el comando de la consola.");
+            free(leido);
+            leido = readline("> ");
+            continue;
+        }
+
+        //Se crea un hilo para atender cada comando
+        pthread_t hilo_atencion_comando_consola;
+        if (pthread_create(&hilo_atencion_comando_consola, NULL, (void*)_atender_instruccion, leido_copy) != 0) {
+            log_error(logger_kernel, "Error al crear el hilo para atender el comando.");
+            free(leido_copy);
+            free(leido);
+            leido = readline("> ");
+            continue;
+        }
+        pthread_join(hilo_atencion_comando_consola, NULL);
 
         free(leido);
         leido = readline("> ");
@@ -26,59 +44,36 @@ void iniciar_consola_interactiva(){
 bool _validacion_de_instrucciones_consola(char *leido){
     bool resultado_validacion = false;
 
-    // TODO: Hacer más controles de validación
-    char** comando_consola = split(leido, " "); // ROMPE LA SEGUNDA VEZ EN string_substring
-
-    // en vez de strcmp para la comparacion podriamos usar:  string_equals_ignore_case(char * actual, char * expected)
-    // la unica diferencia es que contempla escribir el comando en mayuscula o minuscula, le da igual.
-
+    char** comando_consola = split(leido, " ");
     if (comando_consola == NULL) {
         log_error(logger_kernel, "Error al dividir el comando de la consola.");
         return false;
     }
 
-    if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0 && arrayLength(comando_consola) == 2) { // 2 son la cantidad de paramentros
+    int longitud_comando = arrayLength(comando_consola);
+    if ((strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0 && longitud_comando == 2) ||
+        (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0 && longitud_comando == 2) ||
+        (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0 && longitud_comando == 2) ||
+        (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0 && longitud_comando == 1) ||
+        (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0 && longitud_comando == 1) ||
+        (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0 && longitud_comando == 2) ||
+        (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0 && longitud_comando == 1)) {
         resultado_validacion = true;
-    }   else if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0 && arrayLength(comando_consola) == 2) {
-        resultado_validacion = true;
-    } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0 && arrayLength(comando_consola) == 2) {
-        resultado_validacion = true;
-    } else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0  && arrayLength(comando_consola) == 1) {
-        resultado_validacion = true;
-    } else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0 && arrayLength(comando_consola) == 1) {
-        resultado_validacion = true;
-    } else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0 && arrayLength(comando_consola) == 2) {
-        resultado_validacion = true;
-    } else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0 && arrayLength(comando_consola) == 1) {
-        resultado_validacion = true;
-    // } else if (strcmp(comando_consola[0], "HELP") == 0) {
-    //     resultado_validacion = true;
-    // } else if (strcmp(comando_consola[0], "PRINT") == 0) {
-    //     resultado_validacion = true;
     } else {
         log_error(logger_kernel, "Error en validacion del comando.");
-        resultado_validacion = false;
     }
 
     array_string_destroy(comando_consola);
-
     return resultado_validacion;
 }
 
-void _atender_instruccion(char *leido) { 
+void _atender_instruccion(void *args) {
+    char* leido = (char*)args;
     char** comando_consola = split(leido, " ");
 
-    if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0) { // [path][size][prioridad]
-        //buffer_add_string(un_buffer, comando_consola[1]); // [path]
-        // buffer_add_string(un_buffer, comando_consola[2]); // [size]
-        // buffer_add_string(un_buffer, comando_consola[3]); // [prioridad]
-        // f_iniciar_proceso(un_buffer);
-        char* path = string_duplicate(comando_consola[1]);
-
-        pthread_t un_hilo;
-        pthread_create(&un_hilo, NULL, (void *) f_iniciar_proceso, path);
-        pthread_join(un_hilo, NULL);
-
+    if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0) {
+        char* path = strdup(comando_consola[1]);
+        f_iniciar_proceso(path);
         free(path);
     } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0) {
         // código correspondiente
@@ -96,32 +91,33 @@ void _atender_instruccion(char *leido) {
     }
 
     array_string_destroy(comando_consola);
-    //buffer_destroy(un_buffer);
+    free(leido);
 }
 
-void * f_iniciar_proceso(char* path) {
-  //  char* path = buffer_read_string(un_buffer,un_buffer->size);
+void f_iniciar_proceso(char* path) {
     int pid = asignar_pid();
 
-    // Crear el PCB
-    log_info(logger_kernel, "KERNEL CREA PCB");
-    t_PCB*  pcb = pcb_create(pid, 1);
-    //TODO Cargar pcb en la tabla
+    // Creor el PCB
+    t_PCB* pcb = pcb_create(pid, kernel_config->QUANTUM);
+    
+    // Cargo el pcb a la tabla de pcbs
     add_pcb(pcb);
 
-    t_new_process* nuevo_proceso = create_new_process(pid,path);
-
-    log_info(logger_kernel,"pid del pcb: %d",pcb->pid);
+    log_info(logger_kernel,"Se crea el proceso <%d> en NEW",pcb->pid);
  
-
+    // Creo la estrucutura que le voy a pasar a memoria para que
+    // cree la imagen del proceso
+    t_new_process* nuevo_proceso = create_new_process(pid,path);
     
-
-    // Serializar el PCB y enviar a la memoria
-    //TODO Estadarizar iguales lo uint
+    // Calculo el tamaño del buffer para serializar el t_new_process
     u_int32_t buffer_size = sizeof(uint32_t) + strlen(nuevo_proceso->path) + 1 + sizeof(uint32_t);
-    log_info(logger_kernel, "KERNEL SERIALIZA PCB Y ENVIA A MEMORIA");
-    t_package *package = package_create(MSG_KERNEL_CREATE_PROCESS,buffer_size);
+
+    log_info(logger_kernel, "Se serializa el nuevo proceso para enviar a memoria la creacion de la imagen del proceso");
+
+    // Creo el paquete
+    t_package *package = package_create(MSG_KERNEL_CREATE_PROCESS, buffer_size);
     serialize_nuevo_proceso(package->buffer, nuevo_proceso);
+
     package_send(package, fd_kernel_memoria);
     package_destroy(package);
 
@@ -131,11 +127,7 @@ void * f_iniciar_proceso(char* path) {
     // pthread_mutex_unlock(&mutex_new_queue);
 
     free(nuevo_proceso);
-   // buffer_destroy(un_buffer);
-   return 0;
 }
-
-
 
 int asignar_pid() {
     int valor_pid;
