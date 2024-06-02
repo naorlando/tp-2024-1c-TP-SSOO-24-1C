@@ -23,3 +23,7 @@ uint32_t obtener_pc_process(t_next_instruction* next_instruction) {
 void eliminar_next_instruction(t_next_instruction* next_instruction) {
     free(next_instruction);
 }
+
+uint32_t obtener_next_instruction_size(t_next_instruction* next_instruction) {
+    return sizeof(next_instruction->pid_process) + sizeof(next_instruction->program_counter_process);
+}
