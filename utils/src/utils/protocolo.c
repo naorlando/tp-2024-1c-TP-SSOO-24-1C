@@ -100,6 +100,19 @@ t_msg_header get_message_header(t_package* package) {
     return package->msg_header;
 }
 
+int send_pcb(t_msg_header msg_header, int fd, t_PCB* pcb) 
+{
+    uint32_t buffer_size = get_pcb_size(pcb) + sizeof(uint32_t);
+    t_package* package = package_create(msg_header, buffer_size);
+
+    serialize_pcb(get_buffer(package), pcb);
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return 0;
+}
+
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)
 {
