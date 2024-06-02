@@ -30,6 +30,8 @@ typedef enum
 
     // KERNEL <-> CPU
     MSG_KERNEL_CPU_DISPATCH,
+    MSG_PCB_KERNEL,
+    MSG_PCB_CPU,
     MSG_CPU_DISPATCH_KERNEL,
     MSG_IO_KERNEL,
     MSG_KERNEL_IO,
@@ -77,6 +79,14 @@ int package_recv(t_package*, int);
 t_buffer* get_buffer(t_package*);
 t_msg_header get_message_header(t_package*);
 
+/*********** SEND AND RECIVE FUNCTIONS ***********/
+// Envía un t_PCB a través de un socket especificado.
+// Pre: El parámetro msg_header debe contener un encabezado de mensaje válido.
+//      El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+//      El puntero pcb debe apuntar a un bloque de control de proceso válido y no debe ser NULL.
+// Post: El t_PCB se serializa y se envía a través del socket especificado.
+//       La función retorna 0 si el envío se realizó correctamente.
+int send_pcb(t_msg_header, int, t_PCB*);
 
 /*********** SERIALIZE AND DESERIALIZE FUNCTIONS ***********/
 
