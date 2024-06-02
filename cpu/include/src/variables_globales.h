@@ -15,6 +15,8 @@
 extern t_log *logger_cpu;
 extern t_log* logger_cpu_debug;
 extern t_cpu_registers* cpu_registers;
+extern t_PCB* pcb_execute;
+extern bool interrupcion_pendiente;
 
 // CONFIG
 extern t_config *config_cpu;
