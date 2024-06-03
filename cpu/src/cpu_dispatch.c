@@ -123,7 +123,7 @@ void manejar_ciclo_de_instruccion() {
     if(manejar_interrupcion()) return;
 
     //TODO: Se debe actualizar el PC antes de pedir la siguiente instruccion a memoria
-    solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
+    //solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
 }
 
 bool manejar_interrupcion() {
