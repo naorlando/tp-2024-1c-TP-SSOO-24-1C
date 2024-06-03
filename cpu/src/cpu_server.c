@@ -14,7 +14,7 @@ void atender_cpu_kernel_dispatch()
             // atender_cpu_kernel_dispatch();
             break;
         
-        case MSG_PCB_KERNEL:
+        case MSG_PCB_CPU:
             recibir_pcb();
             break;
 
