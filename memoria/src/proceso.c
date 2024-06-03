@@ -25,7 +25,7 @@ t_instruction* obtener_siguiente_instruccion(t_proceso* proceso, uint32_t num_in
     }
 
     char buffer[MAX_LINE_LENGTH];
-    int num_linea_actual = 1;
+    int num_linea_actual = 0;
     char *linea = NULL;
 
     while (fgets(buffer, sizeof(buffer), codigo) != NULL) {
@@ -41,6 +41,7 @@ t_instruction* obtener_siguiente_instruccion(t_proceso* proceso, uint32_t num_in
 
     if (linea == NULL) {
         fprintf(stderr, "Error: Línea %d no encontrada en el archivo %s\n", num_linea_actual, obtener_path_absoluto(proceso));
+        return NULL;
     }
 
     fclose(codigo);
