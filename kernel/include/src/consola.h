@@ -7,6 +7,7 @@
 #include "utils/protocolo.h"
 #include "utils/utils.h"
 #include "table_pcb.h"
+#include "protocolo_kernel.h"
 
 
 
@@ -17,6 +18,8 @@ void _atender_instruccion(void*);
 // FORMAS DE ATENDER PROCESO:
 void f_iniciar_proceso(char*);
 void f_ejecutar_script(const char*);
+
+void enviar_pcb_cpu();
 
 int asignar_pid();
 

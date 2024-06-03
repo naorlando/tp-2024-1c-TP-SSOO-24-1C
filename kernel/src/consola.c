@@ -80,7 +80,7 @@ void _atender_instruccion(void *args) {
     } else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0) {
         // código correspondiente
     } else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0) {
-        // código correspondiente
+        enviar_pcb_cpu();
     } else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0) {
         // código correspondiente
     } else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0) {
@@ -131,6 +131,13 @@ void f_iniciar_proceso(char* path) {
     // pthread_mutex_unlock(&mutex_new_queue);
 
     free(nuevo_proceso);
+}
+
+void enviar_pcb_cpu()
+{
+    t_PCB* pcb = get_pcb(1);
+    //envio a cpu el pcb
+    send_pcb_cpu(pcb);
 }
 
 void f_ejecutar_script(const char* filename) {
