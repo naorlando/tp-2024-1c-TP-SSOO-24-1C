@@ -7,7 +7,7 @@ t_instruction* crear_instruccion(char* linea) {
         return NULL;
     }
 
-    char** partes_instruccion = string_split(linea, " ");
+    char** partes_instruccion = split(linea, " ");
 
     if(partes_instruccion == NULL) return NULL;
 
@@ -17,6 +17,8 @@ t_instruction* crear_instruccion(char* linea) {
     if(instruccion_nueva->name == -1 || instruccion_nueva->params == NULL) {
         return NULL;
     }
+
+    array_string_destroy(partes_instruccion);
 
     return instruccion_nueva;
 }
@@ -83,12 +85,14 @@ t_list* obtener_parametros(t_instruction* instruccion) {
 }
 
 t_list* _lista_parametros(char** array_parametros) {
-    t_list* parametros = malloc(sizeof(t_list));
+    t_list* parametros = list_create();
 
     if(parametros == NULL) return NULL;
 
+    int cant_parametros = arrayLength(array_parametros);
+
     //Se arranca de 1 porque la posicion 0 tiene la instruccion
-    for(int i = 1; i < arrayLength(array_parametros); i++) {
+    for(int i = 1; i < cant_parametros; i++) {
         list_add(parametros, _leer_parametro(array_parametros, i));
     }
 
@@ -98,8 +102,10 @@ t_list* _lista_parametros(char** array_parametros) {
 char* _leer_parametro(char** parametros, int index) {
     char* parametro = NULL;
 
-    if(index >= 0 && index < arrayLength(parametros)) {
-        parametro = parametros[index];
+    int cant_parametros = arrayLength(parametros);
+
+    if(index >= 0 && index < cant_parametros) {
+        parametro = strdup(parametros[index]);
     }
 
     return parametro;
@@ -118,12 +124,19 @@ uint32_t obtener_instruction_size(t_instruction* instruccion)
     // Sumo el nombre de la instruccion (es un enum)
     size += sizeof(obtener_nombre_instruccion(instruccion));
 
-    // Sumo los parametros que tiene la instruccion
+    // obtengo los parametros que tiene la instruccion
     t_list* params = obtener_parametros(instruccion);
     uint32_t num_params = list_size(params);
 
+    // Sumo la cantidad de paramtros
+    size += sizeof(num_params);
+
     for (int i = 0; i < num_params; i++) {
-        size += strlen(list_get(params, i));
+        size += sizeof(uint32_t); // para el tamaño del parametro
+
+        char* param = (char*)list_get(params, i);
+
+        size += (strlen(param) + 1); // para el parametro
     }
     
     return size;
