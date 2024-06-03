@@ -7,6 +7,7 @@ int fd_kernel_dispatch;
 int fd_memoria;
 t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
+t_PCB* pcb_execute;
 
 void init(){
     _iniciar_logger();
