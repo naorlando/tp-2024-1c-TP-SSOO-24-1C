@@ -91,7 +91,7 @@ void cargar_contexto_ejecucion(t_PCB* pcb) {
     cpu_registers->di = contexto->di;
 }
 
-void solicitar_instruccion(int pid, int pc) 
+void solicitar_instruccion(uint32_t pid, uint32_t pc) 
 {
     // Pido la siguiente instruccion a memoria
     send_get_next_instruction(pid, pc);
@@ -128,7 +128,7 @@ void manejar_ciclo_de_instruccion() {
 
 bool manejar_interrupcion() {
     if (interrupcion_pendiente) {
-        log_info(logger, "Interrupción recibida, devolviendo PCB al Kernel");
+        log_info(logger_cpu, "Interrupción recibida, devolviendo PCB al Kernel");
         //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
         // de enviar de nuevo al kernel
         send_pcb_kernel();
