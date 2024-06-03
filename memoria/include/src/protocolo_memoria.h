@@ -22,4 +22,8 @@ int recv_example_msg_entradasalida();
 
 t_new_process* recv_process_kernel();
 
+t_next_instruction* recv_next_instruction();
+
+void send_instrution(t_instruction*);
+
 #endif /*PROTOCOLO_MEMORIA_H_*/

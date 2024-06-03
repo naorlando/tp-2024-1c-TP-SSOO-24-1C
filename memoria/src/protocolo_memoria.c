@@ -12,11 +12,25 @@ void requests_cpu() {
                 recv_example_msg_cpu();
                 //esperar = false; //Cortamos la espera de solicitudes
             break;
+            case MSG_NEXT_INSTRUCTION_CPU:
+                t_next_instruction* next = recv_next_instruction();
 
-            //TODO:
-            /*
-                Agregar operaciones a las que dara servicio el modulo
-            */             
+                if(next == NULL) {
+                    log_error(logger_memoria, "ERROR: Ha surgido un problema al recibir la solicitud de siguiente instruccion.");
+                }
+
+                t_proceso* proceso = obtener_proceso(obtener_pid_process(next));
+
+                if(proceso == NULL) {
+                    log_error(logger_memoria, "ERROR: Ha surgido un problema al buscar el proceso en la memoria.");
+                }else{
+                    t_instruction* instruction = obtener_siguiente_instruccion(proceso, obtener_pc_process(next));
+
+                    if(instruction != NULL){
+                        send_instrution(instruction);
+                    }
+                }
+            break;                     
             case MSG_CPU_MEMORIA:
 
                 log_info(logger_memoria, "Se recibio un mje del cpu");
@@ -188,4 +202,39 @@ t_new_process* recv_process_kernel() {
     buffer_destroy(buffer);
 
     return new_process;
+}
+
+t_next_instruction* recv_next_instruction() 
+{
+    log_info(logger_memoria, "Se recibio la solicitud de CPU para obtener la siguiente instruccion de un proceso");
+    
+    t_buffer* buffer = recive_full_buffer(fd_cpu);
+
+    if(buffer == NULL) return NULL;
+
+    t_next_instruction* next_instruction= deserialize_next_instruction(buffer);
+
+    log_info(logger_memoria,"Siguiente instruccion para el proceso:\npid:%d\nprogram counter: %d",obtener_pid_process(next_instruction), obtener_pc_process(next_instruction));
+
+    buffer_destroy(buffer);
+
+    return next_instruction;
+}
+
+void send_instrution(t_instruction* instruction)
+{
+    // Creo el paquete que se va a enviar a CPU
+    t_package* package = package_create(MSG_INSTRUCTION_MEMORIA, obtener_instruction_size(instruction));
+
+    // Serializo en el buffer el t_instruction
+    serialize_instruction(get_buffer(package), instruction);
+
+    // Envio el paquete a memoria
+    package_send(package, fd_cpu);
+
+    // Elimino t_instruction
+    eliminar_instruccion(instruction);
+
+    //Elimino el paquete usado
+    package_destroy(package);
 }
