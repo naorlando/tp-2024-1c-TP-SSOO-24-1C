@@ -9,7 +9,7 @@
 
 int send_example_cpu();
 int send_example_memoria();
-int send_pcb_cpu();
+void send_pcb_cpu(t_PCB*);
 // void requests_entradasalida();
 int recv_example_msg_entradasalida();
 

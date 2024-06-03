@@ -44,22 +44,9 @@ int send_example_cpu()
     return 0;
 }
 
-int send_pcb_cpu()
+void send_pcb_cpu(t_PCB* pcb)
 {
-    t_PCB *pcb = pcb_create(0, 1);
-    
-    // sumo el size de un uint_32, ya que voy a guardar un buffer auxiliar
-    // con su size para t_cpu_registers
-    uint32_t buffer_size = get_pcb_size(pcb) + sizeof(uint32_t);
-    t_package *package = package_create(MSG_KERNEL_CPU_DISPATCH, buffer_size);
-
-    serialize_pcb(get_buffer(package), pcb);
-    package_send(package, fd_cpu_dispatch);
-
-    // pcb_destroy(pcb); no eliminar hasta que termine de ejecutar
-    package_destroy(package);
-
-    return 0;
+    send_pcb(MSG_PCB_CPU, fd_cpu_dispatch, pcb);
 }
 
 int send_example_memoria()
