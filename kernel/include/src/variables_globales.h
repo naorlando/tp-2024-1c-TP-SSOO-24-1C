@@ -29,5 +29,11 @@ extern t_kernel_config* kernel_config;
 extern int fd_kernel_memoria;
 extern int fd_kernel_IO;
 extern int fd_cpu_dispatch;
+extern int fd_server;
+
+//PORTS
+extern char* server_port;
+extern char* cpu_dispatch_port;
+extern char* memoria_port;
 
 #endif
