@@ -111,6 +111,24 @@ void free_parametro(void* parametro) {
     free(parametro_eliminar);
 }
 
+uint32_t obtener_instruction_size(t_instruction* instruccion) 
+{
+    uint32_t size = 0;
+
+    // Sumo el nombre de la instruccion (es un enum)
+    size += sizeof(obtener_nombre_instruccion(instruccion));
+
+    // Sumo los parametros que tiene la instruccion
+    t_list* params = obtener_parametros(instruccion);
+    uint32_t num_params = list_size(params);
+
+    for (int i = 0; i < num_params; i++) {
+        size += strlen(list_get(params, i));
+    }
+    
+    return size;
+}
+
 // Libera la memoria asignada para una instrucción.
 void instruccion_destroy(t_instruction *instruccion) {
     if (instruccion) {

@@ -66,6 +66,11 @@ t_list* obtener_parametros(t_instruction*);
 // Post: La memoria asignada al parámetro es liberada.
 void free_parametro(void*);
 
+// Obtiene el tamaño una estructura t_instruction.
+// Pre: El puntero a t_instruction debe ser válido y no NULL.
+// Post: Retorna un valor de tipo uint32_t que representa el tamaño en bytes del t_instruction.
+uint32_t obtener_instruction_size(t_instruction*);
+
 /**********************FUNCIONES PRIVADAS**********************/
 
 // Obtiene el tipo de instrucción a partir de una cadena de caracteres.
