@@ -13,7 +13,7 @@
 #include "kernel_config.h"
 #include "inicializar_kernel.h"
 #include <variables_globales.h>
-#include "protocolo_kernel.h"
+#include "kernel_server.h"
 #include "consola.h"
 
 
