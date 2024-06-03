@@ -3,6 +3,7 @@
 
 #include "variables_globales.h"
 #include "protocolo_cpu.h"
+#include "cpu_dispatch.h"
 #include "utils/sockets.h"
 #include "utils/buffer.h"
 #include "utils/estructuras.h"

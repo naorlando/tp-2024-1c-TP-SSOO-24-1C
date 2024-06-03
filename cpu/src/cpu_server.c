@@ -12,7 +12,10 @@ void atender_cpu_kernel_dispatch()
 
         case MSG_KERNEL_CPU_DISPATCH:
             // atender_cpu_kernel_dispatch();
-            recv_pcb_cpu();
+            break;
+        
+        case MSG_PCB_KERNEL:
+            recibir_pcb();
             break;
 
         case EXAMPLE:
@@ -40,7 +43,7 @@ void atender_cpu_memoria()
         switch (cod_op)
         {
         case MSG_INSTRUCTION_MEMORIA:
-            atender_instruccion_memoria();
+            manejar_ciclo_de_instruccion();
             log_info(logger_cpu, "Se recibio una instruccion de memoria");
             break;
         
