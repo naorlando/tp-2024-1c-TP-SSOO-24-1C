@@ -9,7 +9,7 @@
 #include <commons/string.h>
 #include <utils/sockets.h>
 #include "inicializar_memoria.h"
-#include "protocolo_memoria.h"
+#include "memoria_server.h"
 #include "variables_globales.h"
 
 #endif /*MEMORIA_H*/
