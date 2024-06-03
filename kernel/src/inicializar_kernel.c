@@ -8,6 +8,11 @@ t_kernel_config *kernel_config;
 int fd_kernel_IO;
 int fd_cpu_dispatch;
 int fd_kernel_memoria;
+int fd_server;
+
+char* cpu_dispatch_port;
+char* memoria_port;
+char* server_port;
 
 t_dictionary *table_pcb;
 pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
