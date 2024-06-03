@@ -8,12 +8,6 @@
 #include "utils/buffer.h"
 #include "gestion_procesos.h" 
 
-void requests_cpu();
-
-void requests_kernel();
-
-void requests_entradasalida();
-
 int recv_example_msg_cpu();
 
 int recv_example_msg_kernel();
