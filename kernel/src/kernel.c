@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     char *puerto_memoria = string_itoa(kernel_config->PUERTO_MEMORIA);
 
     fd_cpu_dispatch = crear_conexion(logger_kernel, SERVER_CPU, kernel_config->IP_CPU, puerto_cpu_dispatch);
-    fd_cpu_dispatch > 0 ? send_pcb_cpu() : log_error(logger_kernel, "Error al intentar enviar mensaje a %s", SERVER_CPU);
+    //fd_cpu_dispatch > 0 ? send_pcb_cpu() : log_error(logger_kernel, "Error al intentar enviar mensaje a %s", SERVER_CPU);
 
     fd_kernel_memoria = crear_conexion(logger_kernel, SERVER_MEMORIA, kernel_config->IP_MEMORIA, puerto_memoria);
     fd_kernel_memoria > 0 ? send_example_memoria() : log_error(logger_kernel, "Error al intentar enviar mensaje a %s", SERVER_MEMORIA);
