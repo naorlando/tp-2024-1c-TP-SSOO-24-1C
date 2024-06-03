@@ -45,7 +45,12 @@ t_instruction* obtener_siguiente_instruccion(t_proceso* proceso, uint32_t num_in
     }
 
     fclose(codigo);
-    return crear_instruccion(linea);
+
+    t_instruction* instruction = crear_instruccion(linea);
+
+    free(linea);
+
+    return instruction; 
 }
 
 void liberar_proceso(t_proceso* proceso) {
