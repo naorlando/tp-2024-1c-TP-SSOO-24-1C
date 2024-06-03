@@ -91,19 +91,50 @@ void cargar_contexto_ejecucion(t_PCB* pcb) {
     cpu_registers->di = contexto->di;
 }
 
-t_instruction* solicitar_instruccion(int pid, int pc) {
+void solicitar_instruccion(int pid, int pc) 
+{
+    // Pido la siguiente instruccion a memoria
+    send_get_next_instruction(pid, pc);
+}
 
+void recibir_pcb() 
+{
+    // Recibo el pcb que manda kernel para ejecutar sus instrucciones
+    pcb_execute = recv_pcb_cpu();
 
-    char buffer[BUFFER_SIZE];
-    snprintf(buffer, sizeof(buffer), "REQUEST INSTRUCTION %d %d", pid, pc);
+    // Cargo el contexto de ejecucion del pcb en los registros de la cpu
+    cargar_contexto_ejecucion(pcb_execute);
 
-    send(cpu.socket_memory, buffer, strlen(buffer), 0);
+    // Pido a memoria que me mande las instrucciones del proceso
+    solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
+}
 
-    memset(buffer, 0, sizeof(buffer));
-    recv(cpu.socket_memory, buffer, sizeof(buffer), 0);
+void manejar_ciclo_de_instruccion() {
+    // FETCH: Recibo la instruccion que manda memoria
+    t_instruction* instruccion = recv_instruction();
 
-    t_buffer *new_buffer = recive_full_buffer(fd_memoria);
-    t_instruction *instruccion = deserialize_instruction(new_buffer);
+    log_info(logger_cpu, "Instrucción recibida");
 
-    return strdup(buffer); // Retornar una copia de la instrucción
+    // EXECUTE: Ejecuto la instruccion recibida
+    ejecutar_instruccion(instruccion, cpu_registers);
+    eliminar_instruccion(instruccion);
+
+    // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
+    if(manejar_interrupcion()) return;
+
+    //TODO: Se debe actualizar el PC antes de pedir la siguiente instruccion a memoria
+    solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
+}
+
+bool manejar_interrupcion() {
+    if (interrupcion_pendiente) {
+        log_info(logger, "Interrupción recibida, devolviendo PCB al Kernel");
+        //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
+        // de enviar de nuevo al kernel
+        send_pcb_kernel();
+        interrupcion_pendiente = false;
+        return true;
+    }
+
+    return false;
 }
