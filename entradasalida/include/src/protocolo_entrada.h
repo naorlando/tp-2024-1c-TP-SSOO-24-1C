@@ -3,6 +3,8 @@
 
 #include "variables_globales.h"
 #include "utils/protocolo.h"
+#include "utils/estructuras.h"
+#include "utils/instruccion.h"
 
 // Prototipos de funciones
 void requests_kernel();

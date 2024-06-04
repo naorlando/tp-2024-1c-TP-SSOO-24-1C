@@ -29,8 +29,8 @@ typedef enum {
 }t_name_instruct;
 
 typedef struct {
-    t_name_instruct name,
-    t_list * params
+    t_name_instruct name;
+    t_list * params;
 }t_instruction;
 
 typedef struct {
