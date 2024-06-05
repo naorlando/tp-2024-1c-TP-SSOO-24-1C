@@ -2,37 +2,21 @@
 
 int send_example_memoria()
 {
-    char *cadena = "CPU ENVIO MENSAJE A MEMORIA";
-    uint8_t size_cadena = strlen(cadena) + 1; // Include null terminator
-    uint32_t buffer_size = sizeof(uint8_t) * 2 + size_cadena;
-    t_package *package_example = package_create(EXAMPLE, buffer_size);
-    t_message_example *example = malloc(sizeof(t_message_example));
+    char* cadena = "CPU ENVIO MENSAJE A MEMORIA";
+    uint8_t entero = 10;
 
-    example->cadena = malloc(strlen(cadena) + 1);
-    strcpy(example->cadena, cadena);
-    example->entero = 10;
-
-    example_serialize_msg(package_example->buffer, example);
-
-    package_send(package_example, fd_memoria);
-
-    free(example->cadena);
-    free(example);
-    package_destroy(package_example);
-    return 0;
+    return send_example(cadena, entero, fd_memoria);
 }
 
 int recv_example_msg_kernel()
 {
     log_info(logger_cpu, "<<<<< EXAMPLE RECIVE MESSAGE FROM KERNEL >>>>");
-    t_message_example *new_msg = malloc(sizeof(t_message_example));
-    t_buffer *new_buffer = recive_full_buffer(fd_kernel_dispatch);
-    example_deserialize_msg(new_buffer, new_msg);
-    log_info(logger_cpu, "MENSAJE => %s", new_msg->cadena);
-    log_info(logger_cpu, "ENTERO => %d", new_msg->entero);
-    free(new_msg->cadena);
-    free(new_msg);
-    buffer_destroy(new_buffer);
+    t_message_example* new_msg = recv_example(fd_kernel_dispatch);
+
+    log_info(logger_cpu, "MENSAJE => %s", get_cadena(new_msg));
+    log_info(logger_cpu, "ENTERO => %d", get_entero(new_msg));
+    
+    message_example_destroy(new_msg);
 
     return 0;
 }
