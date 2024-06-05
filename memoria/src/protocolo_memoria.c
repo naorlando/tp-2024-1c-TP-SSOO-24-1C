@@ -2,48 +2,39 @@
 
 int recv_example_msg_cpu(){
     log_info(logger_memoria, "<<<<< EXAMPLE RECIVE MESSAGE FROM CPU>>>>");
-    t_message_example * new_msg = malloc(sizeof(t_message_example));
-    t_buffer* new_buffer = recive_full_buffer(fd_cpu);
+    
+    t_message_example * new_msg = recv_example(fd_cpu);
 
-    example_deserialize_msg(new_buffer, new_msg);
-            
-    log_info(logger_memoria, "%s", new_msg->cadena);
-    log_info(logger_memoria, "%d", new_msg->entero);
-    free(new_msg->cadena);
-    free(new_msg);
-    buffer_destroy(new_buffer);
+    log_info(logger_memoria, "MENSAJE => %s", get_cadena(new_msg));
+    log_info(logger_memoria, "ENTERO => %d", get_entero(new_msg));
+    
+    message_example_destroy(new_msg);
 
     return 0;
 }
 
 int recv_example_msg_kernel(){
     log_info(logger_memoria, "<<<<< EXAMPLE RECIVE MESSAGE FROM KERNEL>>>>");
-    t_message_example * new_msg = malloc(sizeof(t_message_example));
-    t_buffer* new_buffer = recive_full_buffer(fd_kernel);
 
-    example_deserialize_msg(new_buffer, new_msg);
-            
-    log_info(logger_memoria, "%s", new_msg->cadena);
-    log_info(logger_memoria, "%d", new_msg->entero);
-    free(new_msg->cadena);
-    free(new_msg);
-    buffer_destroy(new_buffer);
+    t_message_example * new_msg = recv_example(fd_kernel);
+
+    log_info(logger_memoria, "MENSAJE => %s", get_cadena(new_msg));
+    log_info(logger_memoria, "ENTERO => %d", get_entero(new_msg));
+    
+    message_example_destroy(new_msg);
 
     return 0;
 }
 
 int recv_example_msg_entradasalida(){
     log_info(logger_memoria, "<<<<< EXAMPLE RECIVE MESSAGE FROM ENTRADASALIDA>>>>");
-    t_message_example * new_msg = malloc(sizeof(t_message_example));
-    t_buffer* new_buffer = recive_full_buffer(fd_entradasalida);
 
-    example_deserialize_msg(new_buffer, new_msg);
-            
-    log_info(logger_memoria, "%s", new_msg->cadena);
-    log_info(logger_memoria, "%d", new_msg->entero);
-    free(new_msg->cadena);
-    free(new_msg);
-    buffer_destroy(new_buffer);
+    t_message_example * new_msg = recv_example(fd_entradasalida);
+
+    log_info(logger_memoria, "MENSAJE => %s", get_cadena(new_msg));
+    log_info(logger_memoria, "ENTERO => %d", get_entero(new_msg));
+    
+    message_example_destroy(new_msg);
 
     return 0;
 }
