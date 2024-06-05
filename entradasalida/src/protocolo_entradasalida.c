@@ -79,61 +79,29 @@ void atender_instruccion_sleep()
 int recv_example_msg_kernel()
 {
     log_info(logger_entradasalida, "<<<<< EXAMPLE RECIVE MESSAGE FROM KERNEL>>>>");
-    t_message_example *new_msg = malloc(sizeof(t_message_example));
-    t_buffer *new_buffer = recive_full_buffer(fd_kernel);
 
-    example_deserialize_msg(new_buffer, new_msg);
+    t_message_example* new_msg = recv_example(fd_kernel);
 
-    log_info(logger_entradasalida, "%s", new_msg->cadena);
-    log_info(logger_entradasalida, "%d", new_msg->entero);
-    free(new_msg->cadena);
-    free(new_msg);
-    buffer_destroy(new_buffer);
+    log_info(logger_entradasalida, "MENSAJE => %s", get_cadena(new_msg));
+    log_info(logger_entradasalida, "ENTERO => %d", get_entero(new_msg));
+    
+    message_example_destroy(new_msg);
 
     return 0;
 }
 
 int send_example_kernel()
 {
-    char *cadena = "ENTRADASALIDA ENVIO MENSAJE A KERNEL";
-    uint8_t size_cadena = strlen(cadena) + 1; // Include null terminator
-    uint32_t buffer_size = sizeof(uint8_t) * 2 + size_cadena;
-    t_package *package_example = package_create(EXAMPLE, buffer_size);
+    char* cadena = "ENTRADASALIDA ENVIO MENSAJE A KERNEL";
+    uint8_t entero = 7;
 
-    t_message_example *example = malloc(sizeof(t_message_example));
-
-    example->cadena = malloc(strlen(cadena) + 1);
-    strcpy(example->cadena, cadena);
-    example->entero = 7;
-
-    example_serialize_msg(package_example->buffer, example);
-
-    package_send(package_example, fd_kernel);
-
-    free(example->cadena);
-    free(example);
-    package_destroy(package_example);
-    return 0;
+    return send_example(cadena, entero, fd_kernel);
 }
 
 int send_example_memoria()
 {
-    char *cadena = "ENTRADASALIDA ENVIO MENSAJE A MEMORIA";
-    uint8_t size_cadena = strlen(cadena) + 1; // Include null terminator
-    uint32_t buffer_size = sizeof(uint8_t) * 2 + size_cadena;
-    t_package *package_example = package_create(EXAMPLE, buffer_size);
-    t_message_example *example = malloc(sizeof(t_message_example));
+    char* cadena = "ENTRADASALIDA ENVIO MENSAJE A MEMORIA";
+    uint8_t entero = 9;
 
-    example->cadena = malloc(strlen(cadena) + 1);
-    strcpy(example->cadena, cadena);
-    example->entero = 9;
-
-    example_serialize_msg(package_example->buffer, example);
-
-    package_send(package_example, fd_memoria);
-
-    free(example->cadena);
-    free(example);
-    package_destroy(package_example);
-    return 0;
+    return send_example(cadena, entero, fd_memoria);
 }
