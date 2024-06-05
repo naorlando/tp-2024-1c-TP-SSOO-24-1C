@@ -100,6 +100,47 @@ t_msg_header get_message_header(t_package* package) {
     return package->msg_header;
 }
 
+t_message_example* message_example_create(char* cadena, uint8_t entero)
+{
+    t_message_example* example = malloc(sizeof(t_message_example));
+
+    if(example == NULL) return NULL;
+
+    // Guardo la cadena
+    example->cadena = malloc(strlen(cadena));
+    strcpy(example->cadena, cadena);
+    
+    // Guardo el entero
+    example->entero = entero;
+
+    return example;
+}
+
+char* get_cadena(t_message_example* example) 
+{
+    return example->cadena;
+}
+
+uint8_t get_entero(t_message_example* example)
+{
+    return example->entero;
+}
+
+uint32_t get_message_example_size(t_message_example* example) 
+{
+    return sizeof(uint32_t) + (strlen(example->cadena) + 1) + sizeof(example->entero);
+}
+
+void message_example_destroy(t_message_example* example)
+{
+    if (example->cadena != NULL)
+    {
+        free(example->cadena);
+    }
+
+    free(example);
+}
+
 int send_pcb(t_msg_header msg_header, int fd, t_PCB* pcb) 
 {
     uint32_t buffer_size = get_pcb_size(pcb) + sizeof(uint32_t);
@@ -111,6 +152,35 @@ int send_pcb(t_msg_header msg_header, int fd, t_PCB* pcb)
     package_destroy(package);
 
     return 0;
+}
+
+int send_example(char* cadena, uint8_t entero, int fd) 
+{
+    t_message_example* example = message_example_create(cadena, entero);
+
+    if(example == NULL) return -1;
+
+    //Tamaño para el buffer
+    uint32_t buffer_size = get_message_example_size(example);
+
+    //Creo el paquete
+    t_package* package_example = package_create(EXAMPLE, buffer_size);
+
+    // Serializo el t_message_example en el buffer
+    example_serialize_msg(get_buffer(package_example), example);
+
+    // Envio el paquete a fd
+    package_send(package_example, fd);
+
+    message_example_destroy(example);
+    package_destroy(package_example);
+    return 0;
+}
+
+t_message_example* recv_example(int fd) 
+{
+    t_buffer *new_buffer = recive_full_buffer(fd);
+    return example_deserialize_msg(new_buffer);
 }
 
 // serializado generico TP0
@@ -131,38 +201,28 @@ void *serializar_paquete(t_package *paquete, int bytes)
 
 void example_serialize_msg(t_buffer *buffer, t_message_example *msg)
 {
+    // Agrego la cadena
+    buffer_add_string(buffer, get_cadena(msg));
 
-    uint8_t size_cadena = strlen(msg->cadena) + 1; // Include null terminator
-    buffer->stream = malloc(buffer->size);
-    void *stream = malloc(buffer->size);
-    
-
-    memcpy(stream, &size_cadena, sizeof(uint8_t));
-    buffer->offset += sizeof(uint8_t);
-    memcpy(stream + buffer->offset, msg->cadena, size_cadena);
-    buffer->offset += size_cadena;
-    memcpy(stream + buffer->offset, &(msg->entero), sizeof(uint8_t));
-    buffer->offset += sizeof(uint8_t);
-
-    buffer->stream = stream;
+    // Agrego el numero entero
+    buffer_add_uint8(buffer, get_entero(msg));
 }
 
-void example_deserialize_msg(t_buffer *buffer, t_message_example *msg)
+t_message_example* example_deserialize_msg(t_buffer* buffer)
 {
-    // Copiar el tamaño de la cadena desde el stream al buffer
-    uint8_t size_cadena = 0;
-    memcpy(&size_cadena, buffer->stream, sizeof(uint8_t));
-    buffer->offset += sizeof(uint8_t);
+    // Copiar el tamaño de la cadena
+    uint32_t size_cadena = buffer_read_uint32(buffer);
 
-    // Reservar memoria para la cadena y copiarla desde el stream al buffer
-    msg->cadena = malloc(size_cadena);
-    memcpy(msg->cadena, buffer->stream + buffer->offset, size_cadena);
-    buffer->offset += size_cadena;
+    // Obtengo la cadena
+    char* cadena = buffer_read_string(buffer, size_cadena);
 
-    // Copiar el entero desde el stream al buffer
-    memcpy(&(msg->entero), buffer->stream + buffer->offset, sizeof(uint8_t));
+    // Obtengo el numero entero
+    uint8_t entero = buffer_read_uint8(buffer);
+
+    //Creo la estrucutura t_message_example
+    return message_example_create(cadena, entero);
 }
-// CPU registers
+
 void serialize_cpu_registers(t_buffer *buffer, t_cpu_registers *cpu_registers)
 {
     //Agrego pc

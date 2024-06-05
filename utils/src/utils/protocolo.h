@@ -79,6 +79,33 @@ int package_recv(t_package*, int);
 t_buffer* get_buffer(t_package*);
 t_msg_header get_message_header(t_package*);
 
+// Crea un nuevo t_message_example con los datos proporcionados.
+// Pre: El parámetro cadena debe apuntar a una cadena de caracteres válida y no debe ser NULL.
+//      El parámetro entero debe ser un valor entero de 8 bits.
+// Post: La función retorna un puntero a una estructura t_message_example creada con los datos proporcionados.
+//       Si la creación falla, la función retorna NULL.
+t_message_example* message_example_create(char*, uint8_t);
+
+// Obtiene la cadena almacenada en t_message_example.
+// Pre: El parámetro example debe ser un puntero válido a una estructura t_message_example.
+// Post: La función retorna un puntero a la cadena de caracteres almacenada en la estructura.
+char* get_cadena(t_message_example*);
+
+// Obtiene el valor entero almacenado en t_message_example.
+// Pre: El parámetro example debe ser un puntero válido a una estructura t_message_example.
+// Post: La función retorna el valor entero de 8 bits almacenado en la estructura.
+uint8_t get_entero(t_message_example*);
+
+// Calcula el tamaño en bytes de la estructura t_message_example.
+// Pre: El parámetro example debe ser un puntero válido a una estructura t_message_example.
+// Post: La función retorna el tamaño en bytes de la estructura.
+uint32_t get_message_example_size(t_message_example*);
+
+// Libera la memoria utilizada por un t_message_example.
+// Pre: El parámetro example debe ser un puntero válido a una estructura t_message_example.
+// Post: La memoria asociada a la estructura y su cadena interna se libera.
+void message_example_destroy(t_message_example*);
+
 /*********** SEND AND RECIVE FUNCTIONS ***********/
 // Envía un t_PCB a través de un socket especificado.
 // Pre: El parámetro msg_header debe contener un encabezado de mensaje válido.
@@ -87,6 +114,19 @@ t_msg_header get_message_header(t_package*);
 // Post: El t_PCB se serializa y se envía a través del socket especificado.
 //       La función retorna 0 si el envío se realizó correctamente.
 int send_pcb(t_msg_header, int, t_PCB*);
+
+// Envía un mensaje t_message_example a través de un socket especificado.
+// Pre: El parámetro cadena debe apuntar a una cadena de caracteres válida y no debe ser NULL.
+//      El parámetro entero debe ser un valor entero de 8 bits.
+//      El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+// Post: El t_message_example se crea, serializa y se envía a través del socket especificado.
+//       La función retorna 0 si el envío se realizó correctamente, y -1 en caso de error.
+int send_example(char*, uint8_t, int);
+
+// Recibe un mensaje de ejemplo a través de un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+// Post: La función retorna un puntero a una estructura t_message_example creada dinámicamente con los datos recibidos y deserializados.
+t_message_example* recv_example(int);
 
 /*********** SERIALIZE AND DESERIALIZE FUNCTIONS ***********/
 
@@ -98,10 +138,10 @@ void *serializar_paquete(t_package*, int);
 // Post: El mensaje se serializa en el buffer.
 void example_serialize_msg(t_buffer*, t_message_example*);
 
-// Deserializa un mensaje de ejemplo.
-// Pre: El buffer y el mensaje deben ser válidos y no NULL.
-// Post: El mensaje se deserializa desde el buffer y se almacena en la estructura t_message_example.
-void example_deserialize_msg(t_buffer*, t_message_example*);
+// Deserializa un mensaje de ejemplo desde un buffer especificado.
+// Pre: El parámetro buffer debe ser un puntero válido a un t_buffer inicializado.
+// Post: La función retorna un puntero a una estructura t_message_example creada dinámicamente con los datos deserializados.
+t_message_example* example_deserialize_msg(t_buffer* buffer);
 
 /*********** SERIALIZE AND DESERIALIZE 'T_PCB' ***********/
 // Serializa un t_PCB.
