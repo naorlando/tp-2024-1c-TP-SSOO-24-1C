@@ -105,7 +105,7 @@ char* _leer_parametro(char** parametros, int index) {
     int cant_parametros = arrayLength(parametros);
 
     if(index >= 0 && index < cant_parametros) {
-        parametro = strdup(parametros[index]);
+        parametro = my_strdup(parametros[index]);
     }
 
     return parametro;
@@ -136,7 +136,7 @@ uint32_t obtener_instruction_size(t_instruction* instruccion)
 
         char* param = (char*)list_get(params, i);
 
-        size += (strlen(param) + 1); // para el parametro
+        size += (strlen(param)+1); // para el parametro
     }
     
     return size;
