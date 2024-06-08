@@ -80,6 +80,7 @@ void requests_kernel() {
                 }
 
                 //TODO: Hacer funcion para eliminar un t_new_process
+                destroy_new_process(new_process);
             break;
             case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
