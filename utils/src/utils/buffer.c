@@ -248,7 +248,7 @@ char *buffer_read_string(t_buffer *buffer, uint32_t length)
     }
 
     buffer_read_data(buffer, string, length);
-    string[length] = '\0'; // Añado fin de cadena
+    string[length-1] = '\0'; // Añado fin de cadena
 
     return string;
 }
@@ -271,7 +271,7 @@ void buffer_add_uint32(t_buffer *buffer, uint32_t data)
 
 void buffer_add_string(t_buffer *buffer, char *data)
 {
-    uint32_t size_cadena = strlen(data)+1;
+    uint32_t size_cadena = strlen(data) + 1;
 
     buffer_add_uint32(buffer, size_cadena);
 
