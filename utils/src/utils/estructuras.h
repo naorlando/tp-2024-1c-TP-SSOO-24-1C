@@ -56,6 +56,6 @@ uint32_t get_cpu_registers_size(t_cpu_registers*);
 //oid destruir_proceso(t_proceso* proceso);
 
 t_new_process* create_new_process(uint32_t pid, char* path);
-
+void destroy_new_process(t_new_process*);
 
 #endif

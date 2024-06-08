@@ -82,11 +82,20 @@ uint32_t get_cpu_registers_size(t_cpu_registers *cpu_registers)
 // 
 t_new_process* create_new_process(uint32_t pid,char* path)
 {    
-    t_new_process *t_new_process = malloc(sizeof(t_new_process));
+    t_new_process *new_process = malloc(sizeof(t_new_process));
 
-    t_new_process->pid = pid;
-    t_new_process->path = path;
+    new_process->pid = pid;
+    new_process->path = strdup(path);
 
-    return t_new_process;
+    return new_process;
     
+}
+
+void destroy_new_process(t_new_process* new_process) 
+{
+    if(new_process->path != NULL) {
+        free(new_process->path);
+    }
+
+    free(new_process);
 }
