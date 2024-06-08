@@ -8,6 +8,7 @@
 #include "utils/utils.h"
 #include "table_pcb.h"
 #include "protocolo_kernel.h"
+#include "largo_plazo.h"
 
 
 

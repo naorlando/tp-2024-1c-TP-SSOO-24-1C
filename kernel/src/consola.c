@@ -1,32 +1,36 @@
 #include <consola.h>
 
-
-void iniciar_consola_interactiva(){
-    char* leido;
+void iniciar_consola_interactiva()
+{
+    char *leido;
     leido = readline("> ");
     bool validacion_leido;
 
-    while (strcmp(leido, "") != 0) {
+    while (strcmp(leido, "") != 0)
+    {
         validacion_leido = _validacion_de_instrucciones_consola(leido);
 
-        if (!validacion_leido) {
+        if (!validacion_leido)
+        {
             log_error(logger_kernel, "Comando de CONSOLA no reconocido.");
             free(leido);
             leido = readline("> ");
             continue; // Saltar y continuar con el resto de la iteración
         }
 
-        char* leido_copy = strdup(leido);
-        if (leido_copy == NULL) {
+        char *leido_copy = strdup(leido);
+        if (leido_copy == NULL)
+        {
             log_error(logger_kernel, "Error al duplicar el comando de la consola.");
             free(leido);
             leido = readline("> ");
             continue;
         }
 
-        //Se crea un hilo para atender cada comando
+        // Se crea un hilo para atender cada comando
         pthread_t hilo_atencion_comando_consola;
-        if (pthread_create(&hilo_atencion_comando_consola, NULL, (void*)_atender_instruccion, leido_copy) != 0) {
+        if (pthread_create(&hilo_atencion_comando_consola, NULL, (void *)_atender_instruccion, leido_copy) != 0)
+        {
             log_error(logger_kernel, "Error al crear el hilo para atender el comando.");
             free(leido_copy);
             free(leido);
@@ -41,11 +45,13 @@ void iniciar_consola_interactiva(){
     free(leido);
 }
 
-bool _validacion_de_instrucciones_consola(char *leido){
+bool _validacion_de_instrucciones_consola(char *leido)
+{
     bool resultado_validacion = false;
 
-    char** comando_consola = split(leido, " ");
-    if (comando_consola == NULL) {
+    char **comando_consola = split(leido, " ");
+    if (comando_consola == NULL)
+    {
         log_error(logger_kernel, "Error al dividir el comando de la consola.");
         return false;
     }
@@ -57,9 +63,12 @@ bool _validacion_de_instrucciones_consola(char *leido){
         (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0 && longitud_comando == 1) ||
         (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0 && longitud_comando == 1) ||
         (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0 && longitud_comando == 2) ||
-        (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0 && longitud_comando == 1)) {
+        (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0 && longitud_comando == 1))
+    {
         resultado_validacion = true;
-    } else {
+    }
+    else
+    {
         log_error(logger_kernel, "Error en validacion del comando.");
     }
 
@@ -67,29 +76,48 @@ bool _validacion_de_instrucciones_consola(char *leido){
     return resultado_validacion;
 }
 
-void _atender_instruccion(void *args) {
-    char* leido = (char*)args;
-    char** comando_consola = split(leido, " ");
+void _atender_instruccion(void *args)
+{
+    char *leido = (char *)args;
+    char **comando_consola = split(leido, " ");
 
-    if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0) {
-        char* path = my_strdup(comando_consola[1]);
-        f_iniciar_proceso(path);
-        free(path);
-    } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0) {
+    if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0)
+    {
+        if (planificador_status)
+        {
+            char *path = my_strdup(comando_consola[1]);
+            f_iniciar_proceso(path);
+            free(path);
+        }
+    }
+    else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0)
+    {
         // código correspondiente
-    } else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0) {
+    }
+    else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
+    {
         // código correspondiente
-    } else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0) {
+    }
+    else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0)
+    {
         enviar_pcb_cpu();
-    } else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0) {
+    }
+    else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
+    {
         // código correspondiente
-    } else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0) {
+    }
+    else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0)
+    {
         // código correspondiente
-    } else if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0) {
-        char* path = strdup(comando_consola[1]);
+    }
+    else if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0)
+    {
+        char *path = strdup(comando_consola[1]);
         f_ejecutar_script(path);
         free(path);
-    } else {
+    }
+    else
+    {
         log_error(logger_kernel, "Comando no reconocido, pero que paso el filtro ???");
         exit(EXIT_FAILURE);
     }
@@ -98,21 +126,22 @@ void _atender_instruccion(void *args) {
     free(leido);
 }
 
-void f_iniciar_proceso(char* path) {
+void f_iniciar_proceso(char *path)
+{
     int pid = asignar_pid();
 
     // Creor el PCB
-    t_PCB* pcb = pcb_create(pid, kernel_config->QUANTUM);
-    
+    t_PCB *pcb = pcb_create(pid, kernel_config->QUANTUM);
+
     // Cargo el pcb a la tabla de pcbs
     add_pcb(pcb);
 
-    log_info(logger_kernel,"Se crea el proceso <%d> en NEW",pcb->pid);
- 
+    log_info(logger_kernel, "Se crea el proceso <%d> en NEW", pcb->pid);
+
     // Creo la estrucutura que le voy a pasar a memoria para que
     // cree la imagen del proceso
-    t_new_process* nuevo_proceso = create_new_process(pid,path);
-    
+    t_new_process *nuevo_proceso = create_new_process(pid, path);
+
     // Calculo el tamaño del buffer para serializar el t_new_process
     u_int32_t buffer_size = sizeof(uint32_t) + strlen(nuevo_proceso->path) + 1 + sizeof(uint32_t);
 
@@ -125,36 +154,38 @@ void f_iniciar_proceso(char* path) {
     package_send(package, fd_kernel_memoria);
     package_destroy(package);
 
-    // // Agregar PCB a la cola de NEW
-    // pthread_mutex_lock(&mutex_new_queue);
-    // queue_push(new_queue, pcb);
-    // pthread_mutex_unlock(&mutex_new_queue);
+    // SEMAFORO PLANIFICADOR
+    // Agregar PCB a la cola de NEW
+    process_to_new(pcb);
 
     destroy_new_process(nuevo_proceso);
 }
 
 void enviar_pcb_cpu()
 {
-    t_PCB* pcb = get_pcb(1);
-    //envio a cpu el pcb
+    t_PCB *pcb = get_pcb(1);
+    // envio a cpu el pcb
     send_pcb_cpu(pcb);
 }
 
-void f_ejecutar_script(const char* filename) {
+void f_ejecutar_script(const char *filename)
+{
     FILE *file = fopen(filename, "r");
 
-    if (file == NULL) {
+    if (file == NULL)
+    {
         log_error(logger_kernel, "Error no se pudo abrir el archivo a ejecutar");
         return;
     }
 
     char linea[256];
-    while (fgets(linea, sizeof(linea), file)) {
+    while (fgets(linea, sizeof(linea), file))
+    {
         // Eliminar el salto de línea si existe
         linea[strcspn(linea, "\n")] = '\0';
-        
-        log_info(logger_kernel,"Ejecutando comando: %s", linea);
-        
+
+        log_info(logger_kernel, "Ejecutando comando: %s", linea);
+
         // Ejecutar el comando leído
         // Aquí se debería llamar a la función correspondiente al comando leído
     }
@@ -162,11 +193,12 @@ void f_ejecutar_script(const char* filename) {
     fclose(file);
 }
 
-int asignar_pid() {
+int asignar_pid()
+{
     int valor_pid;
     pthread_mutex_lock(&mutex_pid);
-        valor_pid = identificador_PID;
-        identificador_PID++;
+    valor_pid = identificador_PID;
+    identificador_PID++;
     pthread_mutex_unlock(&mutex_pid);
     return valor_pid;
 }
