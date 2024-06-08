@@ -136,3 +136,25 @@ char* join(const char* str1, const char* str2, const char* separator) {
 
     return result;
 }
+
+char* my_strdup(const char* s) {
+    // Calcula la longitud de la cadena original incluyendo el carácter nulo
+    size_t len = strlen(s) + 1;
+
+    // Asigna memoria para la nueva cadena
+    char *dup = (char *)malloc(len);
+
+    // Verifica si la asignación de memoria fue exitosa
+    if (dup == NULL) {
+        return NULL;
+    }
+
+    // Copia la cadena original a la nueva ubicación de memoria
+    memcpy(dup, s, len);
+
+    // Asegúrate de que la nueva cadena termine con un carácter nulo
+    dup[len - 1] = '\0';
+
+    // Devuelve el puntero a la nueva cadena
+    return dup;
+}

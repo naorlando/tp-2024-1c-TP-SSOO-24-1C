@@ -25,6 +25,12 @@ void array_string_destroy(char**);
 // Post: Retorna un puntero a una nueva cadena que es la concatenación de str1, separator y str2. 
 char* join(const char*, const char*, const char*);
 
+// Duplica una cadena dada. 
+// Pre: El puntero a la cadena `s` debe ser válido y no NULL.
+// Post: Retorna un puntero a la nueva cadena asignada que es una duplicación de la que se pasa
+// por parametro. Si la asignación de memoria falla, retorna NULL.
+char* my_strdup(const char*);
+
 #define GET_MAX_LENGTH(type) get_max_length_uint(type##_MAX)
 
 #endif
