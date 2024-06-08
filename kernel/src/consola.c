@@ -72,7 +72,7 @@ void _atender_instruccion(void *args) {
     char** comando_consola = split(leido, " ");
 
     if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0) {
-        char* path = strdup(comando_consola[1]);
+        char* path = my_strdup(comando_consola[1]);
         f_iniciar_proceso(path);
         free(path);
     } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0) {
@@ -130,7 +130,7 @@ void f_iniciar_proceso(char* path) {
     // queue_push(new_queue, pcb);
     // pthread_mutex_unlock(&mutex_new_queue);
 
-    free(nuevo_proceso);
+    destroy_new_process(nuevo_proceso);
 }
 
 void enviar_pcb_cpu()
