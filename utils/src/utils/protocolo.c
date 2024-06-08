@@ -107,8 +107,7 @@ t_message_example* message_example_create(char* cadena, uint8_t entero)
     if(example == NULL) return NULL;
 
     // Guardo la cadena
-    example->cadena = malloc(strlen(cadena));
-    strcpy(example->cadena, cadena);
+    example->cadena = my_strdup(cadena);
     
     // Guardo el entero
     example->entero = entero;
