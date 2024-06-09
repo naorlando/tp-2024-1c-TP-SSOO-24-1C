@@ -1,5 +1,5 @@
-#ifndef LARGO_PLAZO_H
-#define LARGO_PLAZO_H
+#ifndef KERNEL_CORTO_PLAZO_H
+#define KERNEL_CORTO_PLAZO_H
 
 // Standard library
 #include <stdio.h>
@@ -10,22 +10,17 @@
 #include <commons/log.h>
 #include <commons/collections/list.h>
 #include <commons/string.h>
-#include <commons/collections/queue.h>
 
 // Libraries
 #include <semaphore.h>
 #include <string.h>
 
-//project
+// Project
 #include "utils/estructuras.h"
 #include "syncro.h"
+#include "protocolo_kernel.h"
 
-
-
-void planificador_largo_plazo();
-void process_to_new(t_PCB * pcb);
-void send_new_to_ready();
-void send_to_exit(t_PCB * pcb);
-void end_process();
+t_PCB* get_next_pcb_to_exec();
+void planificador_corto_plazo ();
 
 #endif

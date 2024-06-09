@@ -10,6 +10,7 @@
 #include <variables_globales.h>
 #include "table_pcb.h"
 #include "largo_plazo.h"
+#include "corto_plazo.h"
 
 
 

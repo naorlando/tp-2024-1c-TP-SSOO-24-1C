@@ -30,6 +30,7 @@ sem_t BLOQUEADOR;
 sem_t SEM_EXIT;
 sem_t SEM_NEW;
 sem_t SEM_MULTIPROGRAMACION;
+sem_t SEM_CPU; 
 
 
 
@@ -120,15 +121,15 @@ void inicializar_planificadores()
         exit(EXIT_FAILURE);
     }
 
-    // Comienza planificador de corto plazo
-    // pthread_t THREAD_CORTO_PLAZO;
-    // if (!pthread_create(&THREAD_CORTO_PLAZO, NULL, (void *)planificador_corto_plazo, NULL))
-    //     pthread_detach(THREAD_CORTO_PLAZO);
-    // else
-    // {
-    //     log_error(logger_kernel, "ERROR CRITICO INICIANDO EL PLANIFICADOR DE CORTO PLAZO. ABORTANDO.");
-    //     exit(EXIT_FAILURE);
-    // }
+   
+    pthread_t THREAD_CORTO_PLAZO;
+    if (!pthread_create(&THREAD_CORTO_PLAZO, NULL, (void *)planificador_corto_plazo, NULL))
+        pthread_detach(THREAD_CORTO_PLAZO);
+    else
+    {
+        log_error(logger_kernel, "ERROR CRITICO INICIANDO EL PLANIFICADOR DE CORTO PLAZO. ABORTANDO.");
+        exit(EXIT_FAILURE);
+    }
 }
 
 

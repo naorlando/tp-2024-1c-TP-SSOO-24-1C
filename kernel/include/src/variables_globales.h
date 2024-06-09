@@ -26,11 +26,15 @@ extern int identificador_PID;
 extern pthread_mutex_t MUTEX_READY;
 extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
+
+
+//Semaforos
 extern sem_t SEM_READY;
 extern sem_t BLOQUEADOR;
 extern sem_t SEM_EXIT;
 extern sem_t SEM_NEW;
 extern sem_t SEM_MULTIPROGRAMACION;
+extern sem_t SEM_CPU;
 
 //CONFIG
 extern t_config* config_kernel;
