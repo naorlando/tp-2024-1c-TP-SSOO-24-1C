@@ -20,7 +20,16 @@
 #include "syncro.h"
 #include "protocolo_kernel.h"
 
+typedef enum {
+    FIFO,
+    RR,
+    VRR
+    
+}t_planificador;
+
+
 t_PCB* get_next_pcb_to_exec();
 void planificador_corto_plazo ();
+t_planificador _obtener_planificador (char * str);
 
 #endif

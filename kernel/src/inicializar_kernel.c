@@ -123,7 +123,7 @@ void inicializar_planificadores()
 
    
     pthread_t THREAD_CORTO_PLAZO;
-    if (!pthread_create(&THREAD_CORTO_PLAZO, NULL, (void *)planificador_corto_plazo, NULL))
+    if (!pthread_create(&THREAD_CORTO_PLAZO, NULL, (void *) planificador_corto_plazo, NULL))
         pthread_detach(THREAD_CORTO_PLAZO);
     else
     {

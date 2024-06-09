@@ -96,11 +96,12 @@ void _atender_instruccion(void *args)
     }
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {
-        // código correspondiente
+        planificador_status = false;
     }
     else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0)
     {
-        enviar_pcb_cpu();
+        if(!planificador_status)
+        planificador_status = true;
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {

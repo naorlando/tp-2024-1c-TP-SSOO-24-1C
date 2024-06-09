@@ -67,7 +67,7 @@ void end_process()
         pthread_mutex_unlock(&MUTEX_EXIT);
         sem_post(&SEM_MULTIPROGRAMACION);
 
-       //TODO eliminar otros contextos en tablas
+        // TODO eliminar otros contextos en tablas
 
         pcb_destroy(pcb_exit);
     }
