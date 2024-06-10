@@ -36,4 +36,6 @@ bool manejar_interrupcion();
 //       Se solicita la siguiente instrucción a memoria.
 void recibir_pcb();
 
+void solicitar_IO(t_instruction*);
+
 #endif

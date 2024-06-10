@@ -63,8 +63,9 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         case IO_GEN_SLEEP: {
             char* interface = (char*)list_get(instruccion->params, 0);
             int units = atoi((char*)list_get(instruccion->params, 1));
-            // Aquí iría la lógica para solicitar al Kernel la operación de I/O
-            //TODO
+
+            // Enviar el PCB al kernel con el tipo de interfaz
+            solicitar_IO(instruccion);
             log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
             break;
         }
@@ -137,4 +138,10 @@ bool manejar_interrupcion() {
     }
 
     return false;
+}
+
+void solicitar_IO(t_instruction* instruccion)
+{
+    // t_interface interface = create_interface(pcb_execute, instruccion);
+    send_interface_kernel(/*interface*/);
 }
