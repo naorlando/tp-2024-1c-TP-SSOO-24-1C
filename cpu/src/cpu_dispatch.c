@@ -5,7 +5,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
 {
     log_info(logger_cpu, "EJECUTANDO INSTRUCCION");
     log_info(logger_cpu, "INSTRUCCION => %d", instruccion->name);
- 
+
  switch (instruccion->name) {
         case SET: {
             char* reg = (char*)list_get(instruccion->params, 0);
@@ -39,8 +39,9 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         case SUM: {
             char *reg_dest = (char *)list_get(instruccion->params, 0);
             char *reg_src = (char *)list_get(instruccion->params, 1);
-            uint32_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
-            _establecer_registro(cpu_registers, reg_dest, _obtener_valor_registro(cpu_registers, reg_dest) + valor_src);
+            int valor_src = _obtener_valor_registro(cpu_registers, reg_src);
+            int valor_operacion = _obtener_valor_registro(cpu_registers, reg_dest) + valor_src;
+            _establecer_registro(cpu_registers, reg_dest, valor_operacion);
             log_info(logger_cpu, "SUM %s %s\n", reg_dest, reg_src);
             break;
         }
@@ -48,7 +49,8 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             char *reg_dest = (char *)list_get(instruccion->params, 0);
             char *reg_src = (char *)list_get(instruccion->params, 1);
             uint32_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
-            _establecer_registro(cpu_registers, reg_dest, _obtener_valor_registro(cpu_registers, reg_dest) - valor_src);
+            uint32_t valor_operacion = _obtener_valor_registro(cpu_registers, reg_dest) - valor_src;
+            _establecer_registro(cpu_registers, reg_dest, valor_operacion);
             log_info(logger_cpu, "SUB %s %s\n", reg_dest, reg_src);
             break;
         }
@@ -62,6 +64,9 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
                 log_trace(logger_cpu, "el registro %s era igual a cero, por lo tanto se salto a %d (JNZ)\n", reg, instruction_index);
             }
                 log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
+
+            // le restamos uno al PC ya que al finalizar Execute se le va a sumar 1 al PC: entonces esto se cancela.
+            cpu_registers->pc--;
             break;
         }
         case RESIZE: {
@@ -70,7 +75,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             // Función para solicitar a la memoria el ajuste de tamaño
             if (!ajustar_tamano_proceso(cpu_registers, nuevo_tamano)) {
                 // TODO: Si la memoria devuelve Out of Memory, devolver el contexto al Kernel
-                informar_kernel_error(kernel, "Out of Memory");
+                informar_kernel_error("Out of Memory");
             } else {
                 log_info(logger_cpu, "RESIZE %d\n", nuevo_tamano);
             }
@@ -123,14 +128,22 @@ uint32_t* _obtener_registro(t_cpu_registers *registros, const char *nombre) {
 
 // Función para establecer el valor de un registro
 void _establecer_registro(t_cpu_registers *registros, const char *nombre, uint32_t valor) {
-    uint32_t *reg = obtener_registro(registros, nombre);
+    uint32_t *reg = _obtener_registro(registros, nombre);
     if (reg) *reg = valor;
 }
 
 // Función para obtener el valor de un registro
-uint32_t _obtener_valor_registro(t_cpu_registers *registros, const char *nombre) {
-    uint32_t *reg = obtener_registro(registros, nombre);
+uint32_t _obtener_valor_registro(t_cpu_registers *registros, char *nombre) {
+    remove_newline(nombre);
+    uint32_t *reg = _obtener_registro(registros, nombre);
     return reg ? *reg : 0;
+}
+
+void remove_newline(char *str) {
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
+    }
 }
 
 // #############################################################################################################
@@ -150,15 +163,15 @@ bool ajustar_tamano_proceso(t_cpu_registers *cpu_registers, int nuevo_tamano) {
     // TODO: Implementa la lógica para solicitar el ajuste de tamaño a la memoria
     // Devuelve true si el ajuste es exitoso, false si hay un error (por ejemplo, Out of Memory)
     // Ejemplo simplificado
-    if (memoria_tiene_espacio(nuevo_tamano)) {
-        // Ajustar el tamaño en la memoria
-        return true;
-    } else {
-        return false;
-    }
+    // if (memoria_tiene_espacio(nuevo_tamano)) {
+    //     // Ajustar el tamaño en la memoria
+    //     return true;
+    // } else {
+    //     return false;
+    // }
 }
 
-void informar_kernel_error(Kernel *kernel, const char *mensaje) {
+void informar_kernel_error(const char *mensaje) {
     // TODO: Implementa la lógica para informar al Kernel sobre un error.
     printf("Kernel error: %s\n", mensaje);
 }
@@ -209,16 +222,28 @@ void manejar_ciclo_de_instruccion() {
     t_instruction* instruccion = recv_instruction();
 
     log_info(logger_cpu, "Instrucción recibida");
+    log_info(logger_cpu, "antes: AX: %d", cpu_registers->ax);
+    log_info(logger_cpu, "antes: BX: %d", cpu_registers->bx);
+    log_info(logger_cpu, "antes: CX: %d", cpu_registers->cx);
 
     // EXECUTE: Ejecuto la instruccion recibida
     ejecutar_instruccion(instruccion, cpu_registers);
+    //imprimir todos los cpu_registers:
+    log_info(logger_cpu, "despues: AX: %d", cpu_registers->ax);
+    log_info(logger_cpu, "despues: BX: %d", cpu_registers->bx);
+    log_info(logger_cpu, "despues: CX: %d", cpu_registers->cx);
+ 
     eliminar_instruccion(instruccion);
 
     // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
     if(manejar_interrupcion()) return;
 
+    // actualizar PC:
+    cpu_registers->pc++;
+    pcb_execute->program_counter = cpu_registers->pc;
     //TODO: Se debe actualizar el PC antes de pedir la siguiente instruccion a memoria
-    //solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
+    solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
+
 }
 
 bool manejar_interrupcion() {
