@@ -10,13 +10,34 @@ int fd_cpu_dispatch;
 int fd_kernel_memoria;
 int fd_server;
 
-char* cpu_dispatch_port;
-char* memoria_port;
-char* server_port;
+char *cpu_dispatch_port;
+char *memoria_port;
+char *server_port;
 
 t_dictionary *table_pcb;
 pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 int identificador_PID = 1;
+
+
+bool planificador_status = true;
+
+pthread_mutex_t MUTEX_READY;
+pthread_mutex_t MUTEX_EXIT;
+pthread_mutex_t MUTEX_NEW;
+
+sem_t SEM_READY;
+sem_t BLOQUEADOR;
+sem_t SEM_EXIT;
+sem_t SEM_NEW;
+sem_t SEM_MULTIPROGRAMACION;
+sem_t SEM_CPU; 
+
+
+
+t_queue *COLA_READY;
+t_queue *COLA_EXIT;
+t_queue *COLA_NEW;
+t_list *LISTA_COLAS_DISPOSITIVOS;
 
 void init()
 {
@@ -24,6 +45,9 @@ void init()
     _iniciar_config();
     _init_table_pcb();
     imprimir_config();
+    initializeLists();
+    initializeSemaphores();
+    inicializar_planificadores();
 }
 
 void _iniciar_logger()
@@ -83,4 +107,36 @@ void _init_table_pcb()
     {
         log_error(logger_kernel, "Error al crear la tabla de pcb.");
     }
+}
+
+void inicializar_planificadores()
+{
+
+    pthread_t THREAD_LARGO_PLAZO;
+    if (!pthread_create(&THREAD_LARGO_PLAZO, NULL, (void *) planificador_largo_plazo, NULL))
+        pthread_detach(THREAD_LARGO_PLAZO);
+    else
+    {
+        log_error(logger_kernel, "ERROR CRITICO INICIANDO EL PLANIFICADOR DE LARGO PLAZO. ABORTANDO.");
+        exit(EXIT_FAILURE);
+    }
+
+   
+    pthread_t THREAD_CORTO_PLAZO;
+    if (!pthread_create(&THREAD_CORTO_PLAZO, NULL, (void *) planificador_corto_plazo, NULL))
+        pthread_detach(THREAD_CORTO_PLAZO);
+    else
+    {
+        log_error(logger_kernel, "ERROR CRITICO INICIANDO EL PLANIFICADOR DE CORTO PLAZO. ABORTANDO.");
+        exit(EXIT_FAILURE);
+    }
+}
+
+
+void initializeLists()
+{
+    COLA_READY = queue_create();
+    COLA_EXIT = queue_create();
+    COLA_NEW = queue_create();
+    LISTA_COLAS_DISPOSITIVOS = list_create();
 }
