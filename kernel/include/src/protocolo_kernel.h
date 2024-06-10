@@ -11,6 +11,6 @@ int send_example_cpu();
 int send_example_memoria();
 void send_pcb_cpu(t_PCB*);
 // void requests_entradasalida();
-int recv_example_msg_entradasalida();
+int recv_example_msg_entradasalida(int);
 
 #endif

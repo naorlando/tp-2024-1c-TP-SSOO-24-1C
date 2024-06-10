@@ -21,11 +21,11 @@ int send_example_memoria()
     return send_example(cadena, entero, fd_kernel_memoria);
 }
 
-int recv_example_msg_entradasalida()
+int recv_example_msg_entradasalida(int cliente_io)
 {
     log_info(logger_kernel, "<<<<< EXAMPLE RECIVE MESSAGE FROM ENTRADASALIDA >>>>");
 
-    t_message_example* new_msg = recv_example(fd_kernel_IO);
+    t_message_example* new_msg = recv_example(cliente_io);
 
     log_info(logger_kernel, "MENSAJE => %s", get_cadena(new_msg));
     log_info(logger_kernel, "ENTERO => %d", get_entero(new_msg));
