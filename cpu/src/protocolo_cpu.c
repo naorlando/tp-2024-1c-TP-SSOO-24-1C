@@ -90,3 +90,21 @@ void send_pcb_kernel()
 {
     send_pcb(MSG_PCB_KERNEL, fd_kernel_dispatch, pcb_execute);
 }
+
+void send_interface_kernel(/*t_interface interface*/) 
+{
+    // Creo el paquete que se va a enviar al kernel
+    //t_package* package = package_create(MSG_PCB_IO_KERNEL, obtener_interface_size(interface));
+
+    // Serializo en el buffer el t_interface
+    //serialize_interface(get_buffer(package), interface);
+
+    // Envio el paquete al kernel
+    //package_send(package, fd_kernel_dispatch);
+
+    // Elimino t_interface
+    //eliminar_interface(interface);
+
+    //Elimino el paquete usado
+    //package_destroy(package);
+}
