@@ -5,7 +5,6 @@ t_log *logger_kernel_debug;
 t_config *config_kernel;
 t_kernel_config *kernel_config;
 
-int fd_kernel_IO;
 int fd_cpu_dispatch;
 int fd_kernel_memoria;
 int fd_server;
