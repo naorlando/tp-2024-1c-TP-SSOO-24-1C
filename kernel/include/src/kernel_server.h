@@ -20,5 +20,7 @@ void levantar_servidor();
 void inicializar_sockets();
 void crear_hilos_conexiones();
 void cerrar_servidor();
+void _cerrar_conexiones();
+void _cerrar_puertos();
 
 #endif //KERNEL_SERVER
