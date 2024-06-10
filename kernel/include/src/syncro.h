@@ -8,6 +8,7 @@
 #include <variables_globales.h>
 
 
-void initializeSemaphores();
+void initialize_semaphores();
+void initialize_mutexes();
 
 #endif
