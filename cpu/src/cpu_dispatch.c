@@ -10,147 +10,81 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         case SET: {
             char* reg = (char*)list_get(instruccion->params, 0);
             int value = atoi((char*)list_get(instruccion->params, 1));
-            //TODO: revisar si es la mejor manera de hacerlo
-            if(strcmp(reg, "AX") == 0){
-                cpu_registers->ax = value;
-            }else if(strcmp(reg, "BX") == 0){
-                cpu_registers->bx = value;
-            }else if(strcmp(reg, "CX") == 0){
-                cpu_registers->cx = value;
-            }else if(strcmp(reg, "DX") == 0){
-                cpu_registers->dx = value;
-            }else if(strcmp(reg, "EAX") == 0){
-                cpu_registers->eax = value;
-            }else if(strcmp(reg, "EBX") == 0){
-                cpu_registers->ebx = value;
-            }else if(strcmp(reg, "ECX") == 0){
-                cpu_registers->ecx = value;
-            }else if(strcmp(reg, "EDX") == 0){
-                cpu_registers->edx = value;
-            }else if(strcmp(reg, "SI") == 0){
-                cpu_registers->si = value;
-            }else if(strcmp(reg, "DI") == 0){
-                cpu_registers->di = value;
-            }
-            
+            _establecer_registro(cpu_registers, reg, value);
             log_info(logger_cpu, "SET %s %d\n", reg, value);
             break;
         }
+        case MOV_IN: {
+            char *reg_datos = (char *)list_get(instruccion->params, 0);
+            char *reg_direccion = (char *)list_get(instruccion->params, 1);
+
+            uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+            uint32_t valor_memoria = leer_memoria(direccion_logica);
+            _establecer_registro(cpu_registers, reg_datos, valor_memoria);
+
+            log_info(logger_cpu, "MOV_IN %s %s\n", reg_datos, reg_direccion);
+            break;
+        }
+        case MOV_OUT: {
+            char *reg_direccion = (char *)list_get(instruccion->params, 0);
+            char *reg_datos = (char *)list_get(instruccion->params, 1);
+
+            uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+            uint32_t valor_datos = _obtener_valor_registro(cpu_registers, reg_datos);
+            escribir_memoria(direccion_logica, valor_datos);
+
+            log_info(logger_cpu, "MOV_OUT %s %s\n", reg_direccion, reg_datos);
+            break;
+        }
         case SUM: {
-            char* reg_dest = (char*)list_get(instruccion->params, 0);
-            char* reg_src = (char*)list_get(instruccion->params, 1);
-            int registro_src_int = 0;
-            // pasar del char* al int que representa el valor del registro src
-            // Copio el valor del registro src en reg_src:
-            if(strcmp(reg_src, "AX") == 0){
-                registro_src_int = cpu_registers->ax;
-            }else if(strcmp(reg_src, "BX") == 0){
-                registro_src_int = cpu_registers->bx;
-            }else if(strcmp(reg_src, "CX") == 0){
-                registro_src_int = cpu_registers->cx;
-            }else if(strcmp(reg_src, "DX") == 0){
-                registro_src_int = cpu_registers->dx;
-            }else if(strcmp(reg_src, "EAX") == 0){
-                registro_src_int = cpu_registers->eax;
-            }else if(strcmp(reg_src, "EBX") == 0){
-                registro_src_int = cpu_registers->ebx;
-            }else if(strcmp(reg_src, "ECX") == 0){
-                registro_src_int = cpu_registers->ecx;
-            }else if(strcmp(reg_src, "EDX") == 0){
-                registro_src_int = cpu_registers->edx;
-            }else if(strcmp(reg_src, "SI") == 0){
-                registro_src_int = cpu_registers->si;
-            }else if(strcmp(reg_src, "DI") == 0){
-                registro_src_int = cpu_registers->di;
-            }
-
-            //TODO: revisar si es la mejor manera de hacerlo
-            // asignar el valor de la suma al registro destino:
-            if(strcmp(reg_dest, "AX") == 0){
-                cpu_registers->ax += registro_src_int;
-            }else if(strcmp(reg_dest, "BX") == 0){
-                cpu_registers->bx += registro_src_int;
-            }else if(strcmp(reg_dest, "CX") == 0){
-                cpu_registers->cx += registro_src_int;
-            }else if(strcmp(reg_dest, "DX") == 0){
-                cpu_registers->dx += registro_src_int;
-            }else if(strcmp(reg_dest, "EAX") == 0){
-                cpu_registers->eax += registro_src_int;
-            }else if(strcmp(reg_dest, "EBX") == 0){
-                cpu_registers->ebx += registro_src_int;
-            }else if(strcmp(reg_dest, "ECX") == 0){
-                cpu_registers->ecx += registro_src_int;
-            }else if(strcmp(reg_dest, "EDX") == 0){
-                cpu_registers->edx += registro_src_int;
-            }else if(strcmp(reg_dest, "SI") == 0){
-                cpu_registers->si += registro_src_int;
-            }else if(strcmp(reg_dest, "DI") == 0){
-                cpu_registers->di += registro_src_int;
-            }
-
+            char *reg_dest = (char *)list_get(instruccion->params, 0);
+            char *reg_src = (char *)list_get(instruccion->params, 1);
+            uint32_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
+            _establecer_registro(cpu_registers, reg_dest, _obtener_valor_registro(cpu_registers, reg_dest) + valor_src);
             log_info(logger_cpu, "SUM %s %s\n", reg_dest, reg_src);
             break;
         }
-        case SUB: {
-            char* reg_dest = (char*)list_get(instruccion->params, 0);
-            char* reg_src = (char*)list_get(instruccion->params, 1);
-            //TODO
-            // pasar del char* al int que representa el valor del registro src, guardarlo en reg_src :
-            if(strcmp(reg_src, "AX") == 0){
-                reg_src = cpu_registers->ax;
-            }else if(strcmp(reg_src, "BX") == 0){
-                reg_src = cpu_registers->bx;
-            }else if(strcmp(reg_src, "CX") == 0){
-                reg_src = cpu_registers->cx;
-            }else if(strcmp(reg_src, "DX") == 0){
-                reg_src = cpu_registers->dx;
-            }else if(strcmp(reg_src, "EAX") == 0){
-                reg_src = cpu_registers->eax;
-            }else if(strcmp(reg_src, "EBX") == 0){
-                reg_src = cpu_registers->ebx;
-            }else if(strcmp(reg_src, "ECX") == 0){
-                reg_src = cpu_registers->ecx;
-            }else if(strcmp(reg_src, "EDX") == 0){
-                reg_src = cpu_registers->edx;
-            }else if(strcmp(reg_src, "SI") == 0){
-                reg_src = cpu_registers->si;
-            }else if(strcmp(reg_src, "DI") == 0){
-                reg_src = cpu_registers->di;
-            }
-
-            //TODO: revisar si es la mejor manera de hacerlo
-            // asignar el valor de la suma al registro destino:
-            if(strcmp(reg_dest, "AX") == 0){
-                cpu_registers->ax -=reg_src;
-            }else if(strcmp(reg_dest, "BX") == 0){
-                cpu_registers->bx -=reg_src;
-            }else if(strcmp(reg_dest, "CX") == 0){
-                cpu_registers->cx -=reg_src;
-            }else if(strcmp(reg_dest, "DX") == 0){
-                cpu_registers->dx -=reg_src;
-            }else if(strcmp(reg_dest, "EAX") == 0){
-                cpu_registers->eax -=reg_src;
-            }else if(strcmp(reg_dest, "EBX") == 0){
-                cpu_registers->ebx -=reg_src;
-            }else if(strcmp(reg_dest, "ECX") == 0){
-                cpu_registers->ecx -=reg_src;
-            }else if(strcmp(reg_dest, "EDX") == 0){
-                cpu_registers->edx -=reg_src;
-            }else if(strcmp(reg_dest, "SI") == 0){
-                cpu_registers->si -=reg_src;
-            }else if(strcmp(reg_dest, "DI") == 0){
-                cpu_registers->di -=reg_src;
-            }
-
+         case SUB: {
+            char *reg_dest = (char *)list_get(instruccion->params, 0);
+            char *reg_src = (char *)list_get(instruccion->params, 1);
+            uint32_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
+            _establecer_registro(cpu_registers, reg_dest, _obtener_valor_registro(cpu_registers, reg_dest) - valor_src);
             log_info(logger_cpu, "SUB %s %s\n", reg_dest, reg_src);
             break;
         }
         case JNZ: {
-            char* reg = (char*)list_get(instruccion->params, 0);
-            int instruction_index = atoi((char*)list_get(instruccion->params, 1));
-            //TODO
+            char *reg = (char *)list_get(instruccion->params, 0);
+            int instruction_index = atoi((char *)list_get(instruccion->params, 1));
+            uint32_t valor_reg = _obtener_valor_registro(cpu_registers, reg);
 
-            log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
+            if (valor_reg != 0) {
+                cpu_registers->pc = instruction_index;
+                log_trace(logger_cpu, "el registro %s era igual a cero, por lo tanto se salto a %d (JNZ)\n", reg, instruction_index);
+            }
+                log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
+            break;
+        }
+        case RESIZE: {
+            int nuevo_tamano = atoi((char *)list_get(instruccion->params, 0));
+            
+            // Función para solicitar a la memoria el ajuste de tamaño
+            if (!ajustar_tamano_proceso(cpu_registers, nuevo_tamano)) {
+                // TODO: Si la memoria devuelve Out of Memory, devolver el contexto al Kernel
+                informar_kernel_error(kernel, "Out of Memory");
+            } else {
+                log_info(logger_cpu, "RESIZE %d\n", nuevo_tamano);
+            }
+            break;
+        }
+        case COPY_STRING: {
+            int tamano = atoi((char *)list_get(instruccion->params, 0));
+            
+            uint32_t direccion_origen = cpu_registers->si;
+            uint32_t direccion_destino = cpu_registers->di;
+            
+            copiar_cadena(direccion_origen, direccion_destino, tamano);
+            
+            log_info(logger_cpu, "COPY_STRING %d\n", tamano);
             break;
         }
         case IO_GEN_SLEEP: {
@@ -166,6 +100,74 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             break;
     }
 }
+
+// FUNCIONES AUXILIARES DE EJECUCION DE INSTRUCCIONES:
+
+//#############################################################################################################
+// TODO: REVISAR MACHEO DE INT, debuggear.
+//#############################################################################################################
+// Función para obtener el puntero a un registro basado en su nombre:
+uint32_t* _obtener_registro(t_cpu_registers *registros, const char *nombre) {
+    if (strcmp(nombre, "AX") == 0) return (uint32_t *)&registros->ax;
+    if (strcmp(nombre, "BX") == 0) return (uint32_t *)&registros->bx;
+    if (strcmp(nombre, "CX") == 0) return (uint32_t *)&registros->cx;
+    if (strcmp(nombre, "DX") == 0) return (uint32_t *)&registros->dx;
+    if (strcmp(nombre, "EAX") == 0) return &registros->eax;
+    if (strcmp(nombre, "EBX") == 0) return &registros->ebx;
+    if (strcmp(nombre, "ECX") == 0) return &registros->ecx;
+    if (strcmp(nombre, "EDX") == 0) return &registros->edx;
+    if (strcmp(nombre, "SI") == 0) return &registros->si;
+    if (strcmp(nombre, "DI") == 0) return &registros->di;
+    return NULL;
+}
+
+// Función para establecer el valor de un registro
+void _establecer_registro(t_cpu_registers *registros, const char *nombre, uint32_t valor) {
+    uint32_t *reg = obtener_registro(registros, nombre);
+    if (reg) *reg = valor;
+}
+
+// Función para obtener el valor de un registro
+uint32_t _obtener_valor_registro(t_cpu_registers *registros, const char *nombre) {
+    uint32_t *reg = obtener_registro(registros, nombre);
+    return reg ? *reg : 0;
+}
+
+// #############################################################################################################
+// Es importante tener en cuenta las siguientes aclaraciones:
+// Una dirección lógica se traduce a una dirección física, pero al copiar un string/registro a memoria, 
+// podría estar presente en más de una página (ver sección de MMU).
+// #############################################################################################################
+uint32_t leer_memoria(uint32_t direccion_logica){
+    //TODO: se relaciona con la MMU, implementar cuando la MMU esté desarrollada.
+}
+
+void escribir_memoria(uint32_t direccion_logica,uint32_t valor_datos){
+    //TODO: se relaciona con la MMU, implementar cuando la MMU esté desarrollada.
+}
+
+bool ajustar_tamano_proceso(t_cpu_registers *cpu_registers, int nuevo_tamano) {
+    // TODO: Implementa la lógica para solicitar el ajuste de tamaño a la memoria
+    // Devuelve true si el ajuste es exitoso, false si hay un error (por ejemplo, Out of Memory)
+    // Ejemplo simplificado
+    if (memoria_tiene_espacio(nuevo_tamano)) {
+        // Ajustar el tamaño en la memoria
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void informar_kernel_error(Kernel *kernel, const char *mensaje) {
+    // TODO: Implementa la lógica para informar al Kernel sobre un error.
+    printf("Kernel error: %s\n", mensaje);
+}
+
+void copiar_cadena(uint32_t origen, uint32_t destino, int tamano) {
+    // Implementa la lógica para copiar una cadena de bytes de origen a destino
+
+}
+
 
 void cargar_contexto_ejecucion(t_PCB* pcb) {
     t_cpu_registers* contexto = get_cpu_registers(pcb);
