@@ -45,8 +45,9 @@ void init()
     _iniciar_config();
     _init_table_pcb();
     imprimir_config();
-    initializeLists();
-    initializeSemaphores();
+    initialize_lists();
+    initialize_mutexes();
+    initialize_semaphores();
     inicializar_planificadores();
 }
 
@@ -133,7 +134,7 @@ void inicializar_planificadores()
 }
 
 
-void initializeLists()
+void initialize_lists()
 {
     COLA_READY = queue_create();
     COLA_EXIT = queue_create();

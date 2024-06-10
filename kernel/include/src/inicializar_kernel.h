@@ -19,7 +19,7 @@ void _iniciar_logger();
 void _iniciar_config();
 void imprimir_config();
 void _init_table_pcb();
-void initializeLists();
+void initialize_lists();
 void inicializar_planificadores();
 
 #endif /*INICIALIZAR_KERNEL_H_*/
