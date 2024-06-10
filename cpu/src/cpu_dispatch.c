@@ -39,7 +39,54 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         case SUM: {
             char* reg_dest = (char*)list_get(instruccion->params, 0);
             char* reg_src = (char*)list_get(instruccion->params, 1);
-            //TODO
+            int registro_src_int = 0;
+            // pasar del char* al int que representa el valor del registro src
+            // Copio el valor del registro src en reg_src:
+            if(strcmp(reg_src, "AX") == 0){
+                registro_src_int = cpu_registers->ax;
+            }else if(strcmp(reg_src, "BX") == 0){
+                registro_src_int = cpu_registers->bx;
+            }else if(strcmp(reg_src, "CX") == 0){
+                registro_src_int = cpu_registers->cx;
+            }else if(strcmp(reg_src, "DX") == 0){
+                registro_src_int = cpu_registers->dx;
+            }else if(strcmp(reg_src, "EAX") == 0){
+                registro_src_int = cpu_registers->eax;
+            }else if(strcmp(reg_src, "EBX") == 0){
+                registro_src_int = cpu_registers->ebx;
+            }else if(strcmp(reg_src, "ECX") == 0){
+                registro_src_int = cpu_registers->ecx;
+            }else if(strcmp(reg_src, "EDX") == 0){
+                registro_src_int = cpu_registers->edx;
+            }else if(strcmp(reg_src, "SI") == 0){
+                registro_src_int = cpu_registers->si;
+            }else if(strcmp(reg_src, "DI") == 0){
+                registro_src_int = cpu_registers->di;
+            }
+
+            //TODO: revisar si es la mejor manera de hacerlo
+            // asignar el valor de la suma al registro destino:
+            if(strcmp(reg_dest, "AX") == 0){
+                cpu_registers->ax += registro_src_int;
+            }else if(strcmp(reg_dest, "BX") == 0){
+                cpu_registers->bx += registro_src_int;
+            }else if(strcmp(reg_dest, "CX") == 0){
+                cpu_registers->cx += registro_src_int;
+            }else if(strcmp(reg_dest, "DX") == 0){
+                cpu_registers->dx += registro_src_int;
+            }else if(strcmp(reg_dest, "EAX") == 0){
+                cpu_registers->eax += registro_src_int;
+            }else if(strcmp(reg_dest, "EBX") == 0){
+                cpu_registers->ebx += registro_src_int;
+            }else if(strcmp(reg_dest, "ECX") == 0){
+                cpu_registers->ecx += registro_src_int;
+            }else if(strcmp(reg_dest, "EDX") == 0){
+                cpu_registers->edx += registro_src_int;
+            }else if(strcmp(reg_dest, "SI") == 0){
+                cpu_registers->si += registro_src_int;
+            }else if(strcmp(reg_dest, "DI") == 0){
+                cpu_registers->di += registro_src_int;
+            }
 
             log_info(logger_cpu, "SUM %s %s\n", reg_dest, reg_src);
             break;
@@ -48,7 +95,53 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             char* reg_dest = (char*)list_get(instruccion->params, 0);
             char* reg_src = (char*)list_get(instruccion->params, 1);
             //TODO
-  
+            // pasar del char* al int que representa el valor del registro src, guardarlo en reg_src :
+            if(strcmp(reg_src, "AX") == 0){
+                reg_src = cpu_registers->ax;
+            }else if(strcmp(reg_src, "BX") == 0){
+                reg_src = cpu_registers->bx;
+            }else if(strcmp(reg_src, "CX") == 0){
+                reg_src = cpu_registers->cx;
+            }else if(strcmp(reg_src, "DX") == 0){
+                reg_src = cpu_registers->dx;
+            }else if(strcmp(reg_src, "EAX") == 0){
+                reg_src = cpu_registers->eax;
+            }else if(strcmp(reg_src, "EBX") == 0){
+                reg_src = cpu_registers->ebx;
+            }else if(strcmp(reg_src, "ECX") == 0){
+                reg_src = cpu_registers->ecx;
+            }else if(strcmp(reg_src, "EDX") == 0){
+                reg_src = cpu_registers->edx;
+            }else if(strcmp(reg_src, "SI") == 0){
+                reg_src = cpu_registers->si;
+            }else if(strcmp(reg_src, "DI") == 0){
+                reg_src = cpu_registers->di;
+            }
+
+            //TODO: revisar si es la mejor manera de hacerlo
+            // asignar el valor de la suma al registro destino:
+            if(strcmp(reg_dest, "AX") == 0){
+                cpu_registers->ax -=reg_src;
+            }else if(strcmp(reg_dest, "BX") == 0){
+                cpu_registers->bx -=reg_src;
+            }else if(strcmp(reg_dest, "CX") == 0){
+                cpu_registers->cx -=reg_src;
+            }else if(strcmp(reg_dest, "DX") == 0){
+                cpu_registers->dx -=reg_src;
+            }else if(strcmp(reg_dest, "EAX") == 0){
+                cpu_registers->eax -=reg_src;
+            }else if(strcmp(reg_dest, "EBX") == 0){
+                cpu_registers->ebx -=reg_src;
+            }else if(strcmp(reg_dest, "ECX") == 0){
+                cpu_registers->ecx -=reg_src;
+            }else if(strcmp(reg_dest, "EDX") == 0){
+                cpu_registers->edx -=reg_src;
+            }else if(strcmp(reg_dest, "SI") == 0){
+                cpu_registers->si -=reg_src;
+            }else if(strcmp(reg_dest, "DI") == 0){
+                cpu_registers->di -=reg_src;
+            }
+
             log_info(logger_cpu, "SUB %s %s\n", reg_dest, reg_src);
             break;
         }
