@@ -39,8 +39,8 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         case SUM: {
             char *reg_dest = (char *)list_get(instruccion->params, 0);
             char *reg_src = (char *)list_get(instruccion->params, 1);
-            int valor_src = _obtener_valor_registro(cpu_registers, reg_src);
-            int valor_operacion = _obtener_valor_registro(cpu_registers, reg_dest) + valor_src;
+            uint8_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
+            uint8_t valor_operacion = _obtener_valor_registro(cpu_registers, reg_dest) + valor_src;
             _establecer_registro(cpu_registers, reg_dest, valor_operacion);
             log_info(logger_cpu, "SUM %s %s\n", reg_dest, reg_src);
             break;
@@ -127,9 +127,21 @@ uint32_t* _obtener_registro(t_cpu_registers *registros, const char *nombre) {
 }
 
 // Función para establecer el valor de un registro
-void _establecer_registro(t_cpu_registers *registros, const char *nombre, uint32_t valor) {
-    uint32_t *reg = _obtener_registro(registros, nombre);
-    if (reg) *reg = valor;
+// void _establecer_registro(t_cpu_registers *registros, const char *nombre, uint32_t valor) {
+//     uint32_t *reg = _obtener_registro(registros, nombre);
+//     if (reg) *reg = valor;
+// }
+void _establecer_registro(t_cpu_registers *registros, char *nombre, uint32_t valor) {
+    if (strcmp(nombre, "AX") == 0) registros->ax = valor;
+    if (strcmp(nombre, "BX") == 0) registros->bx = valor;
+    if (strcmp(nombre, "CX") == 0) registros->cx = valor;
+    if (strcmp(nombre, "DX") == 0) registros->dx = valor;
+    if (strcmp(nombre, "EAX") == 0) registros->eax = valor;
+    if (strcmp(nombre, "EBX") == 0) registros->ebx = valor;
+    if (strcmp(nombre, "ECX") == 0) registros->ecx = valor;
+    if (strcmp(nombre, "EDX") == 0) registros->edx = valor;
+    if (strcmp(nombre, "SI") == 0) registros->si = valor;
+    if (strcmp(nombre, "DI") == 0) registros->di = valor;
 }
 
 // Función para obtener el valor de un registro

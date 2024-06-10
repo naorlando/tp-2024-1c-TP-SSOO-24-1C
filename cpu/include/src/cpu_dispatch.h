@@ -44,7 +44,7 @@ uint32_t* _obtener_registro(t_cpu_registers *, const char *);
 // Establece el valor de un registro dado un nombre.
 // Pre: Los registros deben ser válidos y no NULL.
 // Post: El registro correspondiente al nombre dado se establece con el valor dado.
-void _establecer_registro(t_cpu_registers *, const char *, uint32_t);
+void _establecer_registro(t_cpu_registers *, char *, uint32_t);
 
 // Obtiene el valor de un registro dado un nombre.
 // Pre: Los registros deben ser válidos y no NULL.
