@@ -28,7 +28,7 @@ bool cargar_IO_config(t_IO_config* config, t_config* cf) {
     config->PATH_BASE_DIALFS = config_get_string_value(cf, "PATH_BASE_DIALFS");
     config->BLOCK_SIZE = config_get_int_value(cf, "BLOCK_SIZE");
     config->BLOCK_COUNT = config_get_int_value(cf, "BLOCK_COUNT");
-    config->RETRASO_COMPACTACION = config_get_int_value(cf, "RETRASO_COMPACTACION");
+    //config->RETRASO_COMPACTACION = config_get_int_value(cf, "RETRASO_COMPACTACION");
 
     return true;
 }
