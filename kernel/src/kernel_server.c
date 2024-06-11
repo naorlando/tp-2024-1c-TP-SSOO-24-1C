@@ -25,18 +25,20 @@ void atender_kernel_memoria()
     }
 }
 
-void atender_kernel_IO()
+void atender_kernel_IO(void* cliente_socket)
 {
+    int cliente_io = *(int*)cliente_socket;
     bool control_key = 1;
+
     while (control_key)
     {
-        int cod_op = recibir_operacion(fd_kernel_IO);
+        int cod_op = recibir_operacion(cliente_io);
 
         switch (cod_op)
         {
             case EXAMPLE:
                 // Se procesa el request
-                recv_example_msg_entradasalida();
+                recv_example_msg_entradasalida(cliente_io);
                 control_key = false; // Cortamos la espera de solicitudes
                 break;
             case MSG_IO_KERNEL:
@@ -121,30 +123,18 @@ void inicializar_sockets()
         log_error(logger_kernel, "Error al conectar con la CPU. ABORTANDO");
         exit(EXIT_FAILURE);
     }
-
-    //fd_kernel_memoria > 0 ? send_example_memoria() : log_error(logger_kernel, "Error al intentar enviar mensaje a %s", SERVER_MEMORIA);
-
-    log_info(logger_kernel, "Esperando a que se conecte %s...", CLIENTE_ENTRADASALIDA);
-    fd_kernel_IO = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, fd_server);
 }
 
 void crear_hilos_conexiones() 
 {
     pthread_t hilo_cpu_dispatch;
-    pthread_t hilo_entradasalida;
     pthread_t hilo_memoria;
+    pthread_t hilo_aceptar_io;
 
     // Hilo para manejar mensajes de CPU Dispatch
     if (pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_cpu_dispatch, NULL) != 0)
     {
         log_error(logger_kernel, "Error al crear el hilo para atender la CPU dispatch. ABORTANDO");
-        exit(EXIT_FAILURE);
-    }
-
-    // Hilo para manejar mensajes de IO
-    if (pthread_create(&hilo_entradasalida, NULL, (void *)atender_kernel_IO, NULL) != 0)
-    {
-        log_error(logger_kernel, "Error al crear el hilo para atender las IOs. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 
@@ -155,9 +145,39 @@ void crear_hilos_conexiones()
         exit(EXIT_FAILURE);
     }
 
+    // Creo hilo para aceptar conexiones de IO de forma dinámica
+    if (pthread_create(&hilo_aceptar_io, NULL, esperar_conexiones_IO, &fd_server) != 0) {
+        log_error(logger_kernel, "Error al crear el hilo para aceptar conexiones de IO. ABORTANDO");
+        exit(EXIT_FAILURE);
+    }
+
     pthread_detach(hilo_cpu_dispatch);
-    pthread_detach(hilo_entradasalida);
     pthread_detach(hilo_memoria);
+    pthread_detach(hilo_aceptar_io);
+}
+
+void* esperar_conexiones_IO(void* arg) 
+{
+    int server_fd = *(int*)arg;
+    bool control_key = 1;
+
+    while (control_key) {
+        int cliente_io = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, server_fd);
+        
+        if (cliente_io != -1) {
+            //add_io_client(cliente_io, "IOClient");
+            
+            pthread_t hilo_io;
+            if (pthread_create(&hilo_io, NULL, (void*)atender_kernel_IO, &cliente_io) != 0) {
+                log_error(logger_kernel, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
+                exit(EXIT_FAILURE);
+            }
+            pthread_detach(hilo_io);
+        } else {
+            log_error(logger_kernel, "Error al esperar cliente de IO");
+        }
+    }
+    return NULL;
 }
 
 void cerrar_servidor()
@@ -179,5 +199,6 @@ void _cerrar_conexiones()
     liberar_conexion(fd_server);
     liberar_conexion(fd_kernel_memoria);
     liberar_conexion(fd_cpu_dispatch);
-    liberar_conexion(fd_kernel_IO);
+    //TODO: Implementar funcion para liberar las conexiones de todas las IOs
+    // que se conectaron al kernel
 }

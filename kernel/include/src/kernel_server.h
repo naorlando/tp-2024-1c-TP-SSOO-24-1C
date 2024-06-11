@@ -14,12 +14,13 @@
 
 
 void atender_kernel_memoria();
-void atender_kernel_IO();
+void atender_kernel_IO(void*);
 void atender_kernel_cpu_dispatch();
 void levantar_servidor();
 void inicializar_sockets();
 void crear_hilos_conexiones();
 void cerrar_servidor();
+void* esperar_conexiones_IO(void*);
 void _cerrar_conexiones();
 void _cerrar_puertos();
 
