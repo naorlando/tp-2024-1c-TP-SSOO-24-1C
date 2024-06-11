@@ -11,6 +11,8 @@ int fd_entradasalida;
 int fd_cpu;
 int fd_kernel;
 
+char* server_port;
+
 void init(){
     _iniciar_logger();
     _iniciar_config();
@@ -70,5 +72,5 @@ void _iniciar_tabla_procesos(){
 }
 
 void imprimir_config() {
-    log_trace(logger_memoria_debug, "PUERTO DE ESCUCHA DE LA MEMORIA: %d", memoria_config->PUERTO_ESCUCHA);
+    log_trace(logger_memoria_debug, "PUERTO DE ESCUCHA DE LA MEMORIA: %d", obtener_puerto_escucha(memoria_config));
 }
