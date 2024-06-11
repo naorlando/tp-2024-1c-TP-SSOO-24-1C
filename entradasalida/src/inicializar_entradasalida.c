@@ -12,10 +12,10 @@ t_IO_config* entradasalida_config;
 char* kernel_port;
 char* memoria_port;
 
-void init(char* config_path){
+void init(char* nombre_interfaz, char* config_path){
     _iniciar_logger();
     _iniciar_config(config_path);
-    _imprimir_config();
+    _imprimir_config(nombre_interfaz);
 }
 
 void _iniciar_logger(){
@@ -64,11 +64,11 @@ void _iniciar_config(char *config_path) {
     }
 }
 
-void _imprimir_config() {    
+void _imprimir_config(char* nombre_interfaz) {    
     // Comento código anterior
     // log_info(logger_entradasalida, "Entrada/salida inicializado");
     
     // Reemplazo el código anterior mostrando un mensaje de inicialización de Interfaz Genérica
-    log_info(logger_entradasalida, "%s inicializada", obtener_tipo_interfaz(entradasalida_config));
+    log_info(logger_entradasalida, "Interfaz %s de tipo %s inicializada", nombre_interfaz, obtener_tipo_interfaz(entradasalida_config));
 }
 
