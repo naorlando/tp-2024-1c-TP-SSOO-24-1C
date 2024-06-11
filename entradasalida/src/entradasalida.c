@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     char* nombre_interfaz = argv[1];
     char* path_config = argv[2];
 
-    init(path_config);
+    init(nombre_interfaz, path_config);
 
     // Comento bloque de conexión con memoria (checkpoint 1)
     memoria_port = string_itoa(obtener_puerto_memoria(entradasalida_config));
