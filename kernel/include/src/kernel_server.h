@@ -7,7 +7,6 @@
 #include "utils/sockets.h"
 #include "utils/estructuras.h"
 #include "utils/buffer.h"
-#include "utils/sockets.h"
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <pthread.h>
