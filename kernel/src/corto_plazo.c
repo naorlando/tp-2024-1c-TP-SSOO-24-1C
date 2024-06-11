@@ -8,7 +8,10 @@ t_PCB *get_next_pcb_to_exec()
     case FIFO:
         break;
     case RR:
-        /* ordenar */
+        // hacer un hilo con sleep y que cada vez que se cumpla el quantum se haga interrupt
+        // post cuando se mande la prox instruccion a cpu
+        
+        
         break;
     case VRR:
         /* ordenar */

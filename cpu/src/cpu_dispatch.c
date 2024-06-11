@@ -165,6 +165,7 @@ void remove_newline(char *str) {
 // #############################################################################################################
 uint32_t leer_memoria(uint32_t direccion_logica){
     //TODO: se relaciona con la MMU, implementar cuando la MMU esté desarrollada.
+    return 0;
 }
 
 void escribir_memoria(uint32_t direccion_logica,uint32_t valor_datos){
@@ -181,6 +182,7 @@ bool ajustar_tamano_proceso(t_cpu_registers *cpu_registers, int nuevo_tamano) {
     // } else {
     //     return false;
     // }
+    return true;
 }
 
 void informar_kernel_error(const char *mensaje) {
@@ -233,7 +235,7 @@ void manejar_ciclo_de_instruccion() {
     // FETCH: Recibo la instruccion que manda memoria
     t_instruction* instruccion = recv_instruction();
 
-    log_info(logger_cpu, "Instrucción recibida");
+    log_info(logger_cpu, "Instrucción recibida de memoria");
     log_info(logger_cpu, "antes: AX: %d", cpu_registers->ax);
     log_info(logger_cpu, "antes: BX: %d", cpu_registers->bx);
     log_info(logger_cpu, "antes: CX: %d", cpu_registers->cx);
@@ -255,18 +257,5 @@ void manejar_ciclo_de_instruccion() {
     pcb_execute->program_counter = cpu_registers->pc;
     //TODO: Se debe actualizar el PC antes de pedir la siguiente instruccion a memoria
     solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
-
-}
-
-bool manejar_interrupcion() {
-    if (interrupcion_pendiente) {
-        log_info(logger_cpu, "Interrupción recibida, devolviendo PCB al Kernel");
-        //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
-        // de enviar de nuevo al kernel
-        send_pcb_kernel();
-        interrupcion_pendiente = false;
-        return true;
-    }
-
-    return false;
+    
 }

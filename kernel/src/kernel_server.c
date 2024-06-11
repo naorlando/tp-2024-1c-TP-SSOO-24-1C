@@ -86,6 +86,38 @@ void atender_kernel_cpu_dispatch()
     }
 }
 
+void atender_kernel_cpu_interrupt()
+{
+    bool control_key = 1;
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(fd_cpu_interrupt);
+
+        switch (cod_op)
+        {
+
+        case MSG_PCB_KERNEL_INTERRUPTION:
+            //TODO: agregar PCB donde este:
+            // 1-recibir pcb:
+
+            // 2-actualizar el pcb en la tabla de pcb
+
+            // 3-actualizar el estado del pcb en la cola correspondiente
+            
+            log_info(logger_kernel, "Se recibio un pcb de CPU INTERRUPT");
+            break;
+
+        case -1:
+            log_error(logger_kernel, "CPU INTERRUPT se desconecto. Terminando servidor");
+            control_key = 0;
+            break;
+        default:
+            log_warning(logger_kernel, "Operacion desconocida en INTERRUPT. No quieras meter la pata");
+            break;
+        }
+    }
+}
+
 void levantar_servidor()
 {
     server_port = string_itoa(kernel_config->PUERTO_ESCUCHA);
@@ -123,6 +155,11 @@ void crear_hilos_conexiones()
     pthread_t hilo_cpu_dispatch;
     pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_cpu_dispatch, NULL);
     pthread_detach(hilo_cpu_dispatch);
+
+    //hilo para manejar mensajes de CPU Interrupt
+    pthread_t hilo_cpu_interrupt;
+    pthread_create(&hilo_cpu_interrupt, NULL, (void *)atender_kernel_cpu_interrupt, NULL);
+    pthread_detach(hilo_cpu_interrupt);
 
     // Hilo para manejar mensajes de IO
     pthread_t hilo_entradasalida;

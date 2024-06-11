@@ -34,10 +34,16 @@ int main(int argc, char *argv[])
     fd_kernel_dispatch = esperar_cliente(logger_cpu, CLIENTE_KERNEL, fd_server);
 
 
-    // Atendemos mensaje del Kernel
+    // Atendemos mensaje del Kernel:
+    // hilo CPU-KERNEL dispatch:
     pthread_t hilo_kernel_dispatch;
     pthread_create(&hilo_kernel_dispatch, NULL, (void *)atender_cpu_kernel_dispatch, NULL);
     pthread_detach(hilo_kernel_dispatch);
+    // hilo CPU-KERNEL interrupt:
+    pthread_t hilo_kernel_interrupt;
+    pthread_create(&hilo_kernel_interrupt, NULL, (void *)atender_cpu_kernel_interrupt, NULL);   
+    pthread_detach(hilo_kernel_interrupt);
+
 
     //Atender los mensajes de la memoria
 

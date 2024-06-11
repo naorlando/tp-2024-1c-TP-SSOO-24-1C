@@ -24,6 +24,7 @@ extern t_cpu_config *cpu_config;
 
 // FD
 extern int fd_kernel_dispatch;
+extern int fd_kernel_interrupt;
 extern int fd_memoria;
 
 // SEMAFOROS
