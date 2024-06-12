@@ -172,6 +172,7 @@ void* esperar_conexiones_IO(void* arg)
                 log_error(logger_kernel, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
                 exit(EXIT_FAILURE);
             }
+            log_info(logger_kernel, "Se conecto una interfaz IO");
             pthread_detach(hilo_io);
         } else {
             log_error(logger_kernel, "Error al esperar cliente de IO");
