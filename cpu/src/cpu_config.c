@@ -14,6 +14,8 @@ t_cpu_config *crear_cpu_config()
 
 void destruir(t_cpu_config *cpu_config)
 {
+    free(cpu_config->IP_MEMORIA);
+    free(cpu_config->ALGORITMO_TLB);
     free(cpu_config);
 }
 
