@@ -64,16 +64,42 @@ void atender_cpu_memoria()
 
 void levantar_servidor()
 {
-    server_port = string_itoa(obtener_puerto_escucha_dispatch(cpu_config));
-    fd_server = iiniciar_servidor(logger_cpu, NULL, NULL, server_port);
+    server_port_dispatch = string_itoa(obtener_puerto_escucha_dispatch(cpu_config));
+    fd_server_dispatch = iniciar_servidor(logger_cpu, NULL, NULL, server_port_dispatch);
 
-    if (fd_server != -1)
+    if (fd_server_dispatch != -1)
     {
-        log_info(logger_cpu, "%s server listo escuchando en puerto %s", SERVERNAME, server_port);
+        log_info(logger_cpu, "%s server listo escuchando en puerto %s", SERVERNAME, server_port_dispatch);
     }
     else
     {
-        log_error(logger_cpu, "Error al iniciar %s server en puerto %s", SERVERNAME, server_port);
+        log_error(logger_cpu, "Error al iniciar %s server en puerto %s", SERVERNAME, server_port_dispatch);
+        exit(EXIT_FAILURE);
+    }
+
+    server_port_interrupt = string_itoa(obtener_puerto_escucha_interrupt(cpu_config));
+    fd_server_interrupt = iniciar_servidor(logger_cpu, NULL, NULL, server_port_interrupt);
+
+    if (fd_server_interrupt != -1)
+    {
+        log_info(logger_cpu, "%s server listo escuchando en puerto %s", SERVERNAME, server_port_interrupt);
+    }
+    else
+    {
+        log_error(logger_cpu, "Error al iniciar %s server en puerto %s", SERVERNAME, server_port_interrupt);
+        exit(EXIT_FAILURE);
+    }
+}
+
+void inicializar_sockets()
+{
+    // Conexion con memoria
+    memoria_port = string_itoa(obtener_puerto_memoria(cpu_config));
+    fd_memoria = crear_conexion(logger_cpu, SERVER_MEMORIA, obtener_ip_memoria(cpu_config), memoria_port);
+
+    if (fd_memoria == -1)
+    {
+        log_error(logger_cpu, "Error al conectar con la MEMORIA. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 }

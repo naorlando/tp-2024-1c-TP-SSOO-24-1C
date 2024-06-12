@@ -11,5 +11,6 @@
 void atender_cpu_kernel_dispatch();
 void atender_cpu_memoria();
 void levantar_servidor();
+void inicializar_sockets();
 
 #endif //CPU_SERVER_H_
