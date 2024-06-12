@@ -259,3 +259,37 @@ void manejar_ciclo_de_instruccion() {
     solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
     
 }
+
+bool manejar_interrupcion() {
+    if (interrupcion_pendiente) {
+        log_info(logger_cpu, "Interrupción recibida, devolviendo PCB al Kernel");
+        //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
+        // de enviar de nuevo al kernel
+        cargar_contexto_ejecucion_a_pcb(pcb_execute);
+        send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
+        sem_post(&SEM_INTERRUPT);
+        interrupcion_pendiente = false; 
+        log_info(logger_cpu, "PCB enviado al Kernel");
+        return true;
+    }
+
+    return false;
+}
+
+// cargar contexto de ejecucion del cpu a los registros del pcb
+void cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
+    t_cpu_registers* contexto = get_cpu_registers(pcb);
+
+    // Cargo el contexto de ejecucion de la CPU en el pcb
+    contexto->pc = cpu_registers->pc;
+    contexto->ax = cpu_registers->ax;
+    contexto->bx = cpu_registers->bx;
+    contexto->cx = cpu_registers->cx;
+    contexto->dx = cpu_registers->dx;
+    contexto->eax = cpu_registers->eax;
+    contexto->ebx = cpu_registers->ebx;
+    contexto->ecx = cpu_registers->ecx;
+    contexto->edx = cpu_registers->edx;
+    contexto->si = cpu_registers->si;
+    contexto->di = cpu_registers->di;
+}

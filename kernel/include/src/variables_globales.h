@@ -14,6 +14,8 @@
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"
+#define SERVER_CPU_DISPATCH "SERVER CPU DISPATCH"
+#define SERVER_CPU_INTERRUPT "SERVER CPU INTERRUPT"
 #define SERVER_MEMORIA "SERVER MEMORIA"
 #define CLIENTE_ENTRADASALIDA "CLIENTE ENTRADA SALIDA"
 
@@ -50,6 +52,7 @@ extern int fd_server;
 //PORTS
 extern char* server_port;
 extern char* cpu_dispatch_port;
+extern char* cpu_interrupt_port;
 extern char* memoria_port;
 
 

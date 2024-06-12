@@ -20,6 +20,7 @@
 #include "cpu_config.h"
 #include "inicializar_cpu.h"
 #include "cpu_dispatch.h"
+#include "cpu_interrupt.h"
 #include "cpu_server.h"
 
 

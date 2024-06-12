@@ -4,6 +4,7 @@ t_log* logger_cpu_debug;
 t_config* config_cpu;
 t_cpu_config* cpu_config;
 int fd_kernel_dispatch;
+int fd_kernel_interrupt;
 int fd_memoria;
 t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;

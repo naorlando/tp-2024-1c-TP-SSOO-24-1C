@@ -51,6 +51,18 @@ uint32_t _obtener_valor_registro(t_cpu_registers *, char *);
 // Post: Retorna el valor del registro correspondiente al nombre dado.
 void remove_newline(char *);
 
+// Maneja las interrupciones de la CPU.
+// Pre: La variable interrupcion_pendiente debe estar correctamente inicializada.
+//      La variable global pcb_execute debe apuntar a un PCB válido y no NULL.
+// Post: Si hay una interrupción pendiente, se envía el PCB de vuelta al kernel y se resetea la interrupción.
+//       Retorna true si hubo una interrupción y se manejó, false en caso contrario.
+bool manejar_interrupcion();
+
+// Carga el contexto de ejecución de la CPU en el PCB.
+// Pre: El PCB debe ser válido y no NULL.
+// Post: El contexto de ejecución de la CPU se carga en el PCB.
+void cargar_contexto_ejecucion_a_pcb(t_PCB*);
+
 // TODO: Implementar.
 uint32_t leer_memoria(uint32_t);
 void escribir_memoria(uint32_t direccion_logica,uint32_t valor_datos);

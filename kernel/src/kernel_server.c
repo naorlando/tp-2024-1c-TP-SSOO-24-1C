@@ -75,27 +75,6 @@ void atender_kernel_cpu_dispatch()
             log_info(logger_kernel, "Se recibio un mje de CPU DISPATCH");
             break;
 
-        case -1:
-            log_error(logger_kernel, "CPU DISPATCH se desconecto. Terminando servidor");
-            control_key = 0;
-            break;
-        default:
-            log_warning(logger_kernel, "Operacion desconocida en dispatch. No quieras meter la pata");
-            break;
-        }
-    }
-}
-
-void atender_kernel_cpu_interrupt()
-{
-    bool control_key = 1;
-    while (control_key)
-    {
-        int cod_op = recibir_operacion(fd_cpu_interrupt);
-
-        switch (cod_op)
-        {
-
         case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
             //TODO: agregar PCB donde este:
             // 1-recibir pcb:
@@ -105,7 +84,7 @@ void atender_kernel_cpu_interrupt()
             // 2-actualizar el pcb en la tabla de pcb:
             // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
             // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
-            dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), pcb_destroy);
+            dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void (*)(void *))pcb_destroy);
             dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
             log_info(logger_kernel, "Se actualizo un pcb-INTERRUPT en la table_pcb");
 
@@ -116,16 +95,57 @@ void atender_kernel_cpu_interrupt()
             log_info(logger_kernel, "Se actualizo el estado del pcb-INTERRUPT en la cola correspondiente");
 
             break;
-
-        case -1:
-            log_error(logger_kernel, "CPU INTERRUPT se desconecto. Terminando servidor");
-            control_key = 0;
-            break;
-        default:
-            log_warning(logger_kernel, "Operacion desconocida en INTERRUPT. No quieras meter la pata");
-            break;
-        }
+            case -1:
+                log_error(logger_kernel, "CPU DISPATCH se desconecto. Terminando servidor");
+                control_key = 0;
+                break;
+            default:
+                log_warning(logger_kernel, "Operacion desconocida en dispatch. No quieras meter la pata");
+                break;
+            }
     }
+}
+
+void atender_kernel_cpu_interrupt()
+{
+    // bool control_key = 1;
+    // while (control_key)
+    // {
+    //     int cod_op = recibir_operacion(fd_cpu_interrupt);
+
+    //     switch (cod_op)
+    //     {
+
+    //     case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
+    //         //TODO: agregar PCB donde este:
+    //         // 1-recibir pcb:
+    //         t_PCB* pcb_interrupt = recv_pcb_interrupt();
+    //         log_info(logger_kernel, "Se recibio un pcb de CPU-INTERRUPT");
+
+    //         // 2-actualizar el pcb en la tabla de pcb:
+    //         // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
+    //         // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
+    //         dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void (*)(void *))pcb_destroy);
+    //         dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
+    //         log_info(logger_kernel, "Se actualizo un pcb-INTERRUPT en la table_pcb");
+
+            
+
+    //         // 3-actualizar el estado del pcb en la cola correspondiente:
+    //         queue_push(COLA_READY, pcb_interrupt);
+    //         log_info(logger_kernel, "Se actualizo el estado del pcb-INTERRUPT en la cola correspondiente");
+
+    //         break;
+
+    //     case -1:
+    //         log_error(logger_kernel, "CPU INTERRUPT se desconecto. Terminando servidor");
+    //         control_key = 0;
+    //         break;
+    //     default:
+    //         log_warning(logger_kernel, "Operacion desconocida en INTERRUPT. No quieras meter la pata");
+    //         break;
+    //     }
+    // }
 }
 
 void levantar_servidor()
@@ -147,7 +167,11 @@ void inicializar_sockets()
 {
     // Conexion con cpu_dispatch
     cpu_dispatch_port = string_itoa(kernel_config->PUERTO_CPU_DISPATCH);
-    fd_cpu_dispatch = crear_conexion(logger_kernel, SERVER_CPU, kernel_config->IP_CPU, cpu_dispatch_port);
+    fd_cpu_dispatch = crear_conexion(logger_kernel, SERVER_CPU_DISPATCH, kernel_config->IP_CPU, cpu_dispatch_port);
+
+    // conexion con cpu_interrupt
+    cpu_interrupt_port = string_itoa(kernel_config->PUERTO_CPU_INTERRUPT); 
+    fd_cpu_interrupt = crear_conexion(logger_kernel, SERVER_CPU_INTERRUPT, kernel_config->IP_CPU, cpu_interrupt_port);
 
     // Conexion con memoria
     memoria_port = string_itoa(kernel_config->PUERTO_MEMORIA);
@@ -166,7 +190,7 @@ void crear_hilos_conexiones()
     pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_cpu_dispatch, NULL);
     pthread_detach(hilo_cpu_dispatch);
 
-    //hilo para manejar mensajes de CPU Interrupt
+    //hilo para manejar mensajes de CPU Interrupt: HACE FALTA?
     pthread_t hilo_cpu_interrupt;
     pthread_create(&hilo_cpu_interrupt, NULL, (void *)atender_kernel_cpu_interrupt, NULL);
     pthread_detach(hilo_cpu_interrupt);

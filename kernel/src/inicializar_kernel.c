@@ -12,6 +12,7 @@ int fd_kernel_memoria;
 int fd_server;
 
 char *cpu_dispatch_port;
+char *cpu_interrupt_port;
 char *memoria_port;
 char *server_port;
 

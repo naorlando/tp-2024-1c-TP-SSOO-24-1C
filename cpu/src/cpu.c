@@ -30,8 +30,11 @@ int main(int argc, char *argv[])
     fd_memoria > 0 ? send_example_memoria() : log_error(logger_cpu, "Error al intentar enviar mensaje a %s", SERVER_MEMORIA);
 
     // Esperamos al Kernel
-    log_info(logger_cpu, "esperando a que se conecte %s",CLIENTE_KERNEL);
+    log_info(logger_cpu, "esperando a que se conecte %s a DISPATCH",CLIENTE_KERNEL);
     fd_kernel_dispatch = esperar_cliente(logger_cpu, CLIENTE_KERNEL, fd_server);
+    // TODO: Esperamos al Kernel por dispatch
+    log_info(logger_cpu, "esperando a que se conecte %s a INTERRUPT",CLIENTE_KERNEL);
+    fd_kernel_interrupt = esperar_cliente(logger_cpu, CLIENTE_KERNEL, fd_server);
 
 
     // Atendemos mensaje del Kernel:
@@ -39,6 +42,7 @@ int main(int argc, char *argv[])
     pthread_t hilo_kernel_dispatch;
     pthread_create(&hilo_kernel_dispatch, NULL, (void *)atender_cpu_kernel_dispatch, NULL);
     pthread_detach(hilo_kernel_dispatch);
+
     // hilo CPU-KERNEL interrupt:
     pthread_t hilo_kernel_interrupt;
     pthread_create(&hilo_kernel_interrupt, NULL, (void *)atender_cpu_kernel_interrupt, NULL);   
