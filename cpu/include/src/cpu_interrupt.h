@@ -5,7 +5,6 @@
 #include "utils/buffer.h"
 #include "utils/protocolo.h"
 
-void atender_cpu_kernel_interrupt(t_log* logger);
 
 
 #endif
