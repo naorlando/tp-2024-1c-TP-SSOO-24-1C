@@ -5,6 +5,9 @@ t_log* logger_cpu_debug;
 t_config* config_cpu;
 t_cpu_config* cpu_config;
 
+int fd_server_dispatch;
+int fd_server_interrupt;
+int fd_kernel_interrupt;
 int fd_kernel_dispatch;
 int fd_memoria;
 
@@ -12,7 +15,8 @@ t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
 t_PCB* pcb_execute;
 
-char* server_port;
+char* server_port_interrupt;
+char* server_port_dispatch;
 
 void init(){
     _iniciar_logger();
