@@ -29,3 +29,33 @@ bool cargar_cpu_config(t_cpu_config *cpu_config, t_config *cf)
 
     return true;
 }
+
+uint16_t obtener_puerto_escucha_dispatch(t_cpu_config* cpu_config)
+{
+    return cpu_config->PUERTO_ESCUCHA_DISPATCH;
+}
+
+char* obtener_ip_memoria(t_cpu_config* cpu_config)
+{
+    return cpu_config->IP_MEMORIA;
+}
+
+uint16_t obtener_puerto_memoria(t_cpu_config* cpu_config)
+{
+    return cpu_config->PUERTO_MEMORIA;
+}
+
+uint16_t obtener_puerto_escucha_interrupt(t_cpu_config* cpu_config)
+{
+    return cpu_config->PUERTO_ESCUCHA_INTERRUPT;
+}
+
+uint16_t obtener_cantidad_entradas_tlb(t_cpu_config* cpu_config)
+{
+    return cpu_config->CANTIDAD_ENTRADAS_TLB;
+}
+
+char* obtener_algoritmo_tlb(t_cpu_config* cpu_config)
+{
+    return cpu_config->ALGORITMO_TLB;
+}
