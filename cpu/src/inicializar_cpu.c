@@ -72,7 +72,12 @@ void _iniciar_config(){
         log_error(logger_cpu, "Error al crear la estructura t_cpu_config");
     }
 
-    cargar_cpu_config(cpu_config, config_cpu);
+    if(cargar_cpu_config(cpu_config, config_cpu)) {
+        log_info(logger_cpu, "La estructura t_cpu_config fue cargado correctamente");
+    } else {
+        log_error(logger_cpu, "Error al cargar la estructura t_cpu_config");
+    }
+
 }
 
 void imprimir_config() {
