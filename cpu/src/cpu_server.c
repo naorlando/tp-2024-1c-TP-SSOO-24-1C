@@ -61,3 +61,19 @@ void atender_cpu_memoria()
         }
     }
 }
+
+void levantar_servidor()
+{
+    server_port = string_itoa(obtener_puerto_escucha_dispatch(cpu_config));
+    fd_server = iiniciar_servidor(logger_cpu, NULL, NULL, server_port);
+
+    if (fd_server != -1)
+    {
+        log_info(logger_cpu, "%s server listo escuchando en puerto %s", SERVERNAME, server_port);
+    }
+    else
+    {
+        log_error(logger_cpu, "Error al iniciar %s server en puerto %s", SERVERNAME, server_port);
+        exit(EXIT_FAILURE);
+    }
+}
