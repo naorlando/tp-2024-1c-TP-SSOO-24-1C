@@ -8,8 +8,8 @@
 #include "utils/buffer.h"
 #include "utils/protocolo.h"
 #include "protocolo_cpu.h"
-#include "cpu_syncro.h"
 
-void atender_cpu_kernel_interrupt();
+
+
 
 #endif
