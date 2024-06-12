@@ -11,6 +11,7 @@
 #include "cpu_config.h"
 #include <commons/log.h>
 #include <pthread.h>
+#include "cpu_syncro.h"
 
 void atender_cpu_kernel_dispatch();
 void atender_cpu_kernel_interrupt();
