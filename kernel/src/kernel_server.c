@@ -203,6 +203,7 @@ void inicializar_sockets()
 void crear_hilos_conexiones() 
 {
     pthread_t hilo_cpu_dispatch;
+    pthread_t hilo_cpu_interrupt;
     pthread_t hilo_memoria;
     pthread_t hilo_aceptar_io;
 
@@ -210,6 +211,13 @@ void crear_hilos_conexiones()
     if (pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_cpu_dispatch, NULL) != 0)
     {
         log_error(logger_kernel, "Error al crear el hilo para atender la CPU dispatch. ABORTANDO");
+        exit(EXIT_FAILURE);
+    }
+
+    // Hilo para manejar mensajes de CPU Interrupt
+    if (pthread_create(&hilo_cpu_interrupt, NULL, (void *)atender_kernel_cpu_interrupt, NULL) != 0)
+    {
+        log_error(logger_kernel, "Error al crear el hilo para atender la CPU interrupt. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 
@@ -227,6 +235,7 @@ void crear_hilos_conexiones()
     }
 
     pthread_detach(hilo_cpu_dispatch);
+    pthread_detach(hilo_cpu_interrupt);
     pthread_detach(hilo_memoria);
     pthread_detach(hilo_aceptar_io);
 }
