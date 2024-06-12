@@ -42,11 +42,13 @@ extern t_kernel_config* kernel_config;
 //FD
 extern int fd_kernel_memoria;
 extern int fd_cpu_dispatch;
+extern int fd_cpu_interrupt;
 extern int fd_server;
 
 //PORTS
 extern char* server_port;
 extern char* cpu_dispatch_port;
+extern char* cpu_interrupt_port;
 extern char* memoria_port;
 
 
