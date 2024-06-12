@@ -201,6 +201,7 @@ void* esperar_conexiones_IO(void* arg)
                 exit(EXIT_FAILURE);
             }
             pthread_detach(hilo_entradasalida);
+            log_info(logger_memoria, "Se conecto una interfaz IO");
         } else {
             log_error(logger_memoria, "Error al esperar cliente de IO");
         }
