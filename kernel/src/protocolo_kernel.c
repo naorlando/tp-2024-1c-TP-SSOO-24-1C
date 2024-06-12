@@ -34,3 +34,14 @@ int recv_example_msg_entradasalida()
 
     return 0;
 }
+
+t_PCB* recv_pcb_interrupt()
+{
+    t_buffer* buffer = recive_full_buffer(fd_cpu_interrupt);
+    t_PCB* pcb = deserialize_pcb(buffer);
+    log_info(logger_kernel, "Se recibio un PCB del CPU_INTERRUPT, PID => %d", pcb->pid);
+    //pcb_destroy(pcb);
+    buffer_destroy(buffer);
+
+    return pcb;
+}

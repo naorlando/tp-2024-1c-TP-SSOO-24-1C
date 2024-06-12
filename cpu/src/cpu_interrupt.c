@@ -20,6 +20,11 @@ void atender_cpu_kernel_interrupt(t_log* logger)
         case MSG_QUANTUM:
             // logica a implementar cuando llega este tipo de interrupcion.
             interrupcion_pendiente = true;
+            sem_wait(&SEM_INTERRUPT); // BINARIO
+            // variable global: tipo_de_interrupcion
+            // hay condicion de carrera ya que pueden entrar una interrupcion de IO y una de QUANTUM al mismo tiempo, 
+            // queriendo modificar la misma variable.
+            tipo_de_interrupcion = MSG_QUANTUM;
             log_info(logger, "Se recibio un mensaje de interrupcion por QUANTUM del kernel");
             break;
 
@@ -40,7 +45,8 @@ bool manejar_interrupcion() {
         //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
         // de enviar de nuevo al kernel
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
-        send_pcb_kernel_interruption();
+        send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
+        sem_post(&SEM_INTERRUPT);
         interrupcion_pendiente = false; 
         log_info(logger_cpu, "PCB enviado al Kernel");
         return true;

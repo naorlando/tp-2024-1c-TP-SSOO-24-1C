@@ -6,6 +6,7 @@
 #include <commons/log.h>
 #include "utils/estructuras.h"
 #include "cpu_config.h"
+#include <semaphore.h>
 
 #define SERVERNAME "CPU"
 #define SERVER_MEMORIA "SERVER MEMORIA"
@@ -17,6 +18,10 @@ extern t_log* logger_cpu_debug;
 extern t_cpu_registers* cpu_registers;
 extern t_PCB* pcb_execute;
 extern bool interrupcion_pendiente;
+extern int tipo_de_interrupcion;
+
+//Semaforos
+extern sem_t SEM_INTERRUPT; // BINARIO
 
 // CONFIG
 extern t_config *config_cpu;

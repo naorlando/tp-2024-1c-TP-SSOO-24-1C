@@ -92,7 +92,17 @@ void send_pcb_kernel()
     send_pcb(MSG_PCB_KERNEL, fd_kernel_dispatch, pcb_execute);
 }
 
-void send_pcb_kernel_interruption()
+void send_pcb_kernel_interruption(int tipo_de_interrupcion)
 {
-    send_pcb(MSG_PCB_KERNEL_INTERRUPTION, fd_kernel_dispatch, pcb_execute);
+    switch (tipo_de_interrupcion)
+    {
+    case MSG_QUANTUM:
+            send_pcb(MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, fd_kernel_dispatch, pcb_execute);
+        break;
+    // case MSG_IO:
+    //         send_pcb(MSG_PCB_KERNEL_INTERRUPTION_IO, fd_kernel_dispatch, pcb_execute);
+    //     break;
+    default:
+        break;
+    }
 }

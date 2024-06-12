@@ -7,13 +7,16 @@ int fd_kernel_dispatch;
 int fd_memoria;
 t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
+int tipo_de_interrupcion;
 t_PCB* pcb_execute;
+sem_t SEM_INTERRUPT; 
 
 void init(){
     _iniciar_logger();
     _iniciar_config();
     imprimir_config();
     _init_cpu_registers();
+    initializeSemaphores();
 }
 
 void _init_cpu_registers() {

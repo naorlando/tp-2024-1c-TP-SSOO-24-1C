@@ -5,6 +5,7 @@
 #include "utils/buffer.h"
 #include "utils/protocolo.h"
 #include "protocolo_cpu.h"
+#include "cpu_syncro.h"
 
 extern int fd_server_interrupt;
 

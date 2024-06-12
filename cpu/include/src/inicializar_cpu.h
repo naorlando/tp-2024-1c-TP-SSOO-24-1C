@@ -7,6 +7,7 @@
 #include "utils/estructuras.h"
 #include <commons/config.h>
 #include "cpu_config.h"
+#include "cpu_syncro.h"
 
 void init();
 void _iniciar_logger();
