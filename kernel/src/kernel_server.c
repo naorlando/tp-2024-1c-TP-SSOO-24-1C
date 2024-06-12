@@ -104,23 +104,33 @@ void levantar_servidor()
 
 void inicializar_sockets()
 {
-    // Conexion con cpu_dispatch
-    cpu_dispatch_port = string_itoa(kernel_config->PUERTO_CPU_DISPATCH);
-    fd_cpu_dispatch = crear_conexion(logger_kernel, SERVER_CPU, kernel_config->IP_CPU, cpu_dispatch_port);
+    // Conexion con cpu-dispatch
+    cpu_dispatch_port = string_itoa(obtener_puerto_cpu_dispatch(kernel_config));
+    fd_cpu_dispatch = crear_conexion(logger_kernel, SERVER_CPU, obtener_ip_cpu(kernel_config), cpu_dispatch_port);
 
     if (fd_cpu_dispatch == -1)
     {
-        log_error(logger_kernel, "Error al conectar con la memoria. ABORTANDO");
+        log_error(logger_kernel, "Error al conectar con la CPU-DISPATCH. ABORTANDO");
+        exit(EXIT_FAILURE);
+    }
+
+    // Conexion con cpu-interrupt
+    cpu_interrupt_port = string_itoa(obtener_puerto_cpu_interrupt(kernel_config));
+    fd_cpu_interrupt = crear_conexion(logger_kernel, SERVER_CPU, obtener_ip_cpu(kernel_config), cpu_interrupt_port);
+
+    if (fd_cpu_interrupt == -1)
+    {
+        log_error(logger_kernel, "Error al conectar con la CPU-INTERRUPT. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 
     // Conexion con memoria
-    memoria_port = string_itoa(kernel_config->PUERTO_MEMORIA);
-    fd_kernel_memoria = crear_conexion(logger_kernel, SERVER_MEMORIA, kernel_config->IP_MEMORIA, memoria_port);
+    memoria_port = string_itoa(obtener_puerto_memoria(kernel_config));
+    fd_kernel_memoria = crear_conexion(logger_kernel, SERVER_MEMORIA, obtener_ip_memoria(kernel_config), memoria_port);
 
     if (fd_kernel_memoria == -1)
     {
-        log_error(logger_kernel, "Error al conectar con la CPU. ABORTANDO");
+        log_error(logger_kernel, "Error al conectar con la MEMORIA. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 }
