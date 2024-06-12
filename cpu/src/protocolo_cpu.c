@@ -110,11 +110,11 @@ void send_interface_kernel(/*t_interface interface*/)
     //package_destroy(package);
 }
 
-void send_pcb_kernel_interruption(int tipo_de_interrupcion)
+void send_pcb_kernel_interruption(t_name_interruption tipo_de_interrupcion)
 {
     switch (tipo_de_interrupcion)
     {
-    case MSG_QUANTUM:
+    case QUANTUM_INTERRUPT:
             send_pcb(MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, fd_kernel_dispatch, pcb_execute);
         break;
     // case MSG_IO:

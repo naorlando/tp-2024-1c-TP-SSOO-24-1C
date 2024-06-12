@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <commons/log.h>
 #include "utils/estructuras.h"
+#include "utils/interruption.h"
 #include "cpu_config.h"
 #include <semaphore.h>
 
@@ -17,8 +18,9 @@ extern t_log *logger_cpu;
 extern t_log* logger_cpu_debug;
 extern t_cpu_registers* cpu_registers;
 extern t_PCB* pcb_execute;
+
 extern bool interrupcion_pendiente;
-extern int tipo_de_interrupcion;
+extern t_name_interruption tipo_de_interrupcion;
 
 //Semaforos
 extern sem_t SEM_INTERRUPT; // BINARIO

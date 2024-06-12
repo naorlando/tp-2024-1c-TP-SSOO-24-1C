@@ -101,6 +101,13 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
             break;
         }
+        case EXIT: {
+            log_info(logger_cpu, "EXIT\n");
+            sem_wait(&SEM_INTERRUPT); //BINARIO
+            interrupcion_pendiente = true;
+            tipo_de_interrupcion = EXIT_INTERRUPT;
+            break;
+        }
         default:
             printf("Instrucción no reconocida\n");
             break;
@@ -263,7 +270,7 @@ void manejar_ciclo_de_instruccion() {
 
 bool manejar_interrupcion() {
     if (interrupcion_pendiente) {
-        log_info(logger_cpu, "Interrupción recibida, devolviendo PCB al Kernel");
+        log_info(logger_cpu, "Interrupción de %s recibida, devolviendo PCB al Kernel",obtener_string_from_interruption(tipo_de_interrupcion));
         //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
         // de enviar de nuevo al kernel
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
@@ -276,6 +283,7 @@ bool manejar_interrupcion() {
 
     return false;
 }
+
 
 void solicitar_IO(t_instruction* instruccion)
 {

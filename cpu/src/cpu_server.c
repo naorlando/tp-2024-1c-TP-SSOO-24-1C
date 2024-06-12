@@ -77,12 +77,12 @@ void atender_cpu_kernel_interrupt()
         {
         case MSG_QUANTUM:
             // logica a implementar cuando llega este tipo de interrupcion.
-            interrupcion_pendiente = true;
             sem_wait(&SEM_INTERRUPT); // BINARIO
+            interrupcion_pendiente = true;
             // variable global: tipo_de_interrupcion
             // hay condicion de carrera ya que pueden entrar una interrupcion de IO y una de QUANTUM al mismo tiempo, 
             // queriendo modificar la misma variable.
-            tipo_de_interrupcion = MSG_QUANTUM;
+            tipo_de_interrupcion = QUANTUM_INTERRUPT;
             log_info(logger_cpu, "Se recibio un mensaje de interrupcion por QUANTUM del kernel");
             break;
 
