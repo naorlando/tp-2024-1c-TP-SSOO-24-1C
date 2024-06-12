@@ -6,10 +6,12 @@ t_config *config_kernel;
 t_kernel_config *kernel_config;
 
 int fd_cpu_dispatch;
+int fd_cpu_interrupt;
 int fd_kernel_memoria;
 int fd_server;
 
 char *cpu_dispatch_port;
+char *cpu_interrupt_port; 
 char *memoria_port;
 char *server_port;
 
