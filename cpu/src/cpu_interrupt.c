@@ -1,9 +1,5 @@
 #include "cpu_interrupt.h"
 
-
-int fd_server_interrupt;
-int fd_kernel_interrupt;
-
 void atender_cpu_kernel_interrupt(t_log* logger)
 {
     // while (1)
