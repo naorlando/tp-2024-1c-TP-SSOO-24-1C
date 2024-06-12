@@ -15,7 +15,7 @@ void requests_cpu();
 
 void requests_kernel();
 
-void requests_entradasalida();
+void requests_entradasalida(void*);
 
 void levantar_servidor();
 

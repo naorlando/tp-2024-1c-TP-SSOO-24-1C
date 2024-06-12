@@ -93,11 +93,13 @@ void requests_kernel() {
     }
 }
 
-void requests_entradasalida() {
+void requests_entradasalida(void* cliente_socket)
+{
+    int cliente_io = *(int*)cliente_socket;
     bool esperar = true;
 
     while(esperar) {
-        int cod_operacion = recibir_operacion(fd_entradasalida);
+        int cod_operacion = recibir_operacion(cliente_io);
 
         switch(cod_operacion){
             case EXAMPLE:
