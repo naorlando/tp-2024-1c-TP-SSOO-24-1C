@@ -11,7 +11,10 @@
 			"random": "c",
 			"*.tcc": "c",
 			"string": "c",
-			"typeinfo": "c"
+			"typeinfo": "c",
+			"unordered_map": "c",
+			"numeric": "c",
+			"ostream": "c"
 		},
 		"C_Cpp.errorSquiggles": "disabled",
 	},
