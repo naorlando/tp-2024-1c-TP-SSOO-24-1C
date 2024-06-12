@@ -89,12 +89,16 @@ void _iniciar_config()
         log_error(logger_kernel, "Error al crear la estructura t_kernel_config");
     }
 
-    cargar_kernel_config(kernel_config, config_kernel);
+    if(cargar_kernel_config(kernel_config, config_kernel)) {
+        log_info(logger_kernel, "La estructura t_kernel_config fue cargado correctamente");
+    } else {
+        log_error(logger_kernel, "Error al cargar la estructura t_kernel_config");
+    }
 }
 
 void imprimir_config()
 {
-    log_trace(logger_kernel_debug, "PUERTO DE ESCUCHA DE LA KERNEL: %d", kernel_config->PUERTO_ESCUCHA);
+    log_trace(logger_kernel_debug, "PUERTO DE ESCUCHA DE LA KERNEL: %d", obtener_puerto_escucha(kernel_config));
 }
 
 void _init_table_pcb()
