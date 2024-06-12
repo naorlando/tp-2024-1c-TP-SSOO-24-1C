@@ -1,19 +1,24 @@
 #include "inicializar_cpu.h"
+
 t_log* logger_cpu;
 t_log* logger_cpu_debug;
 t_config* config_cpu;
 t_cpu_config* cpu_config;
+
 int fd_kernel_dispatch;
 int fd_memoria;
+
 t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
 t_PCB* pcb_execute;
 
+char* server_port;
+
 void init(){
     _iniciar_logger();
     _iniciar_config();
-    imprimir_config();
     _init_cpu_registers();
+    imprimir_config();
 }
 
 void _init_cpu_registers() {
@@ -71,5 +76,5 @@ void _iniciar_config(){
 }
 
 void imprimir_config() {
-    log_trace(logger_cpu_debug, "PUERTO DE ESCUCHA DE LA CPU: %d", cpu_config->PUERTO_ESCUCHA_DISPATCH);
+    log_trace(logger_cpu_debug, "PUERTO DE ESCUCHA DE LA CPU: %d", obtener_puerto_escucha_dispatch(cpu_config));
 }
