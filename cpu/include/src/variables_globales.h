@@ -32,6 +32,7 @@ extern int fd_memoria;
 //PORTS
 extern char* server_port_dispatch;
 extern char* server_port_interrupt;
+extern char* memoria_port;
 
 // SEMAFOROS
 //static pthread_mutex_t mutex_cpu_registers = PTHREAD_MUTEX_INITIALIZER;
