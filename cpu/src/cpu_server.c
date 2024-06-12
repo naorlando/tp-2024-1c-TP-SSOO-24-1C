@@ -104,6 +104,17 @@ void inicializar_sockets()
     }
 }
 
+void esperar_clientes()
+{
+    // Esperamos al Kernel-Dispatch
+    log_info(logger_cpu, "Esperando a que se conecte %s - Dispatch",CLIENTE_KERNEL);
+    fd_kernel_dispatch = esperar_cliente(logger_cpu, CLIENTE_KERNEL, fd_server_dispatch);
+
+    // Esperamos al Kernel-Interrupt
+    log_info(logger_cpu, "Esperando a que se conecte %s - Interrupt",CLIENTE_KERNEL);
+    fd_kernel_interrupt = esperar_cliente(logger_cpu, CLIENTE_KERNEL, fd_server_interrupt);
+}
+
 void cerrar_servidor()
 {
     _cerrar_puertos();
