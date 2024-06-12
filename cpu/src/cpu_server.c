@@ -62,6 +62,31 @@ void atender_cpu_memoria()
     }
 }
 
+void atender_cpu_kernel_interrupt()
+{
+    // while (1)
+    // {
+    //     int cod_op = recibir_operacion(logger,fd_kernel_interrupt);
+    //     switch (cod_op)
+    //     {
+    //     case MENSAJE:
+    //         // recibir_mensaje(cliente_fd);
+    //         break;
+    //     case PAQUETE:
+    //         // lista = recibir_paquete(cliente_fd);
+    //         // log_info(logger, "Me llegaron los siguientes valores:\n");
+    //         // list_iterate(lista, (void *)iterator);
+    //         break;
+    //     case -1:
+    //         log_error(logger, "el KERNEL se desconecto. Terminando servidor");
+    //         return EXIT_FAILURE;
+    //     default:
+    //         log_warning(logger, "Operacion desconocida. No quieras meter la pata");
+    //         break;
+    //     }
+    // }
+}
+
 void levantar_servidor()
 {
     server_port_dispatch = string_itoa(obtener_puerto_escucha_dispatch(cpu_config));
@@ -115,11 +140,39 @@ void esperar_clientes()
     fd_kernel_interrupt = esperar_cliente(logger_cpu, CLIENTE_KERNEL, fd_server_interrupt);
 }
 
+void crear_hilos_conexiones() 
+{
+    pthread_t hilo_kernel_dispatch;
+    pthread_t hilo_kernel_interrupt;
+    pthread_t hilo_memoria;
+    
+    // Hilo para manejar mensajes del Kernel-Dispatch
+    if (pthread_create(&hilo_kernel_dispatch, NULL, (void *)atender_cpu_kernel_dispatch, NULL) != 0)
+    {
+        log_error(logger_cpu, "Error al crear el hilo para atender al KERNEL-DISPATCH. ABORTANDO");
+        exit(EXIT_FAILURE);
+    }
+
+    // Hilo para manejar mensajes del Kernel-Interrupt
+    if (pthread_create(&hilo_kernel_interrupt, NULL, (void *)atender_cpu_kernel_interrupt, NULL) != 0)
+    {
+        log_error(logger_cpu, "Error al crear el hilo para atender al KERNEL-INTERRUPT. ABORTANDO");
+        exit(EXIT_FAILURE);
+    }
+
+    // Hilo para manejar mensajes de Memoria
+    if (pthread_create(&hilo_memoria, NULL, (void *)atender_cpu_memoria, NULL) != 0) 
+    {
+        log_error(logger_cpu, "Error al crear el hilo para atender a la MEMORIA. ABORTANDO");
+        exit(EXIT_FAILURE);
+    }
+}
+
 void cerrar_servidor()
 {
     _cerrar_puertos();
     _cerrar_conexiones();
-    log_info(logger_kernel, "SERVER CPU cerrado correctamente.");
+    log_info(logger_cpu, "SERVER CPU cerrado correctamente.");
 }
 
 void _cerrar_puertos()
