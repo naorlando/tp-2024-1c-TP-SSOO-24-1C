@@ -103,3 +103,26 @@ void inicializar_sockets()
         exit(EXIT_FAILURE);
     }
 }
+
+void cerrar_servidor()
+{
+    _cerrar_puertos();
+    _cerrar_conexiones();
+    log_info(logger_kernel, "SERVER CPU cerrado correctamente.");
+}
+
+void _cerrar_puertos()
+{
+    free(server_port_dispatch);
+    free(server_port_interrupt);
+    free(memoria_port);
+}
+
+void _cerrar_conexiones()
+{
+    liberar_conexion(fd_server_dispatch);
+    liberar_conexion(fd_server_interrupt);
+    liberar_conexion(fd_kernel_dispatch);
+    liberar_conexion(fd_kernel_interrupt);
+    liberar_conexion(fd_memoria);
+}
