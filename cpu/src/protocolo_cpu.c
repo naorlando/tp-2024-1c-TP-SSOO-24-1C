@@ -25,9 +25,10 @@ t_PCB* recv_pcb_cpu()
 {
     t_buffer* buffer = recive_full_buffer(fd_kernel_dispatch);
     t_PCB* pcb = deserialize_pcb(buffer);
-    log_info(logger_cpu, "PCB pc => %d", pcb->program_counter);
-    log_info(logger_cpu, "PCB Quantum => %d", pcb->quantum);
-    log_info(logger_cpu, "PCB cpu_registers AX => %d", pcb->cpu_registers->ax);
+    log_info(logger_cpu, "Se recibio un PCB del Kernel, PID => %d", pcb->pid);
+    // log_info(logger_cpu, "PCB pc => %d", pcb->program_counter);
+    // log_info(logger_cpu, "PCB Quantum => %d", pcb->quantum);
+    // log_info(logger_cpu, "PCB cpu_registers AX => %d", pcb->cpu_registers->ax);
 
     //pcb_destroy(pcb);
     buffer_destroy(buffer);
@@ -107,4 +108,19 @@ void send_interface_kernel(/*t_interface interface*/)
 
     //Elimino el paquete usado
     //package_destroy(package);
+}
+
+void send_pcb_kernel_interruption(int tipo_de_interrupcion)
+{
+    switch (tipo_de_interrupcion)
+    {
+    case MSG_QUANTUM:
+            send_pcb(MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, fd_kernel_dispatch, pcb_execute);
+        break;
+    // case MSG_IO:
+    //         send_pcb(MSG_PCB_KERNEL_INTERRUPTION_IO, fd_kernel_dispatch, pcb_execute);
+    //     break;
+    default:
+        break;
+    }
 }

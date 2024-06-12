@@ -8,6 +8,7 @@
 #include <commons/config.h>
 #include "cpu_config.h"
 #include <variables_globales.h>
+#include "cpu_syncro.h"
 
 void init();
 void _iniciar_logger();

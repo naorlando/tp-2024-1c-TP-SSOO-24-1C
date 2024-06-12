@@ -9,11 +9,14 @@ int fd_server_dispatch;
 int fd_server_interrupt;
 int fd_kernel_interrupt;
 int fd_kernel_dispatch;
+int fd_kernel_interrupt;
 int fd_memoria;
 
 t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
+int tipo_de_interrupcion;
 t_PCB* pcb_execute;
+sem_t SEM_INTERRUPT; 
 
 char* server_port_interrupt;
 char* server_port_dispatch;
@@ -24,6 +27,7 @@ void init(){
     _iniciar_config();
     _init_cpu_registers();
     imprimir_config();
+    initializeSemaphores();
 }
 
 void _init_cpu_registers() {

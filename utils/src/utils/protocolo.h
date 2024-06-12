@@ -36,6 +36,8 @@ typedef enum
     MSG_IO_KERNEL,
     MSG_KERNEL_IO,
     MSG_PCB_IO_KERNEL,
+    MSG_QUANTUM, // KERNEL -> CPU (interrupcion por fin de quantum)
+    MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, // CPU -> KERNEL (devuelvo pcb de proceso a kernel con interrupcion por fin de quantum)
     // KERNEL <-> MEMORIA
     MSG_KERNEL_MEMORIA,
     MSG_MEMORIA_KERNEL,
