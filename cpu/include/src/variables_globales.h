@@ -23,12 +23,15 @@ extern t_config *config_cpu;
 extern t_cpu_config *cpu_config;
 
 // FD
+extern int fd_server_dispatch;
+extern int fd_server_interrupt;
 extern int fd_kernel_dispatch;
 extern int fd_kernel_interrupt;
 extern int fd_memoria;
 
 //PORTS
-extern char* server_port;
+extern char* server_port_dispatch;
+extern char* server_port_interrupt;
 
 // SEMAFOROS
 //static pthread_mutex_t mutex_cpu_registers = PTHREAD_MUTEX_INITIALIZER;
