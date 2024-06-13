@@ -1,5 +1,4 @@
 #include "memoria_config.h"
-#include <stdbool.h>
 
 t_memoria_config* crear_memoria_config(){
     t_memoria_config* mc = malloc(sizeof(t_memoria_config));
@@ -12,7 +11,7 @@ t_memoria_config* crear_memoria_config(){
 }
 
 void destruir(t_memoria_config* mc){
-
+    free(mc);
 }
 
 bool cargar_memoria_config(t_memoria_config* mc, t_config* cf){
@@ -23,4 +22,24 @@ bool cargar_memoria_config(t_memoria_config* mc, t_config* cf){
     mc->RETARDO_RESPUESTA = config_get_int_value(cf, "RETARDO_RESPUESTA");
 
     return true;
+}
+
+char* obtener_path_instrucciones(t_memoria_config* mc) {
+    return mc->PATH_INSTRUCCIONES;
+}
+
+uint16_t obtener_tam_memoria(t_memoria_config* mc) {
+    return mc->TAM_MEMORIA;
+}
+
+uint16_t obtener_tam_pagina(t_memoria_config* mc) {
+    return mc->TAM_PAGINA;
+}
+
+uint16_t obtener_retardo_respuesta(t_memoria_config* mc) {
+    return mc->RETARDO_RESPUESTA;
+}
+
+uint16_t obtener_puerto_escucha(t_memoria_config* mc) {
+    return mc->PUERTO_ESCUCHA;
 }

@@ -6,21 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <commons/log.h>
-#include <protocolo_cpu.h>
-#include "utils/sockets.h"
+#include "inicializar_cpu.h"
+#include "cpu_server.h"
 
 
 #define SERVERNAME "CPU"
-
-/* incluir .h files del cpu*/
-
-#include "cpu_config.h"
-#include "inicializar_cpu.h"
-#include "cpu_dispatch.h"
-
 
 
 #endif

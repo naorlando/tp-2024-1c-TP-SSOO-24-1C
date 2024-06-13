@@ -1,13 +1,22 @@
 #include <inicializar_entradasalida.h>
 
-void init(){
+int fd_memoria;
+int fd_kernel;
+
+t_log* logger_entradasalida;
+t_log* logger_entradasalida_debug;
+
+t_config* config_entradasalida;
+t_IO_config* entradasalida_config;
+
+char* kernel_port;
+char* memoria_port;
+
+void init(char* nombre_interfaz, char* config_path){
     _iniciar_logger();
-    _iniciar_config();
-    _imprimir_config();
-
+    _iniciar_config(config_path);
+    _imprimir_config(nombre_interfaz);
 }
-
-//================================================================//
 
 void _iniciar_logger(){
 
@@ -30,8 +39,8 @@ void _iniciar_logger(){
     }
 }
 
-void _iniciar_config() {
-    config_entradasalida = config_create("/home/utnso/tp-2024-1c-TP-SSOO-24-1C/entradasalida/cfg/entradasalida.config");
+void _iniciar_config(char *config_path) {
+    config_entradasalida = config_create(config_path);
 
     if (config_entradasalida == NULL)
     {
@@ -39,43 +48,27 @@ void _iniciar_config() {
         exit(EXIT_FAILURE);
     }
 
-        // mover a modulo que corresponda:
-    // TIPO_INTERFAZ = config_get_string_value(config_entradasalida, "TIPO_INTERFAZ");
-    // TIEMPO_UNIDAD_TRABAJO = config_get_int_value(config_entradasalida, "TIEMPO_UNIDAD_TRABAJO");
-    // IP_KERNEL = config_get_string_value(config_entradasalida, "IP_KERNEL");
-    // PUERTO_KERNEL = config_get_string_value(config_entradasalida, "PUERTO_KERNEL");
-    // IP_MEMORIA = config_get_string_value(config_entradasalida, "IP_MEMORIA");
-    // PUERTO_MEMORIA = config_get_string_value(config_entradasalida, "PUERTO_MEMORIA");
-    // PATH_BASE_DIALFS = config_get_string_value(config_entradasalida, "PATH_BASE_DIALFS");
-    // BLOCK_SIZE = config_get_int_value(config_entradasalida, "BLOCK_SIZE");
-    // BLOCK_COUNT = config_get_int_value(config_entradasalida, "BLOCK_COUNT");
+    //Creo la estructura para guardar los datos del archivo de configuracion
+    entradasalida_config = crear_IO_config();
 
-    // ------------------------- para que? --------------------------------- //
+    if(entradasalida_config == NULL){
+        log_error(logger_entradasalida, "Error al crear la estructura t_IO_config");
+    }
 
-    // Creo la estructura para guardar los datos del archivo de configuracion
-    // entradasalida_config = crear_entradasalida_config();
+    bool cargo = cargar_IO_config(entradasalida_config, config_entradasalida);
 
-    // if (entradasalida_config == NULL)
-    // {
-    //     log_error(logger_entradasalida, "Error al crear la estructura t_entradasalida_config");
-    // }
-
-    // cargar_entradasalida_config(entradasalida_config, config_entradasalida);
-
-    // ------------------------- para que? ---------------------------------//
-    
-    // Reemplazo el código anterior leyendo sólo los campos necesarios para Interfaz Genérica
-    TIPO_INTERFAZ = config_get_string_value(config_entradasalida, "TIPO_INTERFAZ"); 
-    TIEMPO_UNIDAD_TRABAJO = config_get_int_value(config_entradasalida, "TIEMPO_UNIDAD_TRABAJO");
-    IP_KERNEL = config_get_string_value(config_entradasalida, "IP_KERNEL");
-    PUERTO_KERNEL = config_get_string_value(config_entradasalida, "PUERTO_KERNEL");
+    if(!cargo){
+        log_error(logger_entradasalida, "Error al cargar entradasalida config");
+    }else{
+        log_info(logger_entradasalida, "Se cargo correctamente ENTRADASALIDA.CONFIG");
+    }
 }
 
-void _imprimir_config() {    
+void _imprimir_config(char* nombre_interfaz) {    
     // Comento código anterior
     // log_info(logger_entradasalida, "Entrada/salida inicializado");
     
     // Reemplazo el código anterior mostrando un mensaje de inicialización de Interfaz Genérica
-    log_info(logger_entradasalida, "Interfaz Genérica inicializada");
+    log_info(logger_entradasalida, "Interfaz %s de tipo %s inicializada", nombre_interfaz, obtener_tipo_interfaz(entradasalida_config));
 }
 

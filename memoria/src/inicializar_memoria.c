@@ -4,15 +4,19 @@ t_log* logger_memoria;
 t_log* logger_memoria_debug;
 t_config* config_memoria;
 t_memoria_config* memoria_config;
+t_dictionary* tabla_procesos;
 
 int fd_server;
 int fd_entradasalida;
 int fd_cpu;
 int fd_kernel;
 
+char* server_port;
+
 void init(){
     _iniciar_logger();
     _iniciar_config();
+    _iniciar_tabla_procesos();
     imprimir_config();
 }
 
@@ -57,6 +61,16 @@ void _iniciar_config(){
     }
 }
 
+void _iniciar_tabla_procesos(){
+    crear_tabla_procesos();
+
+    if(tabla_procesos != NULL) {
+        log_info(logger_memoria, "Se creo correctamente la tabla de procesos.");
+    }else {
+        log_error(logger_memoria, "Error al crear la tabla de procesos.");
+    }
+}
+
 void imprimir_config() {
-    log_trace(logger_memoria_debug, "PUERTO DE ESCUCHA DE LA MEMORIA: %d", memoria_config->PUERTO_ESCUCHA);
+    log_trace(logger_memoria_debug, "PUERTO DE ESCUCHA DE LA MEMORIA: %d", obtener_puerto_escucha(memoria_config));
 }

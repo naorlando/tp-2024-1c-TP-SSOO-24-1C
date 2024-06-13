@@ -9,14 +9,12 @@
 
 int send_example_cpu();
 int send_example_memoria();
-int send_pcb_cpu();
+void send_pcb_cpu(t_PCB*);
 // void requests_entradasalida();
 int recv_example_msg_entradasalida();
-
-void atender_kernel_memoria();
-void atender_kernel_IO();
-void atender_kernel_cpu_dispatch();
 int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo);
 int recibir_confirmacion_io();
+int recv_example_msg_entradasalida(int);
+t_PCB* recv_pcb_interrupt();
 
 #endif

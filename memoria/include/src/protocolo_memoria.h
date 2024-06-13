@@ -5,12 +5,8 @@
 #include <utils/sockets.h>
 #include "variables_globales.h"
 #include "utils/protocolo.h"
-
-void requests_cpu();
-
-void requests_kernel();
-
-void requests_entradasalida();
+#include "utils/buffer.h"
+#include "gestion_procesos.h" 
 
 int recv_example_msg_cpu();
 
@@ -18,6 +14,10 @@ int recv_example_msg_kernel();
 
 int recv_example_msg_entradasalida();
 
-void recv_crear_proceso_kernel();
+t_new_process* recv_process_kernel();
+
+t_next_instruction* recv_next_instruction();
+
+void send_instrution(t_instruction*);
 
 #endif /*PROTOCOLO_MEMORIA_H_*/

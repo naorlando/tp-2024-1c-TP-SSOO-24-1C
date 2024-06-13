@@ -2,47 +2,11 @@
 #define ENTRADASALIDA_H_
 
 #include<variables_globales.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <pthread.h>
-#include <commons/string.h>
-#include <commons/config.h>
-#include <commons/log.h>
-#include <utils/sockets.h>
-#include <utils/protocolo.h>
-#include<inicializar_entradasalida.h>
-#include <protocolo_entrada.h>
-
-
-/*
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
- VARIABLES GLOBALES: ir agregando al variables_globales.h
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-*/
-int conexion_io_memoria;
-int conexion_io_kernel;
-int fd_entradasalida;
-int fd_memoria;
-int fd_kernel;
-
-t_log *logger_entradasalida;
-t_log *logger_entradasalida_debug;
-t_config *config_entradasalida;
-// t_entradasalida_config* entradasalida_config;
-
-//Datos de la CONFIG:
-char* TIPO_INTERFAZ;
-int TIEMPO_UNIDAD_TRABAJO;
-char* IP_KERNEL;
-char* PUERTO_KERNEL;
-char* IP_MEMORIA;
-char* PUERTO_MEMORIA;
-char* PATH_BASE_DIALFS;
-int BLOCK_SIZE;
-int BLOCK_COUNT;
-
+#include <inicializar_entradasalida.h>
+#include <entradasalida_server.h>
 
 
 

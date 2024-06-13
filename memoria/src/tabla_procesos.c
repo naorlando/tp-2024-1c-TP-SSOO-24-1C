@@ -1,17 +1,9 @@
 #include "tabla_procesos.h"
 
-//Tabla de procesos que van a estar en memoria
-t_dictionary* tabla_procesos;
-
 bool agregar_proceso(t_proceso* proceso) {
-    if(_esta_vacia_tabla()){
-        bool creacion_tabla = _crear_tabla();
+    if(!_existe_tabla()) return false;
 
-        //Hubo problemas al crear la tabla
-        if (!creacion_tabla) return false;
-    }
-
-    char* key = uint8_to_string(obtener_pid(proceso));
+    char* key = uint32_to_string(obtener_pid(proceso));
 
     if(key == NULL) return false;
 
@@ -20,7 +12,7 @@ bool agregar_proceso(t_proceso* proceso) {
     return true;
 }
 
-t_proceso* obtener_proceso(uint8_t pid) {
+t_proceso* obtener_proceso(uint32_t pid) {
     if(_esta_vacia_tabla()) return NULL;
 
     char* key = uint8_to_string(pid);
@@ -29,26 +21,30 @@ t_proceso* obtener_proceso(uint8_t pid) {
 
     t_proceso* proceso = (t_proceso*)dictionary_get(tabla_procesos, key);
     
-    return (proceso != NULL) proceso : NULL;
+    return (proceso != NULL) ? proceso : NULL;
 }
 
-bool eliminar_proceso(uint8_t pid) {
+bool eliminar_proceso(uint32_t pid) {
 
     if(_esta_vacia_tabla()) return false;
 
     bool seElimino= true;
 
-    char* key = uint8_to_string(pid);
+    char* key = uint32_to_string(pid);
 
     if(key == NULL) return false;
 
     if(dictionary_has_key(tabla_procesos, key)) {
-        dictionary_remove_and_destroy(tabla_procesos, key, eliminar_proceso);
+        dictionary_remove_and_destroy(tabla_procesos, key, free_proceso);
     }else{
         seElimino= false;
     }
 
     return seElimino;
+}
+
+void free_proceso(void* proceso){
+    liberar_proceso((t_proceso*) proceso);
 }
 
 uint8_t cantidad_procesos_activos() {
@@ -58,17 +54,19 @@ uint8_t cantidad_procesos_activos() {
 void eliminar_tabla() {
 
     if(!_esta_vacia_tabla()){
-        dictionary_clean_and_destroy_elements(tabla_procesos, eliminar_proceso);
+        dictionary_clean_and_destroy_elements(tabla_procesos, free_proceso);
     }
 }
 
-bool _crear_tabla(){
+void crear_tabla_procesos(){
     tabla_procesos = dictionary_create();
-
-    return (tabla_procesos != NULL) ? true : false; 
 }
 
 bool _esta_vacia_tabla(){
     return dictionary_is_empty(tabla_procesos);
+}
+
+bool _existe_tabla(){
+    return tabla_procesos != NULL;
 }
 

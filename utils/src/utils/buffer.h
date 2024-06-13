@@ -29,6 +29,11 @@ typedef struct
 // Post: Se retorna un buffer con un size pasado por parametro y offset en 0.
 t_buffer* buffer_create(uint32_t);
 
+// Obtiene el tamaño del buffer.
+// Pre: El buffer ha sido creado previamente.
+// Post: Retorna el tamaño en bytes del buffer.
+uint32_t get_size_buffer(t_buffer*);
+
 // Destruye un buffer.
 // Pre: El buffer ha sido creado previamente.
 // Post: Se libera la memoria asignada al buffer.
@@ -102,8 +107,8 @@ uint16_t buffer_read_uint16(t_buffer* buffer);
 
 // Lee una cadena de caracteres del buffer.
 // Pre: El buffer ha sido creado previamente y contiene una cadena de caracteres.
-// Post: Se lee la cadena de caracteres del buffer y se devuelve junto con su longitud.
-char* buffer_read_string(t_buffer*, uint32_t*);
+// Post: Se lee la cadena de caracteres del buffer y se devuelve.
+char* buffer_read_string(t_buffer*, uint32_t);
 
 // Agrega un entero de 8 bits al buffer.
 // Pre: El buffer ha sido creado previamente y tiene espacio suficiente.
@@ -120,8 +125,24 @@ void buffer_add_uint16(t_buffer*, uint16_t);
 // Post: Se agrega el entero de 32 bits al buffer.
 void buffer_add_uint32(t_buffer*, uint32_t);
 
-// Agrega una cadena de caracteres al buffer.
+// Agrega una cadena de caracteres al buffer, le añade a la cadena un caracter
+// para el caracter fin de cadena.
 // Pre: El buffer ha sido creado previamente y tiene espacio suficiente.
 // Post: Se agrega la cadena de caracteres al buffer.
 void buffer_add_string(t_buffer*, char*);
+
+// Añade el contenido de un buffer a otro buffer.
+// Pre: Ambos buffers han sido creados previamente.
+//      buffer_destination es el buffer al que se añadirá el contenido.
+//      buffer_source es el buffer cuyo contenido será añadido.
+// Post: Los datos de buffer_source se añaden al final de buffer_destination.
+void buffer_add_buffer(t_buffer*, t_buffer*);
+
+// Añade una parte del contenido de un buffer origen a un buffer destino.
+// Pre: Ambos buffers han sido creados previamente.
+//      buffer_destination es el buffer al que se añadirá el contenido.
+//      buffer_source es el buffer cuyo contenido será añadido.
+//      length es la cantidad de datos a copiar desde buffer_source.
+// Post: Los datos con el tamaño de length en buffer_source se añaden al final de buffer_destination.
+void buffer_add_partial_buffer(t_buffer*, t_buffer*, uint32_t);
 #endif

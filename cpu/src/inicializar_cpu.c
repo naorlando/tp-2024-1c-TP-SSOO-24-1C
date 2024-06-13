@@ -1,16 +1,54 @@
 #include "inicializar_cpu.h"
+
 t_log* logger_cpu;
 t_log* logger_cpu_debug;
 t_config* config_cpu;
 t_cpu_config* cpu_config;
+
+int fd_server_dispatch;
+int fd_server_interrupt;
+int fd_kernel_interrupt;
 int fd_kernel_dispatch;
+int fd_kernel_interrupt;
 int fd_memoria;
+
+t_cpu_registers* cpu_registers;
+bool interrupcion_pendiente= false;
+int tipo_de_interrupcion;
+t_PCB* pcb_execute;
+sem_t SEM_INTERRUPT; 
+
+char* server_port_interrupt;
+char* server_port_dispatch;
+char* memoria_port;
 
 void init(){
     _iniciar_logger();
     _iniciar_config();
+    _init_cpu_registers();
     imprimir_config();
+    initializeSemaphores();
 }
+
+void _init_cpu_registers() {
+    cpu_registers = malloc(sizeof(t_cpu_registers));
+    
+    cpu_registers->pc = 0;
+    cpu_registers->ax = 0;
+    cpu_registers->bx = 0;
+    cpu_registers->cx = 0;
+    cpu_registers->dx = 0;
+    cpu_registers->eax = 0;
+    cpu_registers->ebx = 0;
+    cpu_registers->ecx = 0;
+    cpu_registers->edx = 0;
+    cpu_registers->si = 0;
+    cpu_registers->di = 0;
+
+   
+    log_info(logger_cpu, "Se inicializaron los registros de la CPU");
+}
+
 
 void _iniciar_logger(){
     logger_cpu = log_create("cpu.log", "CPU_LOG", 1, LOG_LEVEL_INFO);
@@ -43,9 +81,14 @@ void _iniciar_config(){
         log_error(logger_cpu, "Error al crear la estructura t_cpu_config");
     }
 
-    cargar_cpu_config(cpu_config, config_cpu);
+    if(cargar_cpu_config(cpu_config, config_cpu)) {
+        log_info(logger_cpu, "La estructura t_cpu_config fue cargado correctamente");
+    } else {
+        log_error(logger_cpu, "Error al cargar la estructura t_cpu_config");
+    }
+
 }
 
 void imprimir_config() {
-    log_trace(logger_cpu_debug, "PUERTO DE ESCUCHA DE LA CPU: %d", cpu_config->PUERTO_ESCUCHA_DISPATCH);
+    log_trace(logger_cpu_debug, "PUERTO DE ESCUCHA DE LA CPU: %d", obtener_puerto_escucha_dispatch(cpu_config));
 }

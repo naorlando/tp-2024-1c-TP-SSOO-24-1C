@@ -7,12 +7,11 @@
 // PCB
 t_PCB *pcb_create(uint32_t pid, uint32_t quantum)
 {
-
     t_PCB *pcb = malloc(sizeof(t_PCB));
 
     pcb->pid = pid;
-    pcb->program_counter = 0;
     pcb->quantum = quantum;
+    pcb->program_counter = 0;
     pcb->cpu_registers = cpu_registers_create();
 
     return pcb;
@@ -21,15 +20,23 @@ t_PCB *pcb_create(uint32_t pid, uint32_t quantum)
 
 void pcb_destroy(t_PCB *pcb)
 {
-
     cpu_registers_destroy(pcb->cpu_registers);
     free(pcb);
+}
+
+t_cpu_registers* get_cpu_registers(t_PCB* pcb)
+{
+    return pcb->cpu_registers;
+}
+
+uint32_t get_pcb_size(t_PCB* pcb)
+{
+    return (sizeof(uint32_t) * 3) + get_cpu_registers_size(get_cpu_registers(pcb));
 }
 
 // CPU registers
 t_cpu_registers *cpu_registers_create()
 {
-
     t_cpu_registers *cpu_registers = malloc(sizeof(t_cpu_registers));
 
     cpu_registers->pc = 0;
@@ -49,33 +56,46 @@ t_cpu_registers *cpu_registers_create()
 
 void cpu_registers_destroy(t_cpu_registers *cpu_registers)
 {
-
     if(cpu_registers != NULL){
-    free(cpu_registers);
+        free(cpu_registers);
     }
 }
 
+uint32_t get_cpu_registers_size(t_cpu_registers *cpu_registers)
+{
+    return (sizeof(uint32_t) * 7) + (sizeof(uint8_t) * 4);
+}
+
 // lo usa memoria para crear un proceso
-t_proceso* crear_proceso(uint32_t pid, const char* path) {
-    t_proceso* proceso = malloc(sizeof(t_proceso));
-    proceso->pid = pid;
-    proceso->path = strdup(path);
-    return proceso;
-}
+// t_proceso* crear_proceso(uint32_t pid, const char* path) {
+//     t_proceso* proceso = malloc(sizeof(t_proceso));
+//     proceso->pid = pid;
+//     proceso->path = strdup(path);
+//     return proceso;
+// }
 
-void destruir_proceso(t_proceso* proceso) {
-    free(proceso->path);
-    // list_destroy(proceso->tabla_paginas);
-    free(proceso);
-}
+// void destruir_proceso(t_proceso* proceso) {
+//     free(proceso->path);
+//     // list_destroy(proceso->tabla_paginas);
+//     free(proceso);
+// }
 // 
-t_nuevo_proceso* create_new_process(uint32_t pid,const char* path){
-    
-     t_nuevo_proceso *t_nuevo_proceso = malloc(sizeof(t_nuevo_proceso));
+t_new_process* create_new_process(uint32_t pid,char* path)
+{    
+    t_new_process *new_process = malloc(sizeof(t_new_process));
 
-    t_nuevo_proceso->pid = pid;
-    t_nuevo_proceso->path;
+    new_process->pid = pid;
+    new_process->path = strdup(path);
 
-    return t_nuevo_proceso;
+    return new_process;
     
+}
+
+void destroy_new_process(t_new_process* new_process) 
+{
+    if(new_process->path != NULL) {
+        free(new_process->path);
+    }
+
+    free(new_process);
 }
