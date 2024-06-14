@@ -1,11 +1,12 @@
-#include <protocolo_entrada.h>
-#include <utils/solicitudes_io.h>
+#include "protocolo_entradasalida.h"
+#include "solicitudes_io.h"
 
 //======================================================
 //        FUNCIONES DE ENTRADA/SALIDA GENERICA
 //======================================================
 
-//Agrego la función para atender instrucción de interfaz genérica (IO_GEN_SLEEP)
+// Función que atiende una instrucción genérica de entrada/salida, 
+// la cual consiste en esperar un tiempo determinado
 void atender_instruccion_generica(int fd) {
     t_io_generica *io_generica = deserializar_io_generica(recibir_buffer(fd));
     if (io_generica != NULL) {
@@ -20,83 +21,26 @@ void atender_instruccion_generica(int fd) {
     }
 }
 
-// Función auxiliar para confirmar recepción de instrucción a Kernel
-void enviar_confirmacion_io(int fd) {
-    t_package *package = package_create(MSG_KERNEL_IO);
-    package_send(package, fd);
-    package_destroy(package);
-}
-
-//======================================================
-
-//Agrego la función para enviar una confirmación al Kernel después de procesar una instrucción
-int enviar_confirmacion(int fd, t_msg_header header) {
-    t_package *package = package_create(header);
-    if (package_send(package, fd) != EXIT_SUCCESS) {
-        log_error(logger_entradasalida, "Error al enviar confirmación");
-        package_destroy(package);
-        return -1;
-    }
-    package_destroy(package);
-    return 0;
-}
-
-int recv_example_msg_kernel()
-{
-    log_info(logger_entradasalida, "<<<<< EXAMPLE RECIVE MESSAGE FROM KERNEL>>>>");
-
-    t_message_example* new_msg = recv_example(fd_kernel);
-
-    log_info(logger_entradasalida, "MENSAJE => %s", get_cadena(new_msg));
-    log_info(logger_entradasalida, "ENTERO => %d", get_entero(new_msg));
-    
-    message_example_destroy(new_msg);
-
-    return 0;
-}
-
-int send_example_kernel()
-{
-    char* cadena = "ENTRADASALIDA ENVIO MENSAJE A KERNEL";
-    uint8_t entero = 7;
-
-    return send_example(cadena, entero, fd_kernel);
-}
-
-int send_example_memoria()
-{
-    char* cadena = "ENTRADASALIDA ENVIO MENSAJE A MEMORIA";
-    uint8_t entero = 9;
-
-    return send_example(cadena, entero, fd_memoria);
-}
-
 //======================================================
 //          FUNCIONES DE ENTRADA/SALIDA STDIN
 //======================================================
 
-// Agrego la función para atender instrucción de interfaz STDIN (IO_STDIN_READ), 
-// que recibe un texto por consola y lo escribe en memoria
+// Función que atiende una instrucción de entrada/salida STDIN,
+// la cual consiste en leer un texto desde la consola y guardarlo en memoria
 void atender_instruccion_stdin(int fd) {
-    t_instruction *instruccion = recibir_instruccion(fd);
-    if (instruccion != NULL) {
-        if (instruccion->name == IO_STDIN_READ) {
-            char *input = readline("Ingrese un texto: ");
-            uint32_t direccion_fisica = (uint32_t)atoi(list_get(instruccion->params, 1));
-            uint32_t tamanio = (uint32_t)atoi(list_get(instruccion->params, 2));
-            escribir_memoria(direccion_fisica, input, tamanio);
-            free(input);
-        } else {
-            log_warning(logger_entradasalida, "Instrucción no soportada en dispositivo STDIN");
-        }
+    t_io_stdin *io_stdin = deserializar_io_stdin(recibir_buffer(fd));
+    if (io_stdin != NULL) {
+        char *input = readline("Ingrese un texto: ");
+        escribir_memoria(io_stdin->direccion_fisica, input, io_stdin->tamanio);
+        free(input);
         enviar_confirmacion_io(fd);
-        eliminar_instruccion(instruccion);
+        destruir_io_stdin(io_stdin);
     } else {
-        log_error(logger_entradasalida, "Error al recibir instrucción");
+        log_error(logger_entradasalida, "Error al recibir IO STDIN");
     }
 }
 
-// Función auxiliar para escribir en memoria un valor
+// Función auxiliar que escribe en memoria el valor recibido
 void escribir_memoria(uint32_t direccion_fisica, char *valor, uint32_t tamanio) {
     t_package *package = package_create(MSG_WRITE_MEMORY);
     t_buffer *buffer = get_buffer(package);
@@ -111,27 +55,22 @@ void escribir_memoria(uint32_t direccion_fisica, char *valor, uint32_t tamanio) 
 //          FUNCIONES DE ENTRADA/SALIDA STDOUT
 //======================================================
 
-// Agrego la función para atender instrucción de interfaz STDOUT (IO_STDOUT_WRITE)
+// Función que atiende una instrucción de entrada/salida STDOUT,
+// la cual consiste en leer un texto desde memoria y mostrarlo por consola
 void atender_instruccion_stdout(int fd) {
-    t_instruction *instruccion = recibir_instruccion(fd);
-    if (instruccion != NULL) {
-        if (instruccion->name == IO_STDOUT_WRITE) {
-            uint32_t direccion_fisica = (uint32_t)atoi(list_get(instruccion->params, 1));
-            uint32_t tamanio = (uint32_t)atoi(list_get(instruccion->params, 2));
-            char *valor = leer_memoria(direccion_fisica, tamanio);
-            printf("%.*s", tamanio, valor);
-            free(valor);
-        } else {
-            log_warning(logger_entradasalida, "Instrucción no soportada en dispositivo STDOUT");
-        }
+    t_io_stdout *io_stdout = deserializar_io_stdout(recibir_buffer(fd));
+    if (io_stdout != NULL) {
+        char *valor = leer_memoria(io_stdout->direccion_fisica, io_stdout->tamanio);
+        printf("%.*s", io_stdout->tamanio, valor);
+        free(valor);
         enviar_confirmacion_io(fd);
-        eliminar_instruccion(instruccion);
+        destruir_io_stdout(io_stdout);
     } else {
-        log_error(logger_entradasalida, "Error al recibir instrucción");
+        log_error(logger_entradasalida, "Error al recibir IO STDOUT");
     }
 }
 
-// Función auxiliar para leer un valor enviado desde memoria
+// Función auxiliar que lee la memoria de la dirección física y devuelve el valor leído
 char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
     t_package *package = package_create(MSG_READ_MEMORY);
     t_buffer *buffer = get_buffer(package);
@@ -152,3 +91,16 @@ char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
 //======================================================
 
 // A implementar!
+
+
+
+//======================================================
+//               FUNCIONES DE COMUNES
+//======================================================
+
+// Función auxiliar que envía una confirmación de la operación de entrada/salida
+void enviar_confirmacion_io(int fd) {
+    t_package *package = package_create(MSG_KERNEL_IO);
+    package_send(package, fd);
+    package_destroy(package);
+}
