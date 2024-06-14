@@ -138,6 +138,7 @@ void atender_instruccion_stdin(int fd) {
     }
 }
 
+// Función auxiliar para escribir en memoria un valor
 void escribir_memoria(uint32_t direccion_fisica, char *valor, uint32_t tamanio) {
     t_package *package = package_create(MSG_WRITE_MEMORY);
     t_buffer *buffer = get_buffer(package);
@@ -147,3 +148,49 @@ void escribir_memoria(uint32_t direccion_fisica, char *valor, uint32_t tamanio) 
     package_send(package, fd_memoria);
     package_destroy(package);
 }
+
+//======================================================
+//          FUNCIONES DE ENTRADA/SALIDA STDOUT
+//======================================================
+
+// Agrego la función para atender instrucción de interfaz STDOUT (IO_STDOUT_WRITE)
+void atender_instruccion_stdout(int fd) {
+    t_instruction *instruccion = recibir_instruccion(fd);
+    if (instruccion != NULL) {
+        if (instruccion->name == IO_STDOUT_WRITE) {
+            uint32_t direccion_fisica = (uint32_t)atoi(list_get(instruccion->params, 1));
+            uint32_t tamanio = (uint32_t)atoi(list_get(instruccion->params, 2));
+            char *valor = leer_memoria(direccion_fisica, tamanio);
+            printf("%.*s", tamanio, valor);
+            free(valor);
+        } else {
+            log_warning(logger_entradasalida, "Instrucción no soportada en dispositivo STDOUT");
+        }
+        enviar_confirmacion_io(fd);
+        eliminar_instruccion(instruccion);
+    } else {
+        log_error(logger_entradasalida, "Error al recibir instrucción");
+    }
+}
+
+// Función auxiliar para leer un valor enviado desde memoria
+char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
+    t_package *package = package_create(MSG_READ_MEMORY);
+    t_buffer *buffer = get_buffer(package);
+    buffer_add_uint32(buffer, direccion_fisica);
+    buffer_add_uint32(buffer, tamanio);
+    package_send(package, fd_memoria);
+    package_destroy(package);
+
+    t_package *response = package_create(NULL_HEADER);
+    package_recv(response, fd_memoria);
+    char *valor = strdup(extract_string_buffer(get_buffer(response)));
+    package_destroy(response);
+    return valor;
+}
+
+//======================================================
+//          FUNCIONES DE ENTRADA/SALIDA DIALFS
+//======================================================
+
+// A implementar!
