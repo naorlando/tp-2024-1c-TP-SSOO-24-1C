@@ -4,17 +4,14 @@
 #include "utils/protocolo.h"
 #include "variables_globales.h"
 #include "utils/estructuras.h"
-#include "solicitudes_io.h"
+#include "utils/solicitudes_io.h"
 
 int send_example_kernel();
 int recv_example_msg_kernel();
 int send_example_memoria();
 
-void atender_instruccion_sleep();
-// void atender_io_kernel();
-// void atender_io_memoria();
-void atender_instruccion_sleep();
-int recibir_instruccion(int fd, t_instruction **instruccion);
+void atender_instruccion_generica(int fd);
+int enviar_confirmacion_io(int fd);
 int enviar_confirmacion(int fd, t_msg_header header);
 
 #endif
