@@ -1,63 +1,28 @@
 #include <protocolo_entrada.h>
 
-//Agrego la función para atender la instrucción de IO_GEN_SLEEP
-//REVISAR!!!
-void atender_instruccion_sleep() {
-    int unidades_trabajo;
-    if (recibir_instruccion(fd_kernel, &unidades_trabajo) == 0) {
-        int tiempo_espera = unidades_trabajo * TIEMPO_UNIDAD_TRABAJO;
-        log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
-        sleep(tiempo_espera);
-        log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
-        enviar_confirmacion(fd_kernel, MSG_KERNEL_IO);
+//======================================================
+//        FUNCIONES DE ENTRADA/SALIDA GENERICA
+//======================================================
+
+//Agrego la función para atender instrucción de interfaz genérica (IO_GEN_SLEEP)
+void atender_instruccion_generica(int fd) {
+    t_instruction *instruccion = recibir_instruccion(fd);
+    if (instruccion != NULL) {
+        if (instruccion->name == IO_GEN_SLEEP) {
+            int unidades_trabajo = atoi(list_get(instruccion->params, 1));
+            int tiempo_espera = unidades_trabajo * obtener_tiempo_unidad_trabajo(entradasalida_config);
+            log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
+            sleep(tiempo_espera);
+            log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
+        } else {
+            log_warning(logger_entradasalida, "Instrucción no soportada en dispositivo genérico");
+        }
+        enviar_confirmacion_io(fd);
+        eliminar_instruccion(instruccion);
     } else {
-        log_error(logger_entradasalida, "Error al recibir la instruccion IO_GEN_SLEEP");
-    }
-}
-
-//Agrego la función para recibir una instrucción, que realiza el proceso de deserialización
-/* La función recibir_instruccion() deserializa el mensaje recibido del kernel y crea una estructura 
-t_instruction que contiene el nombre de la instrucción y sus parámetros. Esta estructura es pasada 
-por referencia a atender_instruccion_sleep().  Podría servir en el futuro para recibir más variedad de 
-instrucciones y parámetros.  Por el momento no la uso, y en su lugar, usaré otra función más acorde 
-a la instrucción IO_GEN_SLEEP*/
-/*
-int recibir_instruccion(int fd, t_instruction **instruccion) {
-    t_package *package = package_create(NULL_HEADER);
-    if (package_recv(package, fd) != EXIT_SUCCESS) {
         log_error(logger_entradasalida, "Error al recibir instrucción");
-        package_destroy(package);
-        return -1;
     }
-
-    t_buffer *buffer = package->buffer;
-    void *stream = buffer->stream;
-
-    // Deserializar el nombre de la instrucción
-    uint32_t instruccion_id;
-    memcpy(&instruccion_id, stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    (*instruccion)->name = (t_name_instruct)instruccion_id;
-
-    // Deserializar los parámetros
-    uint32_t cant_params;
-    memcpy(&cant_params, stream, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
-    (*instruccion)->params = list_create();
-    for (uint32_t i = 0; i < cant_params; i++) {
-        uint32_t param_size;
-        memcpy(&param_size, stream, sizeof(uint32_t));
-        stream += sizeof(uint32_t);
-        void *param = malloc(param_size);
-        memcpy(param, stream, param_size);
-        stream += param_size;
-        list_add((*instruccion)->params, param);
-    }
-
-    package_destroy(package);
-    return 0;
 }
-*/
 
 /*Agrego la función para recibir una instrucción IO_GEN_SLEEP, que realiza la deserialización 
 y devuelve el valor de las unidades de trabajo y el PID del proceso que solicita la instrucción*/
@@ -96,10 +61,10 @@ int recibir_instruccion(int fd, int *unidades_trabajo) {
 
     // Deserializar los parámetros
     int pid;
-    memcpy(&pid, stream, sizeof(int));
-    stream += sizeof(int);
+    memcpy(&pid, stream, sizeof(int)); //Obtengo el PID del proceso
+    stream += sizeof(int); //Stream, es un puntero a void, por lo que se debe incrementar en la cantidad de bytes que se desplaza
 
-    memcpy(unidades_trabajo, stream, sizeof(int));
+    memcpy(unidades_trabajo, stream, sizeof(int)); //Obtengo las unidades de trabajo
 
     package_destroy(package);
     return 0;
@@ -116,23 +81,6 @@ int enviar_confirmacion(int fd, t_msg_header header) {
     }
     package_destroy(package);
     return 0;
-}
-
-// Comento las funciones de ejemplo, ya que no se utilizan en la Interfaz Genérica
-
-// Agrego la función para atender la instrucción de sleep
-void atender_instruccion_sleep()
-{
-    // int unidades_trabajo;
-    // if (recibir_instruccion(fd_kernel, &unidades_trabajo) == 0) {
-    //     int tiempo_espera = unidades_trabajo * TIEMPO_UNIDAD_TRABAJO;
-    //     log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
-    //     sleep(tiempo_espera);
-    //     log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
-    //     enviar_confirmacion(fd_kernel, MSG_KERNEL_IO);
-    // } else {
-    //     log_error(logger_entradasalida, "Error al recibir la instruccion IO_GEN_SLEEP");
-    // }
 }
 
 int recv_example_msg_kernel()
@@ -165,3 +113,37 @@ int send_example_memoria()
     return send_example(cadena, entero, fd_memoria);
 }
 
+//======================================================
+//          FUNCIONES DE ENTRADA/SALIDA STDIN
+//======================================================
+
+// Agrego la función para atender instrucción de interfaz STDIN (IO_STDIN_READ), 
+// que recibe un texto por consola y lo escribe en memoria
+void atender_instruccion_stdin(int fd) {
+    t_instruction *instruccion = recibir_instruccion(fd);
+    if (instruccion != NULL) {
+        if (instruccion->name == IO_STDIN_READ) {
+            char *input = readline("Ingrese un texto: ");
+            uint32_t direccion_fisica = (uint32_t)atoi(list_get(instruccion->params, 1));
+            uint32_t tamanio = (uint32_t)atoi(list_get(instruccion->params, 2));
+            escribir_memoria(direccion_fisica, input, tamanio);
+            free(input);
+        } else {
+            log_warning(logger_entradasalida, "Instrucción no soportada en dispositivo STDIN");
+        }
+        enviar_confirmacion_io(fd);
+        eliminar_instruccion(instruccion);
+    } else {
+        log_error(logger_entradasalida, "Error al recibir instrucción");
+    }
+}
+
+void escribir_memoria(uint32_t direccion_fisica, char *valor, uint32_t tamanio) {
+    t_package *package = package_create(MSG_WRITE_MEMORY);
+    t_buffer *buffer = get_buffer(package);
+    buffer_add_uint32(buffer, direccion_fisica);
+    buffer_add_uint32(buffer, tamanio);
+    buffer_add_string(buffer, valor);
+    package_send(package, fd_memoria);
+    package_destroy(package);
+}
