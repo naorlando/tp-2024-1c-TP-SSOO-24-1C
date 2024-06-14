@@ -30,6 +30,5 @@ int main(int argc, char *argv[]) {
     }
 
     cerrar_cliente();
-
     return EXIT_SUCCESS;
 }
