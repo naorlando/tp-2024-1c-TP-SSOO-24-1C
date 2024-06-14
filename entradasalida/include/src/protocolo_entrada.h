@@ -4,6 +4,7 @@
 #include "utils/protocolo.h"
 #include "variables_globales.h"
 #include "utils/estructuras.h"
+#include "solicitudes_io.h"
 
 int send_example_kernel();
 int recv_example_msg_kernel();
