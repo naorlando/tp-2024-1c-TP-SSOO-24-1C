@@ -1,14 +1,14 @@
+#include <entradasalida.h>
+
 int main(int argc, char *argv[]) {
     if (argc != 3) {
         fprintf(stderr, "Uso correcto: %s <nombre_interfaz> <path_config>\\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    // Obtener los argumentos, nombre de interfaz y path del archivo de configuración
     char* nombre_interfaz = argv[1];
     char* path_config = argv[2];
 
-    // Inicializar el módulo de entradasalida
     init(nombre_interfaz, path_config);
 
     // Inicializar los sockets
