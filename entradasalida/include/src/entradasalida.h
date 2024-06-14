@@ -6,9 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <inicializar_entradasalida.h>
-#include <entradasalida_server_generica.h>
-#include <entradasalida_server_stdin.h>
-#include <entradasalida_server_stdout.h>
-#include <entradasalida_server_dialfs.h>
+#include <entradasalida_server.h>
 
 #endif //ENTRADASALIDA_H_
