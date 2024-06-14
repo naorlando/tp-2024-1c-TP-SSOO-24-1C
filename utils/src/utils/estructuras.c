@@ -34,6 +34,14 @@ uint32_t get_pcb_size(t_PCB* pcb)
     return (sizeof(uint32_t) * 3) + get_cpu_registers_size(get_cpu_registers(pcb));
 }
 
+t_state get_state(t_PCB* pcb){
+    return pcb->state;
+}
+
+void set_state(t_PCB* pcb, t_state state){
+    pcb->state = state;
+}
+
 // CPU registers
 t_cpu_registers *cpu_registers_create()
 {

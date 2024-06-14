@@ -179,16 +179,32 @@ void f_ejecutar_script(const char *filename)
         return;
     }
 
-    char linea[256];
-    while (fgets(linea, sizeof(linea), file))
-    {
-        // Eliminar el salto de línea si existe
-        linea[strcspn(linea, "\n")] = '\0';
+    // char* linea = malloc(sizeof(char)*256);
+    // while (fgets(linea, sizeof(linea), file))
+    // {
+    //     // Eliminar el salto de línea si existe
+    //     linea[strcspn(linea, "\n")] = '\0';
 
-        log_info(logger_kernel, "Ejecutando comando: %s", linea);
+    //     log_info(logger_kernel, "Ejecutando comando: %s", linea);
+
+    //     // Ejecutar el comando leído
+    //     // Aquí se debería llamar a la función correspondiente al comando leído
+    //     _atender_instruccion(linea);
+    // }
+
+    size_t len = 0;
+    ssize_t read;
+    char *linea = NULL;
+
+    while ((read = getline(&linea, &len, file)) != -1) {
+        // Eliminar el salto de línea si existe
+        remove_newline(linea);
+        //linea[strcspn(linea, "\n")] = '\0';
+
+        //log_info(NULL, "Ejecutando comando: %s", linea);
 
         // Ejecutar el comando leído
-        // Aquí se debería llamar a la función correspondiente al comando leído
+        _atender_instruccion(linea);
     }
 
     fclose(file);

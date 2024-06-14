@@ -10,8 +10,8 @@ t_PCB *get_next_pcb_to_exec()
     case RR:
         // hacer un hilo con sleep y que cada vez que se cumpla el quantum se haga interrupt
         // post cuando se mande la prox instruccion a cpu
-        
-        
+        // BUSCAR ISSUES DE RR.
+
         break;
     case VRR:
         /* ordenar */
@@ -39,6 +39,7 @@ void planificador_corto_plazo()
 
         log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "READY", "EXEC");
         sem_wait(&SEM_CPU);
+        //EXECUTE = pcb; //referencia la pcb que esta en ejecucion.
         send_pcb_cpu(pcb);
         sem_post(&SEM_CPU);
     }

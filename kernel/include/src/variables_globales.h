@@ -11,6 +11,7 @@
 #include <commons/collections/list.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <utils/estructuras.h>
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"
@@ -58,6 +59,8 @@ extern char* memoria_port;
 extern t_queue* COLA_READY;
 extern t_queue* COLA_EXIT;
 extern t_queue* COLA_NEW;
+//una variable para que el kernel conozca el pcb que este ejecutando:
+extern t_PCB* EXECUTE;
 extern t_list* LISTA_COLAS_DISPOSITIVOS; 
 
 

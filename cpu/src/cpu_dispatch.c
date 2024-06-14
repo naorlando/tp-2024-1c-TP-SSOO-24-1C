@@ -94,7 +94,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         case IO_GEN_SLEEP: {
             char* interface = (char*)list_get(instruccion->params, 0);
             int units = atoi((char*)list_get(instruccion->params, 1));
-
+            
             // Enviar el PCB al kernel con el tipo de interfaz
             solicitar_IO(instruccion);
             log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
@@ -193,12 +193,6 @@ uint32_t _obtener_valor_registro(t_cpu_registers *registros, char *nombre) {
     return reg ? *reg : 0;
 }
 
-void remove_newline(char *str) {
-    size_t len = strlen(str);
-    if (len > 0 && str[len - 1] == '\n') {
-        str[len - 1] = '\0';
-    }
-}
 
 // #############################################################################################################
 // Es importante tener en cuenta las siguientes aclaraciones:

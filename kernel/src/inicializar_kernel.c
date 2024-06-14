@@ -38,6 +38,7 @@ sem_t SEM_CPU;
 t_queue *COLA_READY;
 t_queue *COLA_EXIT;
 t_queue *COLA_NEW;
+t_PCB *EXECUTE;
 t_list *LISTA_COLAS_DISPOSITIVOS;
 
 void init()

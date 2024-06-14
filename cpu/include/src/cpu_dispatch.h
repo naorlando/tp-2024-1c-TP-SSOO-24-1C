@@ -6,6 +6,7 @@
 #include "utils/estructuras.h"
 #include "protocolo_cpu.h"
 #include "cpu_interrupt.h"
+#include "utils/utils.h"
 
 void ejecutar_instruccion(t_instruction*, t_cpu_registers*);
 
@@ -47,11 +48,6 @@ void _establecer_registro(t_cpu_registers *, char *, uint32_t);
 // Post: Retorna el valor del registro correspondiente al nombre dado.
 uint32_t _obtener_valor_registro(t_cpu_registers *, char *);
 
-// TODO: localizarlo en utils?
-// Obtiene el valor de un registro dado un nombre.
-// Pre: Los registros deben ser válidos y no NULL.
-// Post: Retorna el valor del registro correspondiente al nombre dado.
-void remove_newline(char *);
 
 // Maneja las interrupciones de la CPU.
 // Pre: La variable interrupcion_pendiente debe estar correctamente inicializada.

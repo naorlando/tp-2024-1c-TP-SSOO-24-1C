@@ -31,6 +31,13 @@ char* join(const char*, const char*, const char*);
 // por parametro. Si la asignación de memoria falla, retorna NULL.
 char* my_strdup(const char*);
 
+
+// TODO: localizarlo en utils?
+// Obtiene el valor de un registro dado un nombre.
+// Pre: Los registros deben ser válidos y no NULL.
+// Post: Retorna el valor del registro correspondiente al nombre dado.
+void remove_newline(char *);
+
 #define GET_MAX_LENGTH(type) get_max_length_uint(type##_MAX)
 
 #endif
