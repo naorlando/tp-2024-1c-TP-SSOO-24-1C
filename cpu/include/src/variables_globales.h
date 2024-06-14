@@ -20,6 +20,11 @@ extern t_PCB* pcb_execute;
 extern bool interrupcion_pendiente;
 extern int tipo_de_interrupcion;
 
+
+//PAGES
+extern uint32_t page_size;
+extern uint32_t page_table_entries_qty; 
+
 //Semaforos
 extern sem_t SEM_INTERRUPT; // BINARIO
 

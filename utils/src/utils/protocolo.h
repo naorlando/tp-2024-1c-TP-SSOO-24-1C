@@ -47,8 +47,10 @@ typedef enum
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
+    MSG_CPU_MEMORIA_INIT,
     MSG_INSTRUCTION_MEMORIA,
     MSG_NEXT_INSTRUCTION_CPU,
+    MSG_MEMORIA_CPU_INIT,
     //IO <-> MEMORIA
     MSG_IO_MEMORIA,
     EXAMPLE,
@@ -201,5 +203,10 @@ void serialize_next_instruction(t_buffer*, t_next_instruction*);
 // Post: Retorna un puntero a una estructura t_next_instruction creada a partir de los datos del buffer.
 //       Si ocurre un error en la deserialización, retorna NULL.
 t_next_instruction* deserialize_next_instruction(t_buffer*);
+
+void serialize_uint32_t(t_buffer* buffer, int args_qty, ...);
+
+
+void deserialize_uint32_t(t_buffer* buffer, int args_qty, ...);
 
 #endif

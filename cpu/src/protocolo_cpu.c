@@ -8,6 +8,25 @@ int send_example_memoria()
     return send_example(cadena, entero, fd_memoria);
 }
 
+// CPU -> MEMORIA :: MSG_CPU_MEMORIA_INIT
+int send_msg_cpu_memoria_init(int fd) {
+    
+    t_package* package = package_create(MSG_CPU_MEMORIA_INIT,sizeof(uint32_t));
+
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return EXIT_SUCCESS;
+}
+
+int recv_msg_memoria_cpu_init(t_buffer* buffer,  uint32_t* page_size) {
+
+    deserialize_uint32_t(buffer, 1, page_size);
+    
+    return EXIT_SUCCESS;
+}
+
 int recv_example_msg_kernel()
 {
     log_info(logger_cpu, "<<<<< EXAMPLE RECIVE MESSAGE FROM KERNEL >>>>");

@@ -40,6 +40,10 @@ void send_get_next_instruction(uint32_t, uint32_t);
 // Post: Retorna un puntero a t_instruction que contiene la instrucción recibida.
 t_instruction* recv_instruction();
 
+int send_msg_cpu_memoria_init(int fd);
+
+int recv_msg_memoria_cpu_init(t_buffer*, uint32_t* );
+
 void send_interface_kernel(/*t_interface**/);
 
 #endif

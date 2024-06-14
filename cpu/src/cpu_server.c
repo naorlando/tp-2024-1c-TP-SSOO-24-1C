@@ -137,6 +137,20 @@ void inicializar_sockets()
         log_error(logger_cpu, "Error al conectar con la MEMORIA. ABORTANDO");
         exit(EXIT_FAILURE);
     }
+
+    send_msg_cpu_memoria_init(fd_memoria);
+
+    t_package* packageHandshake = package_create(NULL_HEADER,sizeof(uint32_t));
+    package_recv(packageHandshake, fd_memoria);
+    if(packageHandshake->msg_header != MSG_MEMORIA_CPU_INIT){
+        log_error(logger_cpu,"SE DEBE RECIBIR EL HANDSHAKE DESDE MEMORIA");
+        exit(EXIT_FAILURE);
+    }
+
+    recv_msg_memoria_cpu_init(packageHandshake->buffer,&page_size);
+    log_debug(logger_cpu_debug, "HANDSHAKE CON MEMORIA RECIBIDO -- ENTRADAS_TABLA: %d -- PAGE_SIZE: %d", cpu_config->CANTIDAD_ENTRADAS_TLB, page_size);
+    package_destroy(packageHandshake);
+
 }
 
 void esperar_clientes()

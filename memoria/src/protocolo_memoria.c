@@ -105,3 +105,16 @@ void send_instrution(t_instruction* instruction)
     //Elimino el paquete usado
     package_destroy(package);
 }
+
+int send_msg_memoria_cpu_init( uint32_t page_size, int fd) {
+
+    t_package* package = package_create(MSG_MEMORIA_CPU_INIT,sizeof(u_int32_t));
+
+    serialize_uint32_t(package->buffer, 1, page_size);
+
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return EXIT_SUCCESS;
+}
