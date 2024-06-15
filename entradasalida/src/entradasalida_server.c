@@ -1,4 +1,11 @@
 #include "entradasalida_server.h"
+#include "variables_globales.h"
+#include "utils/sockets.h"
+
+
+//=========================================================
+// FUNCIONES PARA INICIALIZAR EL CLIENTE DE ENTRADA/SALIDA
+//=========================================================
 
 void inicializar_sockets() {
     // Inicializar socket de conexión con Kernel
@@ -22,6 +29,11 @@ void inicializar_sockets() {
         }
     }
 }
+
+//==========================================================
+// FUNCIONES PARA CREAR HILOS DE INTERFAZ DE ENTRADA/SALIDA
+//==========================================================
+
 
 void crear_hilo_interfaz_generica() {
     pthread_t hilo_generica;
@@ -58,6 +70,10 @@ void crear_hilo_interfaz_dialfs() {
     }
     pthread_detach(hilo_dialfs);
 }
+
+//====================================================
+// FUNCIONES PARA ATENDER SOLICITUDES DE ENTRADA/SALIDA
+//====================================================
 
 void* atender_solicitudes_generica(void* args) {
     bool esperar = true;
@@ -135,4 +151,28 @@ void* atender_solicitudes_dialfs(void* args) {
         }
     }
     return NULL;
+}
+
+//====================================================
+// FUNCIONES PARA CIERRE DE CLIENTE DE ENTRADA/SALIDA
+//====================================================
+
+void cerrar_cliente() {
+    _cerrar_puertos();
+    _cerrar_conexiones();
+    log_info(logger_entradasalida, "Cliente de entrada/salida cerrado correctamente.");
+}
+
+void _cerrar_puertos() {
+    // Liberar los puertos utilizados por el cliente de entrada/salida
+    free(kernel_port);
+    free(memoria_port);
+    // Liberar otros puertos si es necesario
+}
+
+void _cerrar_conexiones() {
+    // Liberar las conexiones utilizadas por el cliente de entrada/salida
+    liberar_conexion(fd_kernel);
+    liberar_conexion(fd_memoria);
+    // Liberar otras conexiones si es necesario
 }

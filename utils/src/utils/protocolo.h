@@ -53,9 +53,15 @@ typedef enum
     MSG_NEXT_INSTRUCTION_CPU,
     //IO <-> MEMORIA
     MSG_IO_MEMORIA,
+    MSG_READ_MEMORY,
+    MSG_WRITE_MEMORY,
     EXAMPLE,
     //IO <-> KERNEL
     MSG_IO_KERNEL_GEN_SLEEP,
+    //IO
+    IO_GENERICA,
+    IO_STDIN,
+    IO_STDOUT,
 
     //Empty package
     NULL_HEADER

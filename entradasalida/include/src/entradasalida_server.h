@@ -2,7 +2,7 @@
 #define ENTRADASALIDA_SERVER_H
 
 #include "variables_globales.h"
-#include "protocolo_entrada.h"
+#include "protocolo_entradasalida.h"
 #include <commons/string.h>
 #include <utils/sockets.h>
 #include <utils/estructuras.h>
@@ -22,5 +22,9 @@ void* atender_solicitudes_generica(void* args);
 void* atender_solicitudes_stdin(void* args);
 void* atender_solicitudes_stdout(void* args);
 void* atender_solicitudes_dialfs(void* args);
+
+void cerrar_cliente();
+void _cerrar_puertos();
+void _cerrar_conexiones();
 
 #endif
