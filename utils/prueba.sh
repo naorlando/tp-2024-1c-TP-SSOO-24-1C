@@ -12,11 +12,6 @@ KERNEL_EXECUTABLE="$KERNEL_DIR/bin/kernel"
 MEMORIA_EXECUTABLE="$MEMORIA_DIR/bin/memoria"
 ENTRADASALIDA_EXECUTABLE="$ENTRADASALIDA_DIR/bin/entradasalida"
 
-# Rutas a los archivos de configuración
-CPU_CONFIG="$CPU_DIR/cfg/cpu.config"
-KERNEL_CONFIG="$KERNEL_DIR/cfg/kernel.config"
-MEMORIA_CONFIG="$MEMORIA_DIR/cfg/memoria.config"
-
 # Tipos de dispositivos de entrada/salida disponibles
 TIPOS_DISPOSITIVOS=(
     "1. Interfaz Genérica"
@@ -25,11 +20,12 @@ TIPOS_DISPOSITIVOS=(
     "4. Interfaz DialFS"
 )
 
-# Función para ejecutar make clean en un directorio
-run_make_clean() {
+# Función para ejecutar make clean y make en un directorio
+run_make() {
     local dir="$1"
     cd "$dir" || return
     make clean
+    make
     cd - >/dev/null
 }
 
@@ -42,6 +38,7 @@ run_module() {
     else
         exo-open --launch TerminalEmulator --execute "$executable" "$config_file"
     fi
+    sleep 2  # Esperar 2 segundos para que la ventana se abra correctamente
 }
 
 # Función para seleccionar el tipo de dispositivo de entrada/salida
@@ -75,25 +72,28 @@ select_dispositivo() {
     esac
 
     config_file="$ENTRADASALIDA_DIR/cfg/interfaz_$tipo_dispositivo.config"
-    run_module "$ENTRADASALIDA_EXECUTABLE" "$nombre_dispositivo" "$config_file" &
+    run_module "$ENTRADASALIDA_EXECUTABLE" "$nombre_dispositivo" "$config_file"
 }
 
-# Ejecutar make clean en los directorios de los módulos
-run_make_clean "$CPU_DIR"
-run_make_clean "$KERNEL_DIR"
-run_make_clean "$MEMORIA_DIR"
-run_make_clean "$ENTRADASALIDA_DIR"
+# Ejecutar make clean y make en los directorios de los módulos
+run_make "$CPU_DIR"
+run_make "$KERNEL_DIR"
+run_make "$MEMORIA_DIR"
+run_make "$ENTRADASALIDA_DIR"
 
-# Ejecutar los módulos en terminales separadas
-run_module "$CPU_EXECUTABLE" &
-run_module "$KERNEL_EXECUTABLE" &
-run_module "$MEMORIA_EXECUTABLE" &
-
+# Seleccionar dispositivos de entrada/salida a conectar
 read -p "¿Cuántos dispositivos de entrada/salida desea conectar? " num_dispositivos
 
 for ((i=1; i<=num_dispositivos; i++)); do
     select_dispositivo
 done
+
+# Ejecutar los módulos en el orden especificado
+run_module "$MEMORIA_EXECUTABLE"
+sleep 2  # Esperar 2 segundos para que la ventana se abra correctamente
+run_module "$CPU_EXECUTABLE"
+sleep 2  # Esperar 2 segundos para que la ventana se abra correctamente
+run_module "$KERNEL_EXECUTABLE"
 
 # Mantener las terminales abiertas hasta que el usuario las cierre manualmente
 while true; do
