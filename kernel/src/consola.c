@@ -170,47 +170,26 @@ void enviar_pcb_cpu()
 }
 
 // Ejecutar un script con comandos de consola
-void f_ejecutar_script(const char *filename) {
+void f_ejecutar_script(const char *filename)
+{
     FILE *file = fopen(filename, "r");
-    if (file == NULL) {
+
+    if (file == NULL)
+    {
         log_error(logger_kernel, "Error no se pudo abrir el archivo a ejecutar");
         return;
     }
 
     char linea[256];
-    while (fgets(linea, sizeof(linea), file)) {
+    while (fgets(linea, sizeof(linea), file))
+    {
         // Eliminar el salto de línea si existe
         linea[strcspn(linea, "\n")] = '\0';
 
         log_info(logger_kernel, "Ejecutando comando: %s", linea);
 
-        // Dividir la línea en partes (comando y argumentos)
-        char **comando_consola = split(linea, " ");
-        if (comando_consola == NULL) {
-            log_error(logger_kernel, "Error al dividir el comando de la consola.");
-            continue;
-        }
-
-        int longitud_comando = arrayLength(comando_consola);
-
-        // Ejecutar el comando correspondiente
-        if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0 && longitud_comando == 2) {
-            if (planificador_status) {
-                char *path = my_strdup(comando_consola[1]);
-                f_iniciar_proceso(path);
-                free(path);
-            }
-        } else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0 && longitud_comando == 2) {
-            // Código correspondiente
-        } else if (strcmp(comando_consola[0], "IO_GEN_SLEEP") == 0 && longitud_comando == 3) {
-            int pid = atoi(comando_consola[1]);
-            int unidades_trabajo = atoi(comando_consola[2]);
-            enviar_io_gen_sleep(fd_kernel, pid, unidades_trabajo);
-            recibir_confirmacion_io(fd_kernel);
-        }
-        // Otros comandos...
-
-        array_string_destroy(comando_consola);
+        // Ejecutar el comando leído
+        // Aquí se debería llamar a la función correspondiente al comando leído
     }
 
     fclose(file);
