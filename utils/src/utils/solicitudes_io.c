@@ -1,12 +1,11 @@
 #include "solicitudes_io.h"
-#include "buffer.h"
+#include "protocolo.h"
 
 //===============================================
-//        FUNCIONES DE SERIALIZACION
+// FUNCIONES DE SERIALIZACION
 //===============================================
-
 void serializar_solicitud_io_generica(t_buffer* buffer, t_solicitud_io_generica* solicitud) {
-    serializar_pcb(buffer, solicitud->pcb);
+    serialize_pcb(buffer, solicitud->pcb);
     buffer_add_string(buffer, solicitud->nombre_interfaz);
     serializar_io_generica(buffer, solicitud->generica);
 }
@@ -17,7 +16,7 @@ void serializar_io_generica(t_buffer* buffer, t_io_generica* io_generica) {
 }
 
 void serializar_solicitud_io_stdin(t_buffer* buffer, t_solicitud_io_stdin* solicitud) {
-    serializar_pcb(buffer, solicitud->pcb);
+    serialize_pcb(buffer, solicitud->pcb);
     buffer_add_string(buffer, solicitud->nombre_interfaz);
     serializar_io_stdin(buffer, solicitud->stdin);
 }
@@ -28,7 +27,7 @@ void serializar_io_stdin(t_buffer* buffer, t_io_stdin* io_stdin) {
 }
 
 void serializar_solicitud_io_stdout(t_buffer* buffer, t_solicitud_io_stdout* solicitud) {
-    serializar_pcb(buffer, solicitud->pcb);
+    serialize_pcb(buffer, solicitud->pcb);
     buffer_add_string(buffer, solicitud->nombre_interfaz);
     serializar_io_stdout(buffer, solicitud->stdout);
 }
@@ -39,11 +38,10 @@ void serializar_io_stdout(t_buffer* buffer, t_io_stdout* io_stdout) {
 }
 
 //===============================================
-//        FUNCIONES DE DESERIALIZACIÓN
+// FUNCIONES DE DESERIALIZACIÓN
 //===============================================
-
 t_solicitud_io_generica* deserializar_solicitud_io_generica(t_buffer* buffer) {
-    t_PCB* pcb = deserializar_pcb(buffer);
+    t_PCB* pcb = deserialize_pcb(buffer);
     char* nombre_interfaz = extract_string_buffer(buffer);
     t_io_generica* generica = deserializar_io_generica(buffer);
     return crear_solicitud_io_generica(pcb, nombre_interfaz, generica);
@@ -56,7 +54,7 @@ t_io_generica* deserializar_io_generica(t_buffer* buffer) {
 }
 
 t_solicitud_io_stdin* deserializar_solicitud_io_stdin(t_buffer* buffer) {
-    t_PCB* pcb = deserializar_pcb(buffer);
+    t_PCB* pcb = deserialize_pcb(buffer);
     char* nombre_interfaz = extract_string_buffer(buffer);
     t_io_stdin* stdin = deserializar_io_stdin(buffer);
     return crear_solicitud_io_stdin(pcb, nombre_interfaz, stdin);
@@ -69,7 +67,7 @@ t_io_stdin* deserializar_io_stdin(t_buffer* buffer) {
 }
 
 t_solicitud_io_stdout* deserializar_solicitud_io_stdout(t_buffer* buffer) {
-    t_PCB* pcb = deserializar_pcb(buffer);
+    t_PCB* pcb = deserialize_pcb(buffer);
     char* nombre_interfaz = extract_string_buffer(buffer);
     t_io_stdout* stdout = deserializar_io_stdout(buffer);
     return crear_solicitud_io_stdout(pcb, nombre_interfaz, stdout);
@@ -82,9 +80,8 @@ t_io_stdout* deserializar_io_stdout(t_buffer* buffer) {
 }
 
 //===============================================
-//             FUNCIONES DE CREACIÓN
+// FUNCIONES DE CREACIÓN
 //===============================================
-
 t_solicitud_io_generica* crear_solicitud_io_generica(t_PCB* pcb, char* nombre_interfaz, t_io_generica* generica) {
     t_solicitud_io_generica* solicitud = malloc(sizeof(t_solicitud_io_generica));
     solicitud->pcb = pcb;
@@ -131,9 +128,8 @@ t_io_stdout* crear_io_stdout(uint32_t direccion_fisica, uint32_t tamanio) {
 }
 
 //===============================================
-//        FUNCIONES DE DESTRUCCIÓN
+// FUNCIONES DE DESTRUCCIÓN
 //===============================================
-
 void destruir_solicitud_io_generica(t_solicitud_io_generica* solicitud) {
     free(solicitud->nombre_interfaz);
     destruir_io_generica(solicitud->generica);

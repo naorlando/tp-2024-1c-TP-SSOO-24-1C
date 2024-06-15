@@ -18,4 +18,9 @@ void crear_hilo_interfaz_stdin();
 void crear_hilo_interfaz_stdout();
 void crear_hilo_interfaz_dialfs();
 
+void* atender_solicitudes_generica(void* args);
+void* atender_solicitudes_stdin(void* args);
+void* atender_solicitudes_stdout(void* args);
+void* atender_solicitudes_dialfs(void* args);
+
 #endif

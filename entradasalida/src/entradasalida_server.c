@@ -25,7 +25,7 @@ void inicializar_sockets() {
 
 void crear_hilo_interfaz_generica() {
     pthread_t hilo_generica;
-    if (pthread_create(&hilo_generica, NULL, (void *)atender_solicitudes_generica, NULL) != 0) {
+    if (pthread_create(&hilo_generica, NULL, atender_solicitudes_generica, NULL) != 0) {
         log_error(logger_entradasalida, "Error al crear el hilo para atender la interfaz genérica. ABORTANDO");
         exit(EXIT_FAILURE);
     }
@@ -34,7 +34,7 @@ void crear_hilo_interfaz_generica() {
 
 void crear_hilo_interfaz_stdin() {
     pthread_t hilo_stdin;
-    if (pthread_create(&hilo_stdin, NULL, (void *)atender_solicitudes_stdin, NULL) != 0) {
+    if (pthread_create(&hilo_stdin, NULL, atender_solicitudes_stdin, NULL) != 0) {
         log_error(logger_entradasalida, "Error al crear el hilo para atender la interfaz STDIN. ABORTANDO");
         exit(EXIT_FAILURE);
     }
@@ -43,7 +43,7 @@ void crear_hilo_interfaz_stdin() {
 
 void crear_hilo_interfaz_stdout() {
     pthread_t hilo_stdout;
-    if (pthread_create(&hilo_stdout, NULL, (void *)atender_solicitudes_stdout, NULL) != 0) {
+    if (pthread_create(&hilo_stdout, NULL, atender_solicitudes_stdout, NULL) != 0) {
         log_error(logger_entradasalida, "Error al crear el hilo para atender la interfaz STDOUT. ABORTANDO");
         exit(EXIT_FAILURE);
     }
@@ -52,9 +52,87 @@ void crear_hilo_interfaz_stdout() {
 
 void crear_hilo_interfaz_dialfs() {
     pthread_t hilo_dialfs;
-    if (pthread_create(&hilo_dialfs, NULL, (void *)atender_solicitudes_dialfs, NULL) != 0) {
+    if (pthread_create(&hilo_dialfs, NULL, atender_solicitudes_dialfs, NULL) != 0) {
         log_error(logger_entradasalida, "Error al crear el hilo para atender la interfaz DialFS. ABORTANDO");
         exit(EXIT_FAILURE);
     }
     pthread_detach(hilo_dialfs);
+}
+
+void* atender_solicitudes_generica(void* args) {
+    bool esperar = true;
+    while (esperar) {
+        int cod_operacion = recibir_operacion(fd_kernel);
+        switch (cod_operacion) {
+            case IO_GENERICA:
+                atender_instruccion_generica(fd_kernel);
+                break;
+            case -1:
+                log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.");
+                esperar = false;
+                break;
+            default:
+                log_warning(logger_entradasalida, "WARNING: El módulo de entrada/salida ha recibido una solicitud con una operación desconocida");
+                break;
+        }
+    }
+    return NULL;
+}
+
+void* atender_solicitudes_stdin(void* args) {
+    bool esperar = true;
+    while (esperar) {
+        int cod_operacion = recibir_operacion(fd_kernel);
+        switch (cod_operacion) {
+            case IO_STDIN:
+                atender_instruccion_stdin(fd_kernel);
+                break;
+            case -1:
+                log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.");
+                esperar = false;
+                break;
+            default:
+                log_warning(logger_entradasalida, "WARNING: El módulo de entrada/salida ha recibido una solicitud con una operación desconocida");
+                break;
+        }
+    }
+    return NULL;
+}
+
+void* atender_solicitudes_stdout(void* args) {
+    bool esperar = true;
+    while (esperar) {
+        int cod_operacion = recibir_operacion(fd_kernel);
+        switch (cod_operacion) {
+            case IO_STDOUT:
+                atender_instruccion_stdout(fd_kernel);
+                break;
+            case -1:
+                log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.");
+                esperar = false;
+                break;
+            default:
+                log_warning(logger_entradasalida, "WARNING: El módulo de entrada/salida ha recibido una solicitud con una operación desconocida");
+                break;
+        }
+    }
+    return NULL;
+}
+
+void* atender_solicitudes_dialfs(void* args) {
+    bool esperar = true;
+    while (esperar) {
+        int cod_operacion = recibir_operacion(fd_kernel);
+        switch (cod_operacion) {
+            // Agregar casos para las operaciones de DialFS
+            case -1:
+                log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.");
+                esperar = false;
+                break;
+            default:
+                log_warning(logger_entradasalida, "WARNING: El módulo de entrada/salida ha recibido una solicitud con una operación desconocida");
+                break;
+        }
+    }
+    return NULL;
 }
