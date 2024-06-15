@@ -13,7 +13,7 @@ void send_pcb_cpu(t_PCB*);
 // void requests_entradasalida();
 int recv_example_msg_entradasalida();
 int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo);
-int recibir_confirmacion_io();
+int recibir_confirmacion_io(int fd_kernel);
 int recv_example_msg_entradasalida(int);
 t_PCB* recv_pcb_interrupt();
 

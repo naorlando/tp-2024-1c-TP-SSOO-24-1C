@@ -47,8 +47,8 @@ t_PCB* recv_pcb_interrupt()
 
 // Agrego la función que envía la instrucción IO_GEN_SLEEP al módulo de E/S
 int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
-    t_package *paquete = package_create(MSG_IO_KERNEL_GEN_SLEEP);
-
+    t_package *paquete = package_create(MSG_IO_KERNEL_GEN_SLEEP, sizeof(t_buffer));
+    
     // Crear la instrucción
     t_instruction *instruccion = malloc(sizeof(t_instruction));
     instruccion->name = IO_GEN_SLEEP;
@@ -58,30 +58,30 @@ int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
     int *param_pid = malloc(sizeof(int));
     *param_pid = pid;
     list_add(instruccion->params, param_pid);
-
+    
     int *param_unidades_trabajo = malloc(sizeof(int));
     *param_unidades_trabajo = unidades_trabajo;
     list_add(instruccion->params, param_unidades_trabajo);
-
+    
     // Serializar la instrucción
     t_buffer *buffer = paquete->buffer;
-    buffer->size = sizeof(t_name_instruct) + sizeof(uint32_t) * 2 + sizeof(int) * 2;
+    buffer->size = sizeof(t_name_instruction) + sizeof(uint32_t) * 2 + sizeof(int) * 2;
     buffer->stream = malloc(buffer->size);
-
     void *stream = buffer->stream;
-    memcpy(stream, &(instruccion->name), sizeof(t_name_instruct));
-    stream += sizeof(t_name_instruct);
-
+    
+    memcpy(stream, &(instruccion->name), sizeof(t_name_instruction));
+    stream += sizeof(t_name_instruction);
+    
     uint32_t cant_params = list_size(instruccion->params);
     memcpy(stream, &cant_params, sizeof(uint32_t));
     stream += sizeof(uint32_t);
-
+    
     for (int i = 0; i < cant_params; i++) {
         int *param = list_get(instruccion->params, i);
         memcpy(stream, param, sizeof(int));
         stream += sizeof(int);
     }
-
+    
     if (package_send(paquete, fd) != EXIT_SUCCESS) {
         log_error(logger_kernel, "Error al enviar la instrucción IO_GEN_SLEEP");
         list_destroy_and_destroy_elements(instruccion->params, free);
@@ -89,18 +89,21 @@ int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
         package_destroy(paquete);
         return -1;
     }
-
+    
     log_info(logger_kernel, "Instrucción IO_GEN_SLEEP enviada con pid %d y %d unidades de trabajo", pid, unidades_trabajo);
+    
     list_destroy_and_destroy_elements(instruccion->params, free);
     free(instruccion);
     package_destroy(paquete);
+    
     return 0;
 }
 
 // Agrego la función que recibe la confirmación de que la instrucción IO_GEN_SLEEP fue recibida y procesada
-int recibir_confirmacion_io() {
-    t_package *package = package_create(NULL_HEADER);
-    if (package_recv(package, fd_kernel_IO) != EXIT_SUCCESS) {
+int recibir_confirmacion_io(int fd_kernel) {
+    t_package *package = package_create(NULL_HEADER, 0);
+
+    if (package_recv(package, fd_kernel) != EXIT_SUCCESS) {
         log_error(logger_kernel, "Error al recibir confirmación IO_GEN_SLEEP");
         package_destroy(package);
         return -1;
@@ -108,10 +111,9 @@ int recibir_confirmacion_io() {
 
     t_buffer *buffer = package->buffer;
     void *stream = buffer->stream;
-
     uint32_t mensaje_id;
     memcpy(&mensaje_id, stream, sizeof(uint32_t));
-    
+
     if (mensaje_id == MSG_KERNEL_IO) {
         log_info(logger_kernel, "Confirmación de IO_GEN_SLEEP recibida");
     } else {
