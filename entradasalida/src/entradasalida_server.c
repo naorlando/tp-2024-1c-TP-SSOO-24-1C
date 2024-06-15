@@ -9,10 +9,15 @@
 
 void inicializar_sockets() {
     // Inicializar socket de conexión con Kernel
-    kernel_port = string_itoa(obtener_puerto_kernel(entradasalida_config));
-    fd_kernel = crear_conexion(logger_entradasalida, SERVER_KERNEL, obtener_ip_kernel(entradasalida_config), kernel_port);
-    if (fd_kernel == -1) {
-        log_error(logger_entradasalida, "Error al conectar con el Kernel. ABORTANDO");
+    if (tiene_configuracion_kernel(entradasalida_config)) {
+        kernel_port = string_itoa(obtener_puerto_kernel(entradasalida_config));
+        fd_kernel = crear_conexion(logger_entradasalida, SERVER_KERNEL, obtener_ip_kernel(entradasalida_config), kernel_port);
+        if (fd_kernel == -1) {
+            log_error(logger_entradasalida, "Error al conectar con el Kernel. ABORTANDO");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        log_error(logger_entradasalida, "No se encontró configuración para el Kernel. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 
@@ -21,10 +26,15 @@ void inicializar_sockets() {
 
     // Inicializar socket de conexión con Memoria si no es una interfaz genérica
     if (strcmp(tipo_interfaz, "GENERICA") != 0) {
-        memoria_port = string_itoa(obtener_puerto_memoria(entradasalida_config));
-        fd_memoria = crear_conexion(logger_entradasalida, SERVER_MEMORIA, obtener_ip_memoria(entradasalida_config), memoria_port);
-        if (fd_memoria == -1) {
-            log_error(logger_entradasalida, "Error al conectar con la Memoria. ABORTANDO");
+        if (tiene_configuracion_memoria(entradasalida_config)) {
+            memoria_port = string_itoa(obtener_puerto_memoria(entradasalida_config));
+            fd_memoria = crear_conexion(logger_entradasalida, SERVER_MEMORIA, obtener_ip_memoria(entradasalida_config), memoria_port);
+            if (fd_memoria == -1) {
+                log_error(logger_entradasalida, "Error al conectar con la Memoria. ABORTANDO");
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            log_error(logger_entradasalida, "No se encontró configuración para la Memoria. ABORTANDO");
             exit(EXIT_FAILURE);
         }
     }
