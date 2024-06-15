@@ -37,11 +37,17 @@ int recv_example_msg_entradasalida(int cliente_io)
 
 t_PCB* recv_pcb_interrupt()
 {
-    t_buffer* buffer = recive_full_buffer(fd_cpu_interrupt);
+    t_buffer* buffer = recive_full_buffer(fd_cpu_dispatch);
     t_PCB* pcb = deserialize_pcb(buffer);
-    log_info(logger_kernel, "Se recibio un PCB del CPU_INTERRUPT, PID => %d", pcb->pid);
+    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID => %d", pcb->pid);
     //pcb_destroy(pcb);
     buffer_destroy(buffer);
 
     return pcb;
+}
+
+// adapter:
+void send_interruption_cpu(t_interruption* interrupcion)
+{
+    send_interruption(interrupcion, fd_cpu_interrupt);
 }

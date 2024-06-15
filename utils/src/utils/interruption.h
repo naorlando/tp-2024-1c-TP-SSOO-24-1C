@@ -12,7 +12,36 @@ typedef enum {
     EXIT_INTERRUPT
 }t_name_interruption;
 
-char* obtener_string_from_interruption(t_name_interruption);
+typedef struct {
+    t_name_interruption name;
+    uint32_t pid;
+}t_interruption;
 
+char* get_string_from_interruption(t_name_interruption);
+
+// crear una interrupcion
+// pre: nombre de interrupcion y pid validos
+// post: devuelve una interrupcion
+t_interruption* create_interruption(t_name_interruption name, uint32_t pid);
+
+// destruir una interrupcion
+// pre: interrupcion creada
+// post: se destruye la interrupcion
+void destroy_interruption(t_interruption* interruption);
+
+// obtener nombre de interrupcion
+// pre: interrupcion creada
+// post: se retorna el nombre de la interrupcion
+t_name_interruption get_name(t_interruption* interruption);
+
+// obtener pid de interrupcion
+// pre: interrupcion creada
+// post: se retorna el pid de la interrupcion
+uint32_t get_pid(t_interruption* interruption);
+
+// obtener tamaño de interrupcion
+// pre: interrupcion creada
+// post: se retorna el tamaño de la interrupcion
+uint32_t get_interruption_size(t_interruption* interruption);
 
 #endif //INTERRUPTION_H_

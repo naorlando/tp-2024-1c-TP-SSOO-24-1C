@@ -18,7 +18,8 @@ char *server_port;
 t_dictionary *table_pcb;
 pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 int identificador_PID = 1;
-
+t_datos_hilo* hilo_quantum;
+pthread_t hilo_interrupt;
 
 bool planificador_status = true;
 

@@ -401,3 +401,20 @@ t_next_instruction* deserialize_next_instruction(t_buffer* buffer) {
 
     return crear_siguiente_instruccion(pid, pc);
 }
+
+int send_interruption(t_interruption* interruption, int fd)
+{
+    t_package* package = package_create(MSG_QUANTUM, get_interruption_size(interruption));
+
+    // Agrego el nombre de la interruption
+    buffer_add_uint32(get_buffer(package), (uint32_t)interruption->name);
+
+    // Agrego el pid de la interruption
+    buffer_add_uint32(get_buffer(package), interruption->pid);
+
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return 0;
+}

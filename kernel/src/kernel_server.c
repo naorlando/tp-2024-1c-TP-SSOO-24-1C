@@ -82,7 +82,8 @@ void atender_kernel_cpu_dispatch()
             //TODO: agregar PCB donde este:
             // 1-recibir pcb:
             t_PCB* pcb_interrupt = recv_pcb_interrupt();
-            log_info(logger_kernel, "Se recibio un pcb de CPU-INTERRUPT");
+            EXECUTE = NULL; // SACO EL PCB DE EXECUTE
+            log_info(logger_kernel, "Se recibio un pcb de CPU-DISPATCH, PID -> %d", pcb_interrupt->pid);
 
             // 2-actualizar el pcb en la tabla de pcb:
             // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:

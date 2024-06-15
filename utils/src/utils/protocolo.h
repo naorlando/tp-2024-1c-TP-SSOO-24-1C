@@ -19,6 +19,7 @@
 #include "buffer.h"
 #include "instruccion.h"
 #include "next_instruction.h"
+#include "interruption.h"
 
 /*
  *  Messages: enum & structs
@@ -130,6 +131,13 @@ int send_example(char*, uint8_t, int);
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
 // Post: La función retorna un puntero a una estructura t_message_example creada dinámicamente con los datos recibidos y deserializados.
 t_message_example* recv_example(int);
+
+// envia una interrupcion a traves de un socket especificado
+// pre: el parametro interrupcion debe ser un puntero valido a una estructura t_interruption
+//      el parametro fd debe ser un descriptor de archivo de socket valido y abierto
+// post: la interrupcion se serializa y se envia a traves del socket especificado
+//       la funcion retorna 0 si el envio se realizo correctamente, y -1 en caso de error
+int send_interruption(t_interruption*, int);
 
 /*********** SERIALIZE AND DESERIALIZE FUNCTIONS ***********/
 

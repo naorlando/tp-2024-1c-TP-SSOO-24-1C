@@ -10,7 +10,7 @@
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <pthread.h>
-
+#include "datos_hilos.h"
 
 void atender_kernel_memoria();
 void atender_kernel_IO(void*);

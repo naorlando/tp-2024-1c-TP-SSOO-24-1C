@@ -195,6 +195,7 @@ uint32_t _obtener_valor_registro(t_cpu_registers *registros, char *nombre) {
 
 
 // #############################################################################################################
+// TP:
 // Es importante tener en cuenta las siguientes aclaraciones:
 // Una dirección lógica se traduce a una dirección física, pero al copiar un string/registro a memoria, 
 // podría estar presente en más de una página (ver sección de MMU).
@@ -286,6 +287,7 @@ void manejar_ciclo_de_instruccion() {
 
     // EXECUTE: Ejecuto la instruccion recibida
     ejecutar_instruccion(instruccion, cpu_registers);
+    sleep(20);
     //imprimir todos los cpu_registers:
     log_info(logger_cpu, "despues: AX: %u", cpu_registers->ax);
     log_info(logger_cpu, "despues: BX: %u", cpu_registers->bx);
@@ -314,13 +316,14 @@ void manejar_ciclo_de_instruccion() {
 
 bool manejar_interrupcion() {
     if (interrupcion_pendiente) {
-        log_info(logger_cpu, "Interrupción de %s recibida, devolviendo PCB al Kernel",obtener_string_from_interruption(tipo_de_interrupcion));
+        log_info(logger_cpu, "Interrupción de %s recibida, devolviendo PCB al Kernel",get_string_from_interruption(tipo_de_interrupcion));
         //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
         // de enviar de nuevo al kernel
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
         send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
         sem_post(&SEM_INTERRUPT);
         interrupcion_pendiente = false; 
+        
         log_info(logger_cpu, "PCB enviado al Kernel");
         return true;
     }
@@ -334,7 +337,7 @@ void solicitar_IO(t_instruction* instruccion)
 }
 
 // cargar contexto de ejecucion del cpu a los registros del pcb
-void cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
+void  cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
     t_cpu_registers* contexto = get_cpu_registers(pcb);
 
     // Cargo el contexto de ejecucion de la CPU en el pcb

@@ -12,6 +12,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include <utils/estructuras.h>
+#include <datos_hilos.h>
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"
@@ -29,6 +30,8 @@ extern int identificador_PID;
 extern pthread_mutex_t MUTEX_READY;
 extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
+extern t_datos_hilo* hilo_quantum;
+extern pthread_t hilo_interrupt;
 
 //SEMAFOROS
 extern sem_t SEM_READY;
