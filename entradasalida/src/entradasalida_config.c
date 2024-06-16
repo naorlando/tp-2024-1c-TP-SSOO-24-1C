@@ -33,6 +33,14 @@ bool cargar_IO_config(t_IO_config* config, t_config* cf) {
     return true;
 }
 
+bool tiene_configuracion_memoria(t_IO_config* config) {
+    return (config->IP_MEMORIA != NULL && config->PUERTO_MEMORIA != 0);
+}
+
+bool tiene_configuracion_kernel(t_IO_config* config) {
+    return (config->IP_KERNEL != NULL && config->PUERTO_KERNEL != 0);
+}
+
 char* obtener_tipo_interfaz(t_IO_config* config) {
     return config->TIPO_INTERFAZ;
 }

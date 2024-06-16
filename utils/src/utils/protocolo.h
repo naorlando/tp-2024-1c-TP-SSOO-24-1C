@@ -45,6 +45,8 @@ typedef enum
     MSG_KERNEL_CREATE_PROCESS,
     // KERNEL <-> IO
     MSG_IO_GEN_SLEEP,
+    MSG_IO_STDIN_READ,
+    MSG_IO_STDOUT_WRITE,
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
@@ -52,7 +54,15 @@ typedef enum
     MSG_NEXT_INSTRUCTION_CPU,
     //IO <-> MEMORIA
     MSG_IO_MEMORIA,
+    MSG_READ_MEMORY,
+    MSG_WRITE_MEMORY,
     EXAMPLE,
+    //IO <-> KERNEL
+    MSG_IO_KERNEL_GEN_SLEEP,
+    //IO
+    IO_GENERICA,
+    IO_STDIN,
+    IO_STDOUT,
 
     //Empty package
     NULL_HEADER

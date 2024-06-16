@@ -51,6 +51,7 @@ extern int fd_kernel_memoria;
 extern int fd_cpu_dispatch;
 extern int fd_cpu_interrupt;
 extern int fd_server;
+extern int fd_kernel;
 
 //PORTS
 extern char* server_port;

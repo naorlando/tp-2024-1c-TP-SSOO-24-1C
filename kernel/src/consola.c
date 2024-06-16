@@ -169,6 +169,7 @@ void enviar_pcb_cpu()
     send_pcb_cpu(pcb);
 }
 
+// Ejecutar un script con comandos de consola
 void f_ejecutar_script(const char *filename)
 {
     FILE *file = fopen(filename, "r");

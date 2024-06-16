@@ -37,6 +37,16 @@ void destruir_IO_config(t_IO_config*);
 //       Retorna true si la configuración fue cargada correctamente.
 bool cargar_IO_config(t_IO_config*, t_config*);
 
+// Verifica si la configuración de Kernel está presente
+// Pre: El puntero a t_IO_config debe ser válido y no NULL.
+// Post: Retorna true si la configuración de Kernel está presente.
+bool tiene_configuracion_kernel(t_IO_config* config);
+
+// Verifica si la configuración de Memoria está presente
+// Pre: El puntero a t_IO_config debe ser válido y no NULL.
+// Post: Retorna true si la configuración de Memoria está presente.
+bool tiene_configuracion_memoria(t_IO_config*);
+
 // Obtiene el tipo de interfaz de una estructura t_IO_config.
 // Pre: El puntero a t_IO_config debe ser válido y no NULL.
 // Post: Retorna un puntero a la cadena de texto que contiene el tipo de interfaz.
