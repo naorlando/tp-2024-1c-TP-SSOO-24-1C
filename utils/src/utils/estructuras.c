@@ -95,8 +95,7 @@ t_new_process* create_new_process(uint32_t pid,char* path)
     new_process->pid = pid;
     new_process->path = strdup(path);
 
-    return new_process;
-    
+    return new_process;  
 }
 
 void destroy_new_process(t_new_process* new_process) 
@@ -106,4 +105,14 @@ void destroy_new_process(t_new_process* new_process)
     }
 
     free(new_process);
+}
+
+char* get_path_new_process(t_new_process* new_process)
+{
+    return new_process->path;
+}
+
+uint32_t get_size_new_process(t_new_process* new_process) 
+{
+    return sizeof(uint32_t) + strlen(new_process->path) + 1 + sizeof(uint32_t);
 }

@@ -77,4 +77,7 @@ uint32_t get_cpu_registers_size(t_cpu_registers*);
 t_new_process* create_new_process(uint32_t pid, char* path);
 void destroy_new_process(t_new_process*);
 
+char* get_path_new_process(t_new_process*);
+uint32_t get_size_new_process(t_new_process*);
+
 #endif
