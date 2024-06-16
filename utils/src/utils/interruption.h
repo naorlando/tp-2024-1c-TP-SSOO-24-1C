@@ -37,7 +37,7 @@ t_name_interruption get_name(t_interruption* interruption);
 // obtener pid de interrupcion
 // pre: interrupcion creada
 // post: se retorna el pid de la interrupcion
-uint32_t get_pid(t_interruption* interruption);
+uint32_t get_pid_interruption(t_interruption* interruption);
 
 // obtener tamaño de interrupcion
 // pre: interrupcion creada

@@ -32,7 +32,7 @@ t_name_interruption get_name(t_interruption* interruption)
     return interruption->name;
 }
 
-uint32_t get_pid(t_interruption* interruption)
+uint32_t get_pid_interruption(t_interruption* interruption)
 {
     return interruption->pid;
 }
