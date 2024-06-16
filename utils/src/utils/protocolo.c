@@ -406,15 +406,37 @@ int send_interruption(t_interruption* interruption, int fd)
 {
     t_package* package = package_create(MSG_QUANTUM, get_interruption_size(interruption));
 
-    // Agrego el nombre de la interruption
-    buffer_add_uint32(get_buffer(package), (uint32_t)interruption->name);
-
-    // Agrego el pid de la interruption
-    buffer_add_uint32(get_buffer(package), interruption->pid);
+    serialize_interruption(get_buffer(package), interruption);
 
     package_send(package, fd);
 
     package_destroy(package);
 
     return 0;
+}
+
+t_interruption* recv_interruption(int fd) 
+{
+    t_buffer *new_buffer = recive_full_buffer(fd);
+    return deserialize_interruption(new_buffer);
+}
+
+t_interruption* deserialize_interruption(t_buffer* buffer)
+{
+    // Obtengo el nombre de la interrupcion
+    t_name_interruption name = buffer_read_uint32(buffer);
+
+    // Obtengo el pid
+    uint32_t pid = buffer_read_uint32(buffer);
+
+    return create_interruption(name, pid);
+}
+
+void serialize_interruption(t_buffer* buffer, t_interruption* interruption)
+{
+    // Agrego el nombre de la interruption
+    buffer_add_uint32(buffer, (uint32_t)get_name(interruption));
+
+    // Agrego el pid de la interruption
+    buffer_add_uint32(buffer, get_pid_interruption(interruption));
 }

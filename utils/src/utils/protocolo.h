@@ -139,6 +139,8 @@ t_message_example* recv_example(int);
 //       la funcion retorna 0 si el envio se realizo correctamente, y -1 en caso de error
 int send_interruption(t_interruption*, int);
 
+t_interruption* recv_interruption(int);
+
 /*********** SERIALIZE AND DESERIALIZE FUNCTIONS ***********/
 
 void *serializar_paquete(t_package*, int);
@@ -209,5 +211,9 @@ void serialize_next_instruction(t_buffer*, t_next_instruction*);
 // Post: Retorna un puntero a una estructura t_next_instruction creada a partir de los datos del buffer.
 //       Si ocurre un error en la deserialización, retorna NULL.
 t_next_instruction* deserialize_next_instruction(t_buffer*);
+
+t_interruption* deserialize_interruption(t_buffer*);
+
+void serialize_interruption(t_buffer*, t_interruption*);
 
 #endif
