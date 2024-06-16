@@ -132,7 +132,7 @@ void f_iniciar_proceso(char *path)
     int pid = asignar_pid();
 
     // Creor el PCB
-    t_PCB *pcb = pcb_create(pid, kernel_config->QUANTUM);
+    t_PCB *pcb = pcb_create(pid, obtener_quantum(kernel_config));
 
     // Cargo el pcb a la tabla de pcbs
     add_pcb(pcb);
@@ -144,13 +144,13 @@ void f_iniciar_proceso(char *path)
     t_new_process *nuevo_proceso = create_new_process(pid, path);
 
     // Calculo el tamaño del buffer para serializar el t_new_process
-    u_int32_t buffer_size = sizeof(uint32_t) + strlen(nuevo_proceso->path) + 1 + sizeof(uint32_t);
+    u_int32_t buffer_size = get_size_new_process(nuevo_proceso);
 
     log_info(logger_kernel, "Se serializa el nuevo proceso para enviar a memoria la creacion de la imagen del proceso");
 
     // Creo el paquete
     t_package *package = package_create(MSG_KERNEL_CREATE_PROCESS, buffer_size);
-    serialize_nuevo_proceso(package->buffer, nuevo_proceso);
+    serialize_nuevo_proceso(get_buffer(package), nuevo_proceso);
 
     package_send(package, fd_kernel_memoria);
     package_destroy(package);
@@ -199,14 +199,20 @@ void f_ejecutar_script(const char *filename)
     while ((read = getline(&linea, &len, file)) != -1) {
         // Eliminar el salto de línea si existe
         remove_newline(linea);
-        //linea[strcspn(linea, "\n")] = '\0';
 
-        //log_info(NULL, "Ejecutando comando: %s", linea);
+        // Duplicar la línea para pasarla a _atender_instruccion
+        char *linea_copy = strdup(linea);
+        if (linea_copy == NULL)
+        {
+            log_error(logger_kernel, "Error al duplicar la línea del archivo.");
+            continue;
+        }
 
         // Ejecutar el comando leído
-        _atender_instruccion(linea);
+        _atender_instruccion(linea_copy);
     }
 
+    free(linea);
     fclose(file);
 }
 

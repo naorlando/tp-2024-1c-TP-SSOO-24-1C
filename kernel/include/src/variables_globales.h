@@ -2,7 +2,8 @@
 #define VARIABLES_GLOBALES_H
 
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
+#include <stdbool.h> 
 #include <commons/log.h>
 #include <commons/collections/queue.h>
 #include "kernel_config.h"
@@ -30,8 +31,8 @@ extern int identificador_PID;
 extern pthread_mutex_t MUTEX_READY;
 extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
-extern t_datos_hilo* hilo_quantum;
-extern pthread_t hilo_interrupt;
+extern t_datos_hilo* datos_hilo_quantum;
+extern bool interrupcion_enviada;
 
 //SEMAFOROS
 extern sem_t SEM_READY;

@@ -2,7 +2,7 @@
 
 void planificador_corto_plazo()
 {
-    switch (_obtener_planificador(kernel_config->ALGORITMO_PLANIFICACION))
+    switch (_obtener_planificador(obtener_algoritmo_planificacion(kernel_config)))
     {
     case FIFO:
         planificador_FIFO();
@@ -52,7 +52,7 @@ void planificador_VRR()
 void interrupcion_quantum(uint32_t pid) {
     pthread_t hilo_de_quantum;
     pthread_create(&hilo_de_quantum, NULL, funcion_hilo_quantum, &pid);
-    pthread_detach(hilo_de_quantum);  // Para que el hilo se limpie automáticamente al terminar
+    pthread_join(hilo_de_quantum, NULL);  // Para que el hilo se limpie automáticamente al terminar
 }
 
 // Función que ejecuta el hilo quantum
@@ -60,12 +60,12 @@ void* funcion_hilo_quantum(void* arg) {
     uint32_t pid = *(uint32_t*)arg;
 
     // Suponiendo que esta función crea y devuelve un puntero a t_datos_hilo
-    t_datos_hilo* hilo_quantum = datos_hilo_create(pid, kernel_config->QUANTUM, pthread_self()); // TODO: get_quantum
-    usleep(hilo_quantum->quantum / 1000);
+    datos_hilo_quantum = datos_hilo_create(pid, obtener_quantum(kernel_config), pthread_self()); // TODO: get_quantum
+    usleep(obtener_quantum(kernel_config) * 1000);
 
     //pthread_mutex_lock(&MUTEX_EXECUTE);
-    if (EXECUTE != NULL && EXECUTE->pid == get_pid_datos_hilo(hilo_quantum)) {
-        enviar_interrupcion_a_cpu(hilo_quantum->pid);
+    if (EXECUTE != NULL && EXECUTE->pid == get_pid_datos_hilo(datos_hilo_quantum)) {
+        enviar_interrupcion_a_cpu(get_pid_datos_hilo(datos_hilo_quantum));
     }
     //pthread_mutex_unlock(&MUTEX_EXECUTE);
     //free(hilo_quantum);

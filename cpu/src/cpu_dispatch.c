@@ -303,12 +303,13 @@ void manejar_ciclo_de_instruccion() {
  
     eliminar_instruccion(instruccion);
 
-    // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
-    if(manejar_interrupcion()) return;
-
     // actualizar PC:
     cpu_registers->pc++;
     pcb_execute->program_counter = cpu_registers->pc;
+
+    // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
+    if(manejar_interrupcion()) return;
+
     //TODO: Se debe actualizar el PC antes de pedir la siguiente instruccion a memoria
     solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
     

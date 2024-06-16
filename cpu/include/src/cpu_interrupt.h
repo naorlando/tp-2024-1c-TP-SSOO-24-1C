@@ -10,6 +10,6 @@
 #include "protocolo_cpu.h"
 
 
-
+void recibir_interrupcion();
 
 #endif

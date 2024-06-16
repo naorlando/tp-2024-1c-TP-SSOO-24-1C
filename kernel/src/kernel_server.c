@@ -73,6 +73,9 @@ void atender_kernel_cpu_dispatch()
             case MSG_PCB_IO_KERNEL:
                 //Recibimos el t_interface
                 //recibir_pcb_io(); // TODO: hacer la funcion para recibir la interface
+
+                // SI recibo el PCB antes de que se mande la interrupcion tengo que matar el hilo de interrupcion
+                
                 break;
 
             log_info(logger_kernel, "Se recibio un mje de CPU DISPATCH");
@@ -88,7 +91,7 @@ void atender_kernel_cpu_dispatch()
             // 2-actualizar el pcb en la tabla de pcb:
             // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
             // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
-            dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void (*)(void *))pcb_destroy);
+            dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
             dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
             log_info(logger_kernel, "Se actualizo un pcb-INTERRUPT en la table_pcb");
 
@@ -96,6 +99,7 @@ void atender_kernel_cpu_dispatch()
 
             // 3-actualizar el estado del pcb en la cola correspondiente:
             queue_push(COLA_READY, pcb_interrupt);
+            sem_post(&SEM_READY);
             log_info(logger_kernel, "Se actualizo el estado del pcb-INTERRUPT en la cola correspondiente");
 
             break;

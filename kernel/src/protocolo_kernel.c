@@ -49,5 +49,7 @@ t_PCB* recv_pcb_interrupt()
 // adapter:
 void send_interruption_cpu(t_interruption* interrupcion)
 {
+    // Seteo que se envio una interrupcion a CPU
+    interrupcion_enviada = true;
     send_interruption(interrupcion, fd_cpu_interrupt);
 }
