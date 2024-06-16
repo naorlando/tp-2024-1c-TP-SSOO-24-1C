@@ -8,13 +8,13 @@
 typedef struct {
     uint32_t pid;
     uint32_t quantum;
-    pthread_t* hilo;
+    pthread_t hilo;
 } t_datos_hilo;
 
 // crear un t_datos_hilo
 // pre: pid, quantum y hilo validos
 // post: devuelve un t_datos_hilo
-t_datos_hilo* datos_hilo_create(uint32_t pid, uint32_t quantum, pthread_t* hilo);
+t_datos_hilo* datos_hilo_create(uint32_t pid, uint32_t quantum, pthread_t hilo);
 
 // destruir un t_datos_hilo
 // pre: t_datos_hilo creado
@@ -34,6 +34,6 @@ uint32_t get_quantum(t_datos_hilo* datos_hilo);
 // obtener hilo de un t_datos_hilo
 // pre: t_datos_hilo creado
 // post: se retorna el hilo del t_datos_hilo
-pthread_t* get_hilo(t_datos_hilo* datos_hilo);
+pthread_t get_hilo(t_datos_hilo* datos_hilo);
 
 #endif /*DATOS_HILOS_H_*/

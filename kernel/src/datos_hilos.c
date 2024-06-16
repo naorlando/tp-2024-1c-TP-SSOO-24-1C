@@ -1,6 +1,6 @@
 #include "datos_hilos.h"
 
-t_datos_hilo* datos_hilo_create(uint32_t pid, uint32_t quantum, pthread_t* hilo)
+t_datos_hilo* datos_hilo_create(uint32_t pid, uint32_t quantum, pthread_t hilo)
 {
     t_datos_hilo* datos_hilo = malloc(sizeof(t_datos_hilo));
     if(datos_hilo == NULL)
@@ -28,7 +28,7 @@ uint32_t get_quantum(t_datos_hilo* datos_hilo)
     return datos_hilo->quantum;
 }
 
-pthread_t* get_hilo(t_datos_hilo* datos_hilo)
+pthread_t get_hilo(t_datos_hilo* datos_hilo)
 {
     return datos_hilo->hilo;
 }
