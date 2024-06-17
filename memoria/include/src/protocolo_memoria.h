@@ -14,7 +14,7 @@ int recv_example_msg_kernel();
 
 int recv_example_msg_entradasalida();
 
-t_new_process* recv_process_kernel();
+t_new_process* recv_new_process_kernel();
 
 t_next_instruction* recv_next_instruction_cpu();
 

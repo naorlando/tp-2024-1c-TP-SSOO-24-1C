@@ -67,7 +67,7 @@ void requests_kernel() {
 
             case MSG_KERNEL_CREATE_PROCESS:
 
-                t_new_process* new_process= recv_process_kernel();
+                t_new_process* new_process= recv_new_process_kernel();
 
                 if(new_process == NULL) {
                     log_error(logger_memoria, "ERROR: Ha surgido un problema al recibir el nuevo proceso.");

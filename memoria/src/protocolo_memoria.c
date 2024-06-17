@@ -39,16 +39,13 @@ int recv_example_msg_entradasalida(){
     return 0;
 }
 
-t_new_process* recv_process_kernel() {
+t_new_process* recv_new_process_kernel() {
     
     log_info(logger_memoria, "Se recibio la solicitud de KERNEL para crear un proceso en memoria");
     
-    t_buffer* buffer = recive_full_buffer(fd_kernel);
     //t_new_process* nuevo_proceso= malloc(sizeof(t_new_process)); NO hace falta uso la funcion que crea
 
-    if(buffer == NULL) return NULL;
-
-    t_new_process* new_process= deserialize_nuevo_proceso(buffer);
+    t_new_process* new_process= recv_new_process(fd_kernel);
 
     // Crear estructuras administrativas necesarias
     //t_proceso* proceso = malloc(sizeof(t_proceso));
@@ -66,7 +63,6 @@ t_new_process* recv_process_kernel() {
     //free(proceso);
     //free(nuevo_proceso->path);
     //free(nuevo_proceso);
-    buffer_destroy(buffer);
 
     return new_process;
 }
