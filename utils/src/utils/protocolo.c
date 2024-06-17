@@ -153,6 +153,16 @@ int send_pcb(t_msg_header msg_header, int fd, t_PCB* pcb)
     return 0;
 }
 
+t_PCB* recv_pcb(int fd)
+{
+    t_buffer *new_buffer = recive_full_buffer(fd);
+    t_PCB* pcb = deserialize_pcb(new_buffer);
+
+    buffer_destroy(new_buffer);
+
+    return pcb; 
+}
+
 int send_example(char* cadena, uint8_t entero, int fd) 
 {
     t_message_example* example = message_example_create(cadena, entero);

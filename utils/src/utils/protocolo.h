@@ -37,6 +37,7 @@ typedef enum
     MSG_IO_KERNEL,
     MSG_KERNEL_IO,
     MSG_PCB_IO_KERNEL,
+    MSG_PCB_KERNEL_EXIT, // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
     MSG_QUANTUM, // KERNEL -> CPU (interrupcion por fin de quantum)
     MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, // CPU -> KERNEL (devuelvo pcb de proceso a kernel con interrupcion por fin de quantum)
     // KERNEL <-> MEMORIA
@@ -128,6 +129,8 @@ void message_example_destroy(t_message_example*);
 // Post: El t_PCB se serializa y se envía a través del socket especificado.
 //       La función retorna 0 si el envío se realizó correctamente.
 int send_pcb(t_msg_header, int, t_PCB*);
+
+t_PCB* recv_pcb(int);
 
 // Envía un mensaje t_message_example a través de un socket especificado.
 // Pre: El parámetro cadena debe apuntar a una cadena de caracteres válida y no debe ser NULL.
