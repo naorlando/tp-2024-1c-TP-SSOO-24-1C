@@ -152,7 +152,7 @@ void f_iniciar_proceso(char *path)
 void enviar_pcb_cpu()
 {
     t_PCB *pcb = get_pcb(1);
-    // envio a cpu el pcb
+    // envio el pcb a cpu 
     send_pcb_cpu(pcb);
 }
 
@@ -166,19 +166,6 @@ void f_ejecutar_script(const char *filename)
         log_error(logger_kernel, "Error no se pudo abrir el archivo a ejecutar");
         return;
     }
-
-    // char* linea = malloc(sizeof(char)*256);
-    // while (fgets(linea, sizeof(linea), file))
-    // {
-    //     // Eliminar el salto de línea si existe
-    //     linea[strcspn(linea, "\n")] = '\0';
-
-    //     log_info(logger_kernel, "Ejecutando comando: %s", linea);
-
-    //     // Ejecutar el comando leído
-    //     // Aquí se debería llamar a la función correspondiente al comando leído
-    //     _atender_instruccion(linea);
-    // }
 
     size_t len = 0;
     ssize_t read;
