@@ -21,17 +21,16 @@ int recv_example_msg_kernel()
     return 0;
 }
 
-t_PCB* recv_pcb_cpu()
+t_PCB* recv_pcb_kernel()
 {
-    t_buffer* buffer = recive_full_buffer(fd_kernel_dispatch);
-    t_PCB* pcb = deserialize_pcb(buffer);
+    t_PCB* pcb = recv_pcb(fd_kernel_dispatch);
+
     log_info(logger_cpu, "Se recibio un PCB del Kernel, PID => %d", pcb->pid);
     // log_info(logger_cpu, "PCB pc => %d", pcb->program_counter);
     // log_info(logger_cpu, "PCB Quantum => %d", pcb->quantum);
     // log_info(logger_cpu, "PCB cpu_registers AX => %d", pcb->cpu_registers->ax);
 
     //pcb_destroy(pcb);
-    buffer_destroy(buffer);
 
     return pcb;
 }

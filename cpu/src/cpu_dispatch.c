@@ -261,7 +261,7 @@ void solicitar_instruccion(uint32_t pid, uint32_t pc)
 void recibir_pcb() 
 {
     // Recibo el pcb que manda kernel para ejecutar sus instrucciones
-    pcb_execute = recv_pcb_cpu(); //TODO: CAMBIAR cpu por kernel
+    pcb_execute = recv_pcb_kernel();
 
     // Cargo el contexto de ejecucion del pcb en los registros de la cpu
     cargar_contexto_ejecucion(pcb_execute);

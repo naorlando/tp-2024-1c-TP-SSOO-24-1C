@@ -14,7 +14,7 @@ int recv_example_msg_kernel();
 // Recibe un t_PCB desde el Kernel.
 // Pre: El descriptor de archivo fd_kernel_dispatch debe ser válido y estar abierto.
 // Post: Retorna un puntero a t_PCB que contiene el PCB recibido.
-t_PCB* recv_pcb_cpu();
+t_PCB* recv_pcb_kernel();
 
 // Envía un t_PCB al Kernel.
 // Pre: La variable global pcb_execute debe ser un puntero válido a t_PCB y no debe ser NULL.
