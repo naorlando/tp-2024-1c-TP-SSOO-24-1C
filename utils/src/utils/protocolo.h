@@ -166,21 +166,31 @@ int send_interruption(t_interruption*, int);
 // Post: Retorna un puntero a `t_interruption` deserializado desde el buffer recibido.
 t_interruption* recv_interruption(int);
 
-/*********** SEND AND RECIVE 'T_INTRUCTION' ***********/
-
+/*********** SEND AND RECIVE 'T_INSTRUCTION' ***********/
+// Envía una instrucción a través de un descriptor de archivo.
+// Pre: `fd` debe ser un descriptor de archivo válido.
+//      `instruction` debe ser un puntero válido a `t_instruction` y no NULL.
+// Post: La instrucción es serializada y enviada a través del descriptor de archivo.
+void send_instrution(int, t_instruction*);
 
 // Recibe una instrucción desde un descriptor de archivo.
 // Pre: `fd` debe ser un descriptor de archivo válido.
 // Post: Retorna un puntero a `t_instruction` deserializado desde el buffer recibido.
 t_instruction* recv_instruction(int);
 
-/*********** SEND AND RECIVE 'T_NEXT_INTRUCTION' ***********/
+/*********** SEND AND RECIVE 'T_NEXT_INSTRUCTION' ***********/
 // Envía una solicitud para obtener la siguiente instrucción a memoria.
 // Pre: `fd` debe ser un descriptor de archivo válido.
 //      `pid` debe ser un identificador de proceso válido.
 //      `program_counter` debe ser un contador de programa válido.
-// Post: La solicitud para obtener la siguiente instrucción es enviada a memoria.
+// Post: La solicitud para obtener la siguiente instrucción es enviada a través del descriptor de archivo.
 void send_get_next_instruction(int, uint32_t, uint32_t);
+
+// Recibe la siguiente instrucción desde un descriptor de archivo.
+// Pre: `fd` debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a `t_next_instruction` deserializado desde el buffer recibido.
+//       Si el buffer recibido es NULL, retorna NULL.
+t_next_instruction* recv_next_instruction(int);
 
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
