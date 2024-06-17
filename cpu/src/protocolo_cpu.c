@@ -89,7 +89,7 @@ void send_get_next_instruction(uint32_t pid, uint32_t program_counter)
 
 void send_pcb_kernel()
 {
-    send_pcb(MSG_PCB_KERNEL, fd_kernel_dispatch, pcb_execute);
+    send_pcb(MSG_PCB_KERNEL_EXIT, fd_kernel_dispatch, pcb_execute);
 }
 
 void send_interface_kernel(/*t_interface interface*/) 
