@@ -221,6 +221,36 @@ t_interruption* recv_interruption(int fd)
     return interruption;
 }
 
+t_instruction* recv_instruction(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+    t_instruction* instruction = deserialize_instruction(buffer);
+    
+    buffer_destroy(buffer);
+
+    return instruction;
+}
+
+void send_get_next_instruction(int fd, uint32_t pid, uint32_t program_counter)
+{
+    t_next_instruction* next_instruction = crear_siguiente_instruccion(pid, program_counter);
+
+    // Creo el paquete que se va a enviar a memoria
+    t_package* package = package_create(MSG_NEXT_INSTRUCTION_CPU, obtener_next_instruction_size(next_instruction));
+
+    // Serializo en el buffer el t_next_instruction
+    serialize_next_instruction(get_buffer(package), next_instruction);
+
+    // Envio el paquete a memoria
+    package_send(package, fd);
+
+    // Elimino t_next_instruction
+    eliminar_next_instruction(next_instruction);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+}
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)

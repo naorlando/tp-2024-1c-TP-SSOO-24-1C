@@ -124,6 +124,8 @@ uint32_t get_message_example_size(t_message_example*);
 void message_example_destroy(t_message_example*);
 
 /*##########################################  SEND AND RECIVE FUNCTIONS ##########################################*/
+
+/*********** SEND AND RECIVE 'T_PCB' ***********/
 // Envía un t_PCB a través de un socket especificado.
 // Pre: El parámetro msg_header debe contener un encabezado de mensaje válido.
 //      El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
@@ -137,6 +139,7 @@ int send_pcb(t_msg_header, int, t_PCB*);
 // Post: Retorna un puntero a t_PCB deserializado.
 t_PCB* recv_pcb(int);
 
+/*********** SEND AND RECIVE 'T_MESSAGE_EXAMPLE' ***********/
 // Envía un mensaje t_message_example a través de un socket especificado.
 // Pre: El parámetro cadena debe apuntar a una cadena de caracteres válida y no debe ser NULL.
 //      El parámetro entero debe ser un valor entero de 8 bits.
@@ -150,6 +153,7 @@ int send_example(char*, uint8_t, int);
 // Post: La función retorna un puntero a una estructura t_message_example creada dinámicamente con los datos recibidos y deserializados.
 t_message_example* recv_example(int);
 
+/*********** SEND AND RECIVE 'T_INTERRUPTION' ***********/
 // envia una interrupcion a traves de un socket especificado
 // pre: el parametro interrupcion debe ser un puntero valido a una estructura t_interruption
 //      el parametro fd debe ser un descriptor de archivo de socket valido y abierto
@@ -157,7 +161,26 @@ t_message_example* recv_example(int);
 //       la funcion retorna 0 si el envio se realizo correctamente, y -1 en caso de error
 int send_interruption(t_interruption*, int);
 
+// Recibe una interrupción desde un descriptor de archivo.
+// Pre: `fd` debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a `t_interruption` deserializado desde el buffer recibido.
 t_interruption* recv_interruption(int);
+
+/*********** SEND AND RECIVE 'T_INTRUCTION' ***********/
+
+
+// Recibe una instrucción desde un descriptor de archivo.
+// Pre: `fd` debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a `t_instruction` deserializado desde el buffer recibido.
+t_instruction* recv_instruction(int);
+
+/*********** SEND AND RECIVE 'T_NEXT_INTRUCTION' ***********/
+// Envía una solicitud para obtener la siguiente instrucción a memoria.
+// Pre: `fd` debe ser un descriptor de archivo válido.
+//      `pid` debe ser un identificador de proceso válido.
+//      `program_counter` debe ser un contador de programa válido.
+// Post: La solicitud para obtener la siguiente instrucción es enviada a memoria.
+void send_get_next_instruction(int, uint32_t, uint32_t);
 
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
