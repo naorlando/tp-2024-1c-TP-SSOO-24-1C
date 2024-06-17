@@ -86,6 +86,7 @@ typedef struct
  *  package functions
  */
 
+/*########################################## T_PACKAGE FUNCTIONS ##########################################*/
 // Package
 t_package *package_create(t_msg_header, u_int32_t);
 void package_destroy(t_package*);
@@ -94,6 +95,7 @@ int package_recv(t_package*, int);
 t_buffer* get_buffer(t_package*);
 t_msg_header get_message_header(t_package*);
 
+/*########################################## T_MESSAGE_EXAMPLE FUNCTIONS ##########################################*/
 // Crea un nuevo t_message_example con los datos proporcionados.
 // Pre: El parámetro cadena debe apuntar a una cadena de caracteres válida y no debe ser NULL.
 //      El parámetro entero debe ser un valor entero de 8 bits.
@@ -121,7 +123,7 @@ uint32_t get_message_example_size(t_message_example*);
 // Post: La memoria asociada a la estructura y su cadena interna se libera.
 void message_example_destroy(t_message_example*);
 
-/*********** SEND AND RECIVE FUNCTIONS ***********/
+/*##########################################  SEND AND RECIVE FUNCTIONS ##########################################*/
 // Envía un t_PCB a través de un socket especificado.
 // Pre: El parámetro msg_header debe contener un encabezado de mensaje válido.
 //      El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
@@ -157,7 +159,7 @@ int send_interruption(t_interruption*, int);
 
 t_interruption* recv_interruption(int);
 
-/*********** SERIALIZE AND DESERIALIZE FUNCTIONS ***********/
+/*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
 void *serializar_paquete(t_package*, int);
 
@@ -228,6 +230,7 @@ void serialize_next_instruction(t_buffer*, t_next_instruction*);
 //       Si ocurre un error en la deserialización, retorna NULL.
 t_next_instruction* deserialize_next_instruction(t_buffer*);
 
+/*********** SERIALIZE AND DESERIALIZE 'T_INTERRUPTION' ***********/
 // Deserializa una interrupción desde un buffer.
 // Pre: El puntero a t_buffer debe ser válido y no NULL.
 // Post: Retorna un puntero a t_interruption deserializado.

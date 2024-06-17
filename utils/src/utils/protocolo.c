@@ -11,6 +11,7 @@
  *      Package
  */
 
+/*########################################## T_PACKAGE FUNCTIONS ##########################################*/
 // Package create
 t_package *package_create(t_msg_header msg_header, u_int32_t buffer_size)
 {
@@ -100,6 +101,7 @@ t_msg_header get_message_header(t_package* package) {
     return package->msg_header;
 }
 
+/*########################################## T_MESSAGE_EXAMPLE FUNCTIONS ##########################################*/
 t_message_example* message_example_create(char* cadena, uint8_t entero)
 {
     t_message_example* example = malloc(sizeof(t_message_example));
@@ -139,7 +141,7 @@ void message_example_destroy(t_message_example* example)
 
     free(example);
 }
-
+/*##########################################  SEND AND RECIVE FUNCTIONS ##########################################*/
 int send_pcb(t_msg_header msg_header, int fd, t_PCB* pcb) 
 {
     uint32_t buffer_size = get_pcb_size(pcb) + sizeof(uint32_t);
@@ -189,9 +191,37 @@ int send_example(char* cadena, uint8_t entero, int fd)
 t_message_example* recv_example(int fd) 
 {
     t_buffer *new_buffer = recive_full_buffer(fd);
-    return example_deserialize_msg(new_buffer);
+    t_message_example* msg_example = example_deserialize_msg(new_buffer);
+
+    buffer_destroy(new_buffer);
+
+    return msg_example;
 }
 
+int send_interruption(t_interruption* interruption, int fd)
+{
+    t_package* package = package_create(MSG_QUANTUM, get_interruption_size(interruption));
+
+    serialize_interruption(get_buffer(package), interruption);
+
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return 0;
+}
+
+t_interruption* recv_interruption(int fd) 
+{
+    t_buffer *new_buffer = recive_full_buffer(fd);
+    t_interruption* interruption = deserialize_interruption(new_buffer);
+
+    buffer_destroy(new_buffer);
+
+    return interruption;
+}
+
+/*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)
 {
@@ -410,25 +440,6 @@ t_next_instruction* deserialize_next_instruction(t_buffer* buffer) {
     uint32_t pc = buffer_read_uint32(buffer);
 
     return crear_siguiente_instruccion(pid, pc);
-}
-
-int send_interruption(t_interruption* interruption, int fd)
-{
-    t_package* package = package_create(MSG_QUANTUM, get_interruption_size(interruption));
-
-    serialize_interruption(get_buffer(package), interruption);
-
-    package_send(package, fd);
-
-    package_destroy(package);
-
-    return 0;
-}
-
-t_interruption* recv_interruption(int fd) 
-{
-    t_buffer *new_buffer = recive_full_buffer(fd);
-    return deserialize_interruption(new_buffer);
 }
 
 t_interruption* deserialize_interruption(t_buffer* buffer)
