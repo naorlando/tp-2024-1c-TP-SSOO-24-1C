@@ -255,7 +255,7 @@ void cargar_contexto_ejecucion(t_PCB* pcb) {
 void solicitar_instruccion(uint32_t pid, uint32_t pc) 
 {
     // Pido la siguiente instruccion a memoria
-    send_get_next_instruction(pid, pc);
+    send_get_next_instruction_memoria(pid, pc);
 }
 
 void recibir_pcb() 
@@ -272,7 +272,7 @@ void recibir_pcb()
 
 void manejar_ciclo_de_instruccion() {
     // FETCH: Recibo la instruccion que manda memoria
-    t_instruction* instruccion = recv_instruction();
+    t_instruction* instruccion = recv_instruction_memoria();
 
     log_info(logger_cpu, "Instrucción recibida de memoria");
     log_info(logger_cpu, "antes: AX: %u", cpu_registers->ax);

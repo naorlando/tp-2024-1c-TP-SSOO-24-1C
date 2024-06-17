@@ -33,12 +33,12 @@ void send_pcb_kernel_interruption(t_name_interruption);
 // Pre: Los parámetros pid y program_counter deben ser válidos.
 //      El descriptor de archivo fd_memoria debe ser válido y estar abierto.
 // Post: Se envía una solicitud de la siguiente instrucción a memoria.
-void send_get_next_instruction(uint32_t, uint32_t);
+void send_get_next_instruction_memoria(uint32_t, uint32_t);
 
 // Recibe una instrucción desde la memoria.
 // Pre: El descriptor de archivo fd_memoria debe ser válido y estar abierto.
 // Post: Retorna un puntero a t_instruction que contiene la instrucción recibida.
-t_instruction* recv_instruction();
+t_instruction* recv_instruction_memoria();
 
 void send_interface_kernel(/*t_interface**/);
 

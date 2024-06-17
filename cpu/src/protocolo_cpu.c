@@ -56,34 +56,18 @@ t_PCB* recv_pcb_kernel()
     
 // }
 
-t_instruction* recv_instruction()
+t_instruction* recv_instruction_memoria()
 {
-    t_buffer* buffer = recive_full_buffer(fd_memoria);
-    t_instruction* instruction = deserialize_instruction(buffer);
+    t_instruction* instruction = recv_instruction(fd_memoria);
     
     log_info(logger_cpu, "Se recibio una instruccion de memoria");
 
     return instruction;
 }
 
-void send_get_next_instruction(uint32_t pid, uint32_t program_counter)
+void send_get_next_instruction_memoria(uint32_t pid, uint32_t program_counter)
 {
-    t_next_instruction* next_instruction = crear_siguiente_instruccion(pid, program_counter);
-
-    // Creo el paquete que se va a enviar a memoria
-    t_package* package = package_create(MSG_NEXT_INSTRUCTION_CPU, obtener_next_instruction_size(next_instruction));
-
-    // Serializo en el buffer el t_next_instruction
-    serialize_next_instruction(get_buffer(package), next_instruction);
-
-    // Envio el paquete a memoria
-    package_send(package, fd_memoria);
-
-    // Elimino t_next_instruction
-    eliminar_next_instruction(next_instruction);
-
-    //Elimino el paquete usado
-    package_destroy(package);
+    send_get_next_instruction(fd_memoria, pid, program_counter);
 }
 
 void send_pcb_kernel()
