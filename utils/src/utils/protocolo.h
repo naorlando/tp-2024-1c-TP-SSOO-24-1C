@@ -130,6 +130,9 @@ void message_example_destroy(t_message_example*);
 //       La función retorna 0 si el envío se realizó correctamente.
 int send_pcb(t_msg_header, int, t_PCB*);
 
+// Recibe un PCB desde un descriptor de archivo.
+// Pre: El descriptor de archivo fd debe ser válido.
+// Post: Retorna un puntero a t_PCB deserializado.
 t_PCB* recv_pcb(int);
 
 // Envía un mensaje t_message_example a través de un socket especificado.
@@ -225,8 +228,14 @@ void serialize_next_instruction(t_buffer*, t_next_instruction*);
 //       Si ocurre un error en la deserialización, retorna NULL.
 t_next_instruction* deserialize_next_instruction(t_buffer*);
 
+// Deserializa una interrupción desde un buffer.
+// Pre: El puntero a t_buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a t_interruption deserializado.
 t_interruption* deserialize_interruption(t_buffer*);
 
+// Serializa una interrupción en un buffer.
+// Pre: Los punteros a t_buffer y t_interruption deben ser válidos y no NULL.
+// Post: La interrupción es serializada y agregada al buffer.
 void serialize_interruption(t_buffer*, t_interruption*);
 
 #endif
