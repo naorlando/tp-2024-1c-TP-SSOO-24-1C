@@ -102,9 +102,11 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         }
         case EXIT: {
             log_info(logger_cpu, "EXIT\n");
-            sem_wait(&SEM_INTERRUPT); //BINARIO
-            interrupcion_pendiente = true;
-            tipo_de_interrupcion = EXIT_INTERRUPT;
+            // sem_wait(&SEM_INTERRUPT); //BINARIO
+            // interrupcion_pendiente = true;
+            // tipo_de_interrupcion = EXIT_INTERRUPT;
+            enviar_pcb_finalizado();
+            llego_a_exit = true;
             break;
         }
         default:
@@ -259,7 +261,7 @@ void solicitar_instruccion(uint32_t pid, uint32_t pc)
 void recibir_pcb() 
 {
     // Recibo el pcb que manda kernel para ejecutar sus instrucciones
-    pcb_execute = recv_pcb_cpu();
+    pcb_execute = recv_pcb_cpu(); //TODO: CAMBIAR cpu por kernel
 
     // Cargo el contexto de ejecucion del pcb en los registros de la cpu
     cargar_contexto_ejecucion(pcb_execute);
@@ -287,7 +289,7 @@ void manejar_ciclo_de_instruccion() {
 
     // EXECUTE: Ejecuto la instruccion recibida
     ejecutar_instruccion(instruccion, cpu_registers);
-    sleep(20);
+    //sleep(5);
     //imprimir todos los cpu_registers:
     log_info(logger_cpu, "despues: AX: %u", cpu_registers->ax);
     log_info(logger_cpu, "despues: BX: %u", cpu_registers->bx);
@@ -302,6 +304,12 @@ void manejar_ciclo_de_instruccion() {
 
  
     eliminar_instruccion(instruccion);
+
+    // se debe hacer un "return;", si el proceso llego a exit
+    if(llego_a_exit) {
+        llego_a_exit = false; // seteamos en false para el siguiente pcb
+        return;
+    }
 
     // actualizar PC:
     cpu_registers->pc++;
@@ -322,7 +330,7 @@ bool manejar_interrupcion() {
         // de enviar de nuevo al kernel
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
         send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
-        sem_post(&SEM_INTERRUPT);
+        //sem_post(&SEM_INTERRUPT);
         interrupcion_pendiente = false; 
         
         log_info(logger_cpu, "PCB enviado al Kernel");
@@ -353,4 +361,15 @@ void  cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
     contexto->edx = cpu_registers->edx;
     contexto->si = cpu_registers->si;
     contexto->di = cpu_registers->di;
+}
+
+void enviar_pcb_finalizado() 
+{
+    cargar_contexto_ejecucion_a_pcb(pcb_execute);
+    send_pcb_kernel();
+
+    // Controlo si llego una interrupcion
+    if(interrupcion_pendiente) {
+        interrupcion_pendiente = false; // la desestimo
+    }
 }
