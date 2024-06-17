@@ -16,7 +16,8 @@ t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
 t_name_interruption tipo_de_interrupcion;
 t_PCB* pcb_execute;
-sem_t SEM_INTERRUPT; 
+sem_t SEM_INTERRUPT;
+bool llego_a_exit = false; 
 
 char* server_port_interrupt;
 char* server_port_dispatch;
