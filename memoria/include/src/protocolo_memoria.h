@@ -2,10 +2,8 @@
 #define PROTOCOLO_MEMORIA_H_
 
 #include <commons/log.h>
-#include <utils/sockets.h>
 #include "variables_globales.h"
 #include "utils/protocolo.h"
-#include "utils/buffer.h"
 #include "gestion_procesos.h" 
 
 int recv_example_msg_cpu();
