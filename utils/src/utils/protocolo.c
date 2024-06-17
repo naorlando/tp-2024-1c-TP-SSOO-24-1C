@@ -223,13 +223,13 @@ t_interruption* recv_interruption(int fd)
 
 void send_instrution(int fd, t_instruction* instruction)
 {
-    // Creo el paquete que se va a enviar a CPU
+    // Creo el paquete que se va a enviar
     t_package* package = package_create(MSG_INSTRUCTION_MEMORIA, obtener_instruction_size(instruction));
 
     // Serializo en el buffer el t_instruction
     serialize_instruction(get_buffer(package), instruction);
 
-    // Envio el paquete a memoria
+    // Envio el paquete
     package_send(package, fd);
 
     // Elimino t_instruction
@@ -253,13 +253,13 @@ void send_get_next_instruction(int fd, uint32_t pid, uint32_t program_counter)
 {
     t_next_instruction* next_instruction = crear_siguiente_instruccion(pid, program_counter);
 
-    // Creo el paquete que se va a enviar a memoria
+    // Creo el paquete que se va a enviar
     t_package* package = package_create(MSG_NEXT_INSTRUCTION_CPU, obtener_next_instruction_size(next_instruction));
 
     // Serializo en el buffer el t_next_instruction
     serialize_next_instruction(get_buffer(package), next_instruction);
 
-    // Envio el paquete a memoria
+    // Envio el paquete
     package_send(package, fd);
 
     // Elimino t_next_instruction
@@ -280,6 +280,39 @@ t_next_instruction* recv_next_instruction(int fd)
     buffer_destroy(buffer);
 
     return next_instruction;
+}
+
+void send_new_process(int fd, uint32_t pid, char* path)
+{
+    t_new_process* new_process = create_new_process(pid, path);
+
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_CREATE_PROCESS, get_size_new_process(new_process));
+
+    // Serializo en el buffer el t_new_process
+    serialize_nuevo_proceso(get_buffer(package), new_process);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_new_process
+    destroy_new_process(new_process);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+}
+
+t_new_process* recv_new_process(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_new_process* new_process= deserialize_nuevo_proceso(buffer);
+
+    buffer_destroy(buffer);
+
+    return new_process;
 }
 
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/

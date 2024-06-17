@@ -192,6 +192,20 @@ void send_get_next_instruction(int, uint32_t, uint32_t);
 //       Si el buffer recibido es NULL, retorna NULL.
 t_next_instruction* recv_next_instruction(int);
 
+/*********** SEND AND RECIVE 'T_NEW_PROCESS' ***********/
+// Envía un nuevo proceso a través de un descriptor de archivo.
+// Pre: `fd` debe ser un descriptor de archivo válido.
+//      `pid` debe ser un identificador de proceso válido.
+//      `path` debe ser un puntero válido a una cadena de caracteres y no NULL.
+// Post: El nuevo proceso es serializado y enviado a través del descriptor de archivo.
+void send_new_process(int, uint32_t, char*);
+
+// Recibe un nuevo proceso desde un descriptor de archivo.
+// Pre: `fd` debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a `t_new_process` deserializado desde el buffer recibido.
+//       Si el buffer recibido es NULL, retorna NULL.
+t_new_process* recv_new_process(int);
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
 void *serializar_paquete(t_package*, int);
