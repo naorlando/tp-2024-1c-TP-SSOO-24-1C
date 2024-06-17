@@ -16,8 +16,8 @@ int recv_example_msg_entradasalida();
 
 t_new_process* recv_process_kernel();
 
-t_next_instruction* recv_next_instruction();
+t_next_instruction* recv_next_instruction_cpu();
 
-void send_instrution(t_instruction*);
+void send_instrution_cpu(t_instruction*);
 
 #endif /*PROTOCOLO_MEMORIA_H_*/

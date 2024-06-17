@@ -13,7 +13,7 @@ void requests_cpu() {
                 //esperar = false; //Cortamos la espera de solicitudes
             break;
             case MSG_NEXT_INSTRUCTION_CPU:
-                t_next_instruction* next = recv_next_instruction();
+                t_next_instruction* next = recv_next_instruction_cpu();
 
                 if(next == NULL) {
                     log_error(logger_memoria, "ERROR: Ha surgido un problema al recibir la solicitud de siguiente instruccion.");
@@ -27,7 +27,7 @@ void requests_cpu() {
                     t_instruction* instruction = obtener_siguiente_instruccion(proceso, obtener_pc_process(next));
 
                     if(instruction != NULL){
-                        send_instrution(instruction);
+                        send_instrution_cpu(instruction);
                     }
                 }
             break;                     
