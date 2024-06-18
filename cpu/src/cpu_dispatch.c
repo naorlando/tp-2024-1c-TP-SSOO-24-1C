@@ -342,7 +342,38 @@ bool manejar_interrupcion() {
 void solicitar_IO(t_instruction* instruccion)
 {
     // t_interface interface = create_interface(pcb_execute, instruccion);
-    send_interface_kernel(/*interface*/);
+    //send_interface_kernel(/*interface*/);
+
+    switch(obtener_nombre_instruccion(instruccion))
+    {
+        case IO_GEN_SLEEP:
+            send_solicitud_io_generica_kernel(pcb_execute, instruccion);
+            break;
+        case IO_STDIN_READ:
+    
+            break;
+        case IO_STDOUT_WRITE:
+            
+            break;
+        case IO_FS_CREATE:
+            
+            break;
+        case IO_FS_DELETE:
+            
+            break;
+        case IO_FS_TRUNCATE:
+            
+            break;
+        case IO_FS_WRITE:
+            
+            break;
+        case IO_FS_READ:
+            
+            break;
+        default:
+
+            break;
+    }
 }
 
 // cargar contexto de ejecucion del cpu a los registros del pcb
