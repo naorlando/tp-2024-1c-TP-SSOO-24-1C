@@ -20,6 +20,7 @@
 #include "instruccion.h"
 #include "next_instruction.h"
 #include "interruption.h"
+#include "solicitudes_io.h"
 
 /*
  *  Messages: enum & structs
@@ -28,7 +29,6 @@
 // Message headers
 typedef enum
 {
-
     // KERNEL <-> CPU
     MSG_KERNEL_CPU_DISPATCH, // SE LLAMA PERO NO SE USA!
     MSG_PCB_KERNEL, // CPU -> KERNEL (Se manda PCB al KERNEL)
@@ -286,5 +286,65 @@ t_interruption* deserialize_interruption(t_buffer*);
 // Pre: Los punteros a t_buffer y t_interruption deben ser válidos y no NULL.
 // Post: La interrupción es serializada y agregada al buffer.
 void serialize_interruption(t_buffer*, t_interruption*);
+
+// Función para serializar una solicitud de E/S genérica.
+// Pre: El buffer y la solicitud deben ser válidos y no NULL.
+// Post: La solicitud se serializa en el buffer.
+void serializar_solicitud_io_generica(t_buffer* buffer, t_solicitud_io_generica* solicitud);
+
+// Función para deserializar una solicitud de E/S genérica.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_solicitud_io_generica deserializada.
+t_solicitud_io_generica* deserializar_solicitud_io_generica(t_buffer* buffer);
+
+// Función para serializar una E/S genérica.
+// Pre: El buffer y la E/S genérica deben ser válidos y no NULL.
+// Post: La E/S genérica se serializa en el buffer.
+void serializar_io_generica(t_buffer* buffer, t_io_generica* io_generica);
+
+// Función para deserializar una E/S genérica.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_io_generica deserializada.
+t_io_generica* deserializar_io_generica(t_buffer* buffer);
+
+// Función para serializar una solicitud de E/S STDIN.
+// Pre: El buffer y la solicitud deben ser válidos y no NULL.
+// Post: La solicitud se serializa en el buffer.
+void serializar_solicitud_io_stdin(t_buffer* buffer, t_solicitud_io_stdin* solicitud);
+
+// Función para deserializar una solicitud de E/S STDIN.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_solicitud_io_stdin deserializada.
+t_solicitud_io_stdin* deserializar_solicitud_io_stdin(t_buffer* buffer);
+
+// Función para serializar una E/S STDIN.
+// Pre: El buffer y la E/S STDIN deben ser válidos y no NULL.
+// Post: La E/S STDIN se serializa en el buffer.
+void serializar_io_stdin(t_buffer* buffer, t_io_stdin* io_stdin);
+
+// Función para deserializar una E/S STDIN.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_io_stdin deserializada.
+t_io_stdin* deserializar_io_stdin(t_buffer* buffer);
+
+// Función para serializar una solicitud de E/S STDOUT.
+// Pre: El buffer y la solicitud deben ser válidos y no NULL.
+// Post: La solicitud se serializa en el buffer.
+void serializar_solicitud_io_stdout(t_buffer* buffer, t_solicitud_io_stdout* solicitud);
+
+// Función para deserializar una solicitud de E/S STDOUT.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_solicitud_io_stdout deserializada.
+t_solicitud_io_stdout* deserializar_solicitud_io_stdout(t_buffer* buffer);
+
+// Función para serializar una E/S STDOUT.
+// Pre: El buffer y la E/S STDOUT deben ser válidos y no NULL.
+// Post: La E/S STDOUT se serializa en el buffer.
+void serializar_io_stdout(t_buffer* buffer, t_io_stdout* io_stdout);
+
+// Función para deserializar una E/S STDOUT.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_io_stdout deserializada.
+t_io_stdout* deserializar_io_stdout(t_buffer* buffer);
 
 #endif
