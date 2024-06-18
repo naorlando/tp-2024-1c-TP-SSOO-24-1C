@@ -1,5 +1,4 @@
 #include "solicitudes_io.h"
-#include "protocolo.h"
 
 //===============================================
 // FUNCIONES DE SERIALIZACION
@@ -164,6 +163,91 @@ t_io_stdout* crear_io_stdout(uint32_t direccion_fisica, uint32_t tamanio) {
     io_stdout->tamanio = tamanio;
 
     return io_stdout;
+}
+
+//===============================================
+// FUNCIONES DE ACCESO A CAMPOS
+//===============================================
+
+/*********** Functiones 't_io_generica' ***********/
+char* obtener_nombre_interfaz_generica(t_io_generica* io_generica)
+{
+    return io_generica->nombre_interfaz;
+}
+
+uint32_t obtener_tiempo_sleep(t_io_generica* io_generica)
+{
+    return io_generica->tiempo_sleep;
+}
+
+/*********** Functiones 't_io_stdin' ***********/
+uint32_t obtener_direccion_fisica_stdin(t_io_stdin* io_stdin)
+{
+    return io_stdin->direccion_fisica;
+}
+
+uint32_t obtener_tamanio_stdin(t_io_stdin* io_stdin)
+{
+    return io_stdin->tamanio;
+}
+
+/*********** Functiones 't_io_stdout' ***********/
+uint32_t obtener_direccion_fisica_stdout(t_io_stdout* io_stdout)
+{
+    return io_stdout->direccion_fisica;
+}
+
+uint32_t obtener_tamanio_stdout(t_io_stdout* io_stdout)
+{
+    return io_stdout->tamanio;
+}
+
+/*********** Functiones 't_solicitud_io_generica' ***********/
+t_PCB* obtener_pcb_solicitud_generica(t_solicitud_io_generica* solicitud) 
+{
+    return solicitud->pcb;
+}
+
+char* obtener_nombre_solicitud_generica(t_solicitud_io_generica* solicitud)
+{
+    return solicitud->nombre_interfaz;
+}
+
+t_io_generica* obtener_io_solicitud_generica(t_solicitud_io_generica* solicitud)
+{
+    return solicitud->generica;
+}
+
+/*********** Functiones 't_solicitud_io_stdin' ***********/
+t_PCB* obtener_pcb_solicitud_stdin(t_solicitud_io_stdin* solicitud) 
+{
+    return solicitud->pcb;
+}
+
+char* obtener_nombre_solicitud_stdin(t_solicitud_io_stdin* solicitud)
+{
+    return solicitud->nombre_interfaz;
+}
+
+t_io_stdin* obtener_io_solicitud_stdin(t_solicitud_io_stdin* solicitud)
+{
+    return solicitud->io_stdin;
+}
+
+/*********** Functiones 't_solicitud_io_stdout' ***********/
+t_PCB* obtener_pcb_solicitud_stdout(t_solicitud_io_stdout* solicitud) 
+{
+    return solicitud->pcb;
+}
+
+char* obtener_nombre_solicitud_stdout(t_solicitud_io_stdout* solicitud)
+{
+    return solicitud->nombre_interfaz;
+}
+
+t_io_stdout* obtener_io_solicitud_stdout(t_solicitud_io_stdout* solicitud)
+{
+    return solicitud->io_stdout;
 }
 
 //===============================================

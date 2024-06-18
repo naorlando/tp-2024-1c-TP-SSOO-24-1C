@@ -3,6 +3,7 @@
 
 #include "estructuras.h"
 #include "buffer.h"
+#include "protocolo.h"
 
 // Definición de estructuras
 typedef struct {
@@ -168,5 +169,84 @@ void destruir_solicitud_io_stdout(t_solicitud_io_stdout* solicitud);
 // Pre: La E/S STDOUT debe ser válida y no NULL.
 // Post: La memoria asociada a la E/S STDOUT se libera.
 void destruir_io_stdout(t_io_stdout* io_stdout);
+
+//===============================================
+// FUNCIONES DE ACCESO A CAMPOS
+//===============================================
+
+// Obtiene el nombre de la interfaz genérica de una estructura t_io_generica.
+// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
+// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la interfaz.
+char* obtener_nombre_interfaz_generica(t_io_generica* io_generica);
+
+// Obtiene el tiempo de sleep de una estructura t_io_generica.
+// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
+// Post: Retorna el tiempo de sleep como un valor uint32_t.
+uint32_t obtener_tiempo_sleep(t_io_generica* io_generica);
+
+// Obtiene la dirección física del stdin de una estructura t_io_stdin.
+// Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
+// Post: Retorna la dirección física del stdin como un valor uint32_t.
+uint32_t obtener_direccion_fisica_stdin(t_io_stdin* io_stdin);
+
+// Obtiene el tamaño del stdin de una estructura t_io_stdin.
+// Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
+// Post: Retorna el tamaño del stdin como un valor uint32_t.
+uint32_t obtener_tamanio_stdin(t_io_stdin* io_stdin);
+
+// Obtiene la dirección física del stdout de una estructura t_io_stdout.
+// Pre: El puntero io_stdout debe apuntar a una estructura t_io_stdout válida y no debe ser NULL.
+// Post: Retorna la dirección física del stdout como un valor uint32_t.
+uint32_t obtener_direccion_fisica_stdout(t_io_stdout* io_stdout);
+
+// Obtiene el tamaño del stdout de una estructura t_io_stdout.
+// Pre: El puntero io_stdout debe apuntar a una estructura t_io_stdout válida y no debe ser NULL.
+// Post: Retorna el tamaño del stdout como un valor uint32_t.
+uint32_t obtener_tamanio_stdout(t_io_stdout* io_stdout);
+
+// Obtiene el PCB de una solicitud de I/O genérica.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
+// Post: Retorna un puntero a una estructura t_PCB.
+t_PCB* obtener_pcb_solicitud_generica(t_solicitud_io_generica* solicitud);
+
+// Obtiene el nombre de la solicitud de I/O genérica.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
+// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la solicitud.
+char* obtener_nombre_solicitud_generica(t_solicitud_io_generica* solicitud);
+
+// Obtiene la interfaz de I/O genérica de una solicitud.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
+// Post: Retorna un puntero a una estructura t_io_generica.
+t_io_generica* obtener_io_solicitud_generica(t_solicitud_io_generica* solicitud);
+
+// Obtiene el PCB de una solicitud de stdin.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
+// Post: Retorna un puntero a una estructura t_PCB.
+t_PCB* obtener_pcb_solicitud_stdin(t_solicitud_io_stdin* solicitud);
+
+// Obtiene el nombre de la solicitud de stdin.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
+// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la solicitud.
+char* obtener_nombre_solicitud_stdin(t_solicitud_io_stdin* solicitud);
+
+// Obtiene la interfaz de stdin de una solicitud.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
+// Post: Retorna un puntero a una estructura t_io_stdin.
+t_io_stdin* obtener_io_solicitud_stdin(t_solicitud_io_stdin* solicitud);
+
+// Obtiene el PCB de una solicitud de stdout.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
+// Post: Retorna un puntero a una estructura t_PCB.
+t_PCB* obtener_pcb_solicitud_stdout(t_solicitud_io_stdout* solicitud);
+
+// Obtiene el nombre de la solicitud de stdout.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
+// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la solicitud.
+char* obtener_nombre_solicitud_stdout(t_solicitud_io_stdout* solicitud);
+
+// Obtiene la interfaz de stdout de una solicitud.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
+// Post: Retorna un puntero a una estructura t_io_stdout.
+t_io_stdout* obtener_io_solicitud_stdout(t_solicitud_io_stdout* solicitud);
 
 #endif
