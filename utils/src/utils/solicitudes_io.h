@@ -31,14 +31,14 @@ typedef struct {
 typedef struct {
     t_PCB* pcb;
     char* nombre_interfaz;
-    t_io_stdin* stdin;
+    t_io_stdin* io_stdin;
 } t_solicitud_io_stdin;
 
 // INTERFAZ STDOUT
 typedef struct {
     t_PCB* pcb;
     char* nombre_interfaz;
-    t_io_stdout* stdout;
+    t_io_stdout* io_stdout;
 } t_solicitud_io_stdout;
 
 //===============================================
@@ -132,7 +132,7 @@ void destruir_io_generica(t_io_generica* io_generica);
 // Función para crear una solicitud de E/S STDIN.
 // Pre: El PCB, el nombre de interfaz y la E/S STDIN deben ser válidos y no NULL.
 // Post: Retorna un puntero a una estructura t_solicitud_io_stdin creada.
-t_solicitud_io_stdin* crear_solicitud_io_stdin(t_PCB* pcb, char* nombre_interfaz, t_io_stdin* stdin);
+t_solicitud_io_stdin* crear_solicitud_io_stdin(t_PCB* pcb, char* nombre_interfaz, t_io_stdin* io_stdin);
 
 // Función para crear una E/S STDIN.
 // Pre: La dirección física y el tamaño deben ser válidos.
@@ -152,7 +152,7 @@ void destruir_io_stdin(t_io_stdin* io_stdin);
 // Función para crear una solicitud de E/S STDOUT.
 // Pre: El PCB, el nombre de interfaz y la E/S STDOUT deben ser válidos y no NULL.
 // Post: Retorna un puntero a una estructura t_solicitud_io_stdout creada.
-t_solicitud_io_stdout* crear_solicitud_io_stdout(t_PCB* pcb, char* nombre_interfaz, t_io_stdout* stdout);
+t_solicitud_io_stdout* crear_solicitud_io_stdout(t_PCB* pcb, char* nombre_interfaz, t_io_stdout* io_stdout);
 
 // Función para crear una E/S STDOUT.
 // Pre: La dirección física y el tamaño deben ser válidos.
