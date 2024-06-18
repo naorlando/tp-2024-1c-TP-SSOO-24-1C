@@ -108,21 +108,22 @@ void pcb_execute()
 
     t_PCB *pcb = get_next_pcb_to_exec();
 
-    sem_wait(&SEM_CPU);
-    if(EXECUTE != NULL) log_error(logger_kernel,"no se esta liberando la variable EXECUTE"); 
-    EXECUTE = pcb; //referencia la pcb que esta en ejecucion.
+    //sem_wait(&SEM_CPU);
+    pthread_mutex_lock(&MUTEX_EXECUTE);
+    EXECUTE = pcb;
     send_pcb_cpu(pcb);
+    pthread_mutex_unlock(&MUTEX_EXECUTE);
     log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "READY", "EXEC");
-    sem_post(&SEM_CPU);
 }
 
 t_PCB *get_next_pcb_to_exec()
 {
-    t_PCB *pcb_a_tomar; //TODO: hace falta un destroy?
-    // convertir en una funcion VOID que reciba (un pcb)???? y una cola(esto nos va a servir en el VRR)
+    t_PCB *pcb_a_tomar;
+
     pthread_mutex_lock(&MUTEX_READY);
     pcb_a_tomar = queue_pop(COLA_READY);
     pthread_mutex_unlock(&MUTEX_READY);
+
     return pcb_a_tomar;
 }
 

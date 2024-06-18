@@ -13,6 +13,18 @@ void send_pcb_cpu(t_PCB* pcb)
     send_pcb(MSG_PCB_CPU, fd_cpu_dispatch, pcb);
 }
 
+void recv_pcb_cpu() 
+{
+    t_PCB* pcb_exit = recv_pcb(fd_cpu_dispatch);
+    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID => %d, llego a EXIT", pcb_exit->pid);
+
+    // limpio la variable global
+    EXECUTE = NULL;
+
+    // Elimino el PCB
+    pcb_destroy(pcb_exit);
+}
+
 int send_example_memoria()
 {
     char *cadena = "KERNEL ENVIO MENSAJE A MEMORIA";

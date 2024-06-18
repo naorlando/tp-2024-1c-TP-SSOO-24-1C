@@ -26,6 +26,7 @@ bool planificador_status = true;
 pthread_mutex_t MUTEX_READY;
 pthread_mutex_t MUTEX_EXIT;
 pthread_mutex_t MUTEX_NEW;
+pthread_mutex_t MUTEX_EXECUTE;
 
 sem_t SEM_READY;
 sem_t BLOQUEADOR;

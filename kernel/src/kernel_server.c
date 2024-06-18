@@ -76,33 +76,45 @@ void atender_kernel_cpu_dispatch()
 
                 // SI recibo el PCB antes de que se mande la interrupcion tengo que matar el hilo de interrupcion
                 
+
+                log_info(logger_kernel, "Se recibio un mje de CPU DISPATCH");
                 break;
+            case MSG_PCB_KERNEL_EXIT: // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
+                //TODO: ARMAR UNA FUNCION QUE SE ENCARGUE DE LA GESTION DE LIBERAR EL PCB QUE LLEGO A EXIT
+                // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
+                recv_pcb_cpu();
 
-            log_info(logger_kernel, "Se recibio un mje de CPU DISPATCH");
-            break;
+                if(queue_size(COLA_READY) > 0) {
+                    sem_post(&SEM_READY);
+                    //sem_post(&SEM_CPU);
+                }
+                break;
+            case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
+                //TODO: agregar PCB donde este:
+                // 1-recibir pcb:
+                t_PCB* pcb_interrupt = recv_pcb_interrupt();
+                EXECUTE = NULL; // SACO EL PCB DE EXECUTE
+                log_info(logger_kernel, "Se recibio un pcb de CPU-DISPATCH, PID -> %d", pcb_interrupt->pid);
 
-        case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
-            //TODO: agregar PCB donde este:
-            // 1-recibir pcb:
-            t_PCB* pcb_interrupt = recv_pcb_interrupt();
-            EXECUTE = NULL; // SACO EL PCB DE EXECUTE
-            log_info(logger_kernel, "Se recibio un pcb de CPU-DISPATCH, PID -> %d", pcb_interrupt->pid);
+                // 2-actualizar el pcb en la tabla de pcb:
+                // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
+                // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
+                dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
+                dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
+                log_info(logger_kernel, "Se actualizo un pcb-INTERRUPT en la table_pcb");
 
-            // 2-actualizar el pcb en la tabla de pcb:
-            // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
-            // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
-            dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
-            dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
-            log_info(logger_kernel, "Se actualizo un pcb-INTERRUPT en la table_pcb");
+                
 
-            
+                // 3-actualizar el estado del pcb en la cola correspondiente:
+                pthread_mutex_lock(&MUTEX_READY);
+                queue_push(COLA_READY, pcb_interrupt);
+                pthread_mutex_unlock(&MUTEX_READY);
+                sem_post(&SEM_READY);
+                
+                //sem_post(&SEM_CPU);
+                log_info(logger_kernel, "Se actualizo el estado del pcb-INTERRUPT en la cola correspondiente");
 
-            // 3-actualizar el estado del pcb en la cola correspondiente:
-            queue_push(COLA_READY, pcb_interrupt);
-            sem_post(&SEM_READY);
-            log_info(logger_kernel, "Se actualizo el estado del pcb-INTERRUPT en la cola correspondiente");
-
-            break;
+                break;
             case -1:
                 log_error(logger_kernel, "CPU DISPATCH se desconecto. Terminando servidor");
                 control_key = 0;

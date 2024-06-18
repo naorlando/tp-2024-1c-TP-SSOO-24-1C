@@ -31,6 +31,7 @@ extern int identificador_PID;
 extern pthread_mutex_t MUTEX_READY;
 extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
+extern pthread_mutex_t MUTEX_EXECUTE;
 extern t_datos_hilo* datos_hilo_quantum;
 extern bool interrupcion_enviada;
 
