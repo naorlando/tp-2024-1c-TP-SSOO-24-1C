@@ -12,15 +12,19 @@
 #include <pthread.h>
 
 void inicializar_sockets();
-void crear_hilo_interfaz_generica();
-void crear_hilo_interfaz_stdin();
-void crear_hilo_interfaz_stdout();
-void crear_hilo_interfaz_dialfs();
+// void crear_hilo_interfaz_generica();
+// void crear_hilo_interfaz_stdin();
+// void crear_hilo_interfaz_stdout();
+// void crear_hilo_interfaz_dialfs();
+void crear_hilos_conexiones();
 
-void* atender_solicitudes_generica(void* args);
-void* atender_solicitudes_stdin(void* args);
-void* atender_solicitudes_stdout(void* args);
-void* atender_solicitudes_dialfs(void* args);
+
+// void* atender_solicitudes_generica(void* args);
+// void* atender_solicitudes_stdin(void* args);
+// void* atender_solicitudes_stdout(void* args);
+// void* atender_solicitudes_dialfs(void* args);
+void atender_solicitudes_io_kernel();
+void atender_solicitudes_io_memoria();
 
 void cerrar_cliente();
 void _cerrar_puertos();

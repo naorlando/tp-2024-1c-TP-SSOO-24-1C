@@ -87,33 +87,38 @@ void crear_hilos_conexiones()
     // Hilo para manejar mensajes del Kernel
     if (pthread_create(&hilo_kernel, NULL, (void *)atender_solicitudes_io_kernel, NULL) != 0)
     {
-        log_error(logger_cpu, "Error al crear el hilo para atender al KERNEL. ABORTANDO");
+        log_error(logger_entradasalida, "Error al crear el hilo para atender al KERNEL. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 
-    // Hilo para manejar mensajes de Memoria
-    if (pthread_create(&hilo_memoria, NULL, (void *)atender_solicitudes_io_memoria, NULL) != 0) 
-    {
-        log_error(logger_cpu, "Error al crear el hilo para atender a la MEMORIA. ABORTANDO");
-        exit(EXIT_FAILURE);
+    // Inicializar hilo para atender mensajes de Memoria si no es una interfaz genérica
+    if (strcmp(obtener_tipo_interfaz(entradasalida_config), "GENERICA") != 0) {
+        
+        // Hilo para manejar mensajes de Memoria
+        if (pthread_create(&hilo_memoria, NULL, (void *)atender_solicitudes_io_memoria, NULL) != 0) 
+        {
+            log_error(logger_entradasalida, "Error al crear el hilo para atender a la MEMORIA. ABORTANDO");
+            exit(EXIT_FAILURE);
+        }
+
+        pthread_join(hilo_memoria, NULL);
     }
 
-    pthread_detach(hilo_kernel);
-    pthread_join(hilo_memoria, NULL);
+    pthread_join(hilo_kernel, NULL);
 }
 
 //====================================================
 // FUNCIONES PARA ATENDER SOLICITUDES DE ENTRADA/SALIDA
 //====================================================
 
-void atender_solicitudes_io_kernel() {
+void atender_solicitudes_io_memoria() {
     bool esperar = true;
     while (esperar) {
         int cod_operacion = recibir_operacion(fd_kernel);
         switch (cod_operacion) {
-            case MSG_IO_GENERICA:
-                atender_instruccion_generica(fd_kernel);
-                break;
+            // case MSG_IO_GENERICA:
+            //     atender_instruccion_generica(fd_kernel);
+            //     break;
             case -1:
                 log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.");
                 esperar = false;
@@ -125,7 +130,7 @@ void atender_solicitudes_io_kernel() {
     }
 }
 
-void atender_solicitudes_io_memoria() {
+void atender_solicitudes_io_kernel() {
     bool esperar = true;
     while (esperar) {
         int cod_operacion = recibir_operacion(fd_kernel);
