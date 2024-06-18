@@ -1,6 +1,4 @@
 #include "entradasalida_server.h"
-#include "variables_globales.h"
-#include "utils/sockets.h"
 
 
 //=========================================================
