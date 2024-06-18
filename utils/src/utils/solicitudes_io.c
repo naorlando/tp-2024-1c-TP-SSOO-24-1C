@@ -87,6 +87,11 @@ uint32_t obtener_tiempo_sleep(t_io_generica* io_generica)
     return io_generica->tiempo_sleep;
 }
 
+uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica)
+{
+    return strlen(io_generica->nombre_interfaz) + sizeof(io_generica->tiempo_sleep);
+}
+
 /*********** Functiones 't_io_stdin' ***********/
 uint32_t obtener_direccion_fisica_stdin(t_io_stdin* io_stdin)
 {
@@ -98,6 +103,11 @@ uint32_t obtener_tamanio_stdin(t_io_stdin* io_stdin)
     return io_stdin->tamanio;
 }
 
+uint32_t obtener_tamanio_io_stdin(t_io_stdin* io_stdin)
+{
+    return sizeof(io_stdin->direccion_fisica) + sizeof(io_stdin->tamanio);
+}
+
 /*********** Functiones 't_io_stdout' ***********/
 uint32_t obtener_direccion_fisica_stdout(t_io_stdout* io_stdout)
 {
@@ -107,6 +117,11 @@ uint32_t obtener_direccion_fisica_stdout(t_io_stdout* io_stdout)
 uint32_t obtener_tamanio_stdout(t_io_stdout* io_stdout)
 {
     return io_stdout->tamanio;
+}
+
+uint32_t obtener_tamanio_io_stdout(t_io_stdout* io_stdout)
+{
+    return sizeof(io_stdout->direccion_fisica) + sizeof(io_stdout->tamanio);
 }
 
 /*********** Functiones 't_solicitud_io_generica' ***********/
@@ -125,6 +140,11 @@ t_io_generica* obtener_io_solicitud_generica(t_solicitud_io_generica* solicitud)
     return solicitud->generica;
 }
 
+uint32_t obtener_tamanio_solicitud_generica(t_solicitud_io_generica* solicitud)
+{
+    return get_pcb_size(solicitud->pcb) + strlen(solicitud->nombre_interfaz) + obtener_tamanio_io_generica(solicitud->generica);
+}
+
 /*********** Functiones 't_solicitud_io_stdin' ***********/
 t_PCB* obtener_pcb_solicitud_stdin(t_solicitud_io_stdin* solicitud) 
 {
@@ -141,6 +161,11 @@ t_io_stdin* obtener_io_solicitud_stdin(t_solicitud_io_stdin* solicitud)
     return solicitud->io_stdin;
 }
 
+uint32_t obtener_tamanio_solicitud_stdin(t_solicitud_io_stdin* solicitud)
+{
+    return get_pcb_size(solicitud->pcb) + strlen(solicitud->nombre_interfaz) + obtener_tamanio_io_stdin(solicitud->io_stdin);
+}
+
 /*********** Functiones 't_solicitud_io_stdout' ***********/
 t_PCB* obtener_pcb_solicitud_stdout(t_solicitud_io_stdout* solicitud) 
 {
@@ -155,6 +180,11 @@ char* obtener_nombre_solicitud_stdout(t_solicitud_io_stdout* solicitud)
 t_io_stdout* obtener_io_solicitud_stdout(t_solicitud_io_stdout* solicitud)
 {
     return solicitud->io_stdout;
+}
+
+uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud)
+{
+    return get_pcb_size(solicitud->pcb) + strlen(solicitud->nombre_interfaz) + obtener_tamanio_io_stdout(solicitud->io_stdout);
 }
 
 //===============================================

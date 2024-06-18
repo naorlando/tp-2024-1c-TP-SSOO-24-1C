@@ -183,4 +183,34 @@ char* obtener_nombre_solicitud_stdout(t_solicitud_io_stdout* solicitud);
 // Post: Retorna un puntero a una estructura t_io_stdout.
 t_io_stdout* obtener_io_solicitud_stdout(t_solicitud_io_stdout* solicitud);
 
+// Obtiene el tamaño de una solicitud de stdout.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de stdout como un valor uint32_t.
+uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud);
+
+// Obtiene el tamaño de una solicitud de stdin.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de stdin como un valor uint32_t.
+uint32_t obtener_tamanio_solicitud_stdin(t_solicitud_io_stdin* solicitud);
+
+// Obtiene el tamaño de una solicitud de I/O genérica.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O genérica como un valor uint32_t.
+uint32_t obtener_tamanio_solicitud_generica(t_solicitud_io_generica* solicitud);
+
+// Obtiene el tamaño de una interfaz de I/O stdout.
+// Pre: El puntero io_stdout debe apuntar a una estructura t_io_stdout válida y no debe ser NULL.
+// Post: Retorna el tamaño de la interfaz de I/O stdout como un valor uint32_t.
+uint32_t obtener_tamanio_io_stdout(t_io_stdout* io_stdout);
+
+// Obtiene el tamaño de una interfaz de I/O stdin.
+// Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
+// Post: Retorna el tamaño de la interfaz de I/O stdin como un valor uint32_t.
+uint32_t obtener_tamanio_io_stdin(t_io_stdin* io_stdin);
+
+// Obtiene el tamaño de una interfaz de I/O genérica.
+// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
+// Post: Retorna el tamaño de la interfaz de I/O genérica como un valor uint32_t.
+uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica);
+
 #endif
