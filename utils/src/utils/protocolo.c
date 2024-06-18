@@ -315,6 +315,104 @@ t_new_process* recv_new_process(int fd)
     return new_process;
 }
 
+void send_solicitud_io_generica(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_generica* generica)
+{
+    t_solicitud_io_generica* solicitud = crear_solicitud_io_generica(pcb, nombre_interfaz, generica);
+
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_CPU_IO_GEN_SLEEP, obtener_tamanio_solicitud_generica(solicitud));
+
+    // Serializo en el buffer el t_solicitud_io_generica
+    serializar_solicitud_io_generica(get_buffer(package), solicitud);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_new_process
+    destruir_solicitud_io_generica(solicitud);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+} 
+
+t_solicitud_io_generica* recv_solicitud_io_generica(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_solicitud_io_generica* solicitud= deserializar_solicitud_io_generica(buffer);
+
+    buffer_destroy(buffer);
+
+    return solicitud;
+}
+
+void send_solicitud_io_stdin(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_stdin* io_stdin)
+{
+    t_solicitud_io_stdin* solicitud = crear_solicitud_io_stdin(pcb, nombre_interfaz, io_stdin);
+
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_CPU_IO_GEN_SLEEP, obtener_tamanio_solicitud_stdin(solicitud));
+
+    // Serializo en el buffer el t_solicitud_io_generica
+    serializar_solicitud_io_stdin(get_buffer(package), solicitud);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_new_process
+    destruir_solicitud_io_stdin(solicitud);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+}
+
+t_solicitud_io_stdin* recv_solicitud_io_stdin(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_solicitud_io_stdin* solicitud= deserializar_solicitud_io_stdin(buffer);
+
+    buffer_destroy(buffer);
+
+    return solicitud;
+}
+
+void send_solicitud_io_stdout(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_stdout* io_stdout)
+{
+    t_solicitud_io_stdout* solicitud = crear_solicitud_io_stdout(pcb, nombre_interfaz, io_stdout);
+
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_CPU_IO_GEN_SLEEP, obtener_tamanio_solicitud_stdout(solicitud));
+
+    // Serializo en el buffer el t_solicitud_io_generica
+    serializar_solicitud_io_stdout(get_buffer(package), solicitud);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_new_process
+    destruir_solicitud_io_stdout(solicitud);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+} 
+
+t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_solicitud_io_stdout* solicitud= deserializar_solicitud_io_stdout(buffer);
+
+    buffer_destroy(buffer);
+
+    return solicitud;
+}
 
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 // serializado generico TP0

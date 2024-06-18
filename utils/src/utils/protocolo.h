@@ -205,6 +205,51 @@ void send_new_process(int, uint32_t, char*);
 //       Si el buffer recibido es NULL, retorna NULL.
 t_new_process* recv_new_process(int);
 
+/*********** SEND AND RECIVE 'T_SOLICITUD_IO_GENERICA' ***********/
+// Envía una solicitud de I/O genérica a través de un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+//      El puntero pcb debe apuntar a un bloque de control de proceso válido y no debe ser NULL.
+//      El puntero nombre_interfaz debe apuntar a una cadena de caracteres válida y no debe ser NULL.
+//      El puntero generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
+// Post: La solicitud de I/O genérica se serializa y se envía a través del socket especificado.
+void send_solicitud_io_generica(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_generica* generica);
+
+// Recibe una solicitud de I/O genérica desde un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+// Post: Retorna un puntero a una estructura t_solicitud_io_generica recibida desde el socket.
+//       Si ocurre un error o no se recibe ningún dato, retorna NULL.
+t_solicitud_io_generica* recv_solicitud_io_generica(int fd);
+
+/*********** SEND AND RECIVE 'T_SOLICITUD_IO_STDIN' ***********/
+// Envía una solicitud de I/O stdin a través de un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+//      El puntero pcb debe apuntar a un bloque de control de proceso válido y no debe ser NULL.
+//      El puntero nombre_interfaz debe apuntar a una cadena de caracteres válida y no debe ser NULL.
+//      El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
+// Post: La solicitud de I/O stdin se serializa y se envía a través del socket especificado.
+void send_solicitud_io_stdin(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_stdin* io_stdin);
+
+// Recibe una solicitud de I/O stdin desde un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+// Post: Retorna un puntero a una estructura t_solicitud_io_stdin recibida desde el socket.
+//       Si ocurre un error o no se recibe ningún dato, retorna NULL.
+t_solicitud_io_stdin* recv_solicitud_io_stdin(int fd);
+
+/*********** SEND AND RECIVE 'T_SOLICITUD_IO_STDOUT' ***********/
+// Envía una solicitud de I/O stdout a través de un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+//      El puntero pcb debe apuntar a un bloque de control de proceso válido y no debe ser NULL.
+//      El puntero nombre_interfaz debe apuntar a una cadena de caracteres válida y no debe ser NULL.
+//      El puntero io_stdout debe apuntar a una estructura t_io_stdout válida y no debe ser NULL.
+// Post: La solicitud de I/O stdout se serializa y se envía a través del socket especificado.
+void send_solicitud_io_stdout(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_stdout* io_stdout);
+
+// Recibe una solicitud de I/O stdout desde un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+// Post: Retorna un puntero a una estructura t_solicitud_io_stdout recibida desde el socket.
+//       Si ocurre un error o no se recibe ningún dato, retorna NULL.
+t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd);
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
 void *serializar_paquete(t_package*, int);
@@ -287,6 +332,7 @@ t_interruption* deserialize_interruption(t_buffer*);
 // Post: La interrupción es serializada y agregada al buffer.
 void serialize_interruption(t_buffer*, t_interruption*);
 
+/*********** SERIALIZE AND DESERIALIZE 'T_SOLICITUD_IO_GENERICA' ***********/
 // Función para serializar una solicitud de E/S genérica.
 // Pre: El buffer y la solicitud deben ser válidos y no NULL.
 // Post: La solicitud se serializa en el buffer.
@@ -297,6 +343,7 @@ void serializar_solicitud_io_generica(t_buffer* buffer, t_solicitud_io_generica*
 // Post: Retorna un puntero a una estructura t_solicitud_io_generica deserializada.
 t_solicitud_io_generica* deserializar_solicitud_io_generica(t_buffer* buffer);
 
+/*********** SERIALIZE AND DESERIALIZE 'T_IO_GENERICA' ***********/
 // Función para serializar una E/S genérica.
 // Pre: El buffer y la E/S genérica deben ser válidos y no NULL.
 // Post: La E/S genérica se serializa en el buffer.
@@ -307,6 +354,7 @@ void serializar_io_generica(t_buffer* buffer, t_io_generica* io_generica);
 // Post: Retorna un puntero a una estructura t_io_generica deserializada.
 t_io_generica* deserializar_io_generica(t_buffer* buffer);
 
+/*********** SERIALIZE AND DESERIALIZE 'T_SOLICITUD_IO_STDIN' ***********/
 // Función para serializar una solicitud de E/S STDIN.
 // Pre: El buffer y la solicitud deben ser válidos y no NULL.
 // Post: La solicitud se serializa en el buffer.
@@ -317,6 +365,7 @@ void serializar_solicitud_io_stdin(t_buffer* buffer, t_solicitud_io_stdin* solic
 // Post: Retorna un puntero a una estructura t_solicitud_io_stdin deserializada.
 t_solicitud_io_stdin* deserializar_solicitud_io_stdin(t_buffer* buffer);
 
+/*********** SERIALIZE AND DESERIALIZE 'T_IO_STDIN' ***********/
 // Función para serializar una E/S STDIN.
 // Pre: El buffer y la E/S STDIN deben ser válidos y no NULL.
 // Post: La E/S STDIN se serializa en el buffer.
@@ -327,6 +376,7 @@ void serializar_io_stdin(t_buffer* buffer, t_io_stdin* io_stdin);
 // Post: Retorna un puntero a una estructura t_io_stdin deserializada.
 t_io_stdin* deserializar_io_stdin(t_buffer* buffer);
 
+/*********** SERIALIZE AND DESERIALIZE 'T_SOLICITUD_IO_STDOUT' ***********/
 // Función para serializar una solicitud de E/S STDOUT.
 // Pre: El buffer y la solicitud deben ser válidos y no NULL.
 // Post: La solicitud se serializa en el buffer.
@@ -337,6 +387,7 @@ void serializar_solicitud_io_stdout(t_buffer* buffer, t_solicitud_io_stdout* sol
 // Post: Retorna un puntero a una estructura t_solicitud_io_stdout deserializada.
 t_solicitud_io_stdout* deserializar_solicitud_io_stdout(t_buffer* buffer);
 
+/*********** SERIALIZE AND DESERIALIZE 'T_IO_STDOUT' ***********/
 // Función para serializar una E/S STDOUT.
 // Pre: El buffer y la E/S STDOUT deben ser válidos y no NULL.
 // Post: La E/S STDOUT se serializa en el buffer.
