@@ -30,24 +30,29 @@ typedef enum
 {
 
     // KERNEL <-> CPU
-    MSG_KERNEL_CPU_DISPATCH,
-    MSG_PCB_KERNEL,
-    MSG_PCB_CPU,
-    MSG_CPU_DISPATCH_KERNEL,
-    MSG_IO_KERNEL,
-    MSG_KERNEL_IO,
-    MSG_PCB_IO_KERNEL,
+    MSG_KERNEL_CPU_DISPATCH, // SE LLAMA PERO NO SE USA!
+    MSG_PCB_KERNEL, // CPU -> KERNEL (Se manda PCB al KERNEL)
+    MSG_PCB_CPU, // KERNEL -> CPU (Se manda PCB al CPU)
+    MSG_CPU_DISPATCH_KERNEL, // SE LLAMA PERO NO SE USA!
+    MSG_PCB_IO_KERNEL, // SE LLAMA PERO NO SE USA!
     MSG_PCB_KERNEL_EXIT, // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
-    MSG_QUANTUM, // KERNEL -> CPU (interrupcion por fin de quantum)
-    MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, // CPU -> KERNEL (devuelvo pcb de proceso a kernel con interrupcion por fin de quantum)
+    MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, // CPU -> KERNEL (Devuelvo pcb al kernel con interrupcion por fin de quantum)
+    MSG_QUANTUM, // KERNEL -> CPU (Interrupcion por fin de quantum)
+    MSG_CPU_IO_GEN_SLEEP, // CPU -> KERNEL (Se solicita interactuar con IO GENENRICA) 
+    MSG_CPU_IO_STDIN_READ, // CPU -> KERNEL (Se solicita interactuar con IO STDIN) 
+    MSG_CPU_IO_STDOUT_WRITE, // CPU -> KERNEL (Se solicita interactuar con IO STDOUT) 
     // KERNEL <-> MEMORIA
-    MSG_KERNEL_MEMORIA,
-    MSG_MEMORIA_KERNEL,
-    MSG_KERNEL_CREATE_PROCESS,
+    MSG_KERNEL_MEMORIA, // SE LLAMA PERO NO SE USA!
+    MSG_MEMORIA_KERNEL, // SE LLAMA PERO NO SE USA!
+    MSG_KERNEL_CREATE_PROCESS, // KERNEL -> MEMORIA (Se solicita crear la imagen de un proceso) 
     // KERNEL <-> IO
-    MSG_IO_GEN_SLEEP,
-    MSG_IO_STDIN_READ,
-    MSG_IO_STDOUT_WRITE,
+    MSG_IO_KERNEL, // REVISAR
+    MSG_KERNEL_IO, // REVISAR
+    MSG_IO_KERNEL_GEN_SLEEP,
+    MSG_KERNEL_IO_GENERICA, // KERNEL -> IO (Se solicita interactuar con una IO_GENERICA)
+    MSG_KERNEL_IO_STDIN, // KERNEL -> IO (Se solicita interactuar con una IO_STDIN)
+    MSG_KERNEL_IO_STDOUT, // KERNEL -> IO (Se solicita interactuar con una IO_STDOUT)
+    MSG_KERNEL_IO_DIALFS, // KERNEL -> IO (Se solicita interactuar con una IO_DIALFS)
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
@@ -57,14 +62,8 @@ typedef enum
     MSG_IO_MEMORIA,
     MSG_READ_MEMORY,
     MSG_WRITE_MEMORY,
+    // HEADER_EXAMPLE
     EXAMPLE,
-    //IO <-> KERNEL
-    MSG_IO_KERNEL_GEN_SLEEP,
-    //IO
-    IO_GENERICA,
-    IO_STDIN,
-    IO_STDOUT,
-
     //Empty package
     NULL_HEADER
 } t_msg_header;
