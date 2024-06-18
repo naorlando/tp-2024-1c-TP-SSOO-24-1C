@@ -6,6 +6,7 @@
 #include "utils/estructuras.h"
 #include "utils/instruccion.h"
 #include "utils/next_instruction.h"
+#include "utils/solicitudes_io.h"
 
 int send_example_memoria();
 int recv_example_msg_kernel();
@@ -40,6 +41,6 @@ void send_get_next_instruction_memoria(uint32_t, uint32_t);
 // Post: Retorna un puntero a t_instruction que contiene la instrucción recibida.
 t_instruction* recv_instruction_memoria();
 
-void send_interface_kernel(/*t_interface**/);
+void send_solicitud_io_generica_kernel(t_PCB*, t_instruction*);
 
 #endif
