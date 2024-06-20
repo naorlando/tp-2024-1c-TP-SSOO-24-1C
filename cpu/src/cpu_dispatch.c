@@ -329,10 +329,13 @@ bool manejar_interrupcion() {
         //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
         // de enviar de nuevo al kernel
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
+        
+        pthread_mutex_lock(&MUTEX_INTERRUPT);
         send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
         //sem_post(&SEM_INTERRUPT);
         interrupcion_pendiente = false; 
-        
+        pthread_mutex_unlock(&MUTEX_INTERRUPT);
+
         log_info(logger_cpu, "PCB enviado al Kernel");
         return true;
     }
