@@ -24,7 +24,10 @@ extern t_name_interruption tipo_de_interrupcion;
 extern bool llego_a_exit;
 
 //Semaforos
-extern sem_t SEM_INTERRUPT; // BINARIO
+extern sem_t SEM_INTERRUPT; // BINARIO -> Revisar si sirve!
+
+// MUTEXS
+extern pthread_mutex_t MUTEX_INTERRUPT;
 
 // CONFIG
 extern t_config *config_cpu;
