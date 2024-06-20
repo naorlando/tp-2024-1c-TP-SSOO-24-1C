@@ -10,4 +10,7 @@
 
 void initializeSemaphores();
 
+
+void initialize_mutexes();
+
 #endif //SYNCHRO_H
