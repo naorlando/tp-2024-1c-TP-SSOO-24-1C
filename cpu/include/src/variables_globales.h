@@ -8,6 +8,7 @@
 #include "utils/interruption.h"
 #include "cpu_config.h"
 #include <semaphore.h>
+#include <pthread.h>
 
 #define SERVERNAME "CPU"
 #define SERVER_MEMORIA "SERVER MEMORIA"
