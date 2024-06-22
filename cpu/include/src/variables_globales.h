@@ -26,6 +26,7 @@ extern bool llego_a_exit;
 
 //Semaforos
 extern sem_t SEM_INTERRUPT; // BINARIO -> Revisar si sirve!
+extern sem_t SEM_SOCKET_KERNEL_DISPATCH;
 
 // MUTEXS
 extern pthread_mutex_t MUTEX_INTERRUPT;
