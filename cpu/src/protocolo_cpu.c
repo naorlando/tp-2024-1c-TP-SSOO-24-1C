@@ -80,7 +80,7 @@ void send_solicitud_io_generica_kernel(t_PCB* pcb, t_instruction* instruccion)
     t_list* parametros = obtener_parametros(instruccion);
 
     char* nombre = (char*)list_get(parametros, 0);
-    uint32_t tiempo_sleep = *(uint32_t*)list_get(parametros, 1);
+    uint32_t tiempo_sleep = atoi((char*)list_get(instruccion->params, 1));
 
     t_io_generica* generica = crear_io_generica(nombre, tiempo_sleep);
 
