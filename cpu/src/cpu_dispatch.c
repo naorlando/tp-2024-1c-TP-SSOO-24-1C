@@ -260,6 +260,8 @@ void solicitar_instruccion(uint32_t pid, uint32_t pc)
 
 void recibir_pcb() 
 {
+    sem_wait(&SEM_SOCKET_KERNEL_DISPATCH);
+
     // Recibo el pcb que manda kernel para ejecutar sus instrucciones
     pcb_execute = recv_pcb_kernel();
 
@@ -314,9 +316,15 @@ void manejar_ciclo_de_instruccion() {
     // actualizar PC:
     cpu_registers->pc++;
     pcb_execute->program_counter = cpu_registers->pc;
+    
+    //SOlo para seguir el flujo
+    log_info(logger_cpu, "El PCB de pid <%d> tiene el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
 
     // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
     if(manejar_interrupcion()) return;
+
+    //SOlo para seguir el flujo
+    log_info(logger_cpu, "El PCB de pid <%d> solicito la siguiente intruccion a memoria con el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
 
     //TODO: Se debe actualizar el PC antes de pedir la siguiente instruccion a memoria
     solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
@@ -324,20 +332,23 @@ void manejar_ciclo_de_instruccion() {
 }
 
 bool manejar_interrupcion() {
+    pthread_mutex_lock(&MUTEX_INTERRUPT);
     if (interrupcion_pendiente) {
         log_info(logger_cpu, "Interrupción de %s recibida, devolviendo PCB al Kernel",get_string_from_interruption(tipo_de_interrupcion));
         //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
         // de enviar de nuevo al kernel
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
         
-        pthread_mutex_lock(&MUTEX_INTERRUPT);
+        log_info(logger_cpu, "PCB enviado al Kernel");
         send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
         //sem_post(&SEM_INTERRUPT);
         interrupcion_pendiente = false; 
         pthread_mutex_unlock(&MUTEX_INTERRUPT);
+        sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 
-        log_info(logger_cpu, "PCB enviado al Kernel");
         return true;
+    } else {
+        pthread_mutex_unlock(&MUTEX_INTERRUPT);
     }
     return false;
 }
@@ -377,6 +388,7 @@ void solicitar_IO(t_instruction* instruccion)
 
             break;
     }
+    sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 }
 
 // cargar contexto de ejecucion del cpu a los registros del pcb
@@ -401,9 +413,12 @@ void enviar_pcb_finalizado()
 {
     cargar_contexto_ejecucion_a_pcb(pcb_execute);
     send_pcb_kernel();
+    sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 
     // Controlo si llego una interrupcion
     if(interrupcion_pendiente) {
+        pthread_mutex_lock(&MUTEX_INTERRUPT);
         interrupcion_pendiente = false; // la desestimo
+        pthread_mutex_unlock(&MUTEX_INTERRUPT);
     }
 }
