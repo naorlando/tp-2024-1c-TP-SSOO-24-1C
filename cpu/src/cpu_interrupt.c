@@ -15,6 +15,9 @@ void recibir_interrupcion()
         interrupcion_pendiente = true;
         tipo_de_interrupcion = get_name(interruption);
         pthread_mutex_unlock(&MUTEX_INTERRUPT);
+
+        //SOlo para seguir el flujo
+        log_info(logger_cpu, "Se debe desalojar el PCB de pid <%d>", get_pid_interruption(interruption));
     }
 
     destroy_interruption(interruption);
