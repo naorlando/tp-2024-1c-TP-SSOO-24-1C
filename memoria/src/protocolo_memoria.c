@@ -80,5 +80,8 @@ t_next_instruction* recv_next_instruction_cpu()
 
 void send_instrution_cpu(t_instruction* instruction)
 {
+    //Retardo para la respuesta
+    usleep(obtener_retardo_respuesta(memoria_config) * 1000);
+
     send_instrution(fd_cpu, instruction);
 }
