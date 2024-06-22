@@ -89,7 +89,7 @@ uint32_t obtener_tiempo_sleep(t_io_generica* io_generica)
 
 uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica)
 {
-    return strlen(io_generica->nombre_interfaz) + sizeof(io_generica->tiempo_sleep);
+    return (sizeof(uint32_t) + strlen(io_generica->nombre_interfaz) + 1) + sizeof(io_generica->tiempo_sleep);
 }
 
 /*********** Functiones 't_io_stdin' ***********/
@@ -142,7 +142,11 @@ t_io_generica* obtener_io_solicitud_generica(t_solicitud_io_generica* solicitud)
 
 uint32_t obtener_tamanio_solicitud_generica(t_solicitud_io_generica* solicitud)
 {
-    return get_pcb_size(solicitud->pcb) + strlen(solicitud->nombre_interfaz) + obtener_tamanio_io_generica(solicitud->generica);
+    uint32_t size_serialize_pcb = get_pcb_size(solicitud->pcb);
+    uint32_t size_serialize_name_io = sizeof(uint32_t) + strlen(solicitud->nombre_interfaz) + 1; // Para el tamaño y la cadena
+    uint32_t size_serialize_io_gen = obtener_tamanio_io_generica(solicitud->generica);
+
+    return size_serialize_pcb + size_serialize_name_io + size_serialize_io_gen;
 }
 
 /*********** Functiones 't_solicitud_io_stdin' ***********/
@@ -163,7 +167,11 @@ t_io_stdin* obtener_io_solicitud_stdin(t_solicitud_io_stdin* solicitud)
 
 uint32_t obtener_tamanio_solicitud_stdin(t_solicitud_io_stdin* solicitud)
 {
-    return get_pcb_size(solicitud->pcb) + strlen(solicitud->nombre_interfaz) + obtener_tamanio_io_stdin(solicitud->io_stdin);
+    uint32_t size_serialize_pcb = get_pcb_size(solicitud->pcb);
+    uint32_t size_serialize_name_io = sizeof(uint32_t) + strlen(solicitud->nombre_interfaz) + 1; // Para el tamaño y la cadena
+    uint32_t size_serialize_io_stdin = obtener_tamanio_io_stdin(solicitud->io_stdin);
+
+    return size_serialize_pcb + size_serialize_name_io + size_serialize_io_stdin;
 }
 
 /*********** Functiones 't_solicitud_io_stdout' ***********/
@@ -184,7 +192,11 @@ t_io_stdout* obtener_io_solicitud_stdout(t_solicitud_io_stdout* solicitud)
 
 uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud)
 {
-    return get_pcb_size(solicitud->pcb) + strlen(solicitud->nombre_interfaz) + obtener_tamanio_io_stdout(solicitud->io_stdout);
+    uint32_t size_serialize_pcb = get_pcb_size(solicitud->pcb);
+    uint32_t size_serialize_name_io = sizeof(uint32_t) + strlen(solicitud->nombre_interfaz) + 1; // Para el tamaño y la cadena
+    uint32_t size_serialize_io_stdout = obtener_tamanio_io_stdout(solicitud->io_stdout);
+
+    return size_serialize_pcb + size_serialize_name_io + size_serialize_io_stdout;
 }
 
 //===============================================
