@@ -23,6 +23,7 @@ extern t_PCB* pcb_execute;
 extern bool interrupcion_pendiente;
 extern t_name_interruption tipo_de_interrupcion;
 extern bool llego_a_exit;
+extern bool solicitud_io;
 
 //Semaforos
 extern sem_t SEM_INTERRUPT; // BINARIO -> Revisar si sirve!

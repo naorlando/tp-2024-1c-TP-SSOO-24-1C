@@ -16,7 +16,8 @@ t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
 t_name_interruption tipo_de_interrupcion;
 t_PCB* pcb_execute;
-bool llego_a_exit = false; 
+bool llego_a_exit = false;
+bool solicitud_io = false; 
 
 sem_t SEM_INTERRUPT;
 sem_t SEM_SOCKET_KERNEL_DISPATCH;
