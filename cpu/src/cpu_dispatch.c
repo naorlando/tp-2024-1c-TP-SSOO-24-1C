@@ -96,8 +96,9 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             int units = atoi((char*)list_get(instruccion->params, 1));
             
             // Enviar el PCB al kernel con el tipo de interfaz
-            solicitar_IO(instruccion);
             log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
+            solicitar_IO(instruccion);
+            solicitud_io = true;
             break;
         }
         case EXIT: {
@@ -319,6 +320,12 @@ void manejar_ciclo_de_instruccion() {
     
     //SOlo para seguir el flujo
     log_info(logger_cpu, "El PCB de pid <%d> tiene el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
+
+    // se debe hacer un "return;", si el proceso solicito una io
+    if(solicitud_io){
+        solicitud_io = false;
+        return;
+    }
 
     // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
     if(manejar_interrupcion()) return;
