@@ -19,6 +19,7 @@ t_PCB* pcb_execute;
 bool llego_a_exit = false; 
 
 sem_t SEM_INTERRUPT;
+sem_t SEM_SOCKET_KERNEL_DISPATCH;
 pthread_mutex_t MUTEX_INTERRUPT;
 
 char* server_port_interrupt;
