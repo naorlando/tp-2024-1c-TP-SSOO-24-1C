@@ -13,18 +13,12 @@ void send_pcb_cpu(t_PCB* pcb)
     send_pcb(MSG_PCB_CPU, fd_cpu_dispatch, pcb);
 }
 
-void recv_pcb_cpu() 
+t_PCB* recv_pcb_cpu() 
 {
-    t_PCB* pcb_exit = recv_pcb(fd_cpu_dispatch);
-    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID => %d, llego a EXIT", pcb_exit->pid);
+    t_PCB* pcb = recv_pcb(fd_cpu_dispatch);
+    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID => %d", pcb->pid);
 
-    // limpio la variable global
-    pthread_mutex_lock(&MUTEX_EXECUTE);
-    EXECUTE = NULL;
-    pthread_mutex_unlock(&MUTEX_EXECUTE);
-
-    // Elimino el PCB
-    pcb_destroy(pcb_exit);
+    return pcb;
 }
 
 int send_example_memoria()
