@@ -10,7 +10,7 @@
 int send_example_cpu();
 int send_example_memoria();
 void send_pcb_cpu(t_PCB*);
-void recv_pcb_cpu();
+t_PCB* recv_pcb_cpu();
 // void requests_entradasalida();
 int recv_example_msg_entradasalida();
 int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo);
