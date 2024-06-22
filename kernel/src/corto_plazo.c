@@ -60,7 +60,8 @@ void* funcion_hilo_quantum(void* arg) {
     uint32_t pid = *(uint32_t*)arg;
 
     // Suponiendo que esta función crea y devuelve un puntero a t_datos_hilo
-    datos_hilo_quantum = datos_hilo_create(pid, obtener_quantum(kernel_config), pthread_self()); // TODO: get_quantum
+    datos_hilo_quantum = datos_hilo_create(pid, obtener_quantum(kernel_config), pthread_self()); // TODO: Se debe liberar la estructura si no se manda y se cancela
+    interrupcion_enviada = false; // TODO: Ver si es necesario usar un mutex!
     usleep(obtener_quantum(kernel_config) * 1000);
 
     pthread_mutex_lock(&MUTEX_EXECUTE);
