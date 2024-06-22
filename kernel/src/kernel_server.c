@@ -72,18 +72,30 @@ void atender_kernel_cpu_dispatch()
                 break;
             case MSG_PCB_IO_KERNEL:
                 //Recibimos el t_interface
-                //recibir_pcb_io(); // TODO: hacer la funcion para recibir la interface
 
                 // SI recibo el PCB antes de que se mande la interrupcion tengo que matar el hilo de interrupcion
-                
+                t_PCB* pcb_io = recv_pcb_cpu(); 
+                cancelar_hilo_quantum(pcb_io->pid);
 
-                log_info(logger_kernel, "Se recibio un mje de CPU DISPATCH");
+                log_info(logger_kernel, "El PCB de PID <%d> solicita una IO ",pcb_io->pid);
+                
                 break;
             case MSG_PCB_KERNEL_EXIT: // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
                 //TODO: ARMAR UNA FUNCION QUE SE ENCARGUE DE LA GESTION DE LIBERAR EL PCB QUE LLEGO A EXIT
                 // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
-                recv_pcb_cpu();
+                t_PCB* pcb_exit= recv_pcb_cpu();
 
+                // limpio la variable global
+                pthread_mutex_lock(&MUTEX_EXECUTE);
+                EXECUTE = NULL;
+                pthread_mutex_unlock(&MUTEX_EXECUTE);
+
+                cancelar_hilo_quantum(pcb_exit->pid);
+
+                log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
+
+                // Elimino el PCB
+                pcb_destroy(pcb_exit);
                 
                 sem_post(&SEM_CPU);
                 log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
@@ -309,4 +321,16 @@ void _cerrar_conexiones()
     liberar_conexion(fd_cpu_dispatch);
     //TODO: Implementar funcion para liberar las conexiones de todas las IOs
     // que se conectaron al kernel
+}
+
+
+// ESTA FUNCION DESPUES SE DEBE PASAR A UN ARCHIVO
+// VER SI ES NECESARIO CREAR UN MUTEX PARA ACCEDER A datos_hilo_quantum
+void cancelar_hilo_quantum(uint32_t pid) {
+
+    if (get_pid_datos_hilo(datos_hilo_quantum) == pid && !interrupcion_enviada) {
+        pthread_cancel(get_hilo(datos_hilo_quantum));
+        log_info(logger_kernel, "Se cancela el hilo de quantum para desalojar el PCB de PID: <%d>", pid);
+    }
+
 }
