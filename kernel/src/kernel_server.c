@@ -84,24 +84,28 @@ void atender_kernel_cpu_dispatch()
                 // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
                 recv_pcb_cpu();
 
-                if(queue_size(COLA_READY) > 0) {
-                    sem_post(&SEM_READY);
-                    //sem_post(&SEM_CPU);
-                }
+                
+                sem_post(&SEM_CPU);
+                log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+
                 break;
             case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
                 //TODO: agregar PCB donde este:
                 // 1-recibir pcb:
                 t_PCB* pcb_interrupt = recv_pcb_interrupt();
+
+                pthread_mutex_lock(&MUTEX_EXECUTE);
                 EXECUTE = NULL; // SACO EL PCB DE EXECUTE
-                log_info(logger_kernel, "Se recibio un pcb de CPU-DISPATCH, PID -> %d", pcb_interrupt->pid);
+                pthread_mutex_unlock(&MUTEX_EXECUTE);
+
+                log_info(logger_kernel, "Se recibio un PCB por interrupcion a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
 
                 // 2-actualizar el pcb en la tabla de pcb:
                 // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
                 // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
                 dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
                 dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
-                log_info(logger_kernel, "Se actualizo un pcb-INTERRUPT en la table_pcb");
+                log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_interrupt->pid);
 
                 
 
@@ -109,10 +113,12 @@ void atender_kernel_cpu_dispatch()
                 pthread_mutex_lock(&MUTEX_READY);
                 queue_push(COLA_READY, pcb_interrupt);
                 pthread_mutex_unlock(&MUTEX_READY);
+                log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
+                log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
                 sem_post(&SEM_READY);
+                sem_post(&SEM_CPU);
                 
                 //sem_post(&SEM_CPU);
-                log_info(logger_kernel, "Se actualizo el estado del pcb-INTERRUPT en la cola correspondiente");
 
                 break;
             case -1:

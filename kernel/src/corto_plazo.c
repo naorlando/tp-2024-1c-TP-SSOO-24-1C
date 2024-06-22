@@ -63,11 +63,11 @@ void* funcion_hilo_quantum(void* arg) {
     datos_hilo_quantum = datos_hilo_create(pid, obtener_quantum(kernel_config), pthread_self()); // TODO: get_quantum
     usleep(obtener_quantum(kernel_config) * 1000);
 
-    //pthread_mutex_lock(&MUTEX_EXECUTE);
+    pthread_mutex_lock(&MUTEX_EXECUTE);
     if (EXECUTE != NULL && EXECUTE->pid == get_pid_datos_hilo(datos_hilo_quantum)) {
         enviar_interrupcion_a_cpu(get_pid_datos_hilo(datos_hilo_quantum));
     }
-    //pthread_mutex_unlock(&MUTEX_EXECUTE);
+    pthread_mutex_unlock(&MUTEX_EXECUTE);
     //free(hilo_quantum);
     
     return NULL;
@@ -108,17 +108,23 @@ void pcb_execute()
 
     t_PCB *pcb = get_next_pcb_to_exec();
 
-    //sem_wait(&SEM_CPU);
+    log_info(logger_kernel, "Se prepara para ejecutar el PCB con PID: <%d>", pcb->pid);
+    
+    sem_wait(&SEM_CPU);
+
     pthread_mutex_lock(&MUTEX_EXECUTE);
     EXECUTE = pcb;
     send_pcb_cpu(pcb);
     pthread_mutex_unlock(&MUTEX_EXECUTE);
+
     log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "READY", "EXEC");
 }
 
 t_PCB *get_next_pcb_to_exec()
 {
     t_PCB *pcb_a_tomar;
+
+    log_info(logger_kernel, "Se va a tomar el siguiente PCB de la cola de READY");
 
     pthread_mutex_lock(&MUTEX_READY);
     pcb_a_tomar = queue_pop(COLA_READY);

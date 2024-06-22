@@ -19,7 +19,9 @@ void recv_pcb_cpu()
     log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID => %d, llego a EXIT", pcb_exit->pid);
 
     // limpio la variable global
+    pthread_mutex_lock(&MUTEX_EXECUTE);
     EXECUTE = NULL;
+    pthread_mutex_unlock(&MUTEX_EXECUTE);
 
     // Elimino el PCB
     pcb_destroy(pcb_exit);
@@ -51,7 +53,6 @@ t_PCB* recv_pcb_interrupt()
 {
     t_buffer* buffer = recive_full_buffer(fd_cpu_dispatch);
     t_PCB* pcb = deserialize_pcb(buffer);
-    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID => %d", pcb->pid);
     //pcb_destroy(pcb);
     buffer_destroy(buffer);
     return pcb;
