@@ -16,7 +16,7 @@ void send_pcb_cpu(t_PCB* pcb)
 t_PCB* recv_pcb_cpu() 
 {
     t_PCB* pcb = recv_pcb(fd_cpu_dispatch);
-    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID => %d", pcb->pid);
+    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID <%d>", pcb->pid);
 
     return pcb;
 }
@@ -139,3 +139,9 @@ int recibir_confirmacion_io(int fd_kernel) {
     return 0;
 }
 
+t_solicitud_io_generica* recv_solicitud_io_generica_cpu()
+{
+    t_solicitud_io_generica* io_gen = recv_solicitud_io_generica(fd_cpu_dispatch);
+
+    return io_gen;
+}
