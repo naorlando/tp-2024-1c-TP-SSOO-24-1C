@@ -70,7 +70,25 @@ void atender_kernel_cpu_dispatch()
 
                 log_info(logger_kernel, "Se recibio un mje de CPU DISPATCH");
                 break;
-            case MSG_PCB_IO_KERNEL:
+            case MSG_CPU_IO_GEN_SLEEP: //CPU -> KERNEL (Se solicita interactuar con IO GENENRICA)
+                t_solicitud_io_generica* io_gen = recv_solicitud_io_generica_cpu();
+
+                t_PCB* pcb_io_gen = obtener_pcb_solicitud_generica(io_gen);
+
+                log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_gen->pid);
+                
+                cancelar_hilo_quantum(pcb_io_gen->pid);
+                sem_post(&SEM_CPU);
+    
+                //1. Validar que la IO GENERICA este conectada
+                //2. 
+                //  a) Si esta conectada, encolar el PCB a la cola de bloqueo correspondiente (Sigue en 3 el flujo)
+                //  b) Si no esta conectada, pasar a EXIT el PCB. (Termina el flujo aca)
+                //3. Enviar el struct t_io_generica a la IO GENERICA si esta libre
+                //4. Bloquear el envio de otra solicitud de IO GENERICA, hasta que la IO responda luego de su procesamiento
+
+                break;
+            case MSG_PCB_IO_KERNEL: // TODO: NO se esta usando
                 //Recibimos el t_interface
 
                 // SI recibo el PCB antes de que se mande la interrupcion tengo que matar el hilo de interrupcion
@@ -332,5 +350,6 @@ void cancelar_hilo_quantum(uint32_t pid) {
         pthread_cancel(get_hilo(datos_hilo_quantum));
         log_info(logger_kernel, "Se cancela el hilo de quantum para desalojar el PCB de PID: <%d>", pid);
     }
-
+    // Elimino las datos guardados para enviar la interrupcion
+    datos_hilo_destroy(datos_hilo_quantum);
 }
