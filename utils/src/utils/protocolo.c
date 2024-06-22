@@ -144,7 +144,7 @@ void message_example_destroy(t_message_example* example)
 /*##########################################  SEND AND RECIVE FUNCTIONS ##########################################*/
 int send_pcb(t_msg_header msg_header, int fd, t_PCB* pcb) 
 {
-    uint32_t buffer_size = get_pcb_size(pcb) + sizeof(uint32_t);
+    uint32_t buffer_size = get_pcb_size(pcb);
     t_package* package = package_create(msg_header, buffer_size);
 
     serialize_pcb(get_buffer(package), pcb);
