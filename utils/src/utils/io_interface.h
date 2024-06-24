@@ -88,7 +88,7 @@ void liberar_IO_connection(t_IO_connection* conexion);
 // Función para obtener el nombre de una conexión de E/S
 // Pre: El puntero conexión debe apuntar a una estructura de conexión de E/S válida y no debe ser NULL.
 // Post: Se retorna el nombre de la conexión de E/S.
-const char* obtener_nombre_conexion(t_IO_connection* conexion);
+char* obtener_nombre_conexion(t_IO_connection* conexion);
 
 // Función para obtener el tipo de una conexión de E/S
 // Pre: El puntero conexión debe apuntar a una estructura de conexión de E/S válida y no debe ser NULL.

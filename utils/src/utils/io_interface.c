@@ -89,7 +89,7 @@ void liberar_IO_connection(t_IO_connection* conexion) {
     }
 }
 
-const char* obtener_nombre_conexion(t_IO_connection* conexion) {
+char* obtener_nombre_conexion(t_IO_connection* conexion) {
     if (conexion) {
         return conexion->nombre_interfaz;
     }
