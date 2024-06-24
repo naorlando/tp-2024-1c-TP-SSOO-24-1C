@@ -1,6 +1,24 @@
 #include "io_interface.h"
 
 //===============================================
+// FUNCIONES DE TIPO_INTERFAZ_T
+//===============================================
+
+tipo_interfaz_t string_to_tipo_interfaz(char* str) {
+    if (strcmp(str, "GENERICA") == 0) {
+        return GENERICA;
+    } else if (strcmp(str, "STDIN") == 0) {
+        return STDIN;
+    } else if (strcmp(str, "STDOUT") == 0) {
+        return STDOUT;
+    } else if (strcmp(str, "DIALFS") == 0) {
+        return DIALFS;
+    } else {
+        return -1; // Si no se encuentra
+    }
+}
+
+//===============================================
 // FUNCIONES DE T_IO_INTERFACE
 //===============================================
 

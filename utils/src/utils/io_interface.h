@@ -29,6 +29,17 @@ typedef struct {
     t_queue* cola_procesos_bloqueados;
 } t_IO_connection;
 
+
+//===============================================
+// FUNCIONES DE TIPO_INTERFAZ_T
+//===============================================
+
+// Convierte un string en mayúsculas al valor correspondiente del enum tipo_interfaz_t.
+// Pre: El parámetro str debe ser un string en mayúsculas que representa un tipo de interfaz válido.
+// Post: La función retorna el valor correspondiente del enum tipo_interfaz_t.
+//       Si el string no coincide con ningún tipo de interfaz, se retorna -1.
+tipo_interfaz_t string_to_tipo_interfaz(char*);
+
 //===============================================
 // FUNCIONES DE T_IO_INTERFACE
 //===============================================
