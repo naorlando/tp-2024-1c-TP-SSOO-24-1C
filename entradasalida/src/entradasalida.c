@@ -6,10 +6,10 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    char* nombre_interfaz = argv[1];
+    nombre_interfaz = argv[1];
     char* path_config = argv[2];
 
-    init(nombre_interfaz, path_config);
+    init(path_config);
 
     // Inicializar los sockets
     inicializar_sockets();
