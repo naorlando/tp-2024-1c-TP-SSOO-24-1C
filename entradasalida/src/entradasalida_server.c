@@ -14,6 +14,9 @@ void inicializar_sockets() {
             log_error(logger_entradasalida, "Error al conectar con el Kernel. ABORTANDO");
             exit(EXIT_FAILURE);
         }
+        
+        enviar_io_interface();
+        
     } else {
         log_error(logger_entradasalida, "No se encontró configuración para el Kernel. ABORTANDO");
         exit(EXIT_FAILURE);
@@ -31,8 +34,6 @@ void inicializar_sockets() {
                 log_error(logger_entradasalida, "Error al conectar con la Memoria. ABORTANDO");
                 exit(EXIT_FAILURE);
             }
-
-            enviar_io_interface();
         } else {
             log_error(logger_entradasalida, "No se encontró configuración para la Memoria. ABORTANDO");
             exit(EXIT_FAILURE);
