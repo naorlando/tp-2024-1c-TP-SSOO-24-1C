@@ -16,7 +16,7 @@ void agregar_IO_cliente(int cliente_io)
     if (io_connection == NULL) {
         log_error(logger_kernel, "Error al crear la conexión de E/S.");
         liberar_IO_interface(io_interface);
-        liberar_conexion(fd);
+        liberar_conexion(cliente_io);
         return;
     }
 
@@ -27,7 +27,7 @@ void agregar_IO_cliente(int cliente_io)
 void agregar_IO_connection(t_IO_connection* io_connection)
 {
     pthread_mutex_lock(&MUTEX_DICTIONARY);
-    char* nombre_interfaz = obtener_nombre_IO_interface(io_connection);
+    char* nombre_interfaz = obtener_nombre_conexion(io_connection);
 
     if (!dictionary_has_key(io_connections, nombre_interfaz)) {
         dictionary_put(io_connections, nombre_interfaz, io_connection);
