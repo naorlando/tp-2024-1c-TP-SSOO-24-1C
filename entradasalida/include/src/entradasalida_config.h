@@ -2,6 +2,7 @@
 #define ENTRADASALIDA_CONFIG_H_
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <commons/config.h>
@@ -96,5 +97,20 @@ uint32_t obtener_block_count(t_IO_config*);
 // Pre: El puntero a t_IO_config debe ser válido y no NULL.
 // Post: Retorna el tiempo de retraso de compactación en milisegundos.
 uint32_t obtener_retraso_compactacion(t_IO_config*);
+
+// Determina si se requiere tiempo de trabajo para una t_IO_config.
+// Pre: El puntero debe apuntar a una estructura de t_IO_config válida y no debe ser NULL.
+// Post: La función retorna true si el tipo de interfaz es "GENERICA" o "DIALFS"; de lo contrario, retorna false.
+bool _requiere_tiempo_trabajo(t_IO_config*);
+
+// Determina si se requieren datos de memoria para una t_IO_config.
+// Pre: El puntero debe apuntar a una estructura de t_IO_config válida y no debe ser NULL.
+// Post: La función retorna true si el tipo de interfaz no es "GENERICA"; de lo contrario, retorna false.
+bool _requiere_datos_memoria(t_IO_config*);
+
+// Determina si se requieren datos de sistema de archivos para una t_IO_config.
+// Pre: El puntero debe apuntar a una estructura de t_IO_config válida y no debe ser NULL.
+// Post: La función retorna true si el tipo de interfaz es "DIALFS"; de lo contrario, retorna false.
+bool _requiere_datos_fs(t_IO_config*);
 
 #endif /* ENTRADASALIDA_CONFIG_H_ */
