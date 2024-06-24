@@ -414,6 +414,39 @@ t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd)
     return solicitud;
 }
 
+void send_IO_interface(int fd,  char* nombre_interfaz, tipo_interfaz_t tipo)
+{
+    t_IO_interface* interface = crear_IO_interface(nombre_interfaz, tipo);
+
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_IO_KERNEL, obtener_size_IO_interface(interface));
+
+    // Serializo en el buffer el t_solicitud_io_generica
+    serializar_IO_interface(get_buffer(package), interface);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_new_process
+    liberar_IO_interface(interface);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+} 
+
+t_IO_interface* recv_IO_interface(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_IO_interface* interface= deserializar_IO_interface(buffer);
+
+    buffer_destroy(buffer);
+
+    return interface;
+}
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)

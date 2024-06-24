@@ -251,6 +251,21 @@ void send_solicitud_io_stdout(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_st
 //       Si ocurre un error o no se recibe ningún dato, retorna NULL.
 t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd);
 
+/*********** SEND AND RECIVE 'T_IO_INTERFACE' ***********/
+// Envía una estructura t_IO_interface a través de un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+//      El parámetro nombre_interfaz debe ser una cadena válida y no debe ser NULL.
+//      El parámetro tipo debe ser un valor válido del enum tipo_interfaz_t.
+// Post: La estructura t_IO_interface se serializa y se envía a través del socket especificado.
+void send_IO_interface(int,  char*, tipo_interfaz_t);
+
+// Recibe una estructura t_IO_interface desde un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+// Post: Se recibe y deserializa una estructura t_IO_interface desde el socket especificado.
+//       La función retorna un puntero a la estructura t_IO_interface recibida.
+//       Si hay un error durante la recepción, se retorna NULL.
+t_IO_interface* recv_IO_interface(int);
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
 void *serializar_paquete(t_package*, int);
@@ -399,7 +414,7 @@ void serializar_io_stdout(t_buffer* buffer, t_io_stdout* io_stdout);
 // Post: Retorna un puntero a una estructura t_io_stdout deserializada.
 t_io_stdout* deserializar_io_stdout(t_buffer* buffer);
 
-/*********** SERIALIZE AND DESERIALIZE 'T_MESSAGE_EXAMPLE' ***********/
+/*********** SERIALIZE AND DESERIALIZE 'T_IO_INTERFACE' ***********/
 // Serializar una estructura t_IO_interface en un buffer
 // Pre: El puntero interface debe apuntar a una estructura t_IO_interface válida y no debe ser NULL.
 //      El puntero buffer debe ser un buffer previamente asignado con suficiente espacio.
