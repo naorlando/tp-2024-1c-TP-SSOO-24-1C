@@ -105,3 +105,8 @@ void enviar_confirmacion_io(int fd) {
     package_send(package, fd);
     package_destroy(package);
 }
+
+void send_IO_interface_kernel() 
+{
+    send_IO_interface(fd_kernel, nombre_interfaz, obtener_tipo_interfaz(entradasalida_config));
+}
