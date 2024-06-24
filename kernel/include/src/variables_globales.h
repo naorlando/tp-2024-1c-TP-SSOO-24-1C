@@ -26,14 +26,16 @@
 extern t_log* logger_kernel;
 extern t_log* logger_kernel_debug;
 extern t_dictionary* table_pcb;
-extern pthread_mutex_t  mutex_pid;
 extern int identificador_PID;
+extern t_datos_hilo* datos_hilo_quantum;
+extern bool interrupcion_enviada;
+
+//MUTEXS
 extern pthread_mutex_t MUTEX_READY;
+extern pthread_mutex_t mutex_pid;
 extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
 extern pthread_mutex_t MUTEX_EXECUTE;
-extern t_datos_hilo* datos_hilo_quantum;
-extern bool interrupcion_enviada;
 
 //SEMAFOROS
 extern sem_t SEM_READY;

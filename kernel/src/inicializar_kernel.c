@@ -16,13 +16,13 @@ char *memoria_port;
 char *server_port;
 
 t_dictionary *table_pcb;
-pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 int identificador_PID = 1;
 t_datos_hilo* datos_hilo_quantum;
 bool interrupcion_enviada = false;
-
 bool planificador_status = true;
 
+
+pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t MUTEX_READY;
 pthread_mutex_t MUTEX_EXIT;
 pthread_mutex_t MUTEX_NEW;
@@ -34,8 +34,6 @@ sem_t SEM_EXIT;
 sem_t SEM_NEW;
 sem_t SEM_MULTIPROGRAMACION;
 sem_t SEM_CPU; 
-
-
 
 t_queue *COLA_READY;
 t_queue *COLA_EXIT;
