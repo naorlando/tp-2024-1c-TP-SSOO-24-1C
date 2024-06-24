@@ -21,6 +21,7 @@
 #include "next_instruction.h"
 #include "interruption.h"
 #include "solicitudes_io.h"
+#include "io_interface.h"
 
 /*
  *  Messages: enum & structs
@@ -397,5 +398,17 @@ void serializar_io_stdout(t_buffer* buffer, t_io_stdout* io_stdout);
 // Pre: El buffer debe ser válido y no NULL.
 // Post: Retorna un puntero a una estructura t_io_stdout deserializada.
 t_io_stdout* deserializar_io_stdout(t_buffer* buffer);
+
+/*********** SERIALIZE AND DESERIALIZE 'T_MESSAGE_EXAMPLE' ***********/
+// Serializar una estructura t_IO_interface en un buffer
+// Pre: El puntero interface debe apuntar a una estructura t_IO_interface válida y no debe ser NULL.
+//      El puntero buffer debe ser un buffer previamente asignado con suficiente espacio.
+// Post: La t_IO_interface se serializa en el buffer.
+void serializar_IO_interface(t_buffer*, t_IO_interface*);
+
+// Función para deserializar una t_IO_interface.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_IO_interface deserializada.
+t_IO_interface* deserializar_IO_interface(t_buffer*);
 
 #endif

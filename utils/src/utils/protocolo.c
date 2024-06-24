@@ -741,3 +741,22 @@ t_io_stdout* deserializar_io_stdout(t_buffer* buffer) {
     uint32_t tamanio = buffer_read_uint32(buffer);
     return crear_io_stdout(direccion_fisica, tamanio);
 }
+
+void serializar_IO_interface(t_buffer* buffer, t_IO_interface* interface)
+{
+    buffer_add_string(buffer, obtener_nombre_IO_interface(interface));
+    buffer_add_uint32(buffer, obtener_tipo_IO_interface(interface));
+}
+
+t_IO_interface* deserializar_IO_interface(t_buffer* buffer)
+{
+    uint32_t lenght_string = buffer_read_uint32(buffer);
+    char* nombre_interfaz = buffer_read_string(buffer, lenght_string);
+    tipo_interfaz_t tipo = buffer_read_uint32(buffer);
+
+    t_IO_interface* interfaz = crear_IO_interface(nombre_interfaz, tipo);
+
+    free(nombre_interfaz);
+
+    return interfaz;
+}
