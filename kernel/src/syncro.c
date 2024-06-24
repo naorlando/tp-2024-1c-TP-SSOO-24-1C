@@ -6,6 +6,7 @@ void initialize_mutexes()
     pthread_mutex_init(&MUTEX_EXIT, NULL);
     pthread_mutex_init(&MUTEX_NEW,NULL);
     pthread_mutex_init(&MUTEX_EXECUTE,NULL);
+    pthread_mutex_init(&MUTEX_DICTIONARY,NULL);
 }
 
 void initialize_semaphores()
