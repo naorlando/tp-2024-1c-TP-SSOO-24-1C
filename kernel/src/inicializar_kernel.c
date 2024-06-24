@@ -20,7 +20,7 @@ int identificador_PID = 1;
 t_datos_hilo* datos_hilo_quantum;
 bool interrupcion_enviada = false;
 bool planificador_status = true;
-
+t_dictionary* io_connections;
 
 pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t MUTEX_READY;

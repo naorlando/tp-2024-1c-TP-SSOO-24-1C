@@ -29,6 +29,7 @@ extern t_dictionary* table_pcb;
 extern int identificador_PID;
 extern t_datos_hilo* datos_hilo_quantum;
 extern bool interrupcion_enviada;
+extern t_dictionary* io_connections;
 
 //MUTEXS
 extern pthread_mutex_t MUTEX_READY;
