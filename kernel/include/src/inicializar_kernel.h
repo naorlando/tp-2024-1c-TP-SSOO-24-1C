@@ -21,5 +21,6 @@ void imprimir_config();
 void _init_table_pcb();
 void initialize_lists();
 void inicializar_planificadores();
+void inicializar_dictionarios();
 
 #endif /*INICIALIZAR_KERNEL_H_*/

@@ -51,6 +51,7 @@ void init()
     initialize_mutexes();
     initialize_semaphores();
     inicializar_planificadores();
+    inicializar_dictionarios();
 }
 
 void _iniciar_logger()
@@ -146,4 +147,9 @@ void initialize_lists()
     COLA_EXIT = queue_create();
     COLA_NEW = queue_create();
     LISTA_COLAS_DISPOSITIVOS = list_create();
+}
+
+void inicializar_dictionarios()
+{
+    io_connections = dictionary_create();
 }
