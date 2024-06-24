@@ -31,6 +31,8 @@ void inicializar_sockets() {
                 log_error(logger_entradasalida, "Error al conectar con la Memoria. ABORTANDO");
                 exit(EXIT_FAILURE);
             }
+
+            enviar_io_interface();
         } else {
             log_error(logger_entradasalida, "No se encontró configuración para la Memoria. ABORTANDO");
             exit(EXIT_FAILURE);
@@ -258,4 +260,10 @@ void _cerrar_conexiones() {
     liberar_conexion(fd_kernel);
     liberar_conexion(fd_memoria);
     // Liberar otras conexiones si es necesario
+}
+
+//TODO: Analizar si tiene sentido que esta funcion este aca o no
+void enviar_io_interface()
+{
+    send_IO_interface_kernel();
 }
