@@ -49,12 +49,13 @@ void procesar_pcb_exit()
 
     log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
 
-    // Elimino el PCB
-    pcb_destroy(pcb_exit);
+    // Actualizo el estado del pcb en la cola correspondiente:
+    agregar_a_cola_exit(pcb_exit);
     
     sem_post(&SEM_CPU);
 
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+    log_info(logger_kernel, "La cola de Exit tiene %d elementos", queue_size(COLA_EXIT));
 }
 
 void procesar_interrupcion()
