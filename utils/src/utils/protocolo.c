@@ -414,9 +414,11 @@ t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd)
     return solicitud;
 }
 
-void send_IO_interface(int fd,  char* nombre_interfaz, tipo_interfaz_t tipo)
+void send_IO_interface(int fd, char* nombre_interfaz, char* tipo)
 {
-    t_IO_interface* interface = crear_IO_interface(nombre_interfaz, tipo);
+    tipo_interfaz_t tipo_interfaz = string_to_tipo_interfaz(tipo);
+
+    t_IO_interface* interface = crear_IO_interface(nombre_interfaz, tipo_interfaz);
 
     // Creo el paquete que se va a enviar
     t_package* package = package_create(MSG_IO_KERNEL, obtener_size_IO_interface(interface));

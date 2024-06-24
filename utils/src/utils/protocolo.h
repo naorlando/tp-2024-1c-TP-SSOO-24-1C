@@ -255,9 +255,9 @@ t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd);
 // Envía una estructura t_IO_interface a través de un socket especificado.
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
 //      El parámetro nombre_interfaz debe ser una cadena válida y no debe ser NULL.
-//      El parámetro tipo debe ser un valor válido del enum tipo_interfaz_t.
+//      El parámetro tipo debe ser unna cadena válida y no debe ser NULL.
 // Post: La estructura t_IO_interface se serializa y se envía a través del socket especificado.
-void send_IO_interface(int,  char*, tipo_interfaz_t);
+void send_IO_interface(int, char*, char*);
 
 // Recibe una estructura t_IO_interface desde un socket especificado.
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
