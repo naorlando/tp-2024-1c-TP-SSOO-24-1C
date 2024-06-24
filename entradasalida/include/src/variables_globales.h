@@ -11,6 +11,7 @@
 // VARIABLES GLOBALES:
 extern t_log *logger_entradasalida;
 extern t_log *logger_entradasalida_debug;
+extern char* nombre_interfaz;
 
 //FD
 extern int fd_memoria;
