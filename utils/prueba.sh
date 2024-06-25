@@ -24,8 +24,25 @@ TIPOS_DISPOSITIVOS=(
 run_make() {
     local dir="$1"
     cd "$dir" || return
-    make clean
-    make
+    make clean > /dev/null 2>&1
+    echo ""
+    echo "Compilando módulo $dir..."
+    echo ""
+    make > make_output.txt 2>&1
+    make_exit_code=$?
+
+    if [ $make_exit_code -eq 0 ]; then
+        echo ""
+        echo "El módulo $dir se compiló correctamente."
+        echo ""
+    else
+        echo ""
+        echo "Error al compilar el módulo $dir."
+        echo "Revise el archivo make_output.txt para más detalles."
+        echo ""
+        exit 1
+    fi
+
     cd - >/dev/null
 }
 
@@ -36,20 +53,25 @@ run_module() {
     if [ -z "$config_file" ]; then
         exo-open --launch TerminalEmulator --execute "$executable"
     else
-        exo-open --launch TerminalEmulator --execute "$executable" "$config_file"
+        exo-open --launch TerminalEmulator --execute "$executable "'"$nombre_dispositivo"' "$config_file"
     fi
     sleep 2  # Esperar 2 segundos para que la ventana se abra correctamente
 }
 
 # Función para seleccionar el tipo de dispositivo de entrada/salida
 select_dispositivo() {
+    echo ""
+    echo ""
     read -p "Ingrese el nombre de la interfaz de entrada/salida: " nombre_dispositivo
-
+    echo ""
     echo "Seleccione el tipo de dispositivo de entrada/salida:"
+    echo ""
     for tipo in "${TIPOS_DISPOSITIVOS[@]}"; do
         echo "$tipo"
     done
+    echo ""
     read -p "Ingrese el número correspondiente: " opcion
+    echo ""
 
     case $opcion in
         1)
@@ -65,7 +87,9 @@ select_dispositivo() {
             tipo_dispositivo="DIALFS"
             ;;
         *)
+            echo ""
             echo "Opción inválida. Intentelo nuevamente."
+            echo ""
             select_dispositivo
             return
             ;;
@@ -81,8 +105,10 @@ run_make "$KERNEL_DIR"
 run_make "$MEMORIA_DIR"
 run_make "$ENTRADASALIDA_DIR"
 
-# Seleccionar dispositivos de entrada/salida a conectar
+echo ""
+echo ""
 read -p "¿Cuántos dispositivos de entrada/salida desea conectar? " num_dispositivos
+echo ""
 
 for ((i=1; i<=num_dispositivos; i++)); do
     select_dispositivo
