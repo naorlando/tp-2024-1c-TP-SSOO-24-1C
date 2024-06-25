@@ -364,6 +364,7 @@ void solicitar_IO(t_instruction* instruccion)
 {
     // t_interface interface = create_interface(pcb_execute, instruccion);
     //send_interface_kernel(/*interface*/);
+    cargar_contexto_ejecucion_a_pcb(pcb_execute);
 
     switch(obtener_nombre_instruccion(instruccion))
     {
@@ -395,6 +396,7 @@ void solicitar_IO(t_instruction* instruccion)
 
             break;
     }
+    log_info(logger_cpu, "El PCB de pid <%d> se envio al KERNEL para solicitar una IO", pcb_execute->pid);
     sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 }
 
