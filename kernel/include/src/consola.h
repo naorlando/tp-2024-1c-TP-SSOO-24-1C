@@ -2,7 +2,6 @@
 #define CONSOLA_H_
 
 #include <variables_globales.h>
-#include "utils/buffer.h"
 #include "utils/estructuras.h"
 #include "utils/protocolo.h"
 #include "utils/utils.h"

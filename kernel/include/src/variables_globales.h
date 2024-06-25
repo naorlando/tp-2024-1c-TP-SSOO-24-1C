@@ -2,7 +2,8 @@
 #define VARIABLES_GLOBALES_H
 
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
+#include <stdbool.h> 
 #include <commons/log.h>
 #include <commons/collections/queue.h>
 #include "kernel_config.h"
@@ -11,6 +12,8 @@
 #include <commons/collections/list.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <utils/estructuras.h>
+#include <datos_hilos.h>
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"
@@ -23,11 +26,18 @@
 extern t_log* logger_kernel;
 extern t_log* logger_kernel_debug;
 extern t_dictionary* table_pcb;
-extern pthread_mutex_t  mutex_pid;
 extern int identificador_PID;
+extern t_datos_hilo* datos_hilo_quantum;
+extern bool interrupcion_enviada;
+extern t_dictionary* io_connections;
+
+//MUTEXS
 extern pthread_mutex_t MUTEX_READY;
+extern pthread_mutex_t mutex_pid;
 extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
+extern pthread_mutex_t MUTEX_EXECUTE;
+extern pthread_mutex_t MUTEX_DICTIONARY;
 
 //SEMAFOROS
 extern sem_t SEM_READY;
@@ -59,6 +69,8 @@ extern char* memoria_port;
 extern t_queue* COLA_READY;
 extern t_queue* COLA_EXIT;
 extern t_queue* COLA_NEW;
+//una variable para que el kernel conozca el pcb que este ejecutando:
+extern t_PCB* EXECUTE;
 extern t_list* LISTA_COLAS_DISPOSITIVOS; 
 
 

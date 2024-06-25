@@ -6,6 +6,7 @@
 #include "utils/estructuras.h"
 #include "protocolo_cpu.h"
 #include "cpu_interrupt.h"
+#include "utils/utils.h"
 
 void ejecutar_instruccion(t_instruction*, t_cpu_registers*);
 
@@ -47,12 +48,6 @@ void _establecer_registro(t_cpu_registers *, char *, uint32_t);
 // Post: Retorna el valor del registro correspondiente al nombre dado.
 uint32_t _obtener_valor_registro(t_cpu_registers *, char *);
 
-// TODO: localizarlo en utils?
-// Obtiene el valor de un registro dado un nombre.
-// Pre: Los registros deben ser válidos y no NULL.
-// Post: Retorna el valor del registro correspondiente al nombre dado.
-void remove_newline(char *);
-
 // Maneja las interrupciones de la CPU.
 // Pre: La variable interrupcion_pendiente debe estar correctamente inicializada.
 //      La variable global pcb_execute debe apuntar a un PCB válido y no NULL.
@@ -64,6 +59,12 @@ bool manejar_interrupcion();
 // Pre: El PCB debe ser válido y no NULL.
 // Post: El contexto de ejecución de la CPU se carga en el PCB.
 void cargar_contexto_ejecucion_a_pcb(t_PCB*);
+
+// Finaliza el envío del PCB después de completar la ejecución.
+// Pre: `pcb_execute` debe ser un puntero válido a t_PCB y debe estar correctamente inicializado.
+//      `fd_kernel_dispatch` debe ser un descriptor de archivo válido.
+// Post: El PCB es enviado al kernel y cualquier interrupción pendiente es desestimada.
+void enviar_pcb_finalizado();
 
 // TODO: Implementar.
 uint32_t leer_memoria(uint32_t);

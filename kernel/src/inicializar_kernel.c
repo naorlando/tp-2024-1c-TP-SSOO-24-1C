@@ -16,15 +16,18 @@ char *memoria_port;
 char *server_port;
 
 t_dictionary *table_pcb;
-pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 int identificador_PID = 1;
-
-
+t_datos_hilo* datos_hilo_quantum;
+bool interrupcion_enviada = false;
 bool planificador_status = true;
+t_dictionary* io_connections;
 
+pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t MUTEX_READY;
 pthread_mutex_t MUTEX_EXIT;
 pthread_mutex_t MUTEX_NEW;
+pthread_mutex_t MUTEX_EXECUTE;
+pthread_mutex_t MUTEX_DICTIONARY;
 
 sem_t SEM_READY;
 sem_t BLOQUEADOR;
@@ -33,11 +36,10 @@ sem_t SEM_NEW;
 sem_t SEM_MULTIPROGRAMACION;
 sem_t SEM_CPU; 
 
-
-
 t_queue *COLA_READY;
 t_queue *COLA_EXIT;
 t_queue *COLA_NEW;
+t_PCB *EXECUTE;
 t_list *LISTA_COLAS_DISPOSITIVOS;
 
 void init()
@@ -50,6 +52,7 @@ void init()
     initialize_mutexes();
     initialize_semaphores();
     inicializar_planificadores();
+    inicializar_dictionarios();
 }
 
 void _iniciar_logger()
@@ -145,4 +148,9 @@ void initialize_lists()
     COLA_EXIT = queue_create();
     COLA_NEW = queue_create();
     LISTA_COLAS_DISPOSITIVOS = list_create();
+}
+
+void inicializar_dictionarios()
+{
+    io_connections = dictionary_create();
 }

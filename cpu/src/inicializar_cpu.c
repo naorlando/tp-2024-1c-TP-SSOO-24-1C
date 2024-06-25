@@ -14,9 +14,14 @@ int fd_memoria;
 
 t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
-int tipo_de_interrupcion;
+t_name_interruption tipo_de_interrupcion;
 t_PCB* pcb_execute;
-sem_t SEM_INTERRUPT; 
+bool llego_a_exit = false;
+bool solicitud_io = false; 
+
+sem_t SEM_INTERRUPT;
+sem_t SEM_SOCKET_KERNEL_DISPATCH;
+pthread_mutex_t MUTEX_INTERRUPT;
 
 char* server_port_interrupt;
 char* server_port_dispatch;
@@ -27,7 +32,8 @@ void init(){
     _iniciar_config();
     _init_cpu_registers();
     imprimir_config();
-    initializeSemaphores();
+    initializeSemaphores(); // TODO: Revisar si sirve
+    initialize_mutexes();
 }
 
 void _init_cpu_registers() {

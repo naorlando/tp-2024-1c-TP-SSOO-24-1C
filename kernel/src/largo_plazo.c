@@ -35,13 +35,14 @@ void send_new_to_ready()
         pthread_mutex_lock(&MUTEX_NEW);
         pcb = queue_pop(COLA_NEW);
         pthread_mutex_unlock(&MUTEX_NEW);
+        log_info(logger_kernel, "Se paso un PCB de NEW -> READY \nCola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
 
         // encolar en ready
         pthread_mutex_lock(&MUTEX_READY);
         queue_push(COLA_READY, pcb);
         pthread_mutex_unlock(&MUTEX_READY);
-        sem_post(&SEM_READY);
         log_info(logger_kernel, "Cola READY tiene un total de %d elementos", queue_size(COLA_READY));
+        sem_post(&SEM_READY); //POST READY
     }
 }
 

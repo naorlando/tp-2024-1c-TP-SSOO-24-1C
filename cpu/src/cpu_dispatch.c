@@ -58,15 +58,14 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             char *reg = (char *)list_get(instruccion->params, 0);
             int instruction_index = atoi((char *)list_get(instruccion->params, 1));
             uint32_t valor_reg = _obtener_valor_registro(cpu_registers, reg);
-
-            if (valor_reg != 0) {
+            uint32_t valor_cero = 0;
+            if (valor_reg != valor_cero) {
                 cpu_registers->pc = instruction_index;
-                log_trace(logger_cpu, "el registro %s era igual a cero, por lo tanto se salto a %d (JNZ)\n", reg, instruction_index);
+                log_info(logger_cpu, "el registro %s era igual a cero, por lo tanto se salto a %d (JNZ)\n", reg, instruction_index);
+                // le restamos uno al PC ya que al finalizar Execute se le va a sumar 1 al PC: entonces esto se cancela.
+                cpu_registers->pc--;
             }
                 log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
-
-            // le restamos uno al PC ya que al finalizar Execute se le va a sumar 1 al PC: entonces esto se cancela.
-            cpu_registers->pc--;
             break;
         }
         case RESIZE: {
@@ -95,10 +94,20 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         case IO_GEN_SLEEP: {
             char* interface = (char*)list_get(instruccion->params, 0);
             int units = atoi((char*)list_get(instruccion->params, 1));
-
+            
             // Enviar el PCB al kernel con el tipo de interfaz
-            solicitar_IO(instruccion);
             log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
+            solicitar_IO(instruccion);
+            solicitud_io = true;
+            break;
+        }
+        case EXIT: {
+            log_info(logger_cpu, "EXIT\n");
+            // sem_wait(&SEM_INTERRUPT); //BINARIO
+            // interrupcion_pendiente = true;
+            // tipo_de_interrupcion = EXIT_INTERRUPT;
+            enviar_pcb_finalizado();
+            llego_a_exit = true;
             break;
         }
         default:
@@ -114,18 +123,53 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
 //#############################################################################################################
 // Función para obtener el puntero a un registro basado en su nombre:
 uint32_t* _obtener_registro(t_cpu_registers *registros, const char *nombre) {
-    if (strcmp(nombre, "AX") == 0) return (uint32_t *)&registros->ax;
-    if (strcmp(nombre, "BX") == 0) return (uint32_t *)&registros->bx;
-    if (strcmp(nombre, "CX") == 0) return (uint32_t *)&registros->cx;
-    if (strcmp(nombre, "DX") == 0) return (uint32_t *)&registros->dx;
-    if (strcmp(nombre, "EAX") == 0) return &registros->eax;
-    if (strcmp(nombre, "EBX") == 0) return &registros->ebx;
-    if (strcmp(nombre, "ECX") == 0) return &registros->ecx;
-    if (strcmp(nombre, "EDX") == 0) return &registros->edx;
-    if (strcmp(nombre, "SI") == 0) return &registros->si;
-    if (strcmp(nombre, "DI") == 0) return &registros->di;
+    if (strcmp(nombre, "AX") == 0) {
+        //log_info(logger_cpu, "AX = %u", (uint32_t)registros->ax);
+        return (uint32_t*)&registros->ax;
+        // uint32_t valor = (uint32_t)registros->ax; 
+        // return &valor;
+    }
+    if (strcmp(nombre, "BX") == 0) {
+        //log_info(logger_cpu, "BX = %u", (uint32_t)registros->bx);
+        return (uint32_t*)&registros->bx;
+        // uint32_t valor = (uint32_t)registros->bx; 
+        // return &valor;
+    }
+    if (strcmp(nombre, "CX") == 0) {
+        log_info(logger_cpu, "CX = %u", (uint32_t)registros->cx);
+        return (uint32_t*)&registros->cx;
+    }
+    if (strcmp(nombre, "DX") == 0) {
+        log_info(logger_cpu, "DX = %u", (uint32_t)registros->dx);
+        return (uint32_t*)&registros->dx;
+    }
+    if (strcmp(nombre, "EAX") == 0) {
+        log_info(logger_cpu, "EAX = %u", registros->eax);
+        return &registros->eax;
+    }
+    if (strcmp(nombre, "EBX") == 0) {
+        log_info(logger_cpu, "EBX = %u", registros->ebx);
+        return &registros->ebx;
+    }
+    if (strcmp(nombre, "ECX") == 0) {
+        log_info(logger_cpu, "ECX = %u", registros->ecx);
+        return &registros->ecx;
+    }
+    if (strcmp(nombre, "EDX") == 0) {
+        log_info(logger_cpu, "EDX = %u", registros->edx);
+        return &registros->edx;
+    }
+    if (strcmp(nombre, "SI") == 0) {
+        log_info(logger_cpu, "SI = %u", registros->si);
+        return &registros->si;
+    }
+    if (strcmp(nombre, "DI") == 0) {
+        log_info(logger_cpu, "DI = %u", registros->di);
+        return &registros->di;
+    }
     return NULL;
 }
+
 
 // Función para establecer el valor de un registro
 // void _establecer_registro(t_cpu_registers *registros, const char *nombre, uint32_t valor) {
@@ -152,14 +196,9 @@ uint32_t _obtener_valor_registro(t_cpu_registers *registros, char *nombre) {
     return reg ? *reg : 0;
 }
 
-void remove_newline(char *str) {
-    size_t len = strlen(str);
-    if (len > 0 && str[len - 1] == '\n') {
-        str[len - 1] = '\0';
-    }
-}
 
 // #############################################################################################################
+// TP:
 // Es importante tener en cuenta las siguientes aclaraciones:
 // Una dirección lógica se traduce a una dirección física, pero al copiar un string/registro a memoria, 
 // podría estar presente en más de una página (ver sección de MMU).
@@ -217,13 +256,15 @@ void cargar_contexto_ejecucion(t_PCB* pcb) {
 void solicitar_instruccion(uint32_t pid, uint32_t pc) 
 {
     // Pido la siguiente instruccion a memoria
-    send_get_next_instruction(pid, pc);
+    send_get_next_instruction_memoria(pid, pc);
 }
 
 void recibir_pcb() 
 {
+    sem_wait(&SEM_SOCKET_KERNEL_DISPATCH);
+
     // Recibo el pcb que manda kernel para ejecutar sus instrucciones
-    pcb_execute = recv_pcb_cpu();
+    pcb_execute = recv_pcb_kernel();
 
     // Cargo el contexto de ejecucion del pcb en los registros de la cpu
     cargar_contexto_ejecucion(pcb_execute);
@@ -234,57 +275,133 @@ void recibir_pcb()
 
 void manejar_ciclo_de_instruccion() {
     // FETCH: Recibo la instruccion que manda memoria
-    t_instruction* instruccion = recv_instruction();
+    t_instruction* instruccion = recv_instruction_memoria();
 
     log_info(logger_cpu, "Instrucción recibida de memoria");
-    log_info(logger_cpu, "antes: AX: %d", cpu_registers->ax);
-    log_info(logger_cpu, "antes: BX: %d", cpu_registers->bx);
-    log_info(logger_cpu, "antes: CX: %d", cpu_registers->cx);
+    log_info(logger_cpu, "antes: AX: %u", cpu_registers->ax);
+    log_info(logger_cpu, "antes: BX: %u", cpu_registers->bx);
+    log_info(logger_cpu, "antes: CX: %u", cpu_registers->cx);
+    log_info(logger_cpu, "antes: DX: %u", cpu_registers->dx);
+    log_info(logger_cpu, "antes: EAX: %u", cpu_registers->eax);
+    log_info(logger_cpu, "antes: EBX: %u", cpu_registers->ebx);
+    log_info(logger_cpu, "antes: ECX: %u", cpu_registers->ecx);
+    log_info(logger_cpu, "antes: EDX: %u", cpu_registers->edx);
+    log_info(logger_cpu, "antes: SI: %u", cpu_registers->si);
+    log_info(logger_cpu, "antes: DI: %u", cpu_registers->di);
+
 
     // EXECUTE: Ejecuto la instruccion recibida
     ejecutar_instruccion(instruccion, cpu_registers);
+    //sleep(5);
     //imprimir todos los cpu_registers:
-    log_info(logger_cpu, "despues: AX: %d", cpu_registers->ax);
-    log_info(logger_cpu, "despues: BX: %d", cpu_registers->bx);
-    log_info(logger_cpu, "despues: CX: %d", cpu_registers->cx);
+    log_info(logger_cpu, "despues: AX: %u", cpu_registers->ax);
+    log_info(logger_cpu, "despues: BX: %u", cpu_registers->bx);
+    log_info(logger_cpu, "despues: CX: %u", cpu_registers->cx);
+    log_info(logger_cpu, "despues: DX: %u", cpu_registers->dx);
+    log_info(logger_cpu, "despues: EAX: %u", cpu_registers->eax);
+    log_info(logger_cpu, "despues: EBX: %u", cpu_registers->ebx);
+    log_info(logger_cpu, "despues: ECX: %u", cpu_registers->ecx);
+    log_info(logger_cpu, "despues: EDX: %u", cpu_registers->edx);
+    log_info(logger_cpu, "despues: SI: %u", cpu_registers->si);
+    log_info(logger_cpu, "despues: DI: %u", cpu_registers->di);
+
  
     eliminar_instruccion(instruccion);
 
-    // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
-    if(manejar_interrupcion()) return;
+    // se debe hacer un "return;", si el proceso llego a exit
+    if(llego_a_exit) {
+        llego_a_exit = false; // seteamos en false para el siguiente pcb
+        return;
+    }
 
     // actualizar PC:
     cpu_registers->pc++;
     pcb_execute->program_counter = cpu_registers->pc;
+    
+    //SOlo para seguir el flujo
+    log_info(logger_cpu, "El PCB de pid <%d> tiene el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
+
+    // se debe hacer un "return;", si el proceso solicito una io
+    if(solicitud_io){
+        solicitud_io = false;
+        return;
+    }
+
+    // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
+    if(manejar_interrupcion()) return;
+
+    //SOlo para seguir el flujo
+    log_info(logger_cpu, "El PCB de pid <%d> solicito la siguiente intruccion a memoria con el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
+
     //TODO: Se debe actualizar el PC antes de pedir la siguiente instruccion a memoria
     solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);
     
 }
 
 bool manejar_interrupcion() {
+    pthread_mutex_lock(&MUTEX_INTERRUPT);
     if (interrupcion_pendiente) {
-        log_info(logger_cpu, "Interrupción recibida, devolviendo PCB al Kernel");
+        log_info(logger_cpu, "Interrupción de %s recibida, devolviendo PCB al Kernel",get_string_from_interruption(tipo_de_interrupcion));
         //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
         // de enviar de nuevo al kernel
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
-        send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
-        sem_post(&SEM_INTERRUPT);
-        interrupcion_pendiente = false; 
+        
         log_info(logger_cpu, "PCB enviado al Kernel");
-        return true;
-    }
+        send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
+        //sem_post(&SEM_INTERRUPT);
+        interrupcion_pendiente = false; 
+        pthread_mutex_unlock(&MUTEX_INTERRUPT);
+        sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 
+        return true;
+    } else {
+        pthread_mutex_unlock(&MUTEX_INTERRUPT);
+    }
     return false;
 }
 
 void solicitar_IO(t_instruction* instruccion)
 {
     // t_interface interface = create_interface(pcb_execute, instruccion);
-    send_interface_kernel(/*interface*/);
+    //send_interface_kernel(/*interface*/);
+    cargar_contexto_ejecucion_a_pcb(pcb_execute);
+
+    switch(obtener_nombre_instruccion(instruccion))
+    {
+        case IO_GEN_SLEEP:
+            send_solicitud_io_generica_kernel(pcb_execute, instruccion);
+            break;
+        case IO_STDIN_READ:
+    
+            break;
+        case IO_STDOUT_WRITE:
+            
+            break;
+        case IO_FS_CREATE:
+            
+            break;
+        case IO_FS_DELETE:
+            
+            break;
+        case IO_FS_TRUNCATE:
+            
+            break;
+        case IO_FS_WRITE:
+            
+            break;
+        case IO_FS_READ:
+            
+            break;
+        default:
+
+            break;
+    }
+    log_info(logger_cpu, "El PCB de pid <%d> se envio al KERNEL para solicitar una IO", pcb_execute->pid);
+    sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 }
 
 // cargar contexto de ejecucion del cpu a los registros del pcb
-void cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
+void  cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
     t_cpu_registers* contexto = get_cpu_registers(pcb);
 
     // Cargo el contexto de ejecucion de la CPU en el pcb
@@ -299,4 +416,18 @@ void cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
     contexto->edx = cpu_registers->edx;
     contexto->si = cpu_registers->si;
     contexto->di = cpu_registers->di;
+}
+
+void enviar_pcb_finalizado() 
+{
+    cargar_contexto_ejecucion_a_pcb(pcb_execute);
+    send_pcb_kernel();
+    sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
+
+    // Controlo si llego una interrupcion
+    if(interrupcion_pendiente) {
+        pthread_mutex_lock(&MUTEX_INTERRUPT);
+        interrupcion_pendiente = false; // la desestimo
+        pthread_mutex_unlock(&MUTEX_INTERRUPT);
+    }
 }

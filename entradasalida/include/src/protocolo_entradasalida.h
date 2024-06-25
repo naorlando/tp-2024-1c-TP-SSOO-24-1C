@@ -14,4 +14,6 @@ char* leer_memoria(uint32_t direccion_fisica, uint32_t tamanio);
 
 void enviar_confirmacion_io(int fd);
 
+void send_IO_interface_kernel();
+
 #endif

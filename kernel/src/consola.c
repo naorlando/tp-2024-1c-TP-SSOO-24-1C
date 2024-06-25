@@ -132,40 +132,27 @@ void f_iniciar_proceso(char *path)
     int pid = asignar_pid();
 
     // Creor el PCB
-    t_PCB *pcb = pcb_create(pid, kernel_config->QUANTUM);
+    t_PCB *pcb = pcb_create(pid, obtener_quantum(kernel_config));
+    
+    log_info(logger_kernel, "Se crea el proceso <%d> en NEW", pcb->pid);
 
     // Cargo el pcb a la tabla de pcbs
     add_pcb(pcb);
 
-    log_info(logger_kernel, "Se crea el proceso <%d> en NEW", pcb->pid);
-
-    // Creo la estrucutura que le voy a pasar a memoria para que
-    // cree la imagen del proceso
-    t_new_process *nuevo_proceso = create_new_process(pid, path);
-
-    // Calculo el tamaño del buffer para serializar el t_new_process
-    u_int32_t buffer_size = sizeof(uint32_t) + strlen(nuevo_proceso->path) + 1 + sizeof(uint32_t);
-
     log_info(logger_kernel, "Se serializa el nuevo proceso para enviar a memoria la creacion de la imagen del proceso");
 
-    // Creo el paquete
-    t_package *package = package_create(MSG_KERNEL_CREATE_PROCESS, buffer_size);
-    serialize_nuevo_proceso(package->buffer, nuevo_proceso);
-
-    package_send(package, fd_kernel_memoria);
-    package_destroy(package);
+    // Se envia un t_new_process a memoria
+    send_new_process(fd_kernel_memoria, pid, path);
 
     // SEMAFORO PLANIFICADOR
     // Agregar PCB a la cola de NEW
     process_to_new(pcb);
-
-    destroy_new_process(nuevo_proceso);
 }
 
 void enviar_pcb_cpu()
 {
     t_PCB *pcb = get_pcb(1);
-    // envio a cpu el pcb
+    // envio el pcb a cpu 
     send_pcb_cpu(pcb);
 }
 
@@ -180,18 +167,27 @@ void f_ejecutar_script(const char *filename)
         return;
     }
 
-    char linea[256];
-    while (fgets(linea, sizeof(linea), file))
-    {
-        // Eliminar el salto de línea si existe
-        linea[strcspn(linea, "\n")] = '\0';
+    size_t len = 0;
+    ssize_t read;
+    char *linea = NULL;
 
-        log_info(logger_kernel, "Ejecutando comando: %s", linea);
+    while ((read = getline(&linea, &len, file)) != -1) {
+        // Eliminar el salto de línea si existe
+        remove_newline(linea);
+
+        // Duplicar la línea para pasarla a _atender_instruccion
+        char *linea_copy = strdup(linea);
+        if (linea_copy == NULL)
+        {
+            log_error(logger_kernel, "Error al duplicar la línea del archivo.");
+            continue;
+        }
 
         // Ejecutar el comando leído
-        // Aquí se debería llamar a la función correspondiente al comando leído
+        _atender_instruccion(linea_copy);
     }
 
+    free(linea);
     fclose(file);
 }
 

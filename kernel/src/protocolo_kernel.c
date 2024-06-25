@@ -13,6 +13,14 @@ void send_pcb_cpu(t_PCB* pcb)
     send_pcb(MSG_PCB_CPU, fd_cpu_dispatch, pcb);
 }
 
+t_PCB* recv_pcb_cpu() 
+{
+    t_PCB* pcb = recv_pcb(fd_cpu_dispatch);
+    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID <%d>", pcb->pid);
+
+    return pcb;
+}
+
 int send_example_memoria()
 {
     char *cadena = "KERNEL ENVIO MENSAJE A MEMORIA";
@@ -37,12 +45,19 @@ int recv_example_msg_entradasalida(int cliente_io)
 
 t_PCB* recv_pcb_interrupt()
 {
-    t_buffer* buffer = recive_full_buffer(fd_cpu_interrupt);
+    t_buffer* buffer = recive_full_buffer(fd_cpu_dispatch);
     t_PCB* pcb = deserialize_pcb(buffer);
-    log_info(logger_kernel, "Se recibio un PCB del CPU_INTERRUPT, PID => %d", pcb->pid);
     //pcb_destroy(pcb);
     buffer_destroy(buffer);
     return pcb;
+}
+
+// adapter:
+void send_interruption_cpu(t_interruption* interrupcion)
+{
+    // Seteo que se envio una interrupcion a CPU
+    interrupcion_enviada = true;
+    send_interruption(interrupcion, fd_cpu_interrupt);
 }
 
 // Agrego la función que envía la instrucción IO_GEN_SLEEP al módulo de E/S
@@ -124,3 +139,9 @@ int recibir_confirmacion_io(int fd_kernel) {
     return 0;
 }
 
+t_solicitud_io_generica* recv_solicitud_io_generica_cpu()
+{
+    t_solicitud_io_generica* io_gen = recv_solicitud_io_generica(fd_cpu_dispatch);
+
+    return io_gen;
+}

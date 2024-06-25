@@ -8,11 +8,11 @@
 #include <commons/string.h>
 #include <variables_globales.h>
 
-void init(char*, char*);
+void init(char*);
 
 void _iniciar_logger();
 void _iniciar_config(char*);
-void _imprimir_config(char*);
+void _imprimir_config();
 
 
 
