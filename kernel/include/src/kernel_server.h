@@ -5,12 +5,14 @@
 #include "protocolo_kernel.h"
 #include "commons/string.h"
 #include "utils/sockets.h"
-#include "utils/estructuras.h"
-#include "utils/buffer.h"
+//#include "utils/estructuras.h"
+//#include "utils/buffer.h"
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <pthread.h>
-#include "datos_hilos.h"
+//#include "datos_hilos.h"
+#include "manager_dispatch.h"
+#include "manager_ios.h"
 
 void atender_kernel_memoria();
 void atender_kernel_IO(void*);
@@ -22,6 +24,7 @@ void cerrar_servidor();
 void* esperar_conexiones_IO(void*);
 void _cerrar_conexiones();
 void _cerrar_puertos();
-void cancelar_hilo_quantum(uint32_t);
+void recibir_io_connection(int);
+//void cancelar_hilo_quantum(uint32_t);
 
 #endif //KERNEL_SERVER

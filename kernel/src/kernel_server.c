@@ -45,7 +45,6 @@ void atender_kernel_IO(void* cliente_socket)
 
                 log_info(logger_kernel, "Se recibio un mje de IO");
                 break;
-
             case -1:
                 log_error(logger_kernel, "la IO se desconecto. Terminando servidor");
                 control_key = 0;
@@ -71,14 +70,14 @@ void atender_kernel_cpu_dispatch()
                 log_info(logger_kernel, "Se recibio un mje de CPU DISPATCH");
                 break;
             case MSG_CPU_IO_GEN_SLEEP: //CPU -> KERNEL (Se solicita interactuar con IO GENENRICA)
-                t_solicitud_io_generica* io_gen = recv_solicitud_io_generica_cpu();
+                // t_solicitud_io_generica* io_gen = recv_solicitud_io_generica_cpu();
 
-                t_PCB* pcb_io_gen = obtener_pcb_solicitud_generica(io_gen);
+                // t_PCB* pcb_io_gen = obtener_pcb_solicitud_generica(io_gen);
 
-                log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_gen->pid);
+                // log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_gen->pid);
                 
-                cancelar_hilo_quantum(pcb_io_gen->pid);
-                sem_post(&SEM_CPU);
+                // cancelar_hilo_quantum(pcb_io_gen->pid);
+                // sem_post(&SEM_CPU);
     
                 //1. Validar que la IO GENERICA este conectada
                 //2. 
@@ -87,68 +86,75 @@ void atender_kernel_cpu_dispatch()
                 //3. Enviar el struct t_io_generica a la IO GENERICA si esta libre
                 //4. Bloquear el envio de otra solicitud de IO GENERICA, hasta que la IO responda luego de su procesamiento
 
+                procesar_ios_genericas();
+
                 break;
             case MSG_PCB_IO_KERNEL: // TODO: NO se esta usando
                 //Recibimos el t_interface
 
                 // SI recibo el PCB antes de que se mande la interrupcion tengo que matar el hilo de interrupcion
-                t_PCB* pcb_io = recv_pcb_cpu(); 
-                cancelar_hilo_quantum(pcb_io->pid);
+                // t_PCB* pcb_io = recv_pcb_cpu(); 
+                // cancelar_hilo_quantum(pcb_io->pid);
 
-                log_info(logger_kernel, "El PCB de PID <%d> solicita una IO ",pcb_io->pid);
+                // log_info(logger_kernel, "El PCB de PID <%d> solicita una IO ",pcb_io->pid);
                 
                 break;
             case MSG_PCB_KERNEL_EXIT: // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
                 //TODO: ARMAR UNA FUNCION QUE SE ENCARGUE DE LA GESTION DE LIBERAR EL PCB QUE LLEGO A EXIT
                 // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
-                t_PCB* pcb_exit= recv_pcb_cpu();
 
-                // limpio la variable global
-                pthread_mutex_lock(&MUTEX_EXECUTE);
-                EXECUTE = NULL;
-                pthread_mutex_unlock(&MUTEX_EXECUTE);
+                // t_PCB* pcb_exit= recv_pcb_cpu();
 
-                cancelar_hilo_quantum(pcb_exit->pid);
+                // // limpio la variable global
+                // pthread_mutex_lock(&MUTEX_EXECUTE);
+                // EXECUTE = NULL;
+                // pthread_mutex_unlock(&MUTEX_EXECUTE);
 
-                log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
+                // cancelar_hilo_quantum(pcb_exit->pid);
 
-                // Elimino el PCB
-                pcb_destroy(pcb_exit);
+                // log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
+
+                // // Elimino el PCB
+                // pcb_destroy(pcb_exit);
                 
-                sem_post(&SEM_CPU);
-                log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+                // sem_post(&SEM_CPU);
+                // log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+
+                procesar_pcb_exit();
 
                 break;
             case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
                 //TODO: agregar PCB donde este:
                 // 1-recibir pcb:
-                t_PCB* pcb_interrupt = recv_pcb_interrupt();
+                // t_PCB* pcb_interrupt = recv_pcb_interrupt();
 
-                pthread_mutex_lock(&MUTEX_EXECUTE);
-                EXECUTE = NULL; // SACO EL PCB DE EXECUTE
-                pthread_mutex_unlock(&MUTEX_EXECUTE);
+                // pthread_mutex_lock(&MUTEX_EXECUTE);
+                // EXECUTE = NULL; // SACO EL PCB DE EXECUTE
+                // pthread_mutex_unlock(&MUTEX_EXECUTE);
 
-                log_info(logger_kernel, "Se recibio un PCB por interrupcion a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
+                // log_info(logger_kernel, "Se recibio un PCB por interrupcion a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
 
-                // 2-actualizar el pcb en la tabla de pcb:
-                // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
-                // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
-                dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
-                dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
-                log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_interrupt->pid);
+                // // 2-actualizar el pcb en la tabla de pcb:
+                // // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
+                // // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
+                // dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
+                // dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
+                // log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_interrupt->pid);
 
                 
 
-                // 3-actualizar el estado del pcb en la cola correspondiente:
-                pthread_mutex_lock(&MUTEX_READY);
-                queue_push(COLA_READY, pcb_interrupt);
-                pthread_mutex_unlock(&MUTEX_READY);
-                log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
-                log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
-                sem_post(&SEM_READY);
-                sem_post(&SEM_CPU);
+                // // 3-actualizar el estado del pcb en la cola correspondiente:
+                // pthread_mutex_lock(&MUTEX_READY);
+                // queue_push(COLA_READY, pcb_interrupt);
+                // pthread_mutex_unlock(&MUTEX_READY);
+                // log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
+                // log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+                // sem_post(&SEM_READY);
+                // sem_post(&SEM_CPU);
                 
                 //sem_post(&SEM_CPU);
+
+                procesar_interrupcion();
 
                 break;
             case -1:
@@ -302,7 +308,7 @@ void* esperar_conexiones_IO(void* arg)
         int cliente_io = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, server_fd);
         
         if (cliente_io != -1) {
-            //add_io_client(cliente_io, "IOClient");
+            recibir_io_connection(cliente_io);
             
             pthread_t hilo_io;
             if (pthread_create(&hilo_io, NULL, (void*)atender_kernel_IO, &cliente_io) != 0) {
@@ -316,6 +322,18 @@ void* esperar_conexiones_IO(void* arg)
         }
     }
     return NULL;
+}
+
+void recibir_io_connection(int cliente_io) 
+{
+    int cod_op = recibir_operacion(cliente_io);
+
+    if(cod_op == MSG_IO_KERNEL) {
+        agregar_IO_cliente(cliente_io);
+    } else {
+        log_info(logger_kernel, "Error al recibir un cliente IO. ABORTANDO");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void cerrar_servidor()
@@ -339,17 +357,4 @@ void _cerrar_conexiones()
     liberar_conexion(fd_cpu_dispatch);
     //TODO: Implementar funcion para liberar las conexiones de todas las IOs
     // que se conectaron al kernel
-}
-
-
-// ESTA FUNCION DESPUES SE DEBE PASAR A UN ARCHIVO
-// VER SI ES NECESARIO CREAR UN MUTEX PARA ACCEDER A datos_hilo_quantum
-void cancelar_hilo_quantum(uint32_t pid) {
-
-    if (get_pid_datos_hilo(datos_hilo_quantum) == pid && !interrupcion_enviada) {
-        pthread_cancel(get_hilo(datos_hilo_quantum));
-        log_info(logger_kernel, "Se cancela el hilo de quantum para desalojar el PCB de PID: <%d>", pid);
-    }
-    // Elimino las datos guardados para enviar la interrupcion
-    datos_hilo_destroy(datos_hilo_quantum);
 }
