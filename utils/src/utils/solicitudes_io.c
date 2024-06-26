@@ -72,6 +72,26 @@ t_io_stdout* crear_io_stdout(uint32_t direccion_fisica, uint32_t tamanio) {
     return io_stdout;
 }
 
+t_solicitud_io_dialfs* crear_solicitud_io_dialfs(t_PCB* pcb, char* nombre_interfaz, t_io_dialfs* io_dialfs) {
+    t_solicitud_io_dialfs* solicitud = malloc(sizeof(t_solicitud_io_dialfs));
+    if (solicitud == NULL) return NULL;
+    solicitud->pcb = pcb;
+    solicitud->nombre_interfaz = strdup(nombre_interfaz);
+    solicitud->io_dialfs = io_dialfs;
+    return solicitud;
+}
+
+t_io_dialfs* crear_io_dialfs(char* nombre_archivo, uint32_t tamanio, uint32_t offset, void* datos, enum { IO_FS_CREATE, IO_FS_DELETE, IO_FS_TRUNCATE, IO_FS_WRITE, IO_FS_READ } operacion) {
+    t_io_dialfs* io_dialfs = malloc(sizeof(t_io_dialfs));
+    if (io_dialfs == NULL) return NULL;
+    io_dialfs->nombre_archivo = strdup(nombre_archivo);
+    io_dialfs->tamanio = tamanio;
+    io_dialfs->offset = offset;
+    io_dialfs->datos = datos;
+    io_dialfs->operacion = operacion;
+    return io_dialfs;
+}
+
 //===============================================
 // FUNCIONES DE ACCESO A CAMPOS
 //===============================================
@@ -199,6 +219,49 @@ uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud)
     return size_serialize_pcb + size_serialize_name_io + size_serialize_io_stdout;
 }
 
+/*********** Funciones 't_solicitud_io_dialfs' ***********/
+t_PCB* obtener_pcb_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) 
+{
+    return solicitud->pcb;
+}
+
+char* obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs* solicitud)
+{
+    return solicitud->nombre_interfaz;
+}
+
+t_io_dialfs* obtener_io_solicitud_dialfs(t_solicitud_io_dialfs* solicitud)
+{
+    return solicitud->io_dialfs;
+}
+
+uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs* solicitud)
+{
+    uint32_t size_serialize_pcb = get_pcb_size(solicitud->pcb);
+    uint32_t size_serialize_name_io = sizeof(uint32_t) + strlen(solicitud->nombre_interfaz) + 1; // Para el tamaño y la cadena
+    uint32_t size_serialize_io_dialfs = obtener_tamanio_io_dialfs(solicitud->io_dialfs);
+
+    return size_serialize_pcb + size_serialize_name_io + size_serialize_io_dialfs;
+}
+
+// Función auxiliar para obtener el tamaño de t_io_dialfs
+uint32_t obtener_tamanio_io_dialfs(t_io_dialfs* io_dialfs)
+{
+    uint32_t size = 0;
+    
+    size += sizeof(uint32_t) + strlen(io_dialfs->nombre_archivo) + 1; // Nombre del archivo
+    size += sizeof(uint32_t); // Tamaño
+    size += sizeof(uint32_t); // Offset
+    size += sizeof(uint32_t); // Operación
+    
+    // Si es una operación de escritura, incluimos el tamaño de los datos
+    if (io_dialfs->operacion == IO_FS_WRITE) {
+        size += io_dialfs->tamanio;
+    }
+    
+    return size;
+}
+
 //===============================================
 // FUNCIONES DE DESTRUCCIÓN
 //===============================================
@@ -231,4 +294,20 @@ void destruir_solicitud_io_stdout(t_solicitud_io_stdout* solicitud) {
 
 void destruir_io_stdout(t_io_stdout* io_stdout) {
     free(io_stdout);
+}
+
+void destruir_solicitud_io_dialfs(t_solicitud_io_dialfs* solicitud) {
+    if (solicitud != NULL) {
+        free(solicitud->nombre_interfaz);
+        destruir_io_dialfs(solicitud->io_dialfs);
+        free(solicitud);
+    }
+}
+
+void destruir_io_dialfs(t_io_dialfs* io_dialfs) {
+    if (io_dialfs != NULL) {
+        free(io_dialfs->nombre_archivo);
+        free(io_dialfs->datos);
+        free(io_dialfs);
+    }
 }
