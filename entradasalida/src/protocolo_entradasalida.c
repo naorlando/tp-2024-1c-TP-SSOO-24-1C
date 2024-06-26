@@ -91,8 +91,32 @@ char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
 //          FUNCIONES DE ENTRADA/SALIDA DIALFS
 //======================================================
 
-// A implementar!
-
+void atender_instruccion_dialfs(int fd) {
+    t_io_dialfs* io_dialfs = deserializar_io_dialfs(recibir_buffer(&fd, sizeof(int)));
+    if (io_dialfs != NULL) {
+        switch(io_dialfs->operacion) {
+            case IO_FS_CREATE:
+                crear_archivo(dialfs, io_dialfs->nombre_archivo);
+                break;
+            case IO_FS_DELETE:
+                eliminar_archivo(dialfs, io_dialfs->nombre_archivo);
+                break;
+            case IO_FS_TRUNCATE:
+                truncar_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->tamanio);
+                break;
+            case IO_FS_WRITE:
+                escribir_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->datos, io_dialfs->tamanio, io_dialfs->offset);
+                break;
+            case IO_FS_READ:
+                leer_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->buffer, io_dialfs->tamanio, io_dialfs->offset);
+                break;
+        }
+        enviar_confirmacion_io(fd);
+        destruir_io_dialfs(io_dialfs);
+    } else {
+        log_error(logger_entradasalida, "Error al recibir IO DialFS");
+    }
+}
 
 
 //======================================================

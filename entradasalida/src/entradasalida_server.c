@@ -148,7 +148,7 @@ void atender_solicitudes_io_kernel() {
                 atender_instruccion_stdout(fd_kernel);
                 break;
             case MSG_KERNEL_IO_DIALFS:
-                
+                atender_instruccion_dialfs(fd_kernel);
                 break;
             case -1:
                 log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.");
