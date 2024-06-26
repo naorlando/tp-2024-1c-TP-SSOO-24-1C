@@ -308,14 +308,15 @@ void* esperar_conexiones_IO(void* arg)
         int cliente_io = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, server_fd);
         
         if (cliente_io != -1) {
-            recibir_io_connection(cliente_io);
+            char* nombre_interfaz = recibir_io_connection(cliente_io);
+            t_IO_connection* io_connection = get_IO_connection(nombre_interfaz);
             
             pthread_t hilo_io;
             if (pthread_create(&hilo_io, NULL, (void*)atender_kernel_IO, &cliente_io) != 0) {
                 log_error(logger_kernel, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
                 exit(EXIT_FAILURE);
             }
-            log_info(logger_kernel, "Se conecto una interfaz IO");
+            log_info(logger_kernel, "Interfaz %s conectada con éxito", nombre_interfaz);
             pthread_detach(hilo_io);
         } else {
             log_error(logger_kernel, "Error al esperar cliente de IO");
@@ -324,12 +325,12 @@ void* esperar_conexiones_IO(void* arg)
     return NULL;
 }
 
-void recibir_io_connection(int cliente_io) 
+char* recibir_io_connection(int cliente_io) 
 {
     int cod_op = recibir_operacion(cliente_io);
 
     if(cod_op == MSG_IO_KERNEL) {
-        agregar_IO_cliente(cliente_io);
+        return nuevo_IO_cliente_conectado(cliente_io);
     } else {
         log_info(logger_kernel, "Error al recibir un cliente IO. ABORTANDO");
         exit(EXIT_FAILURE);

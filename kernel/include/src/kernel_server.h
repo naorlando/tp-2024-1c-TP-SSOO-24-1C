@@ -24,7 +24,7 @@ void cerrar_servidor();
 void* esperar_conexiones_IO(void*);
 void _cerrar_conexiones();
 void _cerrar_puertos();
-void recibir_io_connection(int);
+char* recibir_io_connection(int);
 //void cancelar_hilo_quantum(uint32_t);
 
 #endif //KERNEL_SERVER
