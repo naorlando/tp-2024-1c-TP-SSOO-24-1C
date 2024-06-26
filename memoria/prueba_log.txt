@@ -1,0 +1,6 @@
+2024-06-25 23:58:37 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria
+2024-06-26 00:07:39 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria
+2024-06-26 00:09:40 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria
+2024-06-26 00:14:07 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria
+2024-06-26 00:39:41 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria
+2024-06-26 00:43:59 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria

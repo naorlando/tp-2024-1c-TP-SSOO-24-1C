@@ -1,0 +1,12 @@
+make --no-print-directory -C include/ 3>&1 1>&2 2>&3 | sed -E 's,(src/)[^ ]+\.(c|h)\:,include/&,' 3>&2 2>&1 1>&3
+make[1]: *** No targets specified and no makefile found.  Stop.
+mkdir -pv obj/
+mkdir: created directory 'obj/'
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/entradasalida_server.o" src/entradasalida_server.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/entradasalida.o" src/entradasalida.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/entradasalida_config.o" src/entradasalida_config.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/protocolo_entradasalida.o" src/protocolo_entradasalida.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/inicializar_entradasalida.o" src/inicializar_entradasalida.c -I../utils/src -I./include/src -I./src
+mkdir -pv bin/
+mkdir: created directory 'bin/'
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -o "bin/entradasalida" obj/entradasalida_server.o obj/entradasalida.o obj/entradasalida_config.o obj/protocolo_entradasalida.o obj/inicializar_entradasalida.o -I../utils/src -I./include/src -I./src -L../utils/bin -L./include/bin -lutils -lcommons -lpthread -lreadline -lm
