@@ -25,14 +25,16 @@ void atender_kernel_memoria()
     }
 }
 
-void atender_kernel_IO(void* cliente_socket)
+void atender_kernel_IO(void* io_connection)
 {
-    int cliente_io = *(int*)cliente_socket;
+    t_IO_connection* cliente_io = (t_IO_connection*)io_connection;
     bool control_key = 1;
 
     while (control_key)
     {
-        int cod_op = recibir_operacion(cliente_io);
+        sem_wait(obtener_semaforo_cola_bloqueados(cliente_io));
+
+        int cod_op = recibir_operacion(obtener_file_descriptor(cliente_io));
 
         switch (cod_op)
         {
@@ -310,9 +312,9 @@ void* esperar_conexiones_IO(void* arg)
         if (cliente_io != -1) {
             char* nombre_interfaz = recibir_io_connection(cliente_io);
             t_IO_connection* io_connection = get_IO_connection(nombre_interfaz);
-            
+
             pthread_t hilo_io;
-            if (pthread_create(&hilo_io, NULL, (void*)atender_kernel_IO, &cliente_io) != 0) {
+            if (pthread_create(&hilo_io, NULL, (void*)atender_kernel_IO, io_connection) != 0) {
                 log_error(logger_kernel, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
                 exit(EXIT_FAILURE);
             }
