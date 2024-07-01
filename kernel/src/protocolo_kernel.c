@@ -145,3 +145,11 @@ t_solicitud_io_generica* recv_solicitud_io_generica_cpu()
 
     return io_gen;
 }
+
+void recv_wait_or_signal_request(char *nombre_recurso, t_PCB *pcb)
+{
+    t_buffer* buffer = recive_full_buffer(fd_cpu_dispatch);
+    pcb = deserialize_pcb(buffer);
+    nombre_recurso = buffer_read_string(buffer);
+    buffer_destroy(buffer);
+}

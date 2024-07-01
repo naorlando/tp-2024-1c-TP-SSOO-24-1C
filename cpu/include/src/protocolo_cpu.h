@@ -41,9 +41,9 @@ void send_get_next_instruction_memoria(uint32_t, uint32_t);
 // Post: Retorna un puntero a t_instruction que contiene la instrucción recibida.
 t_instruction* recv_instruction_memoria();
 
-// Envia un mensaje a kernel segun corresponda (WAIT, SIGNAL) y el nombre del recurso a trabajar.
-// Post: Se envia un mensaje a kernel con el tipo de interrupcion y el nombre del recurso.
-void send_msg_cpu_kernel_recurso(t_name_instruction tipo_de_interrupcion, const char *resource_name);
+// Envia una pcb y recurso al kernel por una instruccion de WAIT
+// post: envia un pcb y un recurso al kernel
+void handle_wait_or_signal(t_PCB * pcb, const char * resource_name, t_name_instruction tipo_de_interrupcion);
 
 void send_solicitud_io_generica_kernel(t_PCB*, t_instruction*);
 

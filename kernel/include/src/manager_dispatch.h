@@ -17,5 +17,7 @@ void procesar_ios_genericas();
 void procesar_pcb_exit();
 void cancelar_hilo_quantum(uint32_t);
 void procesar_interrupcion();
+void handle_wait_request();
+void handle_signal_request();
 
 #endif //MANAGER_DISPATCH_

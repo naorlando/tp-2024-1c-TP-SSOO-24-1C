@@ -107,8 +107,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             char* nombre_recurso = (char*)list_get(instruccion->params, 0);
             // logica de WAIT de un recurso:
             // mandar mensaje a kernel para que haga cositas con el recurso
-            send_msg_cpu_kernel_recurso(WAIT,nombre_recurso);
-            // TODO: recibir mensaje de kernel con la respuesta.
+            handle_wait_or_signal(pcb_execute, nombre_recurso,  WAIT);
 
             break;
         }
@@ -118,8 +117,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             char* nombre_recurso = (char*)list_get(instruccion->params, 0);
             // logica de SIGNAL de un recurso:
             // mandar mensaje a kernel para que haga cositas con el recurso
-            send_msg_cpu_kernel_recurso(SIGNAL,nombre_recurso);
-            // TODO: recibir mensaje de kernel con la respuesta.
+            handle_wait_or_signal(pcb_execute, nombre_recurso,  SIGNAL);
 
             break;
         }

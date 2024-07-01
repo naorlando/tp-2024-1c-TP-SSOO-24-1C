@@ -108,17 +108,29 @@ void send_pcb_kernel_interruption(t_name_interruption tipo_de_interrupcion)
         break;
     }
 }
-void send_msg_cpu_kernel_recurso(t_name_instruction tipo_de_interrupcion, const char *resource_name) {
+
+void handle_wait_or_signal(t_PCB * pcb, const char * resource_name, t_name_instruction tipo_de_interrupcion) {
+
     if(tipo_de_interrupcion = WAIT)
     {
-        send_message_with_string(fd_kernel_dispatch, MSG_CPU_KERNEL_WAIT, resource_name);
+        t_msg_header msg_header = MSG_CPU_KERNEL_WAIT;
     } 
     if(tipo_de_interrupcion = SIGNAL) 
     {
-        send_message_with_string(fd_kernel_dispatch, MSG_CPU_KERNEL_SIGNAL, resource_name);
+        t_msg_header msg_header = MSG_CPU_KERNEL_SIGNAL;
     } 
     else 
     {
         log_error(logger_cpu, "Tipo de interrupcion invalido para recurso.");
+        return;
     }
+
+    // Crear un paquete con el PCB y el nombre del recurso
+    t_package * package = package_create(msg_header, get_pcb_size(pcb) + strlen(resource_name) + 1);
+    serialize_pcb(package->buffer,pcb);
+    buffer_add_string(package->buffer, strlen(resource_name) + 1, resource_name);
+
+    // Enviar el paquete al Kernel
+    package_send(package, fd_kernel_dispatch);
+    package_destroy(package);
 }
