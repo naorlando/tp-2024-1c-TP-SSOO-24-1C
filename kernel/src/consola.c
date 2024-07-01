@@ -186,7 +186,6 @@ void f_ejecutar_script(const char *filename)
         // Ejecutar el comando leído
         _atender_instruccion(linea_copy);
     }
-
     free(linea);
     fclose(file);
 }

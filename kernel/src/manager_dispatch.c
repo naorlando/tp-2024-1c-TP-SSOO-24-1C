@@ -73,7 +73,7 @@ void procesar_interrupcion()
     // 2-actualizar el pcb en la tabla de pcb:
     // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
     // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
-    //dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
+    // dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
     
     // Elimino el PCB de la tabla de pcbs que gestiona el Kernel
     delete_pcb(pcb_interrupt->pid);

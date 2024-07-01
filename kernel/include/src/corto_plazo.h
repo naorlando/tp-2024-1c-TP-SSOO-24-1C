@@ -28,16 +28,20 @@ typedef enum {
     VRR
 }t_planificador;
 
+typedef struct {
+    uint32_t pid;
+    uint32_t quantum;
+} hilo_args;
 
 void planificador_corto_plazo ();
 void planificador_FIFO();
 void planificador_RR();
 void planificador_VRR();
-void interrupcion_quantum(uint32_t);
+void interrupcion_quantum(uint32_t,uint32_t);
 void* funcion_hilo_quantum(void*);
 void enviar_interrupcion_a_cpu(uint32_t); 
-void pcb_execute();
-t_PCB* get_next_pcb_to_exec();
+void pcb_execute(t_PCB*);
+t_PCB* get_next_pcb_to_exec(t_queue*);
 t_planificador _obtener_planificador (char * str);
 
 
