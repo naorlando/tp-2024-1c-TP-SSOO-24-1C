@@ -50,6 +50,13 @@ typedef struct
 
 // t_dictionary
 
+// Estructura para los recursos
+typedef struct {
+    char *nombre;
+    int instancias;
+    t_queue *cola_bloqueados;
+} t_recurso;
+
 
 
 t_PCB* pcb_create(uint32_t pid,  uint32_t quantum);

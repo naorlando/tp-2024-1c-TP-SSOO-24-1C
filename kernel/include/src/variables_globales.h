@@ -30,6 +30,7 @@ extern int identificador_PID;
 extern t_datos_hilo* datos_hilo_quantum;
 extern bool interrupcion_enviada;
 extern t_dictionary* io_connections;
+extern t_dictionary* recursos_dictionary;
 
 //MUTEXS
 extern pthread_mutex_t MUTEX_READY;
@@ -38,6 +39,7 @@ extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
 extern pthread_mutex_t MUTEX_EXECUTE;
 extern pthread_mutex_t MUTEX_DICTIONARY;
+extern pthread_mutex_t MUTEX_RECURSOS;
 
 //SEMAFOROS
 extern sem_t SEM_READY;

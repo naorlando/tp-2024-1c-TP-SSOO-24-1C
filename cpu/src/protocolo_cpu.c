@@ -94,10 +94,31 @@ void send_pcb_kernel_interruption(t_name_interruption tipo_de_interrupcion)
     case QUANTUM_INTERRUPT:
             send_pcb(MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, fd_kernel_dispatch, pcb_execute);
         break;
+
+    //TODO : mandarle el RECURSO.
+    // camino de la interrupcion a la negativa, ya sea  que no haya recursos disponibles, o el signal termino bien.
+    // case RECURSO_INTERRUPT:
+    //         send_pcb(MSG_PCB_KERNEL_INTERRUPTION_RECURSO, fd_kernel_dispatch, pcb_execute);
+    //     break;
+
     // case MSG_IO:
     //         send_pcb(MSG_PCB_KERNEL_INTERRUPTION_IO, fd_kernel_dispatch, pcb_execute);
     //     break;
     default:
         break;
+    }
+}
+void send_msg_cpu_kernel_recurso(t_name_instruction tipo_de_interrupcion, const char *resource_name) {
+    if(tipo_de_interrupcion = WAIT)
+    {
+        send_message_with_string(fd_kernel_dispatch, MSG_CPU_KERNEL_WAIT, resource_name);
+    } 
+    if(tipo_de_interrupcion = SIGNAL) 
+    {
+        send_message_with_string(fd_kernel_dispatch, MSG_CPU_KERNEL_SIGNAL, resource_name);
+    } 
+    else 
+    {
+        log_error(logger_cpu, "Tipo de interrupcion invalido para recurso.");
     }
 }

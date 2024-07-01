@@ -132,6 +132,10 @@ uint32_t get_message_example_size(t_message_example* example)
     return sizeof(uint32_t) + (strlen(example->cadena) + 1) + sizeof(example->entero);
 }
 
+uint32_t get_message_recurso_size(char* nombre_recurso){\
+    return sizeof(uint32_t) + (strlen(nombre_recurso) + 1);
+}
+
 void message_example_destroy(t_message_example* example)
 {
     if (example->cadena != NULL)
@@ -794,4 +798,43 @@ t_IO_interface* deserializar_IO_interface(t_buffer* buffer)
     free(nombre_interfaz);
 
     return interfaz;
+}
+int send_message_with_string(int socket_fd, t_msg_header msg_header, const char *message) {
+    // Crear un paquete con el header del mensaje y el tamaño del string
+    t_package *package = package_create(msg_header, strlen(message) + 1);
+
+    // agrega el tamaño del string al buffer del paquete
+    buffer_add_uint32(package->buffer, strlen(message) + 1);
+
+    // Agregar el string al buffer del paquete
+    buffer_add_string(package->buffer, message);
+
+    // Enviar el paquete a través del socket
+    int result = package_send(package, socket_fd);
+
+    // Destruir el paquete para liberar memoria
+    package_destroy(package);
+
+    return result;
+}
+
+char* receive_message_with_string(int socket_fd) {
+    // Crear un paquete vacío
+    t_package package;
+
+    // Recibir el paquete desde el socket
+    package_recv(&package, socket_fd);
+
+    // Obtener el header del mensaje
+    t_msg_header *msg_header = get_message_header(&package);
+
+    // Leer el string del buffer
+    uint32_t length;
+    length = buffer_read_uint32(package.buffer);
+    char *message = buffer_read_string(package.buffer, length);
+
+    // Destruir el buffer del paquete para liberar memoria
+    buffer_destroy(package.buffer);
+
+    return message;
 }

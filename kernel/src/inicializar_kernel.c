@@ -21,6 +21,8 @@ t_datos_hilo* datos_hilo_quantum;
 bool interrupcion_enviada = false;
 bool planificador_status = true;
 t_dictionary* io_connections;
+t_dictionary *recursos_dictionary;
+//pthread_mutex_t mutex_recursos;
 
 pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t MUTEX_READY;
@@ -28,6 +30,7 @@ pthread_mutex_t MUTEX_EXIT;
 pthread_mutex_t MUTEX_NEW;
 pthread_mutex_t MUTEX_EXECUTE;
 pthread_mutex_t MUTEX_DICTIONARY;
+pthread_mutex_t MUTEX_RECURSOS;
 
 sem_t SEM_READY;
 sem_t BLOQUEADOR;
@@ -54,6 +57,7 @@ void init()
     initialize_semaphores();
     inicializar_planificadores();
     inicializar_dictionarios();
+    inicializar_recursos();
 }
 
 void _iniciar_logger()
@@ -155,4 +159,23 @@ void initialize_lists()
 void inicializar_dictionarios()
 {
     io_connections = dictionary_create();
+    recursos_dictionary = dictionary_create();
+}
+
+void inicializar_recursos() {
+
+    char **nombres_recursos = config_get_array_value(kernel_config, "RECURSOS");
+    char **instancias_recursos = config_get_array_value(kernel_config, "INSTANCIAS_RECURSOS");
+
+    for (int i = 0; nombres_recursos[i] != NULL; i++) {
+        t_recurso *recurso = malloc(sizeof(t_recurso));
+        recurso->nombre = strdup(nombres_recursos[i]);
+        recurso->instancias = atoi(instancias_recursos[i]);
+        recurso->cola_bloqueados = queue_create();
+
+        dictionary_put(recursos_dictionary, recurso->nombre, recurso);
+    }
+
+    string_array_destroy(nombres_recursos);
+    string_array_destroy(instancias_recursos);
 }

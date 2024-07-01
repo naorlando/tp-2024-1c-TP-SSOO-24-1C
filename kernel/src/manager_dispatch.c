@@ -91,3 +91,26 @@ void procesar_interrupcion()
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
     sem_post(&SEM_CPU);      
 }
+
+void manejar_instruccion_wait(){
+    //recibo el paquete con el recurso a manejar
+    pthread_mutex_lock(&MUTEX_RECURSOS);
+    char * nombre_recurso = receive_message_with_string(fd_cpu_dispatch);
+    t_recurso *recurso = dictionary_get(recursos_dictionary, nombre_recurso);
+    char * respuesta;
+    log_info(logger_kernel, "Se recibio una instruccion WAIT para el recurso: %s", nombre_recurso);
+    //verificar si el recurso esta disponible
+    if(recurso->instancias > 0){
+        recurso->instancias--;
+        respuesta = "OK";
+        log_info(logger_kernel, "Se decremento una instancia del recurso: %s", nombre_recurso);
+    }else{
+        //si no esta disponible el recurso, se manda mensaje a cpu de esto, cpu copia el contexto, y manda el pcb al kernel para que este proceso pase a bloqueado.
+    //CHAN, que pija hacemos, ?mandamos todo el pcb en cada parte, o solo mensajes?
+    
+}
+}
+
+void manejar_instruccion_signal(){
+    //recibo el paquete con el recurso a manejar
+}

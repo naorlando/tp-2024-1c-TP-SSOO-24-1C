@@ -9,7 +9,8 @@
 
 typedef enum {
     QUANTUM_INTERRUPT,
-    EXIT_INTERRUPT
+    EXIT_INTERRUPT,
+    RECURSO_INTERRUPT
 }t_name_interruption;
 
 typedef struct {

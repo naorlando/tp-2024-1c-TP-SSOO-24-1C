@@ -101,6 +101,28 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             solicitud_io = true;
             break;
         }
+        case WAIT: {
+            log_info(logger_cpu, "WAIT\n");
+            // variable con nombre de recurso
+            char* nombre_recurso = (char*)list_get(instruccion->params, 0);
+            // logica de WAIT de un recurso:
+            // mandar mensaje a kernel para que haga cositas con el recurso
+            send_msg_cpu_kernel_recurso(WAIT,nombre_recurso);
+            // TODO: recibir mensaje de kernel con la respuesta.
+
+            break;
+        }
+        case SIGNAL: {
+            log_info(logger_cpu, "SIGNAL\n");
+            // variable con nombre de recurso
+            char* nombre_recurso = (char*)list_get(instruccion->params, 0);
+            // logica de SIGNAL de un recurso:
+            // mandar mensaje a kernel para que haga cositas con el recurso
+            send_msg_cpu_kernel_recurso(SIGNAL,nombre_recurso);
+            // TODO: recibir mensaje de kernel con la respuesta.
+
+            break;
+        }
         case EXIT: {
             log_info(logger_cpu, "EXIT\n");
             // sem_wait(&SEM_INTERRUPT); //BINARIO

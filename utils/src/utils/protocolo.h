@@ -39,6 +39,8 @@ typedef enum
     MSG_PCB_KERNEL_EXIT, // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
     MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, // CPU -> KERNEL (Devuelvo pcb al kernel con interrupcion por fin de quantum)
     MSG_QUANTUM, // KERNEL -> CPU (Interrupcion por fin de quantum)
+    MSG_CPU_KERNEL_WAIT, // CPU -> KERNEL (se envia mensaje indicando un WAIT recurso)
+    MSG_CPU_KERNEL_SIGNAL, // CPU -> KERNEL (se envia mensaje indicando un SIGNAL recurso)
     MSG_CPU_IO_GEN_SLEEP, // CPU -> KERNEL (Se solicita interactuar con IO GENENRICA) 
     MSG_CPU_IO_STDIN_READ, // CPU -> KERNEL (Se solicita interactuar con IO STDIN) 
     MSG_CPU_IO_STDOUT_WRITE, // CPU -> KERNEL (Se solicita interactuar con IO STDOUT) 
@@ -425,5 +427,11 @@ void serializar_IO_interface(t_buffer*, t_IO_interface*);
 // Pre: El buffer debe ser válido y no NULL.
 // Post: Retorna un puntero a una estructura t_IO_interface deserializada.
 t_IO_interface* deserializar_IO_interface(t_buffer*);
+
+
+int send_message_with_string(int socket_fd, t_msg_header msg_header, const char *message);
+
+
+char* receive_message_with_string(int socket_fd, t_msg_header *msg_header);
 
 #endif
