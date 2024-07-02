@@ -7,6 +7,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <sys/socket.h>
+#include <commons/collections/queue.h>
 
 
 typedef struct
@@ -53,7 +54,7 @@ typedef struct
 // Estructura para los recursos
 typedef struct {
     char *nombre;
-    int instancias;
+    u_int32_t instancias;
     t_queue *cola_bloqueados;
 } t_recurso;
 

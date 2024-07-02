@@ -101,6 +101,23 @@ void handle_wait_request(){
 
     recv_wait_or_signal_request(&nombre_recurso,&pcb);
 
+    t_recurso *recurso = get_recurso(nombre_recurso);
+    if(recurso == NULL) {
+        // logica de mandar pcb a exit
+        agregar_a_cola_exit(pcb);
+    }
+
+    if(recurso->instancias > 0){
+        recurso->instancias--;
+        // mandar el pcb devuelta para que se siga ejecutando en CPU
+        log_info(logger_kernel, "el recurso tenia instancias disponibles y se pudo decrementar por un WAIT");
+        send_pcb_cpu(pcb);
+    }else{
+        // mandar el pcb a la cola de bloqueados y agregar PCB a la cola de bloqueados del recurso en cuestion para cuando se libere.
+        // TODO:
+        //agregar_a_cola_bloqueados(pcb);
+    }
+
     // t_recurso *recurso = dictionary_get(recursos_dictionary, nombre_recurso);
     // char * respuesta;
     // log_info(logger_kernel, "Se recibio una instruccion WAIT para el recurso: %s", nombre_recurso);

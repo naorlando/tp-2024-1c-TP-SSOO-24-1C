@@ -429,9 +429,5 @@ void serializar_IO_interface(t_buffer*, t_IO_interface*);
 t_IO_interface* deserializar_IO_interface(t_buffer*);
 
 
-int send_message_with_string(int socket_fd, t_msg_header msg_header, const char *message);
-
-
-char* receive_message_with_string(int socket_fd, t_msg_header *msg_header);
 
 #endif

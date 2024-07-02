@@ -164,18 +164,18 @@ void inicializar_dictionarios()
 
 void inicializar_recursos() {
 
-    char **nombres_recursos = config_get_array_value(kernel_config, "RECURSOS");
-    char **instancias_recursos = config_get_array_value(kernel_config, "INSTANCIAS_RECURSOS");
+    char **nombres_recursos = obtener_recursos(kernel_config);
+    u_int32_t *instancias_recursos = obtener_instancias_recursos(kernel_config);
 
     for (int i = 0; nombres_recursos[i] != NULL; i++) {
         t_recurso *recurso = malloc(sizeof(t_recurso));
         recurso->nombre = strdup(nombres_recursos[i]);
-        recurso->instancias = atoi(instancias_recursos[i]);
+        recurso->instancias = instancias_recursos[i];
         recurso->cola_bloqueados = queue_create();
 
         dictionary_put(recursos_dictionary, recurso->nombre, recurso);
     }
 
     string_array_destroy(nombres_recursos);
-    string_array_destroy(instancias_recursos);
+    //string_array_destroy(instancias_recursos);
 }

@@ -146,10 +146,12 @@ t_solicitud_io_generica* recv_solicitud_io_generica_cpu()
     return io_gen;
 }
 
-void recv_wait_or_signal_request(char *nombre_recurso, t_PCB *pcb)
+void recv_wait_or_signal_request(char **nombre_recurso, t_PCB **pcb)
 {
     t_buffer* buffer = recive_full_buffer(fd_cpu_dispatch);
-    pcb = deserialize_pcb(buffer);
-    nombre_recurso = buffer_read_string(buffer);
+        *pcb = deserialize_pcb(buffer);
+        uint32_t size_string = buffer_read_uint32(buffer);
+        *nombre_recurso = buffer_read_string(buffer, size_string);
+    //log_info(logger_kernel, " Se recibio una solicitud de WAIT o SIGNAL del CPU_DISPATCH, PID <%d> y  recurso: %s", pcb->pid, nombre_recurso);
     buffer_destroy(buffer);
 }

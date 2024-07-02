@@ -11,36 +11,30 @@ bool add_recurso(t_recurso *new_recurso) {
 }
 
 // Obtener un recurso de la tabla
-t_recurso *get_recurso(const char *nombre) {
-    if (dictionary_is_empty(recursos_dictionary))
+t_recurso * get_recurso(const char * nombre) {
+    if (recursos_dictionary == NULL) {
+        log_error(logger_kernel, "El diccionario de recursos no está inicializado.");
         return NULL;
-
-    t_recurso *recurso = (t_recurso *)dictionary_get(recursos_dictionary, nombre);
-    return (recurso != NULL) ? recurso : NULL;
-}
-
-// Eliminar un recurso de la tabla
-bool delete_recurso(const char *nombre) {
-    if (dictionary_is_empty(recursos_dictionary))
-        return false;
-
-    bool isDelete = true;
-
-    if (dictionary_has_key(recursos_dictionary, nombre)) {
-        dictionary_remove_and_destroy(recursos_dictionary, nombre, free_recurso);
-    } else {
-        isDelete = false;
     }
 
-    return isDelete;
+    if (dictionary_is_empty(recursos_dictionary)) {
+        log_warning(logger_kernel, "El diccionario de recursos está vacío.");
+        return NULL;
+    }
+
+    if (nombre == NULL) {
+        log_error(logger_kernel, "El nombre del recurso es NULL.");
+        return NULL;
+    }
+
+    t_recurso * recurso = (t_recurso *)dictionary_get(recursos_dictionary, (char*)nombre);
+    if (recurso == NULL) {
+        log_warning(logger_kernel, "El recurso %s no existe en el diccionario.", nombre);
+    }
+
+    return recurso;
 }
 
-// Destruir la tabla de recursos
-void delete_recurso_table() {
-    if (!dictionary_is_empty(recursos_dictionary)) {
-        dictionary_clean_and_destroy_elements(recursos_dictionary, free_recurso);
-    }
-}
 
 // Liberar la memoria de un recurso
 void free_recurso(void *recurso) {

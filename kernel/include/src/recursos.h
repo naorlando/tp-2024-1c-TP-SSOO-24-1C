@@ -17,12 +17,6 @@ bool add_recurso(t_recurso *new_recurso);
 // Obtener un recurso de la tabla
 t_recurso *get_recurso(const char *nombre);
 
-// Eliminar un recurso de la tabla
-bool delete_recurso(const char *nombre);
-
-// Destruir la tabla de recursos
-void delete_recurso_table();
-
 // Liberar la memoria de un recurso
 void free_recurso(void *recurso);
 
