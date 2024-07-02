@@ -107,7 +107,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             char* nombre_recurso = (char*)list_get(instruccion->params, 0);
             // logica de WAIT de un recurso:
             // mandar mensaje a kernel para que haga cositas con el recurso
-            handle_wait_or_signal(pcb_execute, nombre_recurso,  WAIT);
+            handle_wait_or_signal(pcb_execute, nombre_recurso, WAIT);
 
             break;
         }
@@ -452,25 +452,21 @@ void enviar_pcb_finalizado()
     }
 }
 
-void handle_wait_or_signal(t_PCB * pcb, const char * resource_name, t_name_instruction tipo_de_interrupcion) {
+void handle_wait_or_signal(t_PCB * pcb, char * resource_name, t_name_instruction tipo_de_interrupcion) {
 
     t_msg_header msg_header;
-    if(tipo_de_interrupcion == WAIT)
-    {
+    if(tipo_de_interrupcion == WAIT){
         msg_header = MSG_CPU_KERNEL_WAIT;
-    } 
-    if(tipo_de_interrupcion == SIGNAL) 
-    {
+    }else if(tipo_de_interrupcion == SIGNAL) {
         msg_header = MSG_CPU_KERNEL_SIGNAL;
-    } 
-    else 
-    {
+    } else {
         log_error(logger_cpu, "Tipo de interrupcion invalido para recurso.");
         return;
     }
 
+    remove_newline(resource_name);
     // Crear un paquete con el PCB y el nombre del recurso
-    t_package * package = package_create(msg_header, get_pcb_size(pcb) + strlen(resource_name) + 1);
+    t_package * package = package_create(msg_header, get_pcb_size(pcb) + strlen(resource_name)+1);
     serialize_pcb(package->buffer,pcb);
     buffer_add_string(package->buffer, resource_name);
 
