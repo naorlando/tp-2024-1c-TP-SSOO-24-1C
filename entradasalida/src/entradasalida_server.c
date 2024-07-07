@@ -262,9 +262,3 @@ void _cerrar_conexiones() {
     liberar_conexion(fd_memoria);
     // Liberar otras conexiones si es necesario
 }
-
-//TODO: Analizar si tiene sentido que esta funcion este aca o no
-void enviar_io_interface()
-{
-    send_IO_interface_kernel();
-}

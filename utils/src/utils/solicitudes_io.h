@@ -45,7 +45,7 @@ typedef struct {
     uint32_t tamanio;
     uint32_t offset;
     void* datos;
-    enum { IO_FS_CREATE, IO_FS_DELETE, IO_FS_TRUNCATE, IO_FS_WRITE, IO_FS_READ } operacion;
+    t_name_instruction operacion;  // Uso el enum definido en instruccion.h
 } t_io_dialfs;
 
 typedef struct {
@@ -126,7 +126,7 @@ t_solicitud_io_dialfs* crear_solicitud_io_dialfs(t_PCB* pcb, char* nombre_interf
 // Función para crear una E/S DIALFS.
 // Pre: El nombre de archivo, el tamaño, el offset, los datos y la operación deben ser válidos.
 // Post: Retorna un puntero a una estructura t_io_dialfs creada.
-t_io_dialfs* crear_io_dialfs(char* nombre_archivo, uint32_t tamanio, uint32_t offset, void* datos, enum { IO_FS_CREATE, IO_FS_DELETE, IO_FS_TRUNCATE, IO_FS_WRITE, IO_FS_READ } operacion);
+t_io_dialfs* crear_io_dialfs(char* nombre_archivo, uint32_t tamanio, uint32_t offset, void* datos, t_name_instruction operacion);
 
 // Función para destruir una solicitud de E/S DIALFS.
 // Pre: La solicitud debe ser válida y no NULL.
