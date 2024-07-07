@@ -78,6 +78,7 @@ t_IO_connection* crear_IO_connection(const char* nombre, tipo_interfaz_t tipo, i
     nueva_conexion->tipo_interfaz = tipo;
     nueva_conexion->file_descriptor = fd;
     nueva_conexion->cola_procesos_bloqueados = queue_create();
+    sem_init(&(nueva_conexion->sem_cola_bloqueados), 0, 0);
     return nueva_conexion;
 }
 
@@ -113,6 +114,13 @@ int obtener_file_descriptor(t_IO_connection* conexion) {
 t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion) {
     if (conexion) {
         return conexion->cola_procesos_bloqueados;
+    }
+    return NULL;
+}
+
+sem_t* obtener_semaforo_cola_bloqueados(t_IO_connection* conexion) {
+    if (conexion) {
+        return &(conexion->sem_cola_bloqueados);
     }
     return NULL;
 }

@@ -1,14 +1,14 @@
 #include "manager_ios.h"
 
 
-void agregar_IO_cliente(int cliente_io)
+char* nuevo_IO_cliente_conectado(int cliente_io)
 {
     t_IO_interface* io_interface = recv_IO_interface(cliente_io);
 
     if (io_interface == NULL) {
         log_error(logger_kernel, "Error al recibir la interfaz de E/S del cliente.");
         liberar_conexion(cliente_io);
-        return;
+        return NULL;
     }
 
     // Crear la estructura t_IO_connection
@@ -17,11 +17,10 @@ void agregar_IO_cliente(int cliente_io)
         log_error(logger_kernel, "Error al crear la conexión de E/S.");
         liberar_IO_interface(io_interface);
         liberar_conexion(cliente_io);
-        return;
+        return NULL;
     }
 
-    //Agrego al diccionario de IOs
-    agregar_IO_connection(io_connection);
+    return obtener_nombre_conexion(io_connection);
 }
 
 void agregar_IO_connection(t_IO_connection* io_connection)

@@ -10,6 +10,6 @@
 
 t_IO_connection* get_IO_connection(char*);
 void agregar_IO_connection(t_IO_connection*);
-void agregar_IO_cliente(int);
+char* nuevo_IO_cliente_conectado(int);
 
 #endif //MANAGER_IOS_H_
