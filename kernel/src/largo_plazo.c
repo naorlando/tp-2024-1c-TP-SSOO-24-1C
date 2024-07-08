@@ -46,14 +46,6 @@ void send_new_to_ready()
     }
 }
 
-void send_to_exit(t_PCB *pcb)
-{
-    pthread_mutex_lock(&MUTEX_EXIT);
-    queue_push(COLA_EXIT, pcb);
-    pthread_mutex_unlock(&MUTEX_EXIT);
-    sem_post(&SEM_EXIT);
-}
-
 void end_process()
 {
     while (1)
