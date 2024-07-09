@@ -428,6 +428,8 @@ void serializar_IO_interface(t_buffer*, t_IO_interface*);
 // Post: Retorna un puntero a una estructura t_IO_interface deserializada.
 t_IO_interface* deserializar_IO_interface(t_buffer*);
 
+void serialize_manejo_recurso(t_buffer* buffer, t_manejo_recurso* manejo_recurso);
+t_manejo_recurso* deserialize_manejo_recurso(t_buffer* buffer);
 
 
 #endif

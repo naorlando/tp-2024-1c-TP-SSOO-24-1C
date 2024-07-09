@@ -160,12 +160,12 @@ void atender_kernel_cpu_dispatch()
 
                 break;
             case MSG_CPU_KERNEL_WAIT:
-                //TODO:
                 handle_wait_request() ;
+                //manejar_wait_signal(cod_op);
                 break;
             case MSG_CPU_KERNEL_SIGNAL:
-                //TODO:
-                handle_signal_request() ;
+                handle_signal_request();
+                //manejar_wait_signal(cod_op);
                 break;
             case -1:
                 log_error(logger_kernel, "CPU DISPATCH se desconecto. Terminando servidor");

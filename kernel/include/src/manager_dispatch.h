@@ -21,4 +21,15 @@ void procesar_interrupcion();
 void handle_wait_request();
 void handle_signal_request();
 
+
+
+// forma planteada por el tipo:
+void manejar_wait_signal(int cod_op);
+
+// Función para manejar la operación WAIT
+bool wait(char *resource_name, t_PCB *pcb);
+
+// Función para manejar la operación SIGNAL
+void signal(char *resource_name, t_PCB *pcb);
+
 #endif //MANAGER_DISPATCH_

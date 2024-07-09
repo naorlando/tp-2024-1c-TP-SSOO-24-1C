@@ -799,3 +799,19 @@ t_IO_interface* deserializar_IO_interface(t_buffer* buffer)
 
     return interfaz;
 }
+
+void serialize_manejo_recurso(t_buffer* buffer, t_manejo_recurso* manejo_recurso)
+{
+    serialize_pcb(buffer, manejo_recurso->pcb);
+    buffer_add_string(buffer, manejo_recurso->nombre_recurso);
+}
+
+t_manejo_recurso* deserialize_manejo_recurso(t_buffer* buffer)
+{
+    t_PCB* pcb = deserialize_pcb(buffer);
+
+    uint32_t length_string = buffer_read_uint32(buffer);
+    char* nombre_recurso = buffer_read_string(buffer, length_string);
+
+    return manejo_recurso_create(pcb, nombre_recurso);
+}

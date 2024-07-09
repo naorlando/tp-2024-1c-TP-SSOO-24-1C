@@ -116,3 +116,27 @@ uint32_t get_size_new_process(t_new_process* new_process)
 {
     return sizeof(uint32_t) + strlen(new_process->path) + 1 + sizeof(uint32_t);
 }
+
+t_manejo_recurso *manejo_recurso_create(t_PCB *pcb, char *nombre_recurso)
+{  
+    t_manejo_recurso *manejo_recurso = malloc(sizeof(t_manejo_recurso));
+
+    manejo_recurso->pcb = pcb;
+    manejo_recurso->nombre_recurso = strdup(nombre_recurso);
+
+    return manejo_recurso;
+}
+
+void manejo_recurso_destroy(t_manejo_recurso *manejo_recurso)
+{
+    if(manejo_recurso->nombre_recurso != NULL) {
+        free(manejo_recurso->nombre_recurso);
+    }
+
+    free(manejo_recurso);
+}
+
+u_int32_t get_manejo_recurso_size(t_manejo_recurso *manejo_recurso)
+{
+    return sizeof(u_int32_t) + strlen(manejo_recurso->nombre_recurso) + 1 + get_pcb_size(manejo_recurso->pcb);
+}

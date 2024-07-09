@@ -96,10 +96,16 @@ void procesar_interrupcion()
 void handle_wait_request(){
     //recibo el paquete con el recurso a manejar
     pthread_mutex_lock(&MUTEX_RECURSOS);
-    char *nombre_recurso;
-    t_PCB *pcb;
 
-    recv_wait_or_signal_request(&nombre_recurso,&pcb);
+    t_manejo_recurso * manejo_recurso_recv = recv_wait_or_signal_request();
+
+    t_PCB *pcb = manejo_recurso_recv->pcb;
+    char *nombre_recurso = manejo_recurso_recv->nombre_recurso;
+
+    log_info(logger_kernel, "AX: %u", pcb->cpu_registers->ax);
+    log_info(logger_kernel, "BX: %u", pcb->cpu_registers->bx);
+    log_info(logger_kernel, "CX: %u", pcb->cpu_registers->cx);
+    log_info(logger_kernel, "Nombre de recurso: %s", nombre_recurso);
 
     t_recurso *recurso = get_recurso(nombre_recurso);
     if(recurso == NULL) {
@@ -118,27 +124,119 @@ void handle_wait_request(){
         //agregar_a_cola_bloqueados(pcb);
     }
 
-    // t_recurso *recurso = dictionary_get(recursos_dictionary, nombre_recurso);
-    // char * respuesta;
-    // log_info(logger_kernel, "Se recibio una instruccion WAIT para el recurso: %s", nombre_recurso);
-    // //verificar si el recurso esta disponible
-    // if(recurso->instancias > 0){
-    //     recurso->instancias--;
-    //     respuesta = "OK";
-    //     log_info(logger_kernel, "Se decremento una instancia del recurso: %s", nombre_recurso);
-    // }else{
-    //     //si no esta disponible el recurso, se manda mensaje a cpu de esto, cpu copia el contexto, y manda el pcb al kernel para que este proceso pase a bloqueado.
-    // //CHAN, que pija hacemos, ?mandamos todo el pcb en cada parte, o solo mensajes?
-    
-    // }
+    pthread_mutex_unlock(&MUTEX_RECURSOS);
 }
 
 // manejar instruccion WAIT
 void handle_signal_request()
 {
+    //recibo el paquete con el recurso a manejar
+    pthread_mutex_lock(&MUTEX_RECURSOS);
 
+    t_manejo_recurso * manejo_recurso_recv = recv_wait_or_signal_request();
+
+    t_PCB *pcb = manejo_recurso_recv->pcb;
+    char *nombre_recurso = manejo_recurso_recv->nombre_recurso;
+
+    log_info(logger_kernel, "AX: %u", pcb->cpu_registers->ax);
+    log_info(logger_kernel, "BX: %u", pcb->cpu_registers->bx);
+    log_info(logger_kernel, "CX: %u", pcb->cpu_registers->cx);
+    log_info(logger_kernel, "Nombre de recurso: %s", nombre_recurso);
+
+    t_recurso *recurso = get_recurso(nombre_recurso);
+    if(recurso == NULL) {
+        // logica de mandar pcb a exit
+        agregar_a_cola_exit(pcb);
+    }
+
+    if(recurso->instancias > 0){
+        recurso->instancias++;
+        // mandar el pcb devuelta para que se siga ejecutando en CPU
+        log_info(logger_kernel, "el recurso tenia instancias disponibles y se pudo decrementar por un WAIT");
+        send_pcb_cpu(pcb);
+    }else{
+        // mandar el pcb a la cola de bloqueados y agregar PCB a la cola de bloqueados del recurso en cuestion para cuando se libere.
+        // TODO:
+        //agregar_a_cola_bloqueados(pcb);
+    }
+
+    pthread_mutex_unlock(&MUTEX_RECURSOS);
 }
 
-void manejar_instruccion_signal(){
-    //recibo el paquete con el recurso a manejar
+// ############################################################################################################
+// nueva forma planteada por el tipo: 
+// ############################################################################################################
+
+// Función para recibir y manejar el mensaje de WAIT o SIGNAL
+void manejar_wait_signal(int cod_op) {
+    t_PCB* pcb;
+    char* resource_name;
+
+    // Recibir el paquete y deserializar el PCB y el nombre del recurso
+    recv_pcb_and_string(fd_cpu_dispatch, &pcb, &resource_name);
+
+    bool resultado;
+    if (cod_op == MSG_CPU_KERNEL_WAIT) {
+        resultado = wait(resource_name, pcb);
+    } else if (cod_op == MSG_CPU_KERNEL_SIGNAL) {
+        signal(resource_name, pcb);
+        resultado = true;
+    }
+
+    if (resultado) {
+        // Si el resultado es true, reanudar el proceso
+        log_info(logger_kernel, "Proceso %d reanudado después de WAIT/SIGNAL en el recurso %s", pcb->pid, resource_name);
+        // Actualizar el PCB en la tabla
+        dictionary_remove_and_destroy(table_pcb, string_itoa(pcb->pid), (void *)pcb_destroy);
+        dictionary_put(table_pcb, string_itoa(pcb->pid), pcb);
+
+        // Añadir el PCB a la cola READY
+        pthread_mutex_lock(&MUTEX_READY);
+        queue_push(COLA_READY, pcb);
+        pthread_mutex_unlock(&MUTEX_READY);
+
+        sem_post(&SEM_READY); // Despertar al planificador
+    } else {
+        // Si el resultado es false, bloquear el proceso
+        log_info(logger_kernel, "Proceso %d bloqueado esperando el recurso %s", pcb->pid, resource_name);
+        // Actualizar el PCB en la tabla
+        dictionary_remove_and_destroy(table_pcb, string_itoa(pcb->pid), (void *)pcb_destroy);
+        dictionary_put(table_pcb, string_itoa(pcb->pid), pcb);
+
+        // Añadir el PCB a la cola de bloqueados del recurso
+        pthread_mutex_lock(&MUTEX_BLOQUEADOS);
+        // Aquí deberías tener una estructura para manejar los bloqueados por recurso
+        queue_push(get_recurso(resource_name)->cola_bloqueados, pcb);
+        pthread_mutex_unlock(&MUTEX_BLOQUEADOS);
+    }
+
+    free(resource_name); // Liberar la memoria del nombre del recurso
+}
+bool wait(char *resource_name, t_PCB *pcb) {
+    t_recurso *recurso = get_recurso(resource_name);
+    if (recurso == NULL) {
+        log_error(logger_kernel, "Recurso %s no existe", resource_name);
+        return false; // El recurso no existe
+    }
+
+    if (recurso->instancias > 0) {
+        recurso->instancias--;
+        return true; // El recurso está disponible
+    } else {
+        // El recurso no está disponible, el proceso debe ser bloqueado
+        // Aquí puedes añadir el PCB a la cola de bloqueados del recurso
+        return false;
+    }
+}
+
+void signal(char *resource_name, t_PCB *pcb) {
+    t_recurso *recurso = get_recurso(resource_name);
+    if (recurso == NULL) {
+        log_error(logger_kernel, "Recurso %s no existe", resource_name);
+        // Aquí puedes manejar el caso en que el recurso no exista
+        return;
+    }
+
+    recurso->instancias++;
+    // Aquí puedes manejar el desbloqueo de procesos bloqueados por el recurso
 }

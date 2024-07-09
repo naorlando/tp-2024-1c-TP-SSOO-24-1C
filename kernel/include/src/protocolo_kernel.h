@@ -19,5 +19,5 @@ int recv_example_msg_entradasalida(int);
 t_PCB* recv_pcb_interrupt();
 void send_interruption_cpu(t_interruption*);
 t_solicitud_io_generica* recv_solicitud_io_generica_cpu();
-void recv_wait_or_signal_request(char **nombre_recurso, t_PCB **pcb);
+t_manejo_recurso*  recv_wait_or_signal_request();
 #endif

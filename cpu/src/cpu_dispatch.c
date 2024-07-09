@@ -255,24 +255,6 @@ void copiar_cadena(uint32_t origen, uint32_t destino, int tamano) {
 
 }
 
-
-void cargar_contexto_ejecucion(t_PCB* pcb) {
-    t_cpu_registers* contexto = get_cpu_registers(pcb);
-
-    // Cargo el contexto de ejecucion del pcb en la CPU
-    cpu_registers->pc = contexto->pc;
-    cpu_registers->ax = contexto->ax;
-    cpu_registers->bx = contexto->bx;
-    cpu_registers->cx = contexto->cx;
-    cpu_registers->dx = contexto->dx;
-    cpu_registers->eax = contexto->eax;
-    cpu_registers->ebx = contexto->ebx;
-    cpu_registers->ecx = contexto->ecx;
-    cpu_registers->edx = contexto->edx;
-    cpu_registers->si = contexto->si;
-    cpu_registers->di = contexto->di;
-}
-
 void solicitar_instruccion(uint32_t pid, uint32_t pc) 
 {
     // Pido la siguiente instruccion a memoria
@@ -420,6 +402,22 @@ void solicitar_IO(t_instruction* instruccion)
     sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 }
 
+void cargar_contexto_ejecucion(t_PCB* pcb) {
+    t_cpu_registers* contexto = get_cpu_registers(pcb);
+
+    // Cargo el contexto de ejecucion del pcb en la CPU
+    cpu_registers->pc = contexto->pc;
+    cpu_registers->ax = contexto->ax;
+    cpu_registers->bx = contexto->bx;
+    cpu_registers->cx = contexto->cx;
+    cpu_registers->dx = contexto->dx;
+    cpu_registers->eax = contexto->eax;
+    cpu_registers->ebx = contexto->ebx;
+    cpu_registers->ecx = contexto->ecx;
+    cpu_registers->edx = contexto->edx;
+    cpu_registers->si = contexto->si;
+    cpu_registers->di = contexto->di;
+}
 // cargar contexto de ejecucion del cpu a los registros del pcb
 void  cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
     t_cpu_registers* contexto = get_cpu_registers(pcb);
@@ -465,12 +463,16 @@ void handle_wait_or_signal(t_PCB * pcb, char * resource_name, t_name_instruction
     }
 
     remove_newline(resource_name);
-    // Crear un paquete con el PCB y el nombre del recurso
-    t_package * package = package_create(msg_header, get_pcb_size(pcb) + strlen(resource_name)+1);
-    serialize_pcb(package->buffer,pcb);
-    buffer_add_string(package->buffer, resource_name);
+    cargar_contexto_ejecucion_a_pcb(pcb);
+    t_manejo_recurso *t_manejo_recurso = manejo_recurso_create(pcb, resource_name);
+    // Crear un paquete con el PCB y el nombre del recurso (t_manjejo_recurso) y enviarlo al Kernel:
 
-    // Enviar el paquete al Kernel
+    t_package * package = package_create(msg_header, get_manejo_recurso_size(t_manejo_recurso));
+    serialize_manejo_recurso(package->buffer, t_manejo_recurso);
+
+    // Enviar el paquete al Kernel:
     package_send(package, fd_kernel_dispatch);
     package_destroy(package);
+
+    manejo_recurso_destroy(t_manejo_recurso);
 }
