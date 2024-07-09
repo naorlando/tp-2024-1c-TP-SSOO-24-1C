@@ -1,6 +1,5 @@
 #include "protocolo_entradasalida.h"
-#include "utils/solicitudes_io.h"
-#include <readline/readline.h>
+
 
 //======================================================
 //        FUNCIONES DE ENTRADA/SALIDA GENERICA

@@ -1,9 +1,11 @@
 #ifndef PROTOCOLO_ENTRADA_H_
 #define PROTOCOLO_ENTRADA_H_
 
-#include "utils/protocolo.h"
+#include <readline/readline.h>
 #include "variables_globales.h"
+#include "utils/protocolo.h"
 #include "utils/estructuras.h"
+#include "utils/solicitudes_io.h"
 #include "dialfs.h"
 
 // FUNCIONES de atención de instrucciones
