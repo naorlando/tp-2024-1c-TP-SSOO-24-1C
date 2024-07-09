@@ -2,6 +2,11 @@
 #define SOLICITUDES_IO_H
 
 #include "estructuras.h"
+#include "instruccion.h"
+
+//===============================================
+// ESTRUCTURAS
+//===============================================
 
 // INTERFAZ GENERICA
 typedef struct {
@@ -45,7 +50,7 @@ typedef struct {
     uint32_t tamanio;
     uint32_t offset;
     void* datos;
-    t_name_instruction operacion;  // Uso el enum definido en instruccion.h
+    t_name_instruction operacion;
 } t_io_dialfs;
 
 typedef struct {
@@ -55,7 +60,7 @@ typedef struct {
 } t_solicitud_io_dialfs;
 
 //===============================================
-// FUNCIONES DE CREACIÓN Y DESTRUCCIÓN
+// FUNCIONES DE IO GENERICA
 //===============================================
 
 // Función para crear una solicitud de E/S genérica.
@@ -78,6 +83,25 @@ void destruir_solicitud_io_generica(t_solicitud_io_generica* solicitud);
 // Post: La memoria asociada a la E/S genérica se libera.
 void destruir_io_generica(t_io_generica* io_generica);
 
+// Obtiene el nombre de la interfaz genérica de una estructura t_io_generica.
+// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
+// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la interfaz.
+char* obtener_nombre_interfaz_generica(t_io_generica* io_generica);
+
+// Obtiene el tiempo de sleep de una estructura t_io_generica.
+// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
+// Post: Retorna el tiempo de sleep como un valor uint32_t.
+uint32_t obtener_tiempo_sleep(t_io_generica* io_generica);
+
+// Obtiene el tamaño de una interfaz de I/O genérica.
+// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
+// Post: Retorna el tamaño de la interfaz de I/O genérica como un valor uint32_t.
+uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica);
+
+//===============================================
+// FUNCIONES DE IO STDIN
+//===============================================
+
 // Función para crear una solicitud de E/S STDIN.
 // Pre: El PCB, el nombre de interfaz y la E/S STDIN deben ser válidos y no NULL.
 // Post: Retorna un puntero a una estructura t_solicitud_io_stdin creada.
@@ -97,6 +121,20 @@ void destruir_solicitud_io_stdin(t_solicitud_io_stdin* solicitud);
 // Pre: La E/S STDIN debe ser válida y no NULL.
 // Post: La memoria asociada a la E/S STDIN se libera.
 void destruir_io_stdin(t_io_stdin* io_stdin);
+
+// Obtiene la dirección física del stdin de una estructura t_io_stdin.
+// Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
+// Post: Retorna la dirección física del stdin como un valor uint32_t.
+uint32_t obtener_direccion_fisica_stdin(t_io_stdin* io_stdin);
+
+// Obtiene el tamaño de una interfaz de I/O stdin.
+// Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
+// Post: Retorna el tamaño de la interfaz de I/O stdin como un valor uint32_t.
+uint32_t obtener_tamanio_io_stdin(t_io_stdin* io_stdin);
+
+//===============================================
+// FUNCIONES DE IO STDOUT
+//===============================================
 
 // Función para crear una solicitud de E/S STDOUT.
 // Pre: El PCB, el nombre de interfaz y la E/S STDOUT deben ser válidos y no NULL.
@@ -118,6 +156,20 @@ void destruir_solicitud_io_stdout(t_solicitud_io_stdout* solicitud);
 // Post: La memoria asociada a la E/S STDOUT se libera.
 void destruir_io_stdout(t_io_stdout* io_stdout);
 
+// Obtiene la dirección física del stdout de una estructura t_io_stdout.
+// Pre: El puntero io_stdout debe apuntar a una estructura t_io_stdout válida y no debe ser NULL.
+// Post: Retorna la dirección física del stdout como un valor uint32_t.
+uint32_t obtener_direccion_fisica_stdout(t_io_stdout* io_stdout);
+
+// Obtiene el tamaño de una interfaz de I/O stdout.
+// Pre: El puntero io_stdout debe apuntar a una estructura t_io_stdout válida y no debe ser NULL.
+// Post: Retorna el tamaño de la interfaz de I/O stdout como un valor uint32_t.
+uint32_t obtener_tamanio_io_stdout(t_io_stdout* io_stdout);
+
+//===============================================
+// FUNCIONES DE IO DIALFS
+//===============================================
+
 // Función para crear una solicitud de E/S DIALFS.
 // Pre: El PCB, el nombre de interfaz y la E/S DIALFS deben ser válidos y no NULL.
 // Post: Retorna un puntero a una estructura t_solicitud_io_dialfs creada.
@@ -138,143 +190,9 @@ void destruir_solicitud_io_dialfs(t_solicitud_io_dialfs* solicitud);
 // Post: La memoria asociada a la E/S DIALFS se libera.
 void destruir_io_dialfs(t_io_dialfs* io_dialfs);
 
-//===============================================
-// FUNCIONES DE ACCESO A CAMPOS
-//===============================================
-
-/*********** Funciones 't_io_generica' ***********/
-// Obtiene el nombre de la interfaz genérica de una estructura t_io_generica.
-// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
-// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la interfaz.
-char* obtener_nombre_interfaz_generica(t_io_generica* io_generica);
-
-// Obtiene el tiempo de sleep de una estructura t_io_generica.
-// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
-// Post: Retorna el tiempo de sleep como un valor uint32_t.
-uint32_t obtener_tiempo_sleep(t_io_generica* io_generica);
-
-// Obtiene el tamaño de una interfaz de I/O genérica.
-// Pre: El puntero io_generica debe apuntar a una estructura t_io_generica válida y no debe ser NULL.
-// Post: Retorna el tamaño de la interfaz de I/O genérica como un valor uint32_t.
-uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica);
-
-
-/*********** Funciones 't_io_stdin' ***********/
-// Obtiene la dirección física del stdin de una estructura t_io_stdin.
-// Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
-// Post: Retorna la dirección física del stdin como un valor uint32_t.
-uint32_t obtener_direccion_fisica_stdin(t_io_stdin* io_stdin);
-
-// Obtiene el tamaño de una interfaz de I/O stdin.
-// Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
-// Post: Retorna el tamaño de la interfaz de I/O stdin como un valor uint32_t.
-uint32_t obtener_tamanio_io_stdin(t_io_stdin* io_stdin);
-
-
-/*********** Funciones 't_io_stdout' ***********/
-// Obtiene la dirección física del stdout de una estructura t_io_stdout.
-// Pre: El puntero io_stdout debe apuntar a una estructura t_io_stdout válida y no debe ser NULL.
-// Post: Retorna la dirección física del stdout como un valor uint32_t.
-uint32_t obtener_direccion_fisica_stdout(t_io_stdout* io_stdout);
-
-// Obtiene el tamaño de una interfaz de I/O stdout.
-// Pre: El puntero io_stdout debe apuntar a una estructura t_io_stdout válida y no debe ser NULL.
-// Post: Retorna el tamaño de la interfaz de I/O stdout como un valor uint32_t.
-uint32_t obtener_tamanio_io_stdout(t_io_stdout* io_stdout);
-
-
-/*********** Funciones 't_io_dialfs' ***********/
-// Obtiene el tamaño de los datos de una estructura t_io_dialfs.
+// Obtiene el tamaño de una interfaz de I/O DIALFS.
 // Pre: El puntero io_dialfs debe apuntar a una estructura t_io_dialfs válida y no debe ser NULL.
-// Post: Retorna el tamaño de los datos como un valor uint32_t.
+// Post: Retorna el tamaño de la interfaz de I/O DIALFS como un valor uint32_t.
 uint32_t obtener_tamanio_io_dialfs(t_io_dialfs* io_dialfs);
-
-
-/*********** Funciones 't_solicitud_io_generica' ***********/
-// Obtiene el PCB de una solicitud de I/O genérica.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
-// Post: Retorna un puntero a una estructura t_PCB.
-t_PCB* obtener_pcb_solicitud_generica(t_solicitud_io_generica* solicitud);
-
-// Obtiene el nombre de la solicitud de I/O genérica.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
-// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la solicitud.
-char* obtener_nombre_solicitud_generica(t_solicitud_io_generica* solicitud);
-
-// Obtiene la interfaz de I/O genérica de una solicitud.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
-// Post: Retorna un puntero a una estructura t_io_generica.
-t_io_generica* obtener_io_solicitud_generica(t_solicitud_io_generica* solicitud);
-
-// Obtiene el tamaño de una solicitud de I/O genérica.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
-// Post: Retorna el tamaño de la solicitud de I/O genérica como un valor uint32_t.
-uint32_t obtener_tamanio_solicitud_generica(t_solicitud_io_generica* solicitud);
-
-
-/*********** Funciones 't_solicitud_io_stdin' ***********/
-// Obtiene el PCB de una solicitud de stdin.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
-// Post: Retorna un puntero a una estructura t_PCB.
-t_PCB* obtener_pcb_solicitud_stdin(t_solicitud_io_stdin* solicitud);
-
-// Obtiene el nombre de la solicitud de stdin.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
-// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la solicitud.
-char* obtener_nombre_solicitud_stdin(t_solicitud_io_stdin* solicitud);
-
-// Obtiene la interfaz de stdin de una solicitud.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
-// Post: Retorna un puntero a una estructura t_io_stdin.
-t_io_stdin* obtener_io_solicitud_stdin(t_solicitud_io_stdin* solicitud);
-
-// Obtiene el tamaño de una solicitud de stdin.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
-// Post: Retorna el tamaño de la solicitud de stdin como un valor uint32_t.
-uint32_t obtener_tamanio_solicitud_stdin(t_solicitud_io_stdin* solicitud);
-
-
-/*********** Funciones 't_solicitud_io_stdout' ***********/
-// Obtiene el PCB de una solicitud de stdout.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
-// Post: Retorna un puntero a una estructura t_PCB.
-t_PCB* obtener_pcb_solicitud_stdout(t_solicitud_io_stdout* solicitud);
-
-// Obtiene el nombre de la solicitud de stdout.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
-// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la solicitud.
-char* obtener_nombre_solicitud_stdout(t_solicitud_io_stdout* solicitud);
-
-// Obtiene la interfaz de stdout de una solicitud.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
-// Post: Retorna un puntero a una estructura t_io_stdout.
-t_io_stdout* obtener_io_solicitud_stdout(t_solicitud_io_stdout* solicitud);
-
-// Obtiene el tamaño de una solicitud de stdout.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
-// Post: Retorna el tamaño de la solicitud de stdout como un valor uint32_t.
-uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud);
-
-
-/*********** Funciones 't_solicitud_io_dialfs' ***********/
-// Obtiene el tamaño de una solicitud de I/O DIALFS.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_dialfs válida y no debe ser NULL.
-// Post: Retorna el tamaño de la solicitud de I/O DIALFS como un valor uint32_t.
-uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
-
-// Obtiene el PCB de una solicitud de I/O DIALFS.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_dialfs válida y no debe ser NULL.
-// Post: Retorna un puntero a una estructura t_PCB.
-t_PCB* obtener_pcb_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
-
-// Obtiene el nombre de la solicitud de I/O DIALFS.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_dialfs válida y no debe ser NULL.
-// Post: Retorna un puntero a una cadena de caracteres que contiene el nombre de la solicitud.
-char* obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
-
-// Obtiene la interfaz de I/O DIALFS de una solicitud.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_dialfs válida y no debe ser NULL.
-// Post: Retorna un puntero a una estructura t_io_dialfs.
-t_io_dialfs* obtener_io_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
 
 #endif
