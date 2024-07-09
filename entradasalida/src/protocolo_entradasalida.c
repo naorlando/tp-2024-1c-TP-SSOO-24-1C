@@ -13,7 +13,7 @@ void atender_instruccion_generica(int fd) {
     if (io_generica != NULL) {
         int tiempo_espera = io_generica->tiempo_sleep * obtener_tiempo_unidad_trabajo(entradasalida_config);
         log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
-        sleep(tiempo_espera);
+        usleep(tiempo_espera * 1000);
         log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
         enviar_confirmacion_io(fd);
         destruir_io_generica(io_generica);
