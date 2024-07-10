@@ -34,41 +34,12 @@ void atender_kernel_IO(void* io_connection)
     {
         sem_wait(obtener_semaforo_cola_bloqueados(cliente_io));
 
-        // Obtengo la cola de procesos bloquedos
-        t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
+        procesar_solicitud_func procesar_func = obtener_procesador_solicitud(obtener_tipo_conexion(cliente_io));
 
-        switch(obtener_tipo_conexion(cliente_io))
-        {
-            case GENERICA:
-                t_solicitud_io_generica* solicitud_io_gen = (t_solicitud_io_generica)*queue_pop(cola_bloqueados_io); 
-                
-                t_io_generica* io_gen = obtener_io_solicitud_generica(solicitud_io_gen);
-                
-                //TODO: Realizar parte del send a la IO correspondiente
-                break;
-            case STDIN:
-                t_solicitud_io_stdin* solicitud_io_stdin = (t_solicitud_io_stdin)*queue_pop(cola_bloqueados_io); 
-                
-                t_io_stdin* io_stdin = obtener_io_solicitud_stdin(solicitud_io_stdin);
-                
-                //TODO: Realizar parte del send a la IO correspondiente
-
-                break;
-            case STDOUT:
-                t_solicitud_io_stdout* solicitud_io_stdout = (t_solicitud_io_stdout)*queue_pop(cola_bloqueados_io); 
-                
-                t_io_stdout* io_stdout = obtener_io_solicitud_stdout(solicitud_io_stdout);
-                
-                //TODO: Realizar parte del send a la IO correspondiente
-
-                break;
-            case DIALFS:
-                
-                
-                break;
-            default:
-                log_warning(logger_kernel, "Tipo de IO desconocida. No quieras meter la pata");
-                break;
+        if (procesar_func != NULL) {
+            procesar_solicitud_IO(cliente_io, procesar_func);
+        } else {
+            log_warning(logger_kernel, "Tipo de IO desconocida. No quieras meter la pata");
         }
 
         int cod_op = recibir_operacion(obtener_file_descriptor(cliente_io));
