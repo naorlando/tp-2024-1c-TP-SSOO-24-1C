@@ -69,6 +69,7 @@ extern char* memoria_port;
 
 //List
 extern t_queue* COLA_READY;
+extern t_queue *COLA_AUX_READY;
 extern t_queue* COLA_EXIT;
 extern t_queue* COLA_NEW;
 //una variable para que el kernel conozca el pcb que este ejecutando:
