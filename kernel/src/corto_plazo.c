@@ -42,13 +42,43 @@ void planificador_RR()
     }
 }
 
+// planificador VRR:
 void planificador_VRR()
 {
     while (1)
     {
+        t_PCB *pcb = NULL;
         
+        if (!queue_is_empty(COLA_AUX_READY)) {
+            pcb = queue_pop(COLA_AUX_READY);
+        } else {
+            pcb = get_next_pcb_to_exec(COLA_READY);
+        }
+
+        // Inicializar el hilo del quantum
+        pthread_t hilo_quantum;
+        if (pthread_create(&hilo_quantum, NULL, (void*)hilo_quantum_func, (void*)pcb) != 0) {
+            log_error(logger_kernel, "Error al crear el hilo de quantum");
+            continue;
+        }
+        pthread_detach(hilo_quantum);
+
+        pcb_execute(pcb);
     }
+    queue_destroy(COLA_AUX_READY);
 }
+
+void* hilo_quantum_func(void* arg) {
+    t_PCB* pcb = (t_PCB*)arg;
+    if (pcb->cola == COLA_AUX_READY) {
+        usleep(pcb->quantum * 1000); // Quantum del PCB en la cola auxiliar
+    } else {
+        usleep(config_get_int_value(kernel_config, "QUANTUM") * 1000); // Quantum del config
+    }
+    send_interrupt(pcb->pid);
+   return NULL;
+}
+
 // Función que crea la interrupción quantum
 // Función que crea la interrupción quantum
 void interrupcion_quantum(uint32_t pid, uint32_t quantum) {
