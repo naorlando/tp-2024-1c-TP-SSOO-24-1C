@@ -42,3 +42,50 @@ t_IO_connection* get_IO_connection(char* nombre_interfaz)
     pthread_mutex_unlock(&MUTEX_DICTIONARY);
     return io_connection;
 }
+
+procesar_solicitud_func obtener_procesador_solicitud(int tipo_conexion) 
+{
+    switch(tipo_conexion) {
+        case GENERICA:
+            return (procesar_solicitud_func) procesar_solicitud_generica;
+        case STDIN:
+            return (procesar_solicitud_func) procesar_solicitud_stdin;
+        case STDOUT:
+            return (procesar_solicitud_func) procesar_solicitud_stdout;
+        case DIALFS:
+            return (procesar_solicitud_func) procesar_solicitud_dialfs;
+        default:
+            return NULL;
+    }
+}
+
+void procesar_solicitud_IO(t_IO_connection* cliente_io, procesar_solicitud_func procesar_func) 
+{
+    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
+    void* solicitud = queue_pop(cola_bloqueados_io);
+    procesar_func(solicitud);
+}
+
+void procesar_solicitud_generica(t_solicitud_io_generica* solicitud_io_gen) 
+{
+    t_io_generica* io_gen = obtener_io_solicitud_generica(solicitud_io_gen);
+    // TODO: Realizar parte del send a la IO correspondiente
+}
+
+void procesar_solicitud_stdin(t_solicitud_io_stdin* solicitud_io_stdin) 
+{
+    t_io_stdin* io_stdin = obtener_io_solicitud_stdin(solicitud_io_stdin);
+    // TODO: Realizar parte del send a la IO correspondiente
+}
+
+void procesar_solicitud_stdout(t_solicitud_io_stdout* solicitud_io_stdout) 
+{
+    t_io_stdout* io_stdout = obtener_io_solicitud_stdout(solicitud_io_stdout);
+    // TODO: Realizar parte del send a la IO correspondiente
+}
+
+// TODO: Terminar de implementar
+void procesar_solicitud_dialfs()
+{
+
+}
