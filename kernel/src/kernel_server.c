@@ -34,6 +34,43 @@ void atender_kernel_IO(void* io_connection)
     {
         sem_wait(obtener_semaforo_cola_bloqueados(cliente_io));
 
+        // Obtengo la cola de procesos bloquedos
+        t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
+
+        switch(obtener_tipo_conexion(cliente_io))
+        {
+            case GENERICA:
+                t_solicitud_io_generica* solicitud_io_gen = (t_solicitud_io_generica)*queue_pop(cola_bloqueados_io); 
+                
+                t_io_generica* io_gen = obtener_io_solicitud_generica(solicitud_io_gen);
+                
+                //TODO: Realizar parte del send a la IO correspondiente
+                break;
+            case STDIN:
+                t_solicitud_io_stdin* solicitud_io_stdin = (t_solicitud_io_stdin)*queue_pop(cola_bloqueados_io); 
+                
+                t_io_stdin* io_stdin = obtener_io_solicitud_stdin(solicitud_io_stdin);
+                
+                //TODO: Realizar parte del send a la IO correspondiente
+
+                break;
+            case STDOUT:
+                t_solicitud_io_stdout* solicitud_io_stdout = (t_solicitud_io_stdout)*queue_pop(cola_bloqueados_io); 
+                
+                t_io_stdout* io_stdout = obtener_io_solicitud_stdout(solicitud_io_stdout);
+                
+                //TODO: Realizar parte del send a la IO correspondiente
+
+                break;
+            case DIALFS:
+                
+                
+                break;
+            default:
+                log_warning(logger_kernel, "Tipo de IO desconocida. No quieras meter la pata");
+                break;
+        }
+
         int cod_op = recibir_operacion(obtener_file_descriptor(cliente_io));
 
         switch (cod_op)
@@ -42,6 +79,10 @@ void atender_kernel_IO(void* io_connection)
                 // Se procesa el request
                 recv_example_msg_entradasalida(cliente_io);
                 control_key = false; // Cortamos la espera de solicitudes
+                break;
+            case MSG_IO_KERNEL:
+
+                log_info(logger_kernel, "Se recibio un mje de IO");
                 break;
             case MSG_IO_KERNEL:
 
@@ -170,47 +211,6 @@ void atender_kernel_cpu_dispatch()
     }
 }
 
-void atender_kernel_cpu_interrupt()
-{
-    // bool control_key = 1;
-    // while (control_key)
-    // {
-    //     int cod_op = recibir_operacion(fd_cpu_interrupt);
-
-    //     switch (cod_op)
-    //     {
-
-    //     case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
-    //         //TODO: agregar PCB donde este:
-    //         // 1-recibir pcb:
-    //         t_PCB* pcb_interrupt = recv_pcb_interrupt();
-    //         log_info(logger_kernel, "Se recibio un pcb de CPU-INTERRUPT");
-
-    //         // 2-actualizar el pcb en la tabla de pcb:
-    //         // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
-    //         // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
-    //         dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void (*)(void *))pcb_destroy);
-    //         dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
-    //         log_info(logger_kernel, "Se actualizo un pcb-INTERRUPT en la table_pcb");
-
-            
-
-    //         // 3-actualizar el estado del pcb en la cola correspondiente:
-    //         queue_push(COLA_READY, pcb_interrupt);
-    //         log_info(logger_kernel, "Se actualizo el estado del pcb-INTERRUPT en la cola correspondiente");
-
-    //         break;
-
-    //     case -1:
-    //         log_error(logger_kernel, "CPU INTERRUPT se desconecto. Terminando servidor");
-    //         control_key = 0;
-    //         break;
-    //     default:
-    //         log_warning(logger_kernel, "Operacion desconocida en INTERRUPT. No quieras meter la pata");
-    //         break;
-    //     }
-    // }
-}
 
 void levantar_servidor()
 {
