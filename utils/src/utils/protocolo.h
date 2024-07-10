@@ -54,6 +54,10 @@ typedef enum
     MSG_KERNEL_IO_STDIN, // KERNEL -> IO (Se solicita interactuar con una IO_STDIN)
     MSG_KERNEL_IO_STDOUT, // KERNEL -> IO (Se solicita interactuar con una IO_STDOUT)
     MSG_KERNEL_IO_DIALFS, // KERNEL -> IO (Se solicita interactuar con una IO_DIALFS)
+    MSG_IO_KERNEL_GENERICA, // IO -> KERNEL (Respuesta de IO_GENERICA)
+    MSG_IO_KERNEL_STDIN, // IO -> KERNEL (Respuesta de IO_STDIN)
+    MSG_IO_KERNEL_STDOUT, // IO -> KERNEL (Respuesta de IO_STDOUT)
+    MSG_IO_KERNEL_DIALFS, // IO -> KERNEL (Respuesta de IO_DIALFS)
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
