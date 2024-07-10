@@ -18,8 +18,8 @@ void procesar_ios_genericas();
 void procesar_pcb_exit();
 void cancelar_hilo_quantum(uint32_t);
 void procesar_interrupcion();
-void handle_wait_request();
-void handle_signal_request();
+void execute_to_null();
+void cancelar_quantum_si_corresponde(t_PCB *pcb_exit);
 
 
 
@@ -27,9 +27,9 @@ void handle_signal_request();
 void manejar_wait_signal(int cod_op);
 
 // Función para manejar la operación WAIT
-bool wait(char *resource_name, t_PCB *pcb);
+void handle_wait_request();
 
 // Función para manejar la operación SIGNAL
-void signal(char *resource_name, t_PCB *pcb);
+void handle_signal_request();
 
 #endif //MANAGER_DISPATCH_

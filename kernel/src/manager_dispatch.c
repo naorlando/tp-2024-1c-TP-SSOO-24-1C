@@ -38,14 +38,8 @@ void procesar_pcb_exit()
     // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
     t_PCB* pcb_exit= recv_pcb_cpu();
 
-    // limpio la variable global
-    pthread_mutex_lock(&MUTEX_EXECUTE);
-    EXECUTE = NULL;
-    pthread_mutex_unlock(&MUTEX_EXECUTE);
-
-    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {
-        cancelar_hilo_quantum(pcb_exit->pid);
-    }
+    execute_to_null();
+    cancelar_quantum_si_corresponde(pcb_exit);
 
     log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
 
@@ -64,9 +58,7 @@ void procesar_interrupcion()
     // 1-recibir pcb:
     t_PCB* pcb_interrupt = recv_pcb_interrupt();
 
-    pthread_mutex_lock(&MUTEX_EXECUTE);
-    EXECUTE = NULL; // SACO EL PCB DE EXECUTE
-    pthread_mutex_unlock(&MUTEX_EXECUTE);
+    execute_to_null();
 
     log_info(logger_kernel, "Se recibio un PCB por interrupcion a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
 
@@ -109,19 +101,19 @@ void handle_wait_request(){
 
     t_recurso *recurso = get_recurso(nombre_recurso);
     if(recurso == NULL) {
-        // logica de mandar pcb a exit
-        agregar_a_cola_exit(pcb);
+        execute_to_null();
+        cancelar_quantum_si_corresponde(pcb);
+        return; 
     }
 
-    if(recurso->instancias > 0){
+    if (recurso->instancias > 0) {
         recurso->instancias--;
-        // mandar el pcb devuelta para que se siga ejecutando en CPU
-        log_info(logger_kernel, "el recurso tenia instancias disponibles y se pudo decrementar por un WAIT");
+        asignar_proceso_a_recurso(recurso, pcb->pid);
+        log_info(logger_kernel, "Recurso %s tenía instancias disponibles. Instancias restantes: %d", nombre_recurso, recurso->instancias);
         send_pcb_cpu(pcb);
-    }else{
-        // mandar el pcb a la cola de bloqueados y agregar PCB a la cola de bloqueados del recurso en cuestion para cuando se libere.
-        // TODO:
-        //agregar_a_cola_bloqueados(pcb);
+    } else {
+        bloquear_proceso(recurso, pcb);
+        log_info(logger_kernel, "Recurso %s no tenía instancias disponibles. Proceso %d bloqueado", nombre_recurso, pcb->pid);
     }
 
     pthread_mutex_unlock(&MUTEX_RECURSOS);
@@ -145,98 +137,47 @@ void handle_signal_request()
 
     t_recurso *recurso = get_recurso(nombre_recurso);
     if(recurso == NULL) {
-        // logica de mandar pcb a exit
+        execute_to_null();
+        cancelar_quantum_si_corresponde(pcb);
+        return;
+    }
+
+    // Verificar si el proceso que hace SIGNAL está en la lista de procesos asignados
+    if (!proceso_asignado_a_recurso(recurso, pcb->pid)) {
+        log_info(logger_kernel, "Proceso %d no tiene asignado el recurso %s. Proceso enviado a EXIT", pcb->pid, nombre_recurso);
         agregar_a_cola_exit(pcb);
-    }
-
-    if(recurso->instancias > 0){
-        recurso->instancias++;
-        // mandar el pcb devuelta para que se siga ejecutando en CPU
-        log_info(logger_kernel, "el recurso tenia instancias disponibles y se pudo decrementar por un WAIT");
-        send_pcb_cpu(pcb);
-    }else{
-        // mandar el pcb a la cola de bloqueados y agregar PCB a la cola de bloqueados del recurso en cuestion para cuando se libere.
-        // TODO:
-        //agregar_a_cola_bloqueados(pcb);
-    }
-
-    pthread_mutex_unlock(&MUTEX_RECURSOS);
-}
-
-// ############################################################################################################
-// nueva forma planteada por el tipo: 
-// ############################################################################################################
-
-// Función para recibir y manejar el mensaje de WAIT o SIGNAL
-void manejar_wait_signal(int cod_op) {
-    t_PCB* pcb;
-    char* resource_name;
-
-    // Recibir el paquete y deserializar el PCB y el nombre del recurso
-    recv_pcb_and_string(fd_cpu_dispatch, &pcb, &resource_name);
-
-    bool resultado;
-    if (cod_op == MSG_CPU_KERNEL_WAIT) {
-        resultado = wait(resource_name, pcb);
-    } else if (cod_op == MSG_CPU_KERNEL_SIGNAL) {
-        signal(resource_name, pcb);
-        resultado = true;
-    }
-
-    if (resultado) {
-        // Si el resultado es true, reanudar el proceso
-        log_info(logger_kernel, "Proceso %d reanudado después de WAIT/SIGNAL en el recurso %s", pcb->pid, resource_name);
-        // Actualizar el PCB en la tabla
-        dictionary_remove_and_destroy(table_pcb, string_itoa(pcb->pid), (void *)pcb_destroy);
-        dictionary_put(table_pcb, string_itoa(pcb->pid), pcb);
-
-        // Añadir el PCB a la cola READY
-        pthread_mutex_lock(&MUTEX_READY);
-        queue_push(COLA_READY, pcb);
-        pthread_mutex_unlock(&MUTEX_READY);
-
-        sem_post(&SEM_READY); // Despertar al planificador
-    } else {
-        // Si el resultado es false, bloquear el proceso
-        log_info(logger_kernel, "Proceso %d bloqueado esperando el recurso %s", pcb->pid, resource_name);
-        // Actualizar el PCB en la tabla
-        dictionary_remove_and_destroy(table_pcb, string_itoa(pcb->pid), (void *)pcb_destroy);
-        dictionary_put(table_pcb, string_itoa(pcb->pid), pcb);
-
-        // Añadir el PCB a la cola de bloqueados del recurso
-        pthread_mutex_lock(&MUTEX_BLOQUEADOS);
-        // Aquí deberías tener una estructura para manejar los bloqueados por recurso
-        queue_push(get_recurso(resource_name)->cola_bloqueados, pcb);
-        pthread_mutex_unlock(&MUTEX_BLOQUEADOS);
-    }
-
-    free(resource_name); // Liberar la memoria del nombre del recurso
-}
-bool wait(char *resource_name, t_PCB *pcb) {
-    t_recurso *recurso = get_recurso(resource_name);
-    if (recurso == NULL) {
-        log_error(logger_kernel, "Recurso %s no existe", resource_name);
-        return false; // El recurso no existe
-    }
-
-    if (recurso->instancias > 0) {
-        recurso->instancias--;
-        return true; // El recurso está disponible
-    } else {
-        // El recurso no está disponible, el proceso debe ser bloqueado
-        // Aquí puedes añadir el PCB a la cola de bloqueados del recurso
-        return false;
-    }
-}
-
-void signal(char *resource_name, t_PCB *pcb) {
-    t_recurso *recurso = get_recurso(resource_name);
-    if (recurso == NULL) {
-        log_error(logger_kernel, "Recurso %s no existe", resource_name);
-        // Aquí puedes manejar el caso en que el recurso no exista
         return;
     }
 
     recurso->instancias++;
-    // Aquí puedes manejar el desbloqueo de procesos bloqueados por el recurso
+    log_info(logger_kernel, "Recurso %s incrementado. Instancias actuales: %d", nombre_recurso, recurso->instancias);
+
+    // Eliminar el PID de la lista de procesos asignados
+    remover_proceso_de_recurso(recurso, pcb->pid);
+
+    if (!queue_is_empty(recurso->cola_bloqueados)) {
+        t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
+        asignar_proceso_a_recurso(recurso, pcb_desbloqueado->pid);
+        log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
+        agregar_a_cola_ready(pcb_desbloqueado);
+    }
+
+    send_pcb_cpu(pcb);
+
+    pthread_mutex_unlock(&MUTEX_RECURSOS);
+}
+
+
+
+void execute_to_null() {
+    pthread_mutex_lock(&MUTEX_EXECUTE);
+    EXECUTE = NULL;
+    pthread_mutex_unlock(&MUTEX_EXECUTE);
+}
+
+
+void cancelar_quantum_si_corresponde(t_PCB *pcb_exit) {
+    if (strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {
+        cancelar_hilo_quantum(pcb_exit->pid);
+    }
 }

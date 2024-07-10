@@ -54,8 +54,9 @@ typedef struct
 // Estructura para los recursos
 typedef struct {
     char *nombre;
-    u_int32_t instancias;
+    int instancias;
     t_queue *cola_bloqueados;
+    t_list *procesos_asignados; 
 } t_recurso;
 
 typedef struct {

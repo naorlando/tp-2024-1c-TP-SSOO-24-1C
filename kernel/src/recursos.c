@@ -1,17 +1,16 @@
 #include "recursos.h"
 
-// Añadir un recurso a la tabla
 bool add_recurso(t_recurso *new_recurso) {
-    char *key = strdup(new_recurso->nombre); // Usamos el nombre del recurso como clave
+    char *key = strdup(new_recurso->nombre);
     if (key == NULL)
         return false;
 
+    new_recurso->procesos_asignados = list_create();
     dictionary_put(recursos_dictionary, key, new_recurso);
     return true;
 }
 
-// Obtener un recurso de la tabla
-t_recurso * get_recurso(const char * nombre) {
+t_recurso *get_recurso(const char *nombre) {
     if (recursos_dictionary == NULL) {
         log_error(logger_kernel, "El diccionario de recursos no está inicializado.");
         return NULL;
@@ -27,7 +26,7 @@ t_recurso * get_recurso(const char * nombre) {
         return NULL;
     }
 
-    t_recurso * recurso = (t_recurso *)dictionary_get(recursos_dictionary, (char*)nombre);
+    t_recurso *recurso = (t_recurso *)dictionary_get(recursos_dictionary, (char *)nombre);
     if (recurso == NULL) {
         log_warning(logger_kernel, "El recurso %s no existe en el diccionario.", nombre);
     }
@@ -35,20 +34,52 @@ t_recurso * get_recurso(const char * nombre) {
     return recurso;
 }
 
-
-// Liberar la memoria de un recurso
 void free_recurso(void *recurso) {
     t_recurso *recurso_eliminar = (t_recurso *)recurso;
     free(recurso_eliminar->nombre);
+    list_destroy_and_destroy_elements(recurso_eliminar->procesos_asignados, free);
     free(recurso_eliminar);
 }
 
-// Obtener el tamaño de la tabla de recursos
 uint8_t sizeof_table_recursos() {
     return dictionary_size(recursos_dictionary);
 }
 
-// Verificar si la tabla de recursos está vacía
 bool is_empty_recurso_table() {
     return dictionary_is_empty(recursos_dictionary);
+}
+
+void incrementar_recurso(t_recurso *recurso) {
+    recurso->instancias++;
+}
+
+void decrementar_recurso(t_recurso *recurso) {
+    recurso->instancias--;
+}
+
+void asignar_proceso_a_recurso(t_recurso *recurso, int pid) {
+    list_add(recurso->procesos_asignados, (void *)(intptr_t)pid);
+}
+
+
+void bloquear_proceso(t_recurso *recurso, t_PCB *pcb) {
+    queue_push(recurso->cola_bloqueados, pcb);
+}
+
+t_PCB* desbloquear_proceso(t_recurso *recurso) {
+    return queue_pop(recurso->cola_bloqueados);
+}
+
+void remover_proceso_de_recurso(t_recurso *recurso, int pid) {
+    bool pid_match(void* pid_ptr) {
+        return (intptr_t)pid_ptr == (intptr_t)pid;
+    }
+    list_remove_and_destroy_by_condition(recurso->procesos_asignados, pid_match, free);
+}
+
+bool proceso_asignado_a_recurso(t_recurso *recurso, int pid) {
+    bool pid_match(void* pid_ptr) {
+        return (intptr_t)pid_ptr == (intptr_t)pid;
+    }
+    return list_any_satisfy(recurso->procesos_asignados, pid_match);
 }
