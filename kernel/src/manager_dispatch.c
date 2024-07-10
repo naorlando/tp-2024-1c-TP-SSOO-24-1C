@@ -103,6 +103,7 @@ void handle_wait_request(){
     if(recurso == NULL) {
         execute_to_null();
         cancelar_quantum_si_corresponde(pcb);
+        agregar_a_cola_exit(pcb);
         return; 
     }
 
@@ -119,7 +120,7 @@ void handle_wait_request(){
     pthread_mutex_unlock(&MUTEX_RECURSOS);
 }
 
-// manejar instruccion WAIT
+// manejar instruccion SIGNAL
 void handle_signal_request()
 {
     //recibo el paquete con el recurso a manejar
@@ -139,21 +140,25 @@ void handle_signal_request()
     if(recurso == NULL) {
         execute_to_null();
         cancelar_quantum_si_corresponde(pcb);
-        return;
-    }
-
-    // Verificar si el proceso que hace SIGNAL está en la lista de procesos asignados
-    if (!proceso_asignado_a_recurso(recurso, pcb->pid)) {
-        log_info(logger_kernel, "Proceso %d no tiene asignado el recurso %s. Proceso enviado a EXIT", pcb->pid, nombre_recurso);
         agregar_a_cola_exit(pcb);
         return;
     }
 
+    // Verificar si el proceso que hace SIGNAL está en la lista de procesos asignados
+    // si el proceso NO esta en la lista de procesos asignados, lo mando a EXIT...
+    if (!remove_asignado_a_recurso(recurso, pcb->pid)) {
+        log_info(logger_kernel, "Proceso %d no tiene asignado el recurso %s. Proceso enviado a EXIT", pcb->pid, nombre_recurso);
+        execute_to_null();
+        cancelar_quantum_si_corresponde(pcb);
+        agregar_a_cola_exit(pcb);
+        return;
+    }
+    // si el proceso esta en la lista de procesos asignados,se ELEMININA EL PID en la funcion remove_asignado_a_recurso() y 
+    // incremento las instancias del recurso...
     recurso->instancias++;
     log_info(logger_kernel, "Recurso %s incrementado. Instancias actuales: %d", nombre_recurso, recurso->instancias);
 
-    // Eliminar el PID de la lista de procesos asignados
-    remover_proceso_de_recurso(recurso, pcb->pid);
+ 
 
     if (!queue_is_empty(recurso->cola_bloqueados)) {
         t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);

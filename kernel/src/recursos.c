@@ -70,16 +70,32 @@ t_PCB* desbloquear_proceso(t_recurso *recurso) {
     return queue_pop(recurso->cola_bloqueados);
 }
 
-void remover_proceso_de_recurso(t_recurso *recurso, int pid) {
-    bool pid_match(void* pid_ptr) {
-        return (intptr_t)pid_ptr == (intptr_t)pid;
-    }
-    list_remove_and_destroy_by_condition(recurso->procesos_asignados, pid_match, free);
-}
+// void remover_proceso_de_recurso(t_recurso *recurso, int pid) {
+//     bool pid_match(void* pid_ptr) {
+//         return (intptr_t)pid_ptr == (intptr_t)pid;
+//     }
+//     list_remove_and_destroy_by_condition(recurso->procesos_asignados, pid_match, free);
+// }
 
-bool proceso_asignado_a_recurso(t_recurso *recurso, int pid) {
-    bool pid_match(void* pid_ptr) {
-        return (intptr_t)pid_ptr == (intptr_t)pid;
-    }
-    return list_any_satisfy(recurso->procesos_asignados, pid_match);
+// bool proceso_asignado_a_recurso(t_recurso *recurso, int pid) {
+//     bool pid_match(void* pid_ptr) {
+//         return (intptr_t)pid_ptr == (intptr_t)pid;
+//     }
+//     return list_any_satisfy(recurso->procesos_asignados, pid_match);
+// }
+
+// Función de coincidencia de PID
+// bool pid_match(void* pid_ptr, void* target_pid) {
+//     return (intptr_t)pid_ptr == (intptr_t)target_pid;
+// }
+// void remover_proceso_de_recurso(t_recurso *recurso, int pid) {
+//     list_remove_and_destroy_by_condition(recurso->procesos_asignados, pid_match, (void *)(intptr_t)pid);
+// }
+
+// bool proceso_asignado_a_recurso(t_recurso *recurso, int pid) {
+//     return list_remove_element(recurso->procesos_asignados, pid);
+// }
+
+bool remove_asignado_a_recurso(t_recurso *recurso, int pid) {
+    return list_remove_element(recurso->procesos_asignados, (void *)(intptr_t)pid);
 }

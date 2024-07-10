@@ -172,7 +172,7 @@ void inicializar_recursos() {
         recurso->nombre = strdup(nombres_recursos[i]);
         recurso->instancias = instancias_recursos[i];
         recurso->cola_bloqueados = queue_create();
-
+        recurso->procesos_asignados = list_create();
         dictionary_put(recursos_dictionary, recurso->nombre, recurso);
     }
 
