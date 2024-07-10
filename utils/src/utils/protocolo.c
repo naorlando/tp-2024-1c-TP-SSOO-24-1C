@@ -710,6 +710,7 @@ t_solicitud_io_generica* deserializar_solicitud_io_generica(t_buffer* buffer) {
 void serializar_io_generica(t_buffer* buffer, t_io_generica* io_generica) {
     buffer_add_string(buffer, io_generica->nombre_interfaz);
     buffer_add_uint32(buffer, io_generica->tiempo_sleep);
+    buffer_add_uint32(buffer, io_generica->pid);
 }
 
 t_io_generica* deserializar_io_generica(t_buffer* buffer) {
@@ -718,7 +719,9 @@ t_io_generica* deserializar_io_generica(t_buffer* buffer) {
 
     uint32_t tiempo_sleep = buffer_read_uint32(buffer);
 
-    return crear_io_generica(nombre_interfaz, tiempo_sleep);
+    uint32_t pid = buffer_read_uint32(buffer);
+
+    return crear_io_generica(nombre_interfaz, tiempo_sleep, pid);
 }
 
 void serializar_solicitud_io_stdin(t_buffer* buffer, t_solicitud_io_stdin* solicitud) {
@@ -741,12 +744,14 @@ t_solicitud_io_stdin* deserializar_solicitud_io_stdin(t_buffer* buffer) {
 void serializar_io_stdin(t_buffer* buffer, t_io_stdin* io_stdin) {
     buffer_add_uint32(buffer, io_stdin->direccion_fisica);
     buffer_add_uint32(buffer, io_stdin->tamanio);
+    buffer_add_uint32(buffer, io_stdin->pid);
 }
 
 t_io_stdin* deserializar_io_stdin(t_buffer* buffer) {
     uint32_t direccion_fisica = buffer_read_uint32(buffer);
     uint32_t tamanio = buffer_read_uint32(buffer);
-    return crear_io_stdin(direccion_fisica, tamanio);
+    uint32_t pid = buffer_read_uint32(buffer);
+    return crear_io_stdin(direccion_fisica, tamanio, pid);
 }
 
 void serializar_solicitud_io_stdout(t_buffer* buffer, t_solicitud_io_stdout* solicitud) {
@@ -769,12 +774,14 @@ t_solicitud_io_stdout* deserializar_solicitud_io_stdout(t_buffer* buffer) {
 void serializar_io_stdout(t_buffer* buffer, t_io_stdout* io_stdout) {
     buffer_add_uint32(buffer, io_stdout->direccion_fisica);
     buffer_add_uint32(buffer, io_stdout->tamanio);
+    buffer_add_uint32(buffer, io_stdout->pid);
 }
 
 t_io_stdout* deserializar_io_stdout(t_buffer* buffer) {
     uint32_t direccion_fisica = buffer_read_uint32(buffer);
     uint32_t tamanio = buffer_read_uint32(buffer);
-    return crear_io_stdout(direccion_fisica, tamanio);
+    uint32_t pid = buffer_read_uint32(buffer);
+    return crear_io_stdout(direccion_fisica, tamanio, pid);
 }
 
 void serializar_IO_interface(t_buffer* buffer, t_IO_interface* interface)
