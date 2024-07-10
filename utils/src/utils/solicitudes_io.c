@@ -15,13 +15,14 @@ t_solicitud_io_generica* crear_solicitud_io_generica(t_PCB* pcb, char* nombre_in
     return solicitud;
 }
 
-t_io_generica* crear_io_generica(char* nombre_interfaz, uint32_t tiempo_sleep) {
+t_io_generica* crear_io_generica(char* nombre_interfaz, uint32_t tiempo_sleep, uint32_t pid) {
     t_io_generica* io_generica = malloc(sizeof(t_io_generica));
     
     if(io_generica == NULL) return NULL;
 
     io_generica->nombre_interfaz = strdup(nombre_interfaz);
     io_generica->tiempo_sleep = tiempo_sleep;
+    io_generica->pid = pid;
 
     return io_generica;
 }
@@ -38,13 +39,14 @@ t_solicitud_io_stdin* crear_solicitud_io_stdin(t_PCB* pcb, char* nombre_interfaz
     return solicitud;
 }
 
-t_io_stdin* crear_io_stdin(uint32_t direccion_fisica, uint32_t tamanio) {
+t_io_stdin* crear_io_stdin(uint32_t direccion_fisica, uint32_t tamanio, uint32_t pid) {
     t_io_stdin* io_stdin = malloc(sizeof(t_io_stdin));
 
     if(io_stdin == NULL) return NULL;
 
     io_stdin->direccion_fisica = direccion_fisica;
     io_stdin->tamanio = tamanio;
+    io_stdin->pid = pid;
 
     return io_stdin;
 }
@@ -61,13 +63,14 @@ t_solicitud_io_stdout* crear_solicitud_io_stdout(t_PCB* pcb, char* nombre_interf
     return solicitud;
 }
 
-t_io_stdout* crear_io_stdout(uint32_t direccion_fisica, uint32_t tamanio) {
+t_io_stdout* crear_io_stdout(uint32_t direccion_fisica, uint32_t tamanio, uint32_t pid) {
     t_io_stdout* io_stdout = malloc(sizeof(t_io_stdout));
 
     if(io_stdout == NULL) return NULL;
 
     io_stdout->direccion_fisica = direccion_fisica;
     io_stdout->tamanio = tamanio;
+    io_stdout->pid = pid;
 
     return io_stdout;
 }
@@ -82,6 +85,11 @@ char* obtener_nombre_interfaz_generica(t_io_generica* io_generica)
     return io_generica->nombre_interfaz;
 }
 
+uint32_t obtener_pid_generica(t_io_generica* io_generica)
+{
+    return io_generica->pid;
+}
+
 uint32_t obtener_tiempo_sleep(t_io_generica* io_generica)
 {
     return io_generica->tiempo_sleep;
@@ -89,7 +97,7 @@ uint32_t obtener_tiempo_sleep(t_io_generica* io_generica)
 
 uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica)
 {
-    return (sizeof(uint32_t) + strlen(io_generica->nombre_interfaz) + 1) + sizeof(io_generica->tiempo_sleep);
+    return (sizeof(uint32_t) + strlen(io_generica->nombre_interfaz) + 1) + sizeof(io_generica->tiempo_sleep) + sizeof(io_generica->pid);
 }
 
 /*********** Functiones 't_io_stdin' ***********/
@@ -103,9 +111,14 @@ uint32_t obtener_tamanio_stdin(t_io_stdin* io_stdin)
     return io_stdin->tamanio;
 }
 
+uint32_t obtener_pid_stdin(t_io_stdin* io_stdin)
+{
+    return io_stdin->pid;
+}
+
 uint32_t obtener_tamanio_io_stdin(t_io_stdin* io_stdin)
 {
-    return sizeof(io_stdin->direccion_fisica) + sizeof(io_stdin->tamanio);
+    return sizeof(io_stdin->direccion_fisica) + sizeof(io_stdin->tamanio) + sizeof(io_stdin->pid);
 }
 
 /*********** Functiones 't_io_stdout' ***********/
@@ -119,9 +132,14 @@ uint32_t obtener_tamanio_stdout(t_io_stdout* io_stdout)
     return io_stdout->tamanio;
 }
 
+uint32_t obtener_pid_stdout(t_io_stdout* io_stdout)
+{
+    return io_stdout->pid;
+}
+
 uint32_t obtener_tamanio_io_stdout(t_io_stdout* io_stdout)
 {
-    return sizeof(io_stdout->direccion_fisica) + sizeof(io_stdout->tamanio);
+    return sizeof(io_stdout->direccion_fisica) + sizeof(io_stdout->tamanio) + sizeof(io_stdout->pid);
 }
 
 /*********** Functiones 't_solicitud_io_generica' ***********/
