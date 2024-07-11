@@ -449,6 +449,99 @@ t_IO_interface* recv_IO_interface(int fd)
     return interface;
 }
 
+void send_io_generica(int fd, t_io_generica* io_generica)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_IO_GENERICA, obtener_tamanio_io_generica(io_generica));
+
+    // Serializo en el buffer el t_io_generica
+    serializar_io_generica(get_buffer(package), io_generica);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_io_generica
+    destruir_io_generica(io_generica);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+} 
+
+t_io_generica* recv_io_generica(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_io_generica* io_generica= deserializar_io_generica(buffer);
+
+    buffer_destroy(buffer);
+
+    return io_generica;
+}
+
+void send_io_stdin(int fd, t_io_stdin* io_stdin)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_IO_STDIN, obtener_tamanio_io_stdin(io_stdin));
+
+    // Serializo en el buffer el t_io_generica
+    serializar_io_stdin(get_buffer(package), io_stdin);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_io_stdin
+    destruir_io_stdin(io_stdin);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+} 
+
+t_io_stdin* recv_io_stdin(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_io_stdin* io_stdin= deserializar_io_stdin(buffer);
+
+    buffer_destroy(buffer);
+
+    return io_stdin;
+}
+
+void send_io_stdout(int fd, t_io_stdout* io_stdout)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_IO_STDOUT, obtener_tamanio_io_stdout(io_stdout));
+
+    // Serializo en el buffer el t_io_stdout
+    serializar_io_stdout(get_buffer(package), io_stdout);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_io_stdout
+    destruir_io_stdout(io_stdout);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+} 
+
+t_io_stdout* recv_io_stdout(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_io_stdout* io_stdout= deserializar_io_stdout(buffer);
+
+    buffer_destroy(buffer);
+
+    return io_stdout;
+}
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)

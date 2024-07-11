@@ -49,7 +49,7 @@ typedef enum
     // KERNEL <-> IO
     MSG_IO_KERNEL, // REVISAR
     MSG_KERNEL_IO, // REVISAR
-    MSG_IO_KERNEL_GEN_SLEEP,
+    MSG_IO_KERNEL_GEN_SLEEP, // TODO: ELIMINAR 
     MSG_KERNEL_IO_GENERICA, // KERNEL -> IO (Se solicita interactuar con una IO_GENERICA)
     MSG_KERNEL_IO_STDIN, // KERNEL -> IO (Se solicita interactuar con una IO_STDIN)
     MSG_KERNEL_IO_STDOUT, // KERNEL -> IO (Se solicita interactuar con una IO_STDOUT)
@@ -269,6 +269,42 @@ void send_IO_interface(int, char*, char*);
 //       La función retorna un puntero a la estructura t_IO_interface recibida.
 //       Si hay un error durante la recepción, se retorna NULL.
 t_IO_interface* recv_IO_interface(int);
+
+/*********** SEND AND RECIVE 'T_IO_GENERICA' ***********/
+// Recibe una estructura t_io_generica desde un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a una estructura t_io_generica.
+//       Si la recepción falla, retorna NULL.
+t_io_generica* recv_io_generica(int fd);
+
+// Envía una estructura t_io_generica a un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido y io_generica debe ser un puntero a una estructura t_io_generica válida.
+// Post: La estructura t_io_generica se envía al descriptor de archivo fd.
+void send_io_generica(int fd, t_io_generica* io_generica);
+
+/*********** SEND AND RECIVE 'T_IO_STDIN' ***********/
+// Envía una estructura t_io_stdin a un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido y io_stdin debe ser un puntero a una estructura t_io_stdin válida.
+// Post: La estructura t_io_stdin se envía al descriptor de archivo fd.
+void send_io_stdin(int fd, t_io_stdin* io_stdin);
+
+// Recibe una estructura t_io_stdin desde un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a una estructura t_io_stdin.
+//       Si la recepción falla, retorna NULL.
+t_io_stdin* recv_io_stdin(int fd);
+
+/*********** SEND AND RECIVE 'T_IO_STDOUT' ***********/
+// Envía una estructura t_io_stdout a un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido y io_stdout debe ser un puntero a una estructura t_io_stdout válida.
+// Post: La estructura t_io_stdout se envía al descriptor de archivo fd.
+void send_io_stdout(int fd, t_io_stdout* io_stdout);
+
+// Recibe una estructura t_io_stdout desde un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a una estructura t_io_stdout.
+//       Si la recepción falla, retorna NULL.
+t_io_stdout* recv_io_stdout(int fd);
 
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
