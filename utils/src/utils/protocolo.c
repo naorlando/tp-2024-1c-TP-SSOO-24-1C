@@ -542,6 +542,37 @@ t_io_stdout* recv_io_stdout(int fd)
     return io_stdout;
 }
 
+void send_response(int fd, t_response* response)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_IO_STDOUT, get_size_response(response));
+
+    // Serializo en el buffer el t_response
+    serializar_response(get_buffer(package), response);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_response
+    delete_response(response);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+} 
+
+t_response* recv_response(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_response* response= deserializar_response(buffer);
+
+    buffer_destroy(buffer);
+
+    return response;
+}
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)
@@ -894,4 +925,20 @@ t_IO_interface* deserializar_IO_interface(t_buffer* buffer)
     free(nombre_interfaz);
 
     return interfaz;
+}
+
+void serializar_response(t_buffer* buffer, t_response* response)
+{
+    buffer_add_uint32(buffer, get_pid_response(response));
+    //TODO: Agregar funcion para serializar un bool
+}
+
+t_response* deserializar_response(t_buffer* buffer)
+{
+    uint32_t pid_response = buffer_read_uint32(buffer);
+    bool process; //TODO: FUNCION PARA LEER UN BOOL
+
+    t_response* response = create_response(pid_response, process);
+
+    return response;
 }

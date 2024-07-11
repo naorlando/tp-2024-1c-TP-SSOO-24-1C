@@ -306,6 +306,19 @@ void send_io_stdout(int fd, t_io_stdout* io_stdout);
 //       Si la recepción falla, retorna NULL.
 t_io_stdout* recv_io_stdout(int fd);
 
+/*********** SEND AND RECIVE 'T_RESPONSE' ***********/
+// Envía una estructura t_response a través de un socket.
+// Pre: 'fd' debe ser un descriptor de archivo válido para un socket abierto.
+//      'response' debe ser un puntero válido a una estructura t_response.
+// Post: La estructura t_response se serializa y se envía a través del socket especificado por 'fd'.
+void send_response(int, t_response*);
+
+// Recibe una estructura t_response desde un socket.
+// Pre: 'fd' debe ser un descriptor de archivo válido para un socket abierto.
+// Post: Retorna un puntero a una estructura t_response deserializada recibida desde el socket especificado por 'fd'.
+//       Si no se puede recibir el buffer, retorna NULL.
+t_response* recv_response(int);
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
 void *serializar_paquete(t_package*, int);
@@ -465,5 +478,17 @@ void serializar_IO_interface(t_buffer*, t_IO_interface*);
 // Pre: El buffer debe ser válido y no NULL.
 // Post: Retorna un puntero a una estructura t_IO_interface deserializada.
 t_IO_interface* deserializar_IO_interface(t_buffer*);
+
+/*********** SERIALIZE AND DESERIALIZE 'T_RESPONSE' ***********/
+// Serializa una estructura t_response en un buffer.
+// Pre: 'buffer' debe ser un puntero válido a una estructura t_buffer.
+//      'response' debe ser un puntero válido a una estructura t_response.
+// Post: Los datos de la estructura t_response se añaden al buffer en formato serializado.
+void serializar_response(t_buffer*, t_response*);
+
+// Deserializa una estructura t_response desde un buffer.
+// Pre: 'buffer' debe ser un puntero válido a una estructura t_buffer que contiene datos serializados de t_response.
+// Post: Retorna un puntero a una estructura t_response con los datos deserializados desde el buffer.
+t_response* deserializar_response(t_buffer*);
 
 #endif
