@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <commons/collections/queue.h>
 #include <semaphore.h>
+#include <pthread.h>
 
 // Definición del enum tipo_interfaz_t
 typedef enum {
@@ -29,6 +30,7 @@ typedef struct {
     int file_descriptor;
     t_queue* cola_procesos_bloqueados;
     sem_t sem_cola_bloqueados;
+    pthread_mutex_t mutex_cola_bloqueados;
 } t_IO_connection;
 
 
@@ -108,5 +110,7 @@ int obtener_file_descriptor(t_IO_connection* conexion);
 t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion);
 
 sem_t* obtener_semaforo_cola_bloqueados(t_IO_connection* conexion);
+
+pthread_mutex_t* obtener_mutex_cola_bloqueados(t_IO_connection* conexion);
 
 #endif // IO_INTERFACE_H

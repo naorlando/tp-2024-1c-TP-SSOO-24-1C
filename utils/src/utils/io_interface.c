@@ -79,6 +79,8 @@ t_IO_connection* crear_IO_connection(const char* nombre, tipo_interfaz_t tipo, i
     nueva_conexion->file_descriptor = fd;
     nueva_conexion->cola_procesos_bloqueados = queue_create();
     sem_init(&(nueva_conexion->sem_cola_bloqueados), 0, 0);
+    pthread_mutex_init(&(nueva_conexion->mutex_cola_bloqueados), NULL);
+
     return nueva_conexion;
 }
 
@@ -121,6 +123,13 @@ t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion) {
 sem_t* obtener_semaforo_cola_bloqueados(t_IO_connection* conexion) {
     if (conexion) {
         return &(conexion->sem_cola_bloqueados);
+    }
+    return NULL;
+}
+
+pthread_mutex_t* obtener_mutex_cola_bloqueados(t_IO_connection* conexion) {
+    if (conexion) {
+        return &(conexion->mutex_cola_bloqueados);
     }
     return NULL;
 }
