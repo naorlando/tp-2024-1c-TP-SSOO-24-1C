@@ -35,27 +35,6 @@ t_PCB* recv_pcb_kernel()
     return pcb;
 }
 
-// void atender_instruccion_memoria()
-// {
-//     //DECODE:
-
-//     t_buffer *new_buffer = recive_full_buffer(fd_memoria);
-//     t_instruction *instruccion = deserialize_instruction(new_buffer); //TODO
-//     log_info(logger_cpu, "INSTRUCCION => %d", instruccion->name);
-//     //TODO corregir para recorrer la lista y loggear los parametros
-//     // log_info(logger_cpu, "PARAMETROS => %s", instruccion->params);
-
-//     // EXECUTE:
-//     //TODO crear variable global de los registros de la cpu 
-//     t_cpu_registers* registros = NULL;
-//     ejecutar_instruccion(instruccion,registros);//TODO: antes implementar la logica de registros globales
-
-
-//     buffer_destroy(new_buffer);
-//     instruccion_destroy(instruccion); //TODO
-    
-// }
-
 t_instruction* recv_instruction_memoria()
 {
     t_instruction* instruction = recv_instruction(fd_memoria);
