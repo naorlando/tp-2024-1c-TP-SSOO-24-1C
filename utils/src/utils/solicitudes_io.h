@@ -43,6 +43,12 @@ typedef struct {
     t_io_stdout* io_stdout;
 } t_solicitud_io_stdout;
 
+// RESPONSE
+typedef struct {
+    bool process;
+    uint32_t pid;
+} t_response;
+
 //===============================================
 // FUNCIONES DE CREACIÓN Y DESTRUCCIÓN
 //===============================================
@@ -106,6 +112,10 @@ void destruir_solicitud_io_stdout(t_solicitud_io_stdout* solicitud);
 // Pre: La E/S STDOUT debe ser válida y no NULL.
 // Post: La memoria asociada a la E/S STDOUT se libera.
 void destruir_io_stdout(t_io_stdout* io_stdout);
+
+t_response* create_response(bool, uint32_t);
+
+void delete_response(t_response*);
 
 //===============================================
 // FUNCIONES DE ACCESO A CAMPOS
@@ -231,4 +241,9 @@ uint32_t obtener_tamanio_io_stdin(t_io_stdin* io_stdin);
 // Post: Retorna el tamaño de la interfaz de I/O genérica como un valor uint32_t.
 uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica);
 
+bool get_process(t_response*);
+
+uint32_t get_pid(t_response*);
+
+uint32_t obtener_tamanio_response(t_response*);
 #endif

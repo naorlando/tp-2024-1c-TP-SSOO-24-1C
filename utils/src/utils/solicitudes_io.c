@@ -75,6 +75,16 @@ t_io_stdout* crear_io_stdout(uint32_t direccion_fisica, uint32_t tamanio, uint32
     return io_stdout;
 }
 
+t_response* create_response(bool process, uint32_t pid) {
+    t_response* new_response = (t_response*)malloc(sizeof(t_response));
+    if (new_response == NULL) {
+        return NULL;
+    }
+    new_response->process = process;
+    new_response->pid = pid;
+    return new_response;
+}
+
 //===============================================
 // FUNCIONES DE ACCESO A CAMPOS
 //===============================================
@@ -217,6 +227,22 @@ uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud)
     return size_serialize_pcb + size_serialize_name_io + size_serialize_io_stdout;
 }
 
+/*********** Functiones 't_response' ***********/
+bool get_process(t_response* response) 
+{
+    return response->process;
+}
+
+uint32_t get_pid(t_response* response) 
+{
+    return response->pid;
+}
+
+uint32_t obtener_tamanio_response(t_response* response) 
+{
+    return sizeof(get_process(response)) + sizeof(get_pid(response));
+}
+
 //===============================================
 // FUNCIONES DE DESTRUCCIÓN
 //===============================================
@@ -249,4 +275,9 @@ void destruir_solicitud_io_stdout(t_solicitud_io_stdout* solicitud) {
 
 void destruir_io_stdout(t_io_stdout* io_stdout) {
     free(io_stdout);
+}
+
+void delete_response(t_response* response) 
+{
+    free(response);
 }
