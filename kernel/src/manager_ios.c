@@ -69,22 +69,25 @@ void procesar_solicitud_IO(t_IO_connection* cliente_io, procesar_solicitud_func 
 void procesar_solicitud_generica(int fd, t_solicitud_io_generica* solicitud_io_gen) 
 {
     t_io_generica* io_gen = obtener_io_solicitud_generica(solicitud_io_gen);
+    char* nombre_interfaz = obtener_nombre_solicitud_generica(solicitud_io_gen);
 
-    send_kernel_io_gen_sleep(fd, obtener_nombre_solicitud_generica(solicitud_io_gen), obtener_io_solicitud_generica(solicitud_io_gen));
+    send_kernel_io_gen_sleep(fd, nombre_interfaz, io_gen);
 }
 
 void procesar_solicitud_stdin(int fd, t_solicitud_io_stdin* solicitud_io_stdin) 
 {
     t_io_stdin* io_stdin = obtener_io_solicitud_stdin(solicitud_io_stdin);
-    
-    send_kernel_io_stdin(fd, obtener_nombre_solicitud_stdin(solicitud_io_stdin), obtener_io_solicitud_stdin(solicitud_io_stdin));
+    char* nombre_interfaz = obtener_nombre_solicitud_stdin(solicitud_io_stdin);
+
+    send_kernel_io_stdin(fd, nombre_interfaz, io_stdin);
 }
 
 void procesar_solicitud_stdout(int fd, t_solicitud_io_stdout* solicitud_io_stdout) 
 {
     t_io_stdout* io_stdout = obtener_io_solicitud_stdout(solicitud_io_stdout);
-    
-    send_kernel_io_stdout(fd, obtener_nombre_solicitud_stdout(solicitud_io_stdout), obtener_io_solicitud_stdout(solicitud_io_stdout));
+    char* nombre_interfaz = obtener_nombre_solicitud_stdout(solicitud_io_stdout);
+
+    send_kernel_io_stdout(fd, nombre_interfaz, io_stdout);
 }
 
 // TODO: Terminar de implementar

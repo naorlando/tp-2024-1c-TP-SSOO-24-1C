@@ -77,7 +77,7 @@ int send_kernel_io_stdin(int fd, char* nombre_interfaz, t_io_stdin* io_stdin) {
     //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
     send_io_stdin(fd, io_stdin);
     
-    log_info(logger_kernel, "Solicitud enviada a la IO STDIN %s con pid %d", nombre_interfaz, obtener_pid_stdout(io_stdin));
+    log_info(logger_kernel, "Solicitud enviada a la IO STDIN %s con pid %d", nombre_interfaz, obtener_pid_stdin(io_stdin));
     
     return 0;
 }

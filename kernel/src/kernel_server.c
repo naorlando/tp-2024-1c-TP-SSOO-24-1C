@@ -48,12 +48,8 @@ void atender_kernel_IO(void* io_connection)
         {
             case EXAMPLE:
                 // Se procesa el request
-                recv_example_msg_entradasalida(cliente_io);
+                recv_example_msg_entradasalida(obtener_file_descriptor(cliente_io));
                 control_key = false; // Cortamos la espera de solicitudes
-                break;
-            case MSG_IO_KERNEL:
-
-                log_info(logger_kernel, "Se recibio un mje de IO");
                 break;
             case MSG_IO_KERNEL:
 
@@ -235,7 +231,6 @@ void inicializar_sockets()
 void crear_hilos_conexiones() 
 {
     pthread_t hilo_cpu_dispatch;
-    pthread_t hilo_cpu_interrupt;
     pthread_t hilo_memoria;
     pthread_t hilo_aceptar_io;
 
@@ -243,13 +238,6 @@ void crear_hilos_conexiones()
     if (pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_cpu_dispatch, NULL) != 0)
     {
         log_error(logger_kernel, "Error al crear el hilo para atender la CPU dispatch. ABORTANDO");
-        exit(EXIT_FAILURE);
-    }
-
-    // Hilo para manejar mensajes de CPU Interrupt
-    if (pthread_create(&hilo_cpu_interrupt, NULL, (void *)atender_kernel_cpu_interrupt, NULL) != 0)
-    {
-        log_error(logger_kernel, "Error al crear el hilo para atender la CPU interrupt. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 
@@ -267,7 +255,6 @@ void crear_hilos_conexiones()
     }
 
     pthread_detach(hilo_cpu_dispatch);
-    pthread_detach(hilo_cpu_interrupt);
     pthread_detach(hilo_memoria);
     pthread_detach(hilo_aceptar_io);
 }
