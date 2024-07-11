@@ -228,19 +228,19 @@ uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud)
 }
 
 /*********** Functiones 't_response' ***********/
-bool get_process(t_response* response) 
+bool get_process_response(t_response* response) 
 {
     return response->process;
 }
 
-uint32_t get_pid(t_response* response) 
+uint32_t get_pid_response(t_response* response) 
 {
     return response->pid;
 }
 
-uint32_t obtener_tamanio_response(t_response* response) 
+uint32_t get_size_response(t_response* response) 
 {
-    return sizeof(get_process(response)) + sizeof(get_pid(response));
+    return sizeof(get_process_response(response)) + sizeof(get_pid_response(response));
 }
 
 //===============================================

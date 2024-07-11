@@ -113,8 +113,15 @@ void destruir_solicitud_io_stdout(t_solicitud_io_stdout* solicitud);
 // Post: La memoria asociada a la E/S STDOUT se libera.
 void destruir_io_stdout(t_io_stdout* io_stdout);
 
+// Crea una nueva estructura t_response con los valores especificados.
+// Pre: Ninguna.
+// Post: Retorna un puntero a una estructura t_response inicializada con los valores de 'process' y 'pid'.
+//       Si no se puede asignar memoria, retorna NULL.
 t_response* create_response(bool, uint32_t);
 
+// Libera la memoria asignada para una estructura t_response.
+// Pre: 'response' debe ser un puntero válido a una estructura t_response.
+// Post: La memoria asignada para 'response' se libera.
 void delete_response(t_response*);
 
 //===============================================
@@ -241,9 +248,19 @@ uint32_t obtener_tamanio_io_stdin(t_io_stdin* io_stdin);
 // Post: Retorna el tamaño de la interfaz de I/O genérica como un valor uint32_t.
 uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica);
 
-bool get_process(t_response*);
+// Obtiene el valor del campo 'process' de una estructura t_response.
+// Pre: 'response' debe ser un puntero válido a una estructura t_response.
+// Post: Retorna el valor booleano del campo 'process' de la estructura t_response.
+bool get_process_response(t_response*);
 
-uint32_t get_pid(t_response*);
+// Obtiene el valor del campo 'pid' de una estructura t_response.
+// Pre: 'response' debe ser un puntero válido a una estructura t_response.
+// Post: Retorna el valor del campo 'pid' de la estructura t_response.
+uint32_t get_pid_response(t_response*);
 
-uint32_t obtener_tamanio_response(t_response*);
+// Calcula el tamaño en bytes de una estructura t_response.
+// Pre: 'response' debe ser un puntero válido a una estructura t_response.
+// Post: Retorna el tamaño en bytes de la estructura t_response.
+uint32_t get_size_response(t_response*);
+
 #endif
