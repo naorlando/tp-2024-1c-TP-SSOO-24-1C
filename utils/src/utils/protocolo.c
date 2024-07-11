@@ -542,10 +542,10 @@ t_io_stdout* recv_io_stdout(int fd)
     return io_stdout;
 }
 
-void send_response(int fd, t_response* response)
+void send_response(int fd, t_msg_header header, t_response* response)
 {
     // Creo el paquete que se va a enviar
-    t_package* package = package_create(MSG_KERNEL_IO_STDOUT, get_size_response(response));
+    t_package* package = package_create(header, get_size_response(response));
 
     // Serializo en el buffer el t_response
     serializar_response(get_buffer(package), response);

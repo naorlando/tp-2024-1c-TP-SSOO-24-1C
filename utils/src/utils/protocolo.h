@@ -309,9 +309,10 @@ t_io_stdout* recv_io_stdout(int fd);
 /*********** SEND AND RECIVE 'T_RESPONSE' ***********/
 // Envía una estructura t_response a través de un socket.
 // Pre: 'fd' debe ser un descriptor de archivo válido para un socket abierto.
+//      'header' debe ser un t_msg_header valido.
 //      'response' debe ser un puntero válido a una estructura t_response.
 // Post: La estructura t_response se serializa y se envía a través del socket especificado por 'fd'.
-void send_response(int, t_response*);
+void send_response(int, t_msg_header, t_response*);
 
 // Recibe una estructura t_response desde un socket.
 // Pre: 'fd' debe ser un descriptor de archivo válido para un socket abierto.
