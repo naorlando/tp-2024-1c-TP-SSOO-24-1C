@@ -61,55 +61,34 @@ void send_interruption_cpu(t_interruption* interrupcion)
 }
 
 // Agrego la función que envía la instrucción IO_GEN_SLEEP al módulo de E/S
-int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
-    t_package *paquete = package_create(MSG_IO_KERNEL_GEN_SLEEP, sizeof(t_buffer));
+int send_kernel_io_gen_sleep(int fd, char* nombre_interfaz, t_io_generica* io_generica) {
     
-    // Crear la instrucción
-    t_instruction *instruccion = malloc(sizeof(t_instruction));
-    instruccion->name = IO_GEN_SLEEP;
-    instruccion->params = list_create();
+    //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
+    send_io_generica(fd, io_generica);
+    
+    log_info(logger_kernel, "Solicitud enviada a la IO GENERICA %s con pid %d", nombre_interfaz, obtener_pid_generica(io_generica));
+    
+    return 0;
+}
 
-    // Agregar los parámetros a la lista
-    int *param_pid = malloc(sizeof(int));
-    *param_pid = pid;
-    list_add(instruccion->params, param_pid);
+// Agrego la función que envía la instrucción IO_STDIN al módulo de E/S
+int send_kernel_io_stdin(int fd, char* nombre_interfaz, t_io_stdin* io_stdin) {
     
-    int *param_unidades_trabajo = malloc(sizeof(int));
-    *param_unidades_trabajo = unidades_trabajo;
-    list_add(instruccion->params, param_unidades_trabajo);
+    //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
+    send_io_stdin(fd, io_stdin);
     
-    // Serializar la instrucción
-    t_buffer *buffer = paquete->buffer;
-    buffer->size = sizeof(t_name_instruction) + sizeof(uint32_t) * 2 + sizeof(int) * 2;
-    buffer->stream = malloc(buffer->size);
-    void *stream = buffer->stream;
+    log_info(logger_kernel, "Solicitud enviada a la IO STDIN %s con pid %d", nombre_interfaz, obtener_pid_stdout(io_stdin));
     
-    memcpy(stream, &(instruccion->name), sizeof(t_name_instruction));
-    stream += sizeof(t_name_instruction);
+    return 0;
+}
+
+// Agrego la función que envía la instrucción IO_STDOUT al módulo de E/S
+int send_kernel_io_stdout(int fd, char* nombre_interfaz, t_io_stdout* io_stdout) {
     
-    uint32_t cant_params = list_size(instruccion->params);
-    memcpy(stream, &cant_params, sizeof(uint32_t));
-    stream += sizeof(uint32_t);
+    //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
+    send_io_stdout(fd, io_stdout);
     
-    for (int i = 0; i < cant_params; i++) {
-        int *param = list_get(instruccion->params, i);
-        memcpy(stream, param, sizeof(int));
-        stream += sizeof(int);
-    }
-    
-    if (package_send(paquete, fd) != EXIT_SUCCESS) {
-        log_error(logger_kernel, "Error al enviar la instrucción IO_GEN_SLEEP");
-        list_destroy_and_destroy_elements(instruccion->params, free);
-        free(instruccion);
-        package_destroy(paquete);
-        return -1;
-    }
-    
-    log_info(logger_kernel, "Instrucción IO_GEN_SLEEP enviada con pid %d y %d unidades de trabajo", pid, unidades_trabajo);
-    
-    list_destroy_and_destroy_elements(instruccion->params, free);
-    free(instruccion);
-    package_destroy(paquete);
+    log_info(logger_kernel, "Solicitud enviada a la IO STDOUT %s con pid %d", nombre_interfaz, obtener_pid_stdout(io_stdout));
     
     return 0;
 }
