@@ -139,13 +139,13 @@ void atender_solicitudes_io_kernel() {
         int cod_operacion = recibir_operacion(fd_kernel);
         switch (cod_operacion) {
             case MSG_KERNEL_IO_GENERICA:
-                atender_instruccion_generica(fd_kernel);
+                atender_solicitud_generica(fd_kernel);
                 break;
             case MSG_KERNEL_IO_STDIN:
-                atender_instruccion_stdin(fd_kernel);
+                atender_solicitud_stdin(fd_kernel);
                 break;
             case MSG_KERNEL_IO_STDOUT:
-                atender_instruccion_stdout(fd_kernel);
+                atender_solicitud_stdout(fd_kernel);
                 break;
             case MSG_KERNEL_IO_DIALFS:
                 

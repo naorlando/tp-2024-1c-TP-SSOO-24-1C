@@ -4,15 +4,16 @@
 #include "utils/protocolo.h"
 #include "variables_globales.h"
 #include "utils/estructuras.h"
+#include "comportamientos_ios.h"
 
-void atender_solicitud_generica(int fd);
-void atender_solicitud_stdin(int fd);
-void atender_solicitud_stdout(int fd);
+void atender_solicitud_generica(int);
+void atender_solicitud_stdin(int);
+void atender_solicitud_stdout(int);
 
-void escribir_memoria(uint32_t direccion_fisica, char* valor, uint32_t tamanio);
-char* leer_memoria(uint32_t direccion_fisica, uint32_t tamanio);
+void escribir_memoria(uint32_t, char*, uint32_t);
+char* leer_memoria(uint32_t, uint32_t);
 
-void enviar_confirmacion_io(int fd);
+void send_confirmacion_io(int, t_msg_header, t_response*);
 
 void send_IO_interface_kernel();
 
