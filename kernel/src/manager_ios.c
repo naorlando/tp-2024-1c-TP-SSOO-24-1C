@@ -61,8 +61,11 @@ procesar_solicitud_func obtener_procesador_solicitud(int tipo_conexion)
 
 void procesar_solicitud_IO(t_IO_connection* cliente_io, procesar_solicitud_func procesar_func) 
 {
+    pthread_mutex_lock(obtener_mutex_cola_bloqueados(cliente_io));
     t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
     void* solicitud = queue_pop(cola_bloqueados_io);
+    pthread_mutex_unlock(obtener_mutex_cola_bloqueados(cliente_io));
+
     procesar_func(obtener_file_descriptor(cliente_io), solicitud);
 }
 
