@@ -6,9 +6,9 @@
 //        FUNCIONES DE ENTRADA/SALIDA GENERICA
 //======================================================
 
-// Función que atiende una instrucción genérica de entrada/salida, 
+// Función que atiende una solicitud genérica de entrada/salida, 
 // la cual consiste en esperar un tiempo determinado
-void atender_instruccion_generica(int fd) {
+void atender_solicitud_generica(int fd) {
     t_io_generica *io_generica = deserializar_io_generica(recibir_buffer(&fd, sizeof(int)));
     if (io_generica != NULL) {
         int tiempo_espera = io_generica->tiempo_sleep * obtener_tiempo_unidad_trabajo(entradasalida_config);
@@ -26,9 +26,9 @@ void atender_instruccion_generica(int fd) {
 //          FUNCIONES DE ENTRADA/SALIDA STDIN
 //======================================================
 
-// Función que atiende una instrucción de entrada/salida STDIN,
+// Función que atiende una solicitud de entrada/salida STDIN,
 // la cual consiste en leer un texto desde la consola y guardarlo en memoria
-void atender_instruccion_stdin(int fd) {
+void atender_solicitud_stdin(int fd) {
     t_io_stdin *io_stdin = deserializar_io_stdin(recibir_buffer(&fd, sizeof(int)));
     if (io_stdin != NULL) {
         char *input = readline("Ingrese un texto: ");
@@ -56,9 +56,9 @@ void escribir_memoria(uint32_t direccion_fisica, char *valor, uint32_t tamanio) 
 //          FUNCIONES DE ENTRADA/SALIDA STDOUT
 //======================================================
 
-// Función que atiende una instrucción de entrada/salida STDOUT,
+// Función que atiende una solicitud de entrada/salida STDOUT,
 // la cual consiste en leer un texto desde memoria y mostrarlo por consola
-void atender_instruccion_stdout(int fd) {
+void atender_solicitud_stdout(int fd) {
     t_io_stdout *io_stdout = deserializar_io_stdout(recibir_buffer(&fd, sizeof(int)));
     if (io_stdout != NULL) {
         char *valor = leer_memoria(io_stdout->direccion_fisica, io_stdout->tamanio);
