@@ -930,13 +930,13 @@ t_IO_interface* deserializar_IO_interface(t_buffer* buffer)
 void serializar_response(t_buffer* buffer, t_response* response)
 {
     buffer_add_uint32(buffer, get_pid_response(response));
-    //TODO: Agregar funcion para serializar un bool
+    buffer_add_bool(buffer, get_process_response(response));
 }
 
 t_response* deserializar_response(t_buffer* buffer)
 {
     uint32_t pid_response = buffer_read_uint32(buffer);
-    bool process; //TODO: FUNCION PARA LEER UN BOOL
+    bool process = buffer_read_bool(buffer);
 
     t_response* response = create_response(pid_response, process);
 
