@@ -55,6 +55,22 @@ void atender_kernel_IO(void* io_connection)
 
                 log_info(logger_kernel, "Se recibio un mje de IO");
                 break;
+            case MSG_IO_KERNEL_GENERICA:
+
+                log_info(logger_kernel, "Se recibio un mensaje de IO GENERICA");
+                break;
+            case MSG_IO_KERNEL_STDIN:
+                
+                log_info(logger_kernel, "Se recibio un mensaje de IO STDIN");
+                break;
+            case MSG_IO_KERNEL_STDOUT:
+                
+                log_info(logger_kernel, "Se recibio un mensaje de IO STDOUT");
+                break;
+            case MSG_IO_KERNEL_DIALFS: 
+
+                log_info(logger_kernel, "Se recibio un mensaje de IO DIALFS");
+                break;
             case -1:
                 log_error(logger_kernel, "la IO se desconecto. Terminando servidor");
                 control_key = 0;
