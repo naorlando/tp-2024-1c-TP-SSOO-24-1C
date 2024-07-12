@@ -330,15 +330,48 @@ void* esperar_conexiones_IO(void* arg)
     return NULL;
 }
 
-char* recibir_io_connection(int cliente_io) 
+// Función para recibir un cliente IO y devolver la conexión
+t_IO_connection* recibir_io_connection(int cliente_io) 
 {
     int cod_op = recibir_operacion(cliente_io);
 
-    if(cod_op == MSG_IO_KERNEL) {
-        return nuevo_IO_cliente_conectado(cliente_io);
+    // Verificamos si el código de operación corresponde a alguno de nuestros nuevos headers de IO
+    if(cod_op == MSG_IO_GENERICA_KERNEL || 
+       cod_op == MSG_IO_STDIN_KERNEL || 
+       cod_op == MSG_IO_STDOUT_KERNEL || 
+       cod_op == MSG_IO_DIALFS_KERNEL) {
+        
+        t_IO_interface* io_interface = recv_IO_interface(cliente_io);
+        
+        if (io_interface == NULL) {
+            log_error(logger_kernel, "Error al recibir la interfaz de E/S del cliente.");
+            liberar_conexion(cliente_io);
+            return NULL;
+        }
+
+        t_IO_connection* io_connection = crear_IO_connection(
+            obtener_nombre_IO_interface(io_interface),
+            obtener_tipo_IO_interface(io_interface),
+            cliente_io
+        );
+
+        if (io_connection == NULL) {
+            log_error(logger_kernel, "Error al crear la conexión de E/S.");
+            liberar_IO_interface(io_interface);
+            liberar_conexion(cliente_io);
+            return NULL;
+        }
+
+        log_info(logger_kernel, "Nueva conexión de I/O establecida: %s de tipo %s", 
+                 obtener_nombre_conexion(io_connection),
+                 obtener_tipo_conexion(io_connection));
+
+        liberar_IO_interface(io_interface);
+        return io_connection;
     } else {
-        log_info(logger_kernel, "Error al recibir un cliente IO. ABORTANDO");
-        exit(EXIT_FAILURE);
+        log_error(logger_kernel, "Error al recibir un cliente IO. Operación incorrecta: %d", cod_op);
+        liberar_conexion(cliente_io);
+        return NULL;
     }
 }
 
