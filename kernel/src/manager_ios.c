@@ -59,14 +59,21 @@ procesar_solicitud_func obtener_procesador_solicitud(int tipo_conexion)
     }
 }
 
-void procesar_solicitud_IO(t_IO_connection* cliente_io, procesar_solicitud_func procesar_func) 
+void* obtener_siguiente_proceso(t_IO_connection* cliente_io)
 {
-    pthread_mutex_lock(obtener_mutex_cola_bloqueados(cliente_io));
+    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(cliente_io);
+
+    pthread_mutex_lock(mutex_blocked);
     t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
     void* solicitud = queue_pop(cola_bloqueados_io);
-    pthread_mutex_unlock(obtener_mutex_cola_bloqueados(cliente_io));
+    pthread_mutex_unlock(mutex_blocked);
 
-    procesar_func(obtener_file_descriptor(cliente_io), solicitud);
+    return solicitud;
+}
+
+void procesar_solicitud_IO(int fd, void* solicitud, procesar_solicitud_func procesar_func) 
+{
+    procesar_func(fd, solicitud);
 }
 
 void procesar_solicitud_generica(int fd, t_solicitud_io_generica* solicitud_io_gen) 
