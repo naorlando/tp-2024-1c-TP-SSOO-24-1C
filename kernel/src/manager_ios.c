@@ -98,3 +98,15 @@ void procesar_solicitud_dialfs()
 {
 
 }
+
+void procesar_respuesta_io(int fd, char* nombre_interfaz)
+{
+    t_response* response = recv_response(fd);
+
+    if (response == NULL) {
+        log_error(logger_kernel, "Error al recibir el response de la E/S %s", nombre_interfaz);
+    }else {
+        char* resultado_str = get_process_response(response) ? "true" : "false";
+        log_info(logger_kernel, "Procesamiento de la interfaz '%s': %s para el PID <%d>", nombre_interfaz, resultado_str, get_pid_response(response));
+    }
+}

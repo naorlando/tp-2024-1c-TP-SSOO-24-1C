@@ -15,6 +15,7 @@ void procesar_solicitud_generica(int, t_solicitud_io_generica*);
 void procesar_solicitud_stdin(int, t_solicitud_io_stdin*);
 void procesar_solicitud_stdout(int, t_solicitud_io_stdout*);
 void procesar_solicitud_dialfs();
+void procesar_respuesta_io(int, char*);
 
 t_IO_connection* get_IO_connection(char*);
 void agregar_IO_connection(t_IO_connection*);
