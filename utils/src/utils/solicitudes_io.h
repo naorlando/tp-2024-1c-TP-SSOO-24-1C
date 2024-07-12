@@ -263,4 +263,15 @@ uint32_t get_pid_response(t_response*);
 // Post: Retorna el tamaño en bytes de la estructura t_response.
 uint32_t get_size_response(t_response*);
 
+//===============================================
+// FUNCIONES AUXILIARES
+//===============================================
+
+// Obtiene el PCB de una solicitud específica basada en el tipo de interfaz.
+// Pre: El puntero solicitud debe apuntar a una solicitud válida y no debe ser NULL.
+//      El puntero tipo_interfaz debe apuntar a una cadena de caracteres válida que representa el tipo de interfaz y no debe ser NULL.
+// Post: Retorna un puntero a un t_PCB si se encuentra uno correspondiente al tipo de interfaz especificado.
+//       Si el tipo de interfaz no es reconocido, retorna NULL.
+t_PCB* obtener_pcb_de_solicitud(void*, char*);
+
 #endif

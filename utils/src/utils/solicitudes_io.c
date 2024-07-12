@@ -281,3 +281,21 @@ void delete_response(t_response* response)
 {
     free(response);
 }
+
+//===============================================
+// FUNCIONES AUXILIARES
+//===============================================
+
+t_PCB* obtener_pcb_de_solicitud(void* solicitud, char* tipo_interfaz) {    
+    if(strcmp(tipo_interfaz, "GENERICA") == 0) {
+        return obtener_pcb_solicitud_generica(solicitud);
+    }else if(strcmp(tipo_interfaz, "STDIN") == 0) {
+        return obtener_pcb_solicitud_stdin(solicitud);
+    }else if(strcmp(tipo_interfaz, "STDOUT") == 0) {
+        return obtener_pcb_solicitud_stdout(solicitud);
+    }/*else if(strcmp(tipo_interfaz, "DIALFS") == 0) {
+        return obtener_pcb_solicitud_generica(solicitud);
+    }*/
+
+    return NULL;
+}
