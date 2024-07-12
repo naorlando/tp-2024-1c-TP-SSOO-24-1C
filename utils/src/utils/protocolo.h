@@ -49,7 +49,6 @@ typedef enum
     // KERNEL <-> IO
     MSG_IO_KERNEL, // REVISAR
     MSG_KERNEL_IO, // REVISAR
-    MSG_IO_KERNEL_GEN_SLEEP, // TODO: ELIMINAR 
     MSG_KERNEL_IO_GENERICA, // KERNEL -> IO (Se solicita interactuar con una IO_GENERICA)
     MSG_KERNEL_IO_STDIN, // KERNEL -> IO (Se solicita interactuar con una IO_STDIN)
     MSG_KERNEL_IO_STDOUT, // KERNEL -> IO (Se solicita interactuar con una IO_STDOUT)
