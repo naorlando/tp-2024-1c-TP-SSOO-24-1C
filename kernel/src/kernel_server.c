@@ -53,7 +53,7 @@ void atender_kernel_IO(void* io_connection)
             case MSG_IO_KERNEL_GENERICA:
             case MSG_IO_KERNEL_STDIN:
             case MSG_IO_KERNEL_STDOUT:
-                log_info(logger_kernel, "Se recibio un mensaje de IO %s");
+                log_info(logger_kernel, "Se recibio un mensaje de IO %s", tipo_interfaz_to_string(obtener_tipo_conexion(cliente_io)));
                 procesar_respuesta_io(obtener_file_descriptor(cliente_io), obtener_nombre_conexion(cliente_io));
                 break;
             case MSG_IO_KERNEL_DIALFS: 
