@@ -288,14 +288,26 @@ void delete_response(t_response* response)
 
 t_PCB* obtener_pcb_de_solicitud(void* solicitud, char* tipo_interfaz) {    
     if(strcmp(tipo_interfaz, "GENERICA") == 0) {
-        return obtener_pcb_solicitud_generica(solicitud);
+        return obtener_pcb_solicitud_generica((t_solicitud_io_generica*)solicitud);
     }else if(strcmp(tipo_interfaz, "STDIN") == 0) {
-        return obtener_pcb_solicitud_stdin(solicitud);
+        return obtener_pcb_solicitud_stdin((t_solicitud_io_stdin*)solicitud);
     }else if(strcmp(tipo_interfaz, "STDOUT") == 0) {
-        return obtener_pcb_solicitud_stdout(solicitud);
+        return obtener_pcb_solicitud_stdout((t_solicitud_io_stdout*)solicitud);
     }/*else if(strcmp(tipo_interfaz, "DIALFS") == 0) {
-        return obtener_pcb_solicitud_generica(solicitud);
+        return obtener_pcb_solicitud_dialfs(solicitud);
     }*/
 
     return NULL;
+}
+
+void destruir_solicitud_io(void* solicitud, char* tipo_interfaz) {
+    if (strcmp(tipo_interfaz, "GENERICA") == 0) {
+        destruir_solicitud_io_generica((t_solicitud_io_generica*)solicitud);
+    } else if (strcmp(tipo_interfaz, "STDIN") == 0) {
+        destruir_solicitud_io_stdin((t_solicitud_io_stdin*)solicitud);
+    } else if (strcmp(tipo_interfaz, "STDOUT") == 0) {
+        destruir_solicitud_io_stdout((t_solicitud_io_stdout*)solicitud);
+    }/*else if(strcmp(tipo_interfaz, "DIALFS") == 0) {
+        destruir_solicitud_io_dialfs((t_solicitud_io_dialfs*)solicitud)
+    }*/
 }

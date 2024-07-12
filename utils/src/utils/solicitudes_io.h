@@ -274,4 +274,10 @@ uint32_t get_size_response(t_response*);
 //       Si el tipo de interfaz no es reconocido, retorna NULL.
 t_PCB* obtener_pcb_de_solicitud(void*, char*);
 
+
+// Destruye una estructura de solicitud IO basada en su tipo.
+// Pre: El puntero solicitud debe apuntar a una estructura de solicitud IO válida y no debe ser NULL.
+//      El puntero tipo_interfaz debe apuntar a una cadena de caracteres válida que representa el tipo de interfaz y no debe ser NULL.
+// Post: La estructura de solicitud IO se destruye utilizando la función de destrucción correspondiente.
+void destruir_solicitud_io(void*, char*);
 #endif
