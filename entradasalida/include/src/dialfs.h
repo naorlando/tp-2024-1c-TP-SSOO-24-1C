@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <commons/bitarray.h>
 
 typedef struct {
     char* nombre;
@@ -15,8 +16,10 @@ typedef struct {
     uint32_t block_size;
     uint32_t block_count;
     uint32_t retraso_compactacion;
-    // Añade más campos según sea necesario
+    t_bitarray* bitmap;
+    t_list* archivos;
 } t_dialfs;
+
 
 t_dialfs* inicializar_dialfs(char* path_base, uint32_t block_size, uint32_t block_count, uint32_t retraso_compactacion);
 void destruir_dialfs(t_dialfs* fs);
