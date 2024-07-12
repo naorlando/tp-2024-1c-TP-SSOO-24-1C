@@ -49,23 +49,12 @@ void atender_kernel_IO(void* io_connection)
             case EXAMPLE:
                 // Se procesa el request
                 recv_example_msg_entradasalida(obtener_file_descriptor(cliente_io));
-                control_key = false; // Cortamos la espera de solicitudes
-                break;
-            case MSG_IO_KERNEL:
-
-                log_info(logger_kernel, "Se recibio un mje de IO");
                 break;
             case MSG_IO_KERNEL_GENERICA:
-
-                log_info(logger_kernel, "Se recibio un mensaje de IO GENERICA");
-                break;
             case MSG_IO_KERNEL_STDIN:
-                
-                log_info(logger_kernel, "Se recibio un mensaje de IO STDIN");
-                break;
             case MSG_IO_KERNEL_STDOUT:
-                
-                log_info(logger_kernel, "Se recibio un mensaje de IO STDOUT");
+                log_info(logger_kernel, "Se recibio un mensaje de IO %s");
+                procesar_respuesta_io(obtener_file_descriptor(cliente_io), obtener_nombre_conexion(cliente_io));
                 break;
             case MSG_IO_KERNEL_DIALFS: 
 
