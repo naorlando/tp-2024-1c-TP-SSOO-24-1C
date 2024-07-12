@@ -35,9 +35,10 @@ void atender_kernel_IO(void* io_connection)
         sem_wait(obtener_semaforo_cola_bloqueados(cliente_io));
 
         procesar_solicitud_func procesar_func = obtener_procesador_solicitud(obtener_tipo_conexion(cliente_io));
+        void* solicitud = obtener_siguiente_proceso(cliente_io);
 
         if (procesar_func != NULL) {
-            procesar_solicitud_IO(cliente_io, procesar_func);
+            procesar_solicitud_IO(obtener_file_descriptor(cliente_io), solicitud, procesar_func);
         } else {
             log_warning(logger_kernel, "Tipo de IO desconocida. No quieras meter la pata");
         }
@@ -67,6 +68,14 @@ void atender_kernel_IO(void* io_connection)
             default:
                 log_warning(logger_kernel, "Operacion desconocida en IO. No quieras meter la pata");
                 break;
+        }
+
+        // Obtener el PCB de la solicitud y moverlo a ready
+        t_PCB* pcb = obtener_pcb_de_solicitud(solicitud, tipo_interfaz_to_string(obtener_tipo_conexion(cliente_io)));
+        if (pcb != NULL) {
+            agregar_de_blocked_a_ready(pcb);
+        } else {
+            log_warning(logger_kernel, "No se pudo obtener el PCB de la solicitud");
         }
     }
 }
