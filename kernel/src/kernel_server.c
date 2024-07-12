@@ -394,6 +394,20 @@ void _cerrar_conexiones()
     liberar_conexion(fd_server);
     liberar_conexion(fd_kernel_memoria);
     liberar_conexion(fd_cpu_dispatch);
-    //TODO: Implementar funcion para liberar las conexiones de todas las IOs
-    // que se conectaron al kernel
-}
+    liberar_conexion(fd_cpu_interrupt);
+
+    // Liberar conexiones de todas las I/O
+    void cerrar_conexion_io(char* key, void* value) {
+        t_IO_connection* conexion = (t_IO_connection*) value;
+        liberar_conexion(obtener_file_descriptor(conexion));
+        liberar_IO_connection(conexion);
+    }
+
+    // Aplico el cierre de conexiones a cada entrada de io_connections,
+    // que es un diccionario que almacena todas las conexiones I/O
+    dictionary_iterator(io_connections, cerrar_conexion_io);
+
+    // Destruir el diccionario de conexiones I/O
+    dictionary_destroy(io_connections);
+
+    log_info(logger_kernel, "Todas las conexiones han sido cerradas correctamente.");
