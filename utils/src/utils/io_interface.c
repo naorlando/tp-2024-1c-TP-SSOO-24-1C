@@ -18,6 +18,21 @@ tipo_interfaz_t string_to_tipo_interfaz(char* str) {
     }
 }
 
+char* tipo_interfaz_to_string(tipo_interfaz_t tipo) {
+    switch (tipo) {
+        case GENERICA:
+            return "GENERICA";
+        case STDIN:
+            return "STDIN";
+        case STDOUT:
+            return "STDOUT";
+        case DIALFS:
+            return "DIALFS";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 //===============================================
 // FUNCIONES DE T_IO_INTERFACE
 //===============================================

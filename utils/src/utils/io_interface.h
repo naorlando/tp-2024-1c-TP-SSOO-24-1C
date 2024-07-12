@@ -44,6 +44,12 @@ typedef struct {
 //       Si el string no coincide con ningún tipo de interfaz, se retorna -1.
 tipo_interfaz_t string_to_tipo_interfaz(char*);
 
+// Convierte un valor de tipo_interfaz_t a su representación en cadena de caracteres.
+// Pre: El parámetro tipo debe ser un valor válido de tipo_interfaz_t.
+// Post: Retorna una cadena de caracteres que representa el tipo de interfaz.
+//       Si el valor de tipo no corresponde a ningún caso conocido, retorna "UNKNOWN".
+char* tipo_interfaz_to_string(tipo_interfaz_t);
+
 //===============================================
 // FUNCIONES DE T_IO_INTERFACE
 //===============================================
