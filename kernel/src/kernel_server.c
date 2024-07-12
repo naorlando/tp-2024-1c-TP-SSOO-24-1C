@@ -38,14 +38,17 @@ void atender_kernel_IO(void* io_connection)
 
         switch (cod_op)
         {
-            case EXAMPLE:
-                // Se procesa el request
-                recv_example_msg_entradasalida(cliente_io);
-                control_key = false; // Cortamos la espera de solicitudes
+            case MSG_IO_GENERICA_KERNEL:
+                atender_respuesta_io_generica(cliente_io);
                 break;
-            case MSG_IO_KERNEL:
-
-                log_info(logger_kernel, "Se recibio un mje de IO");
+            case MSG_IO_STDIN_KERNEL:
+                atender_respuesta_io_stdin(cliente_io);
+                break;
+            case MSG_IO_STDOUT_KERNEL:
+                atender_respuesta_io_stdout(cliente_io);
+                break;
+            case MSG_IO_DIALFS_KERNEL:
+                atender_respuesta_io_dialfs(cliente_io);
                 break;
             case -1:
                 log_error(logger_kernel, "la IO se desconecto. Terminando servidor");

@@ -62,7 +62,7 @@ void send_interruption_cpu(t_interruption* interrupcion)
 
 // Agrego la función que envía la instrucción IO_GEN_SLEEP al módulo de E/S
 int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
-    t_package *paquete = package_create(MSG_IO_KERNEL_GEN_SLEEP, sizeof(t_buffer));
+    t_package *paquete = package_create(MSG_KERNEL_IO_GENERICA, sizeof(t_buffer));
     
     // Crear la instrucción
     t_instruction *instruccion = malloc(sizeof(t_instruction));
@@ -74,6 +74,7 @@ int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
     *param_pid = pid;
     list_add(instruccion->params, param_pid);
     
+    // Agregar las unidades de trabajo a la lista
     int *param_unidades_trabajo = malloc(sizeof(int));
     *param_unidades_trabajo = unidades_trabajo;
     list_add(instruccion->params, param_unidades_trabajo);
@@ -84,19 +85,23 @@ int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
     buffer->stream = malloc(buffer->size);
     void *stream = buffer->stream;
     
+    // Copiar los datos a stream
     memcpy(stream, &(instruccion->name), sizeof(t_name_instruction));
     stream += sizeof(t_name_instruction);
     
+    // Copiar la cantidad de parámetros
     uint32_t cant_params = list_size(instruccion->params);
     memcpy(stream, &cant_params, sizeof(uint32_t));
     stream += sizeof(uint32_t);
     
+    // Copiar los parámetros
     for (int i = 0; i < cant_params; i++) {
         int *param = list_get(instruccion->params, i);
         memcpy(stream, param, sizeof(int));
         stream += sizeof(int);
     }
     
+    // Manejo de errores
     if (package_send(paquete, fd) != EXIT_SUCCESS) {
         log_error(logger_kernel, "Error al enviar la instrucción IO_GEN_SLEEP");
         list_destroy_and_destroy_elements(instruccion->params, free);
@@ -105,8 +110,10 @@ int enviar_io_gen_sleep(int fd, int pid, int unidades_trabajo) {
         return -1;
     }
     
+    // Loggear la instrucción enviada
     log_info(logger_kernel, "Instrucción IO_GEN_SLEEP enviada con pid %d y %d unidades de trabajo", pid, unidades_trabajo);
     
+    // Liberar memoria
     list_destroy_and_destroy_elements(instruccion->params, free);
     free(instruccion);
     package_destroy(paquete);
