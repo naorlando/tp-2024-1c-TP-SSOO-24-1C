@@ -70,18 +70,54 @@ void asignar_proceso_a_recurso(char *nombre_recurso, u_int32_t pid) {
         dictionary_put(recursos_asignados_por_pid, uint32_to_string(pid), recursos);
     }
     list_add(recursos, (void *) nombre_recurso);
+    print_dictionary();
 }
 
-bool remover_proceso_de_recurso(char *nombre_recurso, u_int32_t pid) {
-    t_list *recursos = dictionary_get(recursos_asignados_por_pid, uint32_to_string(pid));
+// bool remover_proceso_de_recurso(char *nombre_recurso, u_int32_t pid) {
+//     t_list *recursos = dictionary_get(recursos_asignados_por_pid, uint32_to_string(pid));
+//     if (recursos != NULL) {
+//         list_remove_element(recursos, (void *) nombre_recurso);
+//         if (list_is_empty(recursos)) {
+//             dictionary_remove_and_destroy(recursos_asignados_por_pid, uint32_to_string(pid), (void *) list_destroy);
+//         }
+//         print_dictionary();
+//         return true;
+//     }else{
+//         log_error(logger_kernel, "No se encontró el proceso %d en la lista de recursos asignados.", pid);
+//         return false;
+//     }
+// }
+
+bool remover_proceso_de_recurso(char *nombre_recurso, uint32_t pid) {
+    char* pid_str = uint32_to_string(pid);
+
+    t_list *recursos = dictionary_get(recursos_asignados_por_pid, pid_str);
     if (recursos != NULL) {
-        list_remove_element(recursos, nombre_recurso);
-        if (list_is_empty(recursos)) {
-            dictionary_remove_and_destroy(recursos_asignados_por_pid, uint32_to_string(pid), (void *) list_destroy);
+        bool recurso_match(void* recurso_ptr) {
+            return strcmp((char*) recurso_ptr, nombre_recurso) == 0;
         }
+        list_remove_by_condition(recursos, recurso_match);
+        if (list_is_empty(recursos)) {
+            dictionary_remove_and_destroy(recursos_asignados_por_pid, pid_str, (void *) list_destroy);
+        }
+        free(pid_str);  // Liberar la memoria asignada para pid_str
+        print_dictionary();
         return true;
-    }else{
+    } else {
         log_error(logger_kernel, "No se encontró el proceso %d en la lista de recursos asignados.", pid);
+        free(pid_str);  // Liberar la memoria asignada para pid_str
         return false;
     }
+}
+
+void print_dictionary() {
+    void print_item(char* key, void* value) {
+        t_list* recursos = (t_list*)value;
+        printf("PID: %s -> Recursos: ", key);
+        for (int i = 0; i < list_size(recursos); i++) {
+            printf("%s ", (char*)list_get(recursos, i));
+        }
+        printf("\n");
+    }
+    dictionary_iterator(recursos_asignados_por_pid, print_item);
 }

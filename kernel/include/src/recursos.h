@@ -33,6 +33,6 @@ bool remove_asignado_a_recurso(t_recurso *recurso, int pid);
 
 void asignar_proceso_a_recurso(char *nombre_recurso, u_int32_t pid);
 bool remover_proceso_de_recurso(char *nombre_recurso, u_int32_t pid);
-
+void print_dictionary();
 
 #endif // RESOURCES_H_
