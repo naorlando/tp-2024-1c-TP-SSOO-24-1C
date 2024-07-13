@@ -63,7 +63,7 @@ t_PCB* desbloquear_proceso(t_recurso *recurso) {
     return queue_pop(recurso->cola_bloqueados);
 }
 
-void asignar_proceso_a_recurso(char *nombre_recurso, u_int32_t pid) {
+void asignar_proceso_a_recurso(char *nombre_recurso, uint32_t pid) {
     t_list *recursos = dictionary_get(recursos_asignados_por_pid, uint32_to_string(pid));
     if (recursos == NULL) {
         recursos = list_create();
@@ -96,10 +96,10 @@ bool remover_proceso_de_recurso(char *nombre_recurso, uint32_t pid) {
         bool recurso_match(void* recurso_ptr) {
             return strcmp((char*) recurso_ptr, nombre_recurso) == 0;
         }
-        list_remove_by_condition(recursos, recurso_match);
-        if (list_is_empty(recursos)) {
-            dictionary_remove_and_destroy(recursos_asignados_por_pid, pid_str, (void *) list_destroy);
-        }
+        char *recurso_borrado = (char*)list_remove_by_condition(recursos, recurso_match);
+        // if (list_is_empty(recursos)) {
+        //     dictionary_remove_and_destroy(recursos_asignados_por_pid, pid_str, (void *) list_destroy);
+        // }
         free(pid_str);  // Liberar la memoria asignada para pid_str
         print_dictionary();
         return true;

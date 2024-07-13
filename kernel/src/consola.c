@@ -253,8 +253,11 @@ void f_finalizar_proceso(u_int32_t pid){
         return;
     }
 
-    // Eliminar de la tabla de PCBs
-    delete_pcb(pid);
     // elimina el PCB para siempre (ver en largo_plazo.c)
-    send_to_exit(pcb);
+    agregar_a_cola_exit(pcb);
+
+    // Eliminar de la tabla de PCBs
+    // TODO: verificar si se genera un doble free (del diccionario... ).
+    delete_pcb(pid);
 }
+

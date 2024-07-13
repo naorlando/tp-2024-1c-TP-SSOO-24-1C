@@ -49,14 +49,10 @@ void send_new_to_ready()
     }
 }
 
+// deprecada
 void send_to_exit(t_PCB *pcb)
 {
     pthread_mutex_lock(&MUTEX_EXIT);
-    // -------------------------------------------------------------------
-    // agregar logica de liberar recursos de prcesos de ser necesario AQUI...
-    u_int32_t pid = pcb->pid;
-    liberar_recursos_de_proceso(pid);
-    // -------------------------------------------------------------------
     queue_push(COLA_EXIT, pcb);
     pthread_mutex_unlock(&MUTEX_EXIT);
     sem_post(&SEM_EXIT);
@@ -70,23 +66,48 @@ void end_process()
         t_PCB *pcb_exit;  
 
         log_info(logger_kernel, "empieza a terminar el proceso");
-
         pthread_mutex_lock(&MUTEX_EXIT);
         pcb_exit = queue_pop(COLA_EXIT);
         pthread_mutex_unlock(&MUTEX_EXIT);
         sem_post(&SEM_MULTIPROGRAMACION);
+        // -------------------------------------------------------------------
+        // agregar logica de liberar recursos de prcesos de ser necesario AQUI...
+        // chequeo de recursos no liberados:
+        liberar_recursos_de_proceso(pcb_exit->pid);
+        // -------------------------------------------------------------------
 
         // TODO eliminar otros contextos en tablas
 
+        // liberar memoria de pcb:
         pcb_destroy(pcb_exit);
     }
 }
 
 // manejo de chequeo de recursos al finalizar un proceso:
-void liberar_recursos_de_proceso(u_int32_t pid){
-// chequeo que el proceso es valido y se encuentra en el diccionario de pcbs
-// chequeo que el proceso tiene recursos asignados
-// si tiene les hago signal a los recursos en cuestion que no se habian liberado.
-
-
+void liberar_recursos_de_proceso(u_int32_t pid)
+{
+// chequeo que el proceso es valido y se encuentra en el diccionario de pcbs:
+    if(get_pcb(pid) == NULL){
+        log_error(logger_kernel, "No se encontro el proceso (con PID: %d) en el diccionario de PCBs ", pid);
+        return;
+    }
+// chequeo que el proceso tiene recursos asignados:
+    t_list *recursos = dictionary_get(recursos_asignados_por_pid, uint32_to_string(pid));
+    if (recursos == NULL) {
+        log_info(logger_kernel, "El proceso %d no tiene recursos asignados, se puede eliminar tranquilamente.", pid);
+        return;
+    }
+// Si tiene, les hago signal a los recursos en cuestión que no se habían liberado.
+    while (!list_is_empty(recursos)) {
+        char *nombre_recurso = (char *)list_get(recursos, 0);
+        t_recurso *recurso = get_recurso(nombre_recurso);
+        if (recurso != NULL) {
+            incrementar_recurso(recurso);
+            log_info(logger_kernel, "Se libera recurso %s (SIN PREVIAMENTE SER LIBERADO) del PID = %d", nombre_recurso, pid);
+            print_dictionary(); //antes
+            remover_proceso_de_recurso(nombre_recurso, pid);
+            //sem_post(&recurso->sem);
+        }
+        //free(nombre_recurso); // Si la memoria del nombre del recurso fue asignada dinámicamente, liberarla.
+    }
 }

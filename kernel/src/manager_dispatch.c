@@ -108,7 +108,7 @@ void handle_wait_request(){
     }
 
     if (recurso->instancias > 0) {
-        recurso->instancias--;
+        decrementar_recurso(recurso); // recurso->instancias--;
         // ----------------------------------------------------------------------------------------------
         asignar_proceso_a_recurso(nombre_recurso, pcb->pid);
         // ----------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ void handle_signal_request()
     }
     // si el proceso esta en la lista de procesos asignados,se ELEMININA EL PID en la funcion remove_asignado_a_recurso() y 
     // incremento las instancias del recurso...
-    recurso->instancias++;
+    incrementar_recurso(recurso); // recurso->instancias++;
     log_info(logger_kernel, "Recurso %s incrementado. Instancias actuales: %d", nombre_recurso, recurso->instancias);
 
  

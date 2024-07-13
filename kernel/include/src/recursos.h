@@ -8,6 +8,8 @@
 #include "variables_globales.h"
 #include "utils/utils.h"
 #include "utils/estructuras.h"
+#include "commons/collections/list.h"
+#include "commons/collections/dictionary.h"
 
 // Declaraciones de funciones
 
@@ -26,13 +28,20 @@ uint8_t sizeof_table_recursos();
 // Verificar si la tabla de recursos está vacía
 bool is_empty_recurso_table();
 
-// void remover_proceso_de_recurso(t_recurso *recurso, int pid);
+// Incrementar la cantidad de instancias de un recurso:
+void incrementar_recurso(t_recurso *recurso);
+
+// Decrementar la cantidad de instancias de un recurso:
+void decrementar_recurso(t_recurso *recurso); 
+
 void bloquear_proceso(t_recurso *recurso, t_PCB *pcb);
 t_PCB* desbloquear_proceso(t_recurso *recurso);
-bool remove_asignado_a_recurso(t_recurso *recurso, int pid);
 
-void asignar_proceso_a_recurso(char *nombre_recurso, u_int32_t pid);
-bool remover_proceso_de_recurso(char *nombre_recurso, u_int32_t pid);
+void asignar_proceso_a_recurso(char *nombre_recurso, uint32_t pid);
+bool recurso_match(void* recurso_ptr);
+
 void print_dictionary();
+bool remover_proceso_de_recurso(char *nombre_recurso, uint32_t pid);
+
 
 #endif // RESOURCES_H_

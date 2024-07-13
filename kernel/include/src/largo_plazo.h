@@ -20,6 +20,8 @@
 #include "utils/estructuras.h"
 #include "syncro.h"
 #include "utils_queue.h"
+#include "recursos.h"
+#include "table_pcb.h"
 
 
 
