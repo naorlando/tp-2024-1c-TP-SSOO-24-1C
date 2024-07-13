@@ -1,0 +1,70 @@
+make --no-print-directory -C include/ 3>&1 1>&2 2>&3 | sed -E 's,(src/)[^ ]+\.(c|h)\:,include/&,' 3>&2 2>&1 1>&3
+make[1]: *** No targets specified and no makefile found.  Stop.
+make --no-print-directory -C  3>&1 1>&2 2>&3 | sed -E 's,(src/)[^ ]+\.(c|h)\:,&,' 3>&2 2>&1 1>&3
+make: option requires an argument -- 'C'
+Usage: make [options] [target] ...
+Options:
+  -b, -m                      Ignored for compatibility.
+  -B, --always-make           Unconditionally make all targets.
+  -C DIRECTORY, --directory=DIRECTORY
+                              Change to DIRECTORY before doing anything.
+  -d                          Print lots of debugging information.
+  --debug[=FLAGS]             Print various types of debugging information.
+  -e, --environment-overrides
+                              Environment variables override makefiles.
+  -E STRING, --eval=STRING    Evaluate STRING as a makefile statement.
+  -f FILE, --file=FILE, --makefile=FILE
+                              Read FILE as a makefile.
+  -h, --help                  Print this message and exit.
+  -i, --ignore-errors         Ignore errors from recipes.
+  -I DIRECTORY, --include-dir=DIRECTORY
+                              Search DIRECTORY for included makefiles.
+  -j [N], --jobs[=N]          Allow N jobs at once; infinite jobs with no arg.
+  -k, --keep-going            Keep going when some targets can't be made.
+  -l [N], --load-average[=N], --max-load[=N]
+                              Don't start multiple jobs unless load is below N.
+  -L, --check-symlink-times   Use the latest mtime between symlinks and target.
+  -n, --just-print, --dry-run, --recon
+                              Don't actually run any recipe; just print them.
+  -o FILE, --old-file=FILE, --assume-old=FILE
+                              Consider FILE to be very old and don't remake it.
+  -O[TYPE], --output-sync[=TYPE]
+                              Synchronize output of parallel jobs by TYPE.
+  -p, --print-data-base       Print make's internal database.
+  -q, --question              Run no recipe; exit status says if up to date.
+  -r, --no-builtin-rules      Disable the built-in implicit rules.
+  -R, --no-builtin-variables  Disable the built-in variable settings.
+  -s, --silent, --quiet       Don't echo recipes.
+  --no-silent                 Echo recipes (disable --silent mode).
+  -S, --no-keep-going, --stop
+                              Turns off -k.
+  -t, --touch                 Touch targets instead of remaking them.
+  --trace                     Print tracing information.
+  -v, --version               Print the version number of make and exit.
+  -w, --print-directory       Print the current directory.
+  --no-print-directory        Turn off -w, even if it was turned on implicitly.
+  -W FILE, --what-if=FILE, --new-file=FILE, --assume-new=FILE
+                              Consider FILE to be infinitely new.
+  --warn-undefined-variables  Warn when an undefined variable is referenced.
+
+This program built for x86_64-pc-linux-gnu
+Report bugs to <bug-make@gnu.org>
+mkdir -pv obj/
+mkdir: created directory 'obj/'
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/protocolo_kernel.o" src/protocolo_kernel.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/manager_dispatch.o" src/manager_dispatch.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/kernel_server.o" src/kernel_server.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/utils_queue.o" src/utils_queue.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/datos_hilos.o" src/datos_hilos.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/syncro.o" src/syncro.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/consola.o" src/consola.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/manager_ios.o" src/manager_ios.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/largo_plazo.o" src/largo_plazo.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/corto_plazo.o" src/corto_plazo.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/inicializar_kernel.o" src/inicializar_kernel.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/kernel.o" src/kernel.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/kernel_config.o" src/kernel_config.c -I../utils/src -I./include/src -I./src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/table_pcb.o" src/table_pcb.c -I../utils/src -I./include/src -I./src -I./src
+mkdir -pv bin/
+mkdir: created directory 'bin/'
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -o "bin/kernel" obj/protocolo_kernel.o obj/manager_dispatch.o obj/kernel_server.o obj/utils_queue.o obj/datos_hilos.o obj/syncro.o obj/consola.o obj/manager_ios.o obj/largo_plazo.o obj/corto_plazo.o obj/inicializar_kernel.o obj/kernel.o obj/kernel_config.o obj/table_pcb.o -I../utils/src -I./include/src -I./src -I./src -L../utils/bin -L./include/bin -L./bin -lutils -lcommons -lpthread -lreadline -lm

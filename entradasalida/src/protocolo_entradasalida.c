@@ -1,6 +1,5 @@
 #include "protocolo_entradasalida.h"
-#include "utils/solicitudes_io.h"
-#include <readline/readline.h>
+
 
 //======================================================
 //        FUNCIONES DE ENTRADA/SALIDA GENERICA
@@ -116,8 +115,69 @@ char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
 //          FUNCIONES DE ENTRADA/SALIDA DIALFS
 //======================================================
 
-// A implementar!
+void atender_instruccion_dialfs(int fd) {
+    t_io_dialfs* io_dialfs = deserializar_io_dialfs(recibir_buffer(&fd, sizeof(int)));
+    if (io_dialfs != NULL) {
+        bool operacion_exitosa = false;
+        
+        switch(io_dialfs->operacion) {
+            case IO_FS_CREATE:
+                operacion_exitosa = crear_archivo(dialfs, io_dialfs->nombre_archivo);
+                log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
+                break;
+            case IO_FS_DELETE:
+                operacion_exitosa = eliminar_archivo(dialfs, io_dialfs->nombre_archivo);
+                log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
+                break;
+            case IO_FS_TRUNCATE:
+                operacion_exitosa = truncar_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->tamanio);
+                log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio);
+                break;
+            case IO_FS_WRITE:
+                operacion_exitosa = escribir_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->datos, io_dialfs->tamanio, io_dialfs->offset);
+                log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->offset);
+                break;
+            case IO_FS_READ:
+                void* buffer = malloc(io_dialfs->tamanio);
+                operacion_exitosa = leer_archivo(dialfs, io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->offset);
+                if (operacion_exitosa) {
+                    enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
+                }
+                free(buffer);
+                log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->offset);
+                break;
+            default:
+                log_error(logger_entradasalida, "Operación DialFS no reconocida");
+                break;
+        }
+        
+        if (io_dialfs->operacion == IO_FS_READ && operacion_exitosa) {
+            // Ya se enviaron los datos leídos, no es necesario enviar confirmación adicional
+        } else {
+            enviar_confirmacion_io(fd, operacion_exitosa);
+        }
+        
+        destruir_io_dialfs(io_dialfs);
+    } else {
+        log_error(logger_entradasalida, "Error al recibir IO DialFS");
+        enviar_confirmacion_io(fd, false);
+    }
+    
+    // Comprobamos si es necesario realizar una compactación
+    if (es_necesario_compactar(dialfs)) {
+        log_info(logger_entradasalida, "Inicio Compactación.");
+        compactar_fs(dialfs);
+        log_info(logger_entradasalida, "Fin Compactación.");
+    }
+}
 
+void enviar_datos_leidos(int fd, void* buffer, uint32_t tamanio) {
+    t_package* package = package_create(MSG_DIALFS_DATA, tamanio);
+    t_buffer* package_buffer = get_buffer(package);
+    buffer_add_data(package_buffer, buffer, tamanio);
+    package_send(package, fd);
+    package_destroy(package);
+}
 
 
 //======================================================

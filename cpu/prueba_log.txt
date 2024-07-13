@@ -1,0 +1,6 @@
+2024-06-25 23:58:36 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu
+2024-06-26 00:07:38 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu
+2024-06-26 00:09:38 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu
+2024-06-26 00:14:05 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu
+2024-06-26 00:39:40 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu
+2024-06-26 00:43:58 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu

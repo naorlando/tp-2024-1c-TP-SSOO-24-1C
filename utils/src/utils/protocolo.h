@@ -63,9 +63,12 @@ typedef enum
     MSG_INSTRUCTION_MEMORIA,
     MSG_NEXT_INSTRUCTION_CPU,
     //IO <-> MEMORIA
-    MSG_IO_MEMORIA,
-    MSG_READ_MEMORY,
-    MSG_WRITE_MEMORY,
+    MSG_MEMORIA_IO_STDIN,
+    MSG_MEMORIA_IO_STDOUT,
+    MSG_MEMORIA_IO_DIALFS,
+    MSG_IO_STDIN_MEMORIA,
+    MSG_IO_STDOUT_MEMORIA,
+    MSG_IO_DIALFS_MEMORIA,
     // HEADER_EXAMPLE
     EXAMPLE,
     //Empty package
@@ -224,6 +227,13 @@ void send_solicitud_io_generica(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_
 //       Si ocurre un error o no se recibe ningún dato, retorna NULL.
 t_solicitud_io_generica* recv_solicitud_io_generica(int fd);
 
+// Obtiene el tamaño de una solicitud de I/O genérica.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O genérica en bytes.
+//      Si la solicitud es NULL, retorna 0.
+uint32_t obtener_tamanio_solicitud_generica(t_solicitud_io_generica* solicitud);
+
+
 /*********** SEND AND RECIVE 'T_SOLICITUD_IO_STDIN' ***********/
 // Envía una solicitud de I/O stdin a través de un socket especificado.
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
@@ -239,6 +249,12 @@ void send_solicitud_io_stdin(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_std
 //       Si ocurre un error o no se recibe ningún dato, retorna NULL.
 t_solicitud_io_stdin* recv_solicitud_io_stdin(int fd);
 
+// Obtiene el tamaño de una solicitud de I/O stdin.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O stdin en bytes.
+//      Si la solicitud es NULL, retorna 0.
+uint32_t obtener_tamanio_solicitud_stdin(t_solicitud_io_stdin* solicitud);
+
 /*********** SEND AND RECIVE 'T_SOLICITUD_IO_STDOUT' ***********/
 // Envía una solicitud de I/O stdout a través de un socket especificado.
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
@@ -253,6 +269,35 @@ void send_solicitud_io_stdout(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_st
 // Post: Retorna un puntero a una estructura t_solicitud_io_stdout recibida desde el socket.
 //       Si ocurre un error o no se recibe ningún dato, retorna NULL.
 t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd);
+
+// Obtiene el tamaño de una solicitud de I/O stdout.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O stdout en bytes.
+//      Si la solicitud es NULL, retorna 0.
+uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud);
+
+/*********** SEND AND RECIVE 'T_SOLICITUD_IO_DIALFS' ***********/
+
+// Envía una solicitud de I/O dialfs a través de un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+//      El puntero pcb debe apuntar a un bloque de control de proceso válido y no debe ser NULL.
+//      El puntero nombre_interfaz debe apuntar a una cadena de caracteres válida y no debe ser NULL.
+//      El puntero io_dialfs debe apuntar a una estructura t_io_dialfs válida y no debe ser NULL.
+// Post: La solicitud de I/O dialfs se serializa y se envía a través del socket especificado.
+void send_solicitud_io_dialfs(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_dialfs* io_dialfs);
+
+// Recibe una solicitud de I/O dialfs desde un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+// Post: Retorna un puntero a una estructura t_solicitud_io_dialfs recibida desde el socket.
+//       Si ocurre un error o no se recibe ningún dato, retorna NULL.
+t_solicitud_io_dialfs* recv_solicitud_io_dialfs(int fd);
+
+// Obtiene el tamaño de una solicitud de I/O dialfs.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_dialfs válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O dialfs en bytes.
+//      Si la solicitud es NULL, retorna 0.
+uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
+
 
 /*********** SEND AND RECIVE 'T_IO_INTERFACE' ***********/
 // Envía una estructura t_IO_interface a través de un socket especificado.

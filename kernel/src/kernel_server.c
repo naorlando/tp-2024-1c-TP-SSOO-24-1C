@@ -1,5 +1,7 @@
 #include "kernel_server.h"
 
+t_dictionary* io_connections = NULL;
+
 void atender_kernel_memoria()
 {
     bool control_key = 1;
@@ -242,6 +244,9 @@ void inicializar_sockets()
         log_error(logger_kernel, "Error al conectar con la MEMORIA. ABORTANDO");
         exit(EXIT_FAILURE);
     }
+
+    // Inicializar el diccionario de conexiones I/O
+    io_connections = dictionary_create();
 }
 
 void crear_hilos_conexiones() 
@@ -284,16 +289,18 @@ void* esperar_conexiones_IO(void* arg)
         int cliente_io = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, server_fd);
         
         if (cliente_io != -1) {
-            char* nombre_interfaz = recibir_io_connection(cliente_io);
-            t_IO_connection* io_connection = get_IO_connection(nombre_interfaz);
-
-            pthread_t hilo_io;
-            if (pthread_create(&hilo_io, NULL, (void*)atender_kernel_IO, io_connection) != 0) {
-                log_error(logger_kernel, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
-                exit(EXIT_FAILURE);
+            t_IO_connection* io_connection = recibir_io_connection(cliente_io);
+            if (io_connection != NULL) {
+                agregar_IO_connection(io_connection);
+                
+                pthread_t hilo_io;
+                if (pthread_create(&hilo_io, NULL, (void*)atender_kernel_IO, io_connection) != 0) {
+                    log_error(logger_kernel, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
+                    exit(EXIT_FAILURE);
+                }
+                log_info(logger_kernel, "Interfaz %s conectada con éxito", obtener_nombre_conexion(io_connection));
+                pthread_detach(hilo_io);
             }
-            log_info(logger_kernel, "Interfaz %s conectada con éxito", nombre_interfaz);
-            pthread_detach(hilo_io);
         } else {
             log_error(logger_kernel, "Error al esperar cliente de IO");
         }
@@ -301,16 +308,59 @@ void* esperar_conexiones_IO(void* arg)
     return NULL;
 }
 
-char* recibir_io_connection(int cliente_io) 
+// Función para recibir un cliente IO y devolver la conexión
+t_IO_connection* recibir_io_connection(int cliente_io) 
 {
     int cod_op = recibir_operacion(cliente_io);
 
-    if(cod_op == MSG_IO_KERNEL) {
-        return nuevo_IO_cliente_conectado(cliente_io);
+    if(cod_op == MSG_IO_GENERICA_KERNEL || 
+       cod_op == MSG_IO_STDIN_KERNEL || 
+       cod_op == MSG_IO_STDOUT_KERNEL || 
+       cod_op == MSG_IO_DIALFS_KERNEL) {
+        
+        t_IO_interface* io_interface = recv_IO_interface(cliente_io);
+        
+        if (io_interface == NULL) {
+            log_error(logger_kernel, "Error al recibir la interfaz de E/S del cliente.");
+            liberar_conexion(cliente_io);
+            return NULL;
+        }
+
+        t_IO_connection* io_connection = crear_IO_connection(
+            obtener_nombre_IO_interface(io_interface),
+            obtener_tipo_IO_interface(io_interface),
+            cliente_io
+        );
+
+        if (io_connection == NULL) {
+            log_error(logger_kernel, "Error al crear la conexión de E/S.");
+            liberar_IO_interface(io_interface);
+            liberar_conexion(cliente_io);
+            return NULL;
+        }
+
+        log_info(logger_kernel, "Nueva conexión de I/O establecida: %s de tipo %s", 
+                 obtener_nombre_conexion(io_connection),
+                 obtener_tipo_conexion(io_connection));
+
+        liberar_IO_interface(io_interface);
+        return io_connection;
     } else {
-        log_info(logger_kernel, "Error al recibir un cliente IO. ABORTANDO");
-        exit(EXIT_FAILURE);
+        log_error(logger_kernel, "Error al recibir un cliente IO. Operación incorrecta: %d", cod_op);
+        liberar_conexion(cliente_io);
+        return NULL;
     }
+}
+
+void agregar_IO_connection(t_IO_connection* io_connection)
+{
+    char* nombre_interfaz = obtener_nombre_conexion(io_connection);
+    dictionary_put(io_connections, nombre_interfaz, io_connection);
+}
+
+t_IO_connection* get_IO_connection(char* nombre_interfaz) 
+{
+    return dictionary_get(io_connections, nombre_interfaz);
 }
 
 void cerrar_servidor()
@@ -332,6 +382,41 @@ void _cerrar_conexiones()
     liberar_conexion(fd_server);
     liberar_conexion(fd_kernel_memoria);
     liberar_conexion(fd_cpu_dispatch);
-    //TODO: Implementar funcion para liberar las conexiones de todas las IOs
-    // que se conectaron al kernel
+    liberar_conexion(fd_cpu_interrupt);
+
+    // Liberar conexiones de todas las I/O
+    void cerrar_conexion_io(char* key, void* value) {
+        t_IO_connection* conexion = (t_IO_connection*) value;
+        liberar_conexion(obtener_file_descriptor(conexion));
+        liberar_IO_connection(conexion);
+    }
+
+    if (io_connections != NULL) {
+        dictionary_iterator(io_connections, cerrar_conexion_io);
+        dictionary_destroy(io_connections);
+        io_connections = NULL;
+    }
+
+    log_info(logger_kernel, "Todas las conexiones han sido cerradas correctamente.");
+}
+
+// Funciones auxiliares
+int obtener_file_descriptor(t_IO_connection* conexion) {
+    return conexion->file_descriptor;
+}
+
+char* obtener_nombre_conexion(t_IO_connection* conexion) {
+    return conexion->nombre_interfaz;
+}
+
+tipo_interfaz_t obtener_tipo_conexion(t_IO_connection* conexion) {
+    return conexion->tipo_interfaz;
+}
+
+void liberar_IO_connection(t_IO_connection* io_connection) {
+    if (io_connection != NULL) {
+        free(io_connection->nombre_interfaz);
+        // Liberar otros recursos si los hay
+        free(io_connection);
+    }
 }

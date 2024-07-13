@@ -1,0 +1,6 @@
+2024-06-25 23:58:37 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel
+2024-06-26 00:07:38 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel
+2024-06-26 00:09:39 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel
+2024-06-26 00:14:06 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel
+2024-06-26 00:39:41 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel
+2024-06-26 00:43:59 - Compilación exitosa en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel

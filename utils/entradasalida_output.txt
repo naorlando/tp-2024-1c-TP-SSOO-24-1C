@@ -1,0 +1,10 @@
+[INFO] 00:39:57:042 ENTRADASALIDA_LOG/(2996:2996): Se cargo correctamente ENTRADASALIDA.CONFIG
+[0m[INFO] 00:39:57:060 ENTRADASALIDA_LOG/(2996:2996): Interfaz "Jorge" de tipo STDIN inicializada
+[0m[31m[ERROR] 00:39:57:060 ENTRADASALIDA_LOG/(2996:2996): Error al conectar (a SERVER KERNEL)
+
+[0m[31m[ERROR] 00:39:57:060 ENTRADASALIDA_LOG/(2996:2996): Error al conectar (a SERVER MEMORIA)
+
+[0m[31m[ERROR] 00:39:57:060 ENTRADASALIDA_LOG/(2996:3001): ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.
+[0m[31m[ERROR] 00:39:57:060 ENTRADASALIDA_LOG/(2996:3002): ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.
+[0m[INFO] 00:39:57:061 ENTRADASALIDA_LOG/(2996:2996): Cliente de entrada/salida cerrado correctamente.
+[0m
