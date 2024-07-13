@@ -255,6 +255,26 @@ void destruir_io_generica(t_io_generica* io_generica) {
     free(io_generica);
 }
 
+void destruir_solicitud_io_stdin(t_solicitud_io_stdin* solicitud) {
+    free(solicitud->nombre_interfaz);
+    destruir_io_stdin(solicitud->io_stdin);
+    free(solicitud);
+}
+
+void destruir_io_stdin(t_io_stdin* io_stdin) {
+    free(io_stdin);
+}
+
+void destruir_solicitud_io_stdout(t_solicitud_io_stdout* solicitud) {
+    free(solicitud->nombre_interfaz);
+    destruir_io_stdout(solicitud->io_stdout);
+    free(solicitud);
+}
+
+void destruir_io_stdout(t_io_stdout* io_stdout) {
+    free(io_stdout);
+}
+
 void delete_response(t_response* response) 
 {
     free(response);
