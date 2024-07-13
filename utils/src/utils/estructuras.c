@@ -13,6 +13,7 @@ t_PCB *pcb_create(uint32_t pid, uint32_t quantum)
     pcb->quantum = quantum;
     pcb->program_counter = 0;
     pcb->cpu_registers = cpu_registers_create();
+    pcb->state = NEW;
 
     return pcb;
 }

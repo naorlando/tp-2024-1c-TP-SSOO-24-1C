@@ -109,7 +109,9 @@ void handle_wait_request(){
 
     if (recurso->instancias > 0) {
         recurso->instancias--;
-        asignar_proceso_a_recurso(recurso, pcb->pid);
+        // ----------------------------------------------------------------------------------------------
+        asignar_proceso_a_recurso(nombre_recurso, pcb->pid);
+        // ----------------------------------------------------------------------------------------------
         log_info(logger_kernel, "Recurso %s tenía instancias disponibles. Instancias restantes: %d", nombre_recurso, recurso->instancias);
         send_pcb_cpu(pcb);
     } else {
@@ -146,7 +148,7 @@ void handle_signal_request()
 
     // Verificar si el proceso que hace SIGNAL está en la lista de procesos asignados
     // si el proceso NO esta en la lista de procesos asignados, lo mando a EXIT...
-    if (!remove_asignado_a_recurso(recurso, pcb->pid)) {
+    if (!remover_proceso_de_recurso(nombre_recurso, pcb->pid)) {
         log_info(logger_kernel, "Proceso %d no tiene asignado el recurso %s. Proceso enviado a EXIT", pcb->pid, nombre_recurso);
         execute_to_null();
         cancelar_quantum_si_corresponde(pcb);
@@ -162,7 +164,11 @@ void handle_signal_request()
 
     if (!queue_is_empty(recurso->cola_bloqueados)) {
         t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
-        asignar_proceso_a_recurso(recurso, pcb_desbloqueado->pid);
+
+
+        asignar_proceso_a_recurso(nombre_recurso, pcb_desbloqueado->pid);
+
+
         log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
         agregar_a_cola_ready(pcb_desbloqueado);
     }
@@ -172,14 +178,11 @@ void handle_signal_request()
     pthread_mutex_unlock(&MUTEX_RECURSOS);
 }
 
-
-
 void execute_to_null() {
     pthread_mutex_lock(&MUTEX_EXECUTE);
     EXECUTE = NULL;
     pthread_mutex_unlock(&MUTEX_EXECUTE);
 }
-
 
 void cancelar_quantum_si_corresponde(t_PCB *pcb_exit) {
     if (strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {

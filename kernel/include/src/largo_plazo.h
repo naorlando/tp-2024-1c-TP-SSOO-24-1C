@@ -19,6 +19,7 @@
 //project
 #include "utils/estructuras.h"
 #include "syncro.h"
+#include "utils_queue.h"
 
 
 
@@ -27,5 +28,6 @@ void process_to_new(t_PCB * pcb);
 void send_new_to_ready();
 void send_to_exit(t_PCB * pcb);
 void end_process();
+void liberar_recursos_de_proceso(u_int32_t pid);
 
 #endif

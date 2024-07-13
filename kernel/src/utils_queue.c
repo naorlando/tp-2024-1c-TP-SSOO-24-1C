@@ -3,6 +3,7 @@
 void agregar_a_cola_ready(t_PCB* pcb) 
 {
     pthread_mutex_lock(&MUTEX_READY);
+    pcb->state = READY;
     queue_push(COLA_READY, pcb);
     pthread_mutex_unlock(&MUTEX_READY);
 
@@ -43,7 +44,9 @@ void agregar_de_blocked_a_ready(t_PCB* pcb)
 
 void agregar_a_cola_exit(t_PCB* pcb){
     pthread_mutex_lock(&MUTEX_EXIT);
+    pcb->state = FINISHED;
     queue_push(COLA_EXIT, pcb);
+    //log_debug(logger_kernel, "Se agregó el proceso %d a la cola EXIT", pcb->pid);
     pthread_mutex_unlock(&MUTEX_EXIT);
     sem_post(&SEM_EXIT);
 }

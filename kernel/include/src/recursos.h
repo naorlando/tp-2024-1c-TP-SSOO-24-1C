@@ -26,11 +26,13 @@ uint8_t sizeof_table_recursos();
 // Verificar si la tabla de recursos está vacía
 bool is_empty_recurso_table();
 
-void asignar_proceso_a_recurso(t_recurso *recurso, int pid);
 // void remover_proceso_de_recurso(t_recurso *recurso, int pid);
 void bloquear_proceso(t_recurso *recurso, t_PCB *pcb);
 t_PCB* desbloquear_proceso(t_recurso *recurso);
 bool remove_asignado_a_recurso(t_recurso *recurso, int pid);
+
+void asignar_proceso_a_recurso(char *nombre_recurso, u_int32_t pid);
+bool remover_proceso_de_recurso(char *nombre_recurso, u_int32_t pid);
 
 
 #endif // RESOURCES_H_

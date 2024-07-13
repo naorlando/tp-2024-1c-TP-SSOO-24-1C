@@ -22,6 +22,8 @@ bool interrupcion_enviada = false;
 bool planificador_status = true;
 t_dictionary* io_connections;
 t_dictionary *recursos_dictionary;
+t_dictionary *recursos_asignados_por_pid;
+
 //pthread_mutex_t mutex_recursos;
 
 pthread_mutex_t mutex_pid = PTHREAD_MUTEX_INITIALIZER;
@@ -160,6 +162,7 @@ void inicializar_dictionarios()
 {
     io_connections = dictionary_create();
     recursos_dictionary = dictionary_create();
+    recursos_asignados_por_pid = dictionary_create();
 }
 
 void inicializar_recursos() {
@@ -172,10 +175,11 @@ void inicializar_recursos() {
         recurso->nombre = strdup(nombres_recursos[i]);
         recurso->instancias = instancias_recursos[i];
         recurso->cola_bloqueados = queue_create();
-        recurso->procesos_asignados = list_create();
         dictionary_put(recursos_dictionary, recurso->nombre, recurso);
     }
 
     string_array_destroy(nombres_recursos);
     //string_array_destroy(instancias_recursos);
+
+
 }

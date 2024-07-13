@@ -31,7 +31,7 @@ typedef enum
     READY,
     EXEC,
     BLOCKED,
-    FINISHED //ex EXIT
+    FINISHED //ex EXIT, por que existe ya la instruccion EXIT
 } t_state;
 typedef struct
 {
@@ -56,7 +56,6 @@ typedef struct {
     char *nombre;
     int instancias;
     t_queue *cola_bloqueados;
-    t_list *procesos_asignados; 
 } t_recurso;
 
 typedef struct {
