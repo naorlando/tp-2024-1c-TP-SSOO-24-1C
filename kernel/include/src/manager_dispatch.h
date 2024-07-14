@@ -12,6 +12,7 @@
 #include "datos_hilos.h"
 #include "utils_queue.h"
 #include "table_pcb.h"
+#include "solicitud.h"
 
 void procesar_ios_genericas();
 void procesar_pcb_exit();

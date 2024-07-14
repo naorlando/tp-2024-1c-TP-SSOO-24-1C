@@ -12,9 +12,9 @@ void cancelar_hilo_quantum(uint32_t pid)
 
 void procesar_ios_genericas()
 {
-    t_solicitud_io_generica* io_gen = recv_solicitud_io_generica_cpu();
+    t_solicitud_io_generica* solicitud_gen = recv_solicitud_io_generica_cpu();
 
-    t_PCB* pcb_io_gen = obtener_pcb_solicitud_generica(io_gen);
+    t_PCB* pcb_io_gen = obtener_pcb_solicitud_generica(solicitud_gen);
 
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_gen->pid);
     
@@ -23,6 +23,9 @@ void procesar_ios_genericas()
     }
 
     sem_post(&SEM_CPU);
+
+    set_contenido(solicitud_gen);
+    sem_post(&SEM_BLOCKED);
     
     //1. Validar que la IO GENERICA este conectada
     //2. 
