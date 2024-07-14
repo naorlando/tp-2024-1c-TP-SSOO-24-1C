@@ -1,7 +1,7 @@
 #include "manager_ios.h"
 
 
-char* nuevo_IO_cliente_conectado(int cliente_io)
+t_IO_connection* nuevo_IO_cliente_conectado(int cliente_io)
 {
     t_IO_interface* io_interface = recv_IO_interface(cliente_io);
 
@@ -22,7 +22,7 @@ char* nuevo_IO_cliente_conectado(int cliente_io)
     // Libero la io_interface
     liberar_IO_interface(io_interface);
 
-    return obtener_nombre_conexion(io_connection);
+    return io_connection;
 }
 
 void agregar_IO_connection(t_IO_connection* io_connection)
