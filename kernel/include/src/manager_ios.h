@@ -8,12 +8,12 @@
 #include "utils/estructuras.h"
 #include "utils/solicitudes_io.h"
 
-typedef void (*procesar_solicitud_func)(int, void*);
+typedef int (*procesar_solicitud_func)(int, void*);
 procesar_solicitud_func obtener_procesador_solicitud(int);
-void procesar_solicitud_IO(int, void*, procesar_solicitud_func);
-void procesar_solicitud_generica(int, t_solicitud_io_generica*);
-void procesar_solicitud_stdin(int, t_solicitud_io_stdin*);
-void procesar_solicitud_stdout(int, t_solicitud_io_stdout*);
+int procesar_solicitud_IO(int, void*, procesar_solicitud_func);
+int procesar_solicitud_generica(int, t_solicitud_io_generica*);
+int procesar_solicitud_stdin(int, t_solicitud_io_stdin*);
+int procesar_solicitud_stdout(int, t_solicitud_io_stdout*);
 void procesar_solicitud_dialfs();
 void procesar_respuesta_io(int, char*);
 void* obtener_siguiente_proceso(t_IO_connection*);
