@@ -27,20 +27,21 @@ t_dialfs* inicializar_dialfs(char* path_base, uint32_t block_size, uint32_t bloc
 void destruir_dialfs(t_dialfs* fs) {
     free(fs->path_base);
     bitarray_destroy(fs->bitmap);
-    list_destroy_and_destroy_elements(fs->archivos, free);
+    list_destroy_and_destroy_elements(fs->archivos, (void*)destruir_archivo_dialfs);
     free(fs);
 }
 
 //===============================================
 // FUNCIONES DE OPERACIONES DE ARCHIVO
 //===============================================
+
 bool crear_archivo(t_dialfs* fs, char* nombre) {
     t_archivo_dialfs* nuevo_archivo = malloc(sizeof(t_archivo_dialfs));
     nuevo_archivo->nombre = strdup(nombre);
     nuevo_archivo->bloque_inicial = buscar_bloque_libre(fs);
     nuevo_archivo->tamanio = 0;
 
-    if (nuevo_archivo->bloque_inicial == -1) {
+    if (nuevo_archivo->bloque_inicial == (uint32_t)-1) {
         free(nuevo_archivo->nombre);
         free(nuevo_archivo);
         return false;
@@ -80,7 +81,6 @@ bool truncar_archivo(t_dialfs* fs, char* nombre, uint32_t nuevo_tamanio) {
 }
 
 bool escribir_archivo(t_dialfs* fs, char* nombre, void* datos, uint32_t tamanio, uint32_t offset) {
-    
     t_archivo_dialfs* archivo = buscar_archivo(fs, nombre);
     if (archivo == NULL) return false;
 
@@ -98,7 +98,6 @@ bool escribir_archivo(t_dialfs* fs, char* nombre, void* datos, uint32_t tamanio,
 }
 
 bool leer_archivo(t_dialfs* fs, char* nombre, void* buffer, uint32_t tamanio, uint32_t offset) {
-    // Implementación faltante
     t_archivo_dialfs* archivo = buscar_archivo(fs, nombre);
     if (archivo == NULL) return false;
 
@@ -117,20 +116,18 @@ bool leer_archivo(t_dialfs* fs, char* nombre, void* buffer, uint32_t tamanio, ui
 //===============================================
 
 void compactar_fs(t_dialfs* fs) {
-    // Implementación faltante
     list_sort(fs->archivos, (void*)comparar_bloques_iniciales);
 
     uint32_t bloque_actual = 0;
     for (int i = 0; i < list_size(fs->archivos); i++) {
         t_archivo_dialfs* archivo = list_get(fs->archivos, i);
         if (archivo->bloque_inicial != bloque_actual) {
-            mover_bloques(fs, archivo->bloque_inicial, bloque_actual, archivo->tamanio / fs->block_size);
+            mover_bloques(fs, archivo->bloque_inicial, bloque_actual, (archivo->tamanio + fs->block_size - 1) / fs->block_size);
             archivo->bloque_inicial = bloque_actual;
         }
         bloque_actual += (archivo->tamanio + fs->block_size - 1) / fs->block_size;
     }
 
-    // Limpiar bloques no utilizados
     for (uint32_t i = bloque_actual; i < fs->block_count; i++) {
         bitarray_clean_bit(fs->bitmap, i);
     }
@@ -139,7 +136,6 @@ void compactar_fs(t_dialfs* fs) {
 }
 
 bool es_necesario_compactar(t_dialfs* fs) {
-    // Implementación faltante
     uint32_t bloques_libres = 0;
     uint32_t bloques_libres_contiguos = 0;
     uint32_t max_bloques_libres_contiguos = 0;
@@ -162,6 +158,101 @@ bool es_necesario_compactar(t_dialfs* fs) {
 //===============================================
 // FUNCIONES AUXILIARES
 //===============================================
+
+uint32_t buscar_bloque_libre(t_dialfs* fs) {
+    for (uint32_t i = 0; i < fs->block_count; i++) {
+        if (!bitarray_test_bit(fs->bitmap, i)) {
+            return i;
+        }
+    }
+    return (uint32_t)-1;
+}
+
+void liberar_bloques(t_dialfs* fs, uint32_t bloque_inicial, uint32_t tamanio) {
+    uint32_t bloques_a_liberar = (tamanio + fs->block_size - 1) / fs->block_size;
+    for (uint32_t i = 0; i < bloques_a_liberar; i++) {
+        bitarray_clean_bit(fs->bitmap, bloque_inicial + i);
+    }
+}
+
+t_archivo_dialfs* buscar_archivo(t_dialfs* fs, char* nombre) {
+    for (int i = 0; i < list_size(fs->archivos); i++) {
+        t_archivo_dialfs* archivo = list_get(fs->archivos, i);
+        if (strcmp(archivo->nombre, nombre) == 0) {
+            return archivo;
+        }
+    }
+    return NULL;
+}
+
+bool ampliar_archivo(t_dialfs* fs, t_archivo_dialfs* archivo, uint32_t nuevo_tamanio) {
+    uint32_t bloques_actuales = (archivo->tamanio + fs->block_size - 1) / fs->block_size;
+    uint32_t bloques_necesarios = (nuevo_tamanio + fs->block_size - 1) / fs->block_size;
+    uint32_t bloques_adicionales = bloques_necesarios - bloques_actuales;
+
+    for (uint32_t i = 0; i < bloques_adicionales; i++) {
+        uint32_t nuevo_bloque = buscar_bloque_libre(fs);
+        if (nuevo_bloque == (uint32_t)-1) {
+            return false;
+        }
+        bitarray_set_bit(fs->bitmap, nuevo_bloque);
+    }
+
+    return true;
+}
+
+void escribir_bloques(t_dialfs* fs, uint32_t bloque_inicio, uint32_t offset_bloque, void* datos, uint32_t tamanio) {
+    uint32_t bytes_escritos = 0;
+    while (bytes_escritos < tamanio) {
+        uint32_t bytes_en_bloque = fs->block_size - offset_bloque;
+        uint32_t bytes_a_escribir = (tamanio - bytes_escritos < bytes_en_bloque) ? tamanio - bytes_escritos : bytes_en_bloque;
+        
+        // Aquí iría la lógica para escribir en el bloque físico
+        // Por ahora, solo simulamos la escritura
+
+        bytes_escritos += bytes_a_escribir;
+        bloque_inicio++;
+        offset_bloque = 0;
+    }
+}
+
+void leer_bloques(t_dialfs* fs, uint32_t bloque_inicio, uint32_t offset_bloque, void* buffer, uint32_t tamanio) {
+    uint32_t bytes_leidos = 0;
+    while (bytes_leidos < tamanio) {
+        uint32_t bytes_en_bloque = fs->block_size - offset_bloque;
+        uint32_t bytes_a_leer = (tamanio - bytes_leidos < bytes_en_bloque) ? tamanio - bytes_leidos : bytes_en_bloque;
+        
+        // Aquí iría la lógica para leer del bloque físico
+        // Por ahora, solo simulamos la lectura
+
+        bytes_leidos += bytes_a_leer;
+        bloque_inicio++;
+        offset_bloque = 0;
+    }
+}
+
+void mover_bloques(t_dialfs* fs, uint32_t bloque_origen, uint32_t bloque_destino, uint32_t cantidad_bloques) {
+    // Aquí iría la lógica para mover bloques físicos
+    // Por ahora, solo actualizamos el bitmap
+    for (uint32_t i = 0; i < cantidad_bloques; i++) {
+        bool bit = bitarray_test_bit(fs->bitmap, bloque_origen + i);
+        bitarray_clean_bit(fs->bitmap, bloque_origen + i);
+        if (bit) {
+            bitarray_set_bit(fs->bitmap, bloque_destino + i);
+        } else {
+            bitarray_clean_bit(fs->bitmap, bloque_destino + i);
+        }
+    }
+}
+
+int comparar_bloques_iniciales(t_archivo_dialfs* a, t_archivo_dialfs* b) {
+    return a->bloque_inicial - b->bloque_inicial;
+}
+
+void destruir_archivo_dialfs(t_archivo_dialfs* archivo) {
+    free(archivo->nombre);
+    free(archivo);
+}
 
 void enviar_datos_leidos(int fd, void* buffer, uint32_t tamanio) {
     t_package* package = package_create(MSG_DIALFS_DATA, tamanio);

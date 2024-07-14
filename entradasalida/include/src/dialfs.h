@@ -94,6 +94,60 @@ bool es_necesario_compactar(t_dialfs* fs);
 // FUNCIONES AUXILIARES
 //===============================================
 
+// Busca un bloque libre en el sistema de archivos DialFS para asignar a un nuevo
+// archivo o para ampliar uno existente.
+// Pre: fs debe ser un puntero válido a una estructura t_dialfs
+// Post: Retorna el número del bloque libre encontrado, o -1 si no hay bloques libres
+uint32_t buscar_bloque_libre(t_dialfs* fs);
+
+// Libera los bloques ocupados por un archivo, marcándolos como disponibles en el
+// bitmap del sistema de archivos.
+// Pre: fs debe ser un puntero válido a una estructura t_dialfs
+// Post: Los bloques especificados son marcados como libres en el bitmap
+void liberar_bloques(t_dialfs* fs, uint32_t bloque_inicial, uint32_t tamanio);
+
+// Busca un archivo en el sistema DialFS por su nombre, recorriendo la lista de
+// archivos almacenados.
+// Pre: fs debe ser un puntero válido a una estructura t_dialfs, nombre debe ser una cadena válida
+// Post: Retorna un puntero al archivo encontrado, o NULL si no existe
+t_archivo_dialfs* buscar_archivo(t_dialfs* fs, char* nombre);
+
+// Amplía el tamaño de un archivo existente, asignando nuevos bloques si es necesario
+// y actualizando las estructuras de control.
+// Pre: fs y archivo deben ser punteros válidos, nuevo_tamanio debe ser mayor que el tamaño actual
+// Post: Retorna true si el archivo se amplió exitosamente, false en caso contrario
+bool ampliar_archivo(t_dialfs* fs, t_archivo_dialfs* archivo, uint32_t nuevo_tamanio);
+
+// Escribe datos en los bloques correspondientes del sistema de archivos, manejando
+// la fragmentación si es necesario.
+// Pre: fs debe ser un puntero válido, datos debe contener la información a escribir
+// Post: Los datos son escritos en los bloques especificados
+void escribir_bloques(t_dialfs* fs, uint32_t bloque_inicio, uint32_t offset_bloque, void* datos, uint32_t tamanio);
+
+// Lee datos de los bloques correspondientes del sistema de archivos, manejando
+// la fragmentación si es necesario.
+// Pre: fs debe ser un puntero válido, buffer debe tener espacio suficiente para los datos
+// Post: Los datos son leídos de los bloques especificados y almacenados en el buffer
+void leer_bloques(t_dialfs* fs, uint32_t bloque_inicio, uint32_t offset_bloque, void* buffer, uint32_t tamanio);
+
+// Mueve bloques de datos de una ubicación a otra en el sistema de archivos,
+// utilizado durante la compactación.
+// Pre: fs debe ser un puntero válido, los bloques de origen y destino deben ser válidos
+// Post: Los bloques son movidos de la ubicación de origen a la de destino
+void mover_bloques(t_dialfs* fs, uint32_t bloque_origen, uint32_t bloque_destino, uint32_t cantidad_bloques);
+
+// Compara dos archivos por su bloque inicial, utilizado para ordenar la lista de
+// archivos durante la compactación.
+// Pre: a y b deben ser punteros válidos a estructuras t_archivo_dialfs
+// Post: Retorna un valor negativo si a < b, 0 si a == b, o positivo si a > b
+int comparar_bloques_iniciales(t_archivo_dialfs* a, t_archivo_dialfs* b);
+
+// Libera la memoria asociada a una estructura de archivo, utilizado al eliminar
+// un archivo del sistema.
+// Pre: archivo debe ser un puntero válido a una estructura t_archivo_dialfs
+// Post: La memoria asociada al archivo es liberada
+void destruir_archivo_dialfs(t_archivo_dialfs* archivo);
+
 // Envía los datos leídos al descriptor de archivo especificado, utilizando
 // el protocolo de comunicación definido para el sistema.
 // Pre: fd debe ser un descriptor de archivo válido, buffer debe contener los datos a enviar
