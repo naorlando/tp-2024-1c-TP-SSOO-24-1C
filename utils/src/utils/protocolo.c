@@ -51,11 +51,11 @@ int package_send(t_package *package, int fd)
     offset += sizeof(uint32_t);
     memcpy(stream + offset, package->buffer->stream, package->buffer->size);
 
-    send(fd, stream, size, 0);
+    int bytes_enviados = send(fd, stream, size, 0);
 
     free(stream);
 
-    return EXIT_SUCCESS;
+    return (bytes_enviados > 0) ? EXIT_SUCCESS : -1;
 }
 
 // Abstraction of sockets recv method. It should check if the connection has ended
@@ -449,7 +449,7 @@ t_IO_interface* recv_IO_interface(int fd)
     return interface;
 }
 
-void send_io_generica(int fd, t_io_generica* io_generica)
+int send_io_generica(int fd, t_io_generica* io_generica)
 {
     // Creo el paquete que se va a enviar
     t_package* package = package_create(MSG_KERNEL_IO_GENERICA, obtener_tamanio_io_generica(io_generica));
@@ -458,13 +458,15 @@ void send_io_generica(int fd, t_io_generica* io_generica)
     serializar_io_generica(get_buffer(package), io_generica);
 
     // Envio el paquete
-    package_send(package, fd);
+    int bytes_enviados = package_send(package, fd);
 
     // Elimino t_io_generica
     destruir_io_generica(io_generica);
 
     //Elimino el paquete usado
     package_destroy(package);
+
+    return bytes_enviados;
 } 
 
 t_io_generica* recv_io_generica(int fd)
@@ -480,7 +482,7 @@ t_io_generica* recv_io_generica(int fd)
     return io_generica;
 }
 
-void send_io_stdin(int fd, t_io_stdin* io_stdin)
+int send_io_stdin(int fd, t_io_stdin* io_stdin)
 {
     // Creo el paquete que se va a enviar
     t_package* package = package_create(MSG_KERNEL_IO_STDIN, obtener_tamanio_io_stdin(io_stdin));
@@ -489,13 +491,15 @@ void send_io_stdin(int fd, t_io_stdin* io_stdin)
     serializar_io_stdin(get_buffer(package), io_stdin);
 
     // Envio el paquete
-    package_send(package, fd);
+    int bytes_enviados = package_send(package, fd);
 
     // Elimino t_io_stdin
     destruir_io_stdin(io_stdin);
 
     //Elimino el paquete usado
     package_destroy(package);
+
+    return bytes_enviados;
 } 
 
 t_io_stdin* recv_io_stdin(int fd)
@@ -511,7 +515,7 @@ t_io_stdin* recv_io_stdin(int fd)
     return io_stdin;
 }
 
-void send_io_stdout(int fd, t_io_stdout* io_stdout)
+int send_io_stdout(int fd, t_io_stdout* io_stdout)
 {
     // Creo el paquete que se va a enviar
     t_package* package = package_create(MSG_KERNEL_IO_STDOUT, obtener_tamanio_io_stdout(io_stdout));
@@ -520,13 +524,15 @@ void send_io_stdout(int fd, t_io_stdout* io_stdout)
     serializar_io_stdout(get_buffer(package), io_stdout);
 
     // Envio el paquete
-    package_send(package, fd);
+    int bytes_enviados = package_send(package, fd);
 
     // Elimino t_io_stdout
     destruir_io_stdout(io_stdout);
 
     //Elimino el paquete usado
     package_destroy(package);
+
+    return bytes_enviados;
 } 
 
 t_io_stdout* recv_io_stdout(int fd)
