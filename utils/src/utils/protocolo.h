@@ -64,12 +64,12 @@ typedef enum
     MSG_INSTRUCTION_MEMORIA,
     MSG_NEXT_INSTRUCTION_CPU,
     //IO <-> MEMORIA
-    MSG_MEMORIA_IO_STDIN,
-    MSG_MEMORIA_IO_STDOUT,
-    MSG_MEMORIA_IO_DIALFS,
-    MSG_IO_STDIN_MEMORIA,
-    MSG_IO_STDOUT_MEMORIA,
-    MSG_IO_DIALFS_MEMORIA,
+    MSG_MEMORIA_IO_STDIN,  // NO SE USA / Memoria -> IO STDIN
+    MSG_MEMORIA_IO_STDOUT, // Memoria -> IO STDOUT (Envía datos a IO STDOUT para mostrar en pantalla)
+    MSG_MEMORIA_IO_DIALFS, // Memoria -> IO DIALFS (Envía datos a IO DIALFS)
+    MSG_IO_STDIN_MEMORIA,  // IO -> Memoria STDIN (Guarda datos en Memoria)
+    MSG_IO_STDOUT_MEMORIA, // NO SE USA / IO -> Memoria STDOUT 
+    MSG_IO_DIALFS_MEMORIA, // IO -> Memoria DIALFS (Guarda datos en Memoria)
     // HEADER_EXAMPLE
     EXAMPLE,
     //Empty package

@@ -21,9 +21,8 @@ bool ejecutar_unidades_de_trabajo(t_io_generica* io_generica)
 // FUNCIONES DE IO STDIN
 //===============================================
 
-void escribir_memoria(uint32_t direccion_fisica, char* valor, uint32_t tamanio) 
-{
-    t_package* package = package_create(MSG_WRITE_MEMORY, sizeof(t_buffer));
+void escribir_memoria(uint32_t direccion_fisica, char* valor, uint32_t tamanio) {
+    t_package* package = package_create(MSG_IO_STDIN_MEMORIA, sizeof(t_buffer));
     t_buffer* buffer = get_buffer(package);
     buffer_add_uint32(buffer, direccion_fisica);
     buffer_add_uint32(buffer, tamanio);
@@ -36,18 +35,17 @@ void escribir_memoria(uint32_t direccion_fisica, char* valor, uint32_t tamanio)
 // FUNCIONES DE IO STDOUT
 //===============================================
 
-char* leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) 
-{
-    t_package* package = package_create(MSG_READ_MEMORY, sizeof(t_buffer));
+char* leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
+    t_package* package = package_create(MSG_IO_STDOUT_MEMORIA, sizeof(t_buffer));
     t_buffer* buffer = get_buffer(package);
     buffer_add_uint32(buffer, direccion_fisica);
     buffer_add_uint32(buffer, tamanio);
     package_send(package, fd_memoria);
     package_destroy(package);
 
-    t_package* response = package_create(NULL_HEADER, 0);
+    t_package* response = package_create(MSG_MEMORIA_IO_STDOUT, 0);
     package_recv(response, fd_memoria);
-    char* valor = strdup(extract_string_buffer(get_buffer(response)));
+    char* valor = extract_string_buffer(get_buffer(response));
     package_destroy(response);
     return valor;
 }
