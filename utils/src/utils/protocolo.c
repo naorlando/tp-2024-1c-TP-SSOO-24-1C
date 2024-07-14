@@ -55,7 +55,7 @@ int package_send(t_package *package, int fd)
 
     free(stream);
 
-    return (bytes_enviados > 0) ? EXIT_SUCCESS : -1;
+    return (bytes_enviados > 0) ? bytes_enviados : -1;
 }
 
 // Abstraction of sockets recv method. It should check if the connection has ended
