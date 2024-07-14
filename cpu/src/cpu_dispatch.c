@@ -314,18 +314,17 @@ void manejar_ciclo_de_instruccion() {
         return;
     }
 
-    // actualizar PC:
-    cpu_registers->pc++;
-    pcb_execute->program_counter = cpu_registers->pc;
-    
-    //SOlo para seguir el flujo
-    log_info(logger_cpu, "El PCB de pid <%d> tiene el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
-
     // se debe hacer un "return;", si el proceso solicito una io
     if(solicitud_io){
         solicitud_io = false;
         return;
     }
+
+    aumentar_program_counter();
+    
+    //SOlo para seguir el flujo
+    log_info(logger_cpu, "El PCB de pid <%d> tiene el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
+
 
     // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
     if(manejar_interrupcion()) return;
@@ -364,6 +363,7 @@ void solicitar_IO(t_instruction* instruccion)
 {
     // t_interface interface = create_interface(pcb_execute, instruccion);
     //send_interface_kernel(/*interface*/);
+    aumentar_program_counter();
     cargar_contexto_ejecucion_a_pcb(pcb_execute);
 
     switch(obtener_nombre_instruccion(instruccion))
@@ -430,4 +430,11 @@ void enviar_pcb_finalizado()
         interrupcion_pendiente = false; // la desestimo
         pthread_mutex_unlock(&MUTEX_INTERRUPT);
     }
+}
+
+void aumentar_program_counter() 
+{
+    // actualizar PC:
+    cpu_registers->pc++;
+    pcb_execute->program_counter = cpu_registers->pc;
 }
