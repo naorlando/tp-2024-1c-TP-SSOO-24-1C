@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <variables_globales.h>
 #include "utils/solicitudes_io.h"
+#include "utils/estructuras.h"
 #include "manager_ios.h"
 
 typedef enum
@@ -31,6 +32,7 @@ t_header_solicitud get_tipo();
 void* get_contenido(t_solicitud*);
 void set_tipo(t_header_solicitud);
 void set_contenido(void*);
-void procesar_solicitud(t_solicitud*);
+bool procesar_solicitud(t_solicitud*);
+t_PCB* obtener_pcb_solicitud(t_solicitud*);
 
 #endif /*SOLICITUD_H_*/

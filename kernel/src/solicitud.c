@@ -53,7 +53,7 @@ void set_contenido(void* contenido)
     solicitud->contenido = contenido;
 }
 
-void procesar_solicitud(t_solicitud* solicitud_a_procesar)
+bool procesar_solicitud(t_solicitud* solicitud_a_procesar)
 {
     t_IO_connection* io_connection;
     void* proceso;
@@ -91,6 +91,31 @@ void procesar_solicitud(t_solicitud* solicitud_a_procesar)
             break;
     }
 
-    if(io_connection != NULL)
-        agregar_proceso_bloqueado(io_connection, proceso);
+    if(io_connection != NULL) {
+        return agregar_proceso_bloqueado(io_connection, proceso);  
+    }
+
+    return false;
+}
+
+t_PCB* obtener_pcb_solicitud(t_solicitud* solicitud)
+{
+    t_PCB* pcb;
+
+    switch(get_tipo(solicitud)){
+        case SOLICITUD_VACIA:
+            
+            break;
+        case SOLICITUD_GENERICA:
+        case SOLICITUD_STDIN:
+        case SOLICITUD_STDOUT:
+        case SOLICITUD_DIALFS:
+            //TODO: REALIZAR UNA FUNCION QUE PERMITA OBTENER EL TIPO DE INTERFAZ QUE SE RECIBE
+            pcb = obtener_pcb_de_solicitud(get_contenido(solicitud), "GENERICA");
+            break;
+        default:
+            //caso de error
+            break;
+    }
+    return pcb;
 }
