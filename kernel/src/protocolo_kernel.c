@@ -64,58 +64,45 @@ void send_interruption_cpu(t_interruption* interrupcion)
 int send_kernel_io_gen_sleep(int fd, char* nombre_interfaz, t_io_generica* io_generica) {
     
     //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
-    send_io_generica(fd, io_generica);
+    int bytes_enviados = send_io_generica(fd, io_generica);
+
+    if(bytes_enviados > 0) {
+         log_info(logger_kernel, "Solicitud enviada a la IO GENERICA %s con pid %d", nombre_interfaz, obtener_pid_generica(io_generica));
+    }else {
+        log_error(logger_kernel, "Hubo un error al enviar la solicitud a la IO GENERICA %s con pid %d", nombre_interfaz, obtener_pid_generica(io_generica));
+    }
     
-    log_info(logger_kernel, "Solicitud enviada a la IO GENERICA %s con pid %d", nombre_interfaz, obtener_pid_generica(io_generica));
-    
-    return 0;
+    return bytes_enviados;
 }
 
 // Agrego la función que envía la instrucción IO_STDIN al módulo de E/S
 int send_kernel_io_stdin(int fd, char* nombre_interfaz, t_io_stdin* io_stdin) {
     
     //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
-    send_io_stdin(fd, io_stdin);
+    int bytes_enviados = send_io_stdin(fd, io_stdin);
+
+    if(bytes_enviados > 0) {
+        log_info(logger_kernel, "Solicitud enviada a la IO STDIN %s con pid %d", nombre_interfaz, obtener_pid_stdin(io_stdin));
+    }else {
+        log_error(logger_kernel, "Hubo un error al enviar la solicitud a la IO STDIN %s con pid %d", nombre_interfaz, obtener_pid_stdin(io_stdin));
+    }
     
-    log_info(logger_kernel, "Solicitud enviada a la IO STDIN %s con pid %d", nombre_interfaz, obtener_pid_stdin(io_stdin));
-    
-    return 0;
+    return bytes_enviados;
 }
 
 // Agrego la función que envía la instrucción IO_STDOUT al módulo de E/S
 int send_kernel_io_stdout(int fd, char* nombre_interfaz, t_io_stdout* io_stdout) {
     
     //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
-    send_io_stdout(fd, io_stdout);
+    int bytes_enviados = send_io_stdout(fd, io_stdout);
     
-    log_info(logger_kernel, "Solicitud enviada a la IO STDOUT %s con pid %d", nombre_interfaz, obtener_pid_stdout(io_stdout));
+    if(bytes_enviados > 0) {
+        log_info(logger_kernel, "Solicitud enviada a la IO STDOUT %s con pid %d", nombre_interfaz, obtener_pid_stdout(io_stdout));
+    }else {
+        log_error(logger_kernel, "Hubo un error al enviar la solicitud a la IO STDOUT %s con pid %d", nombre_interfaz, obtener_pid_stdout(io_stdout));
+    }
     
-    return 0;
-}
-
-// Agrego la función que recibe la confirmación de que la instrucción IO_GEN_SLEEP fue recibida y procesada
-int recibir_confirmacion_io(int fd_kernel) {
-    t_package *package = package_create(NULL_HEADER, 0);
-
-    if (package_recv(package, fd_kernel) != EXIT_SUCCESS) {
-        log_error(logger_kernel, "Error al recibir confirmación IO_GEN_SLEEP");
-        package_destroy(package);
-        return -1;
-    }
-
-    t_buffer *buffer = package->buffer;
-    void *stream = buffer->stream;
-    uint32_t mensaje_id;
-    memcpy(&mensaje_id, stream, sizeof(uint32_t));
-
-    if (mensaje_id == MSG_KERNEL_IO) {
-        log_info(logger_kernel, "Confirmación de IO_GEN_SLEEP recibida");
-    } else {
-        log_warning(logger_kernel, "Se recibió un mensaje desconocido en confirmación IO_GEN_SLEEP");
-    }
-
-    package_destroy(package);
-    return 0;
+    return bytes_enviados;
 }
 
 t_solicitud_io_generica* recv_solicitud_io_generica_cpu()

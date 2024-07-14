@@ -16,7 +16,6 @@ int recv_example_msg_entradasalida();
 int send_kernel_io_gen_sleep(int, char*, t_io_generica*);
 int send_kernel_io_stdin(int, char*, t_io_stdin*);
 int send_kernel_io_stdout(int, char*, t_io_stdout*);
-int recibir_confirmacion_io(int fd_kernel);
 int recv_example_msg_entradasalida(int);
 t_PCB* recv_pcb_interrupt();
 void send_interruption_cpu(t_interruption*);
