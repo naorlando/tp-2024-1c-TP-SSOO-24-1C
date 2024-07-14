@@ -9,6 +9,31 @@ void agregar_a_cola_ready(t_PCB* pcb)
     sem_post(&SEM_READY);
 }
 
+void agregar_a_cola_new(t_PCB* pcb)
+{
+    pthread_mutex_lock(&MUTEX_NEW);
+    queue_push(COLA_NEW, pcb);
+    pthread_mutex_unlock(&MUTEX_NEW);
+}
+
+t_PCB* siguiente_pcb_cola_new()
+{
+    pthread_mutex_lock(&MUTEX_NEW);
+    t_PCB* pcb = queue_pop(COLA_NEW);
+    pthread_mutex_unlock(&MUTEX_NEW);
+
+    return pcb;
+}
+
+t_PCB* siguiente_pcb_cola_ready()
+{
+    pthread_mutex_lock(&MUTEX_READY);
+    t_PCB* pcb = queue_pop(COLA_READY);
+    pthread_mutex_unlock(&MUTEX_READY);
+
+    return pcb;
+}
+
 void agregar_de_new_a_ready(t_PCB* pcb)
 {
     agregar_a_cola_ready(pcb);
