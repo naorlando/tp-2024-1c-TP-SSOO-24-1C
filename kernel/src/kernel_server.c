@@ -36,16 +36,21 @@ void atender_kernel_IO(void* io_connection)
 
         procesar_solicitud_func procesar_func = obtener_procesador_solicitud(obtener_tipo_conexion(cliente_io));
         void* solicitud = obtener_siguiente_proceso(cliente_io);
+        char* tipo_interfaz = tipo_interfaz_to_string(obtener_tipo_conexion(cliente_io));
 
         if (procesar_func != NULL) {
-            procesar_solicitud_IO(obtener_file_descriptor(cliente_io), solicitud, procesar_func);
-            // TODO: Armar el flujo para enviar el pcb a EXIT
+            int enviado = procesar_solicitud_IO(obtener_file_descriptor(cliente_io), solicitud, procesar_func);
+            
+            //La IO esta desconectada, se pasa a EXIT el PCB y se procesa el siguiente que este en la cola
+            if(enviado == -1) {
+                agregar_a_cola_exit(obtener_pcb_de_solicitud(solicitud, tipo_interfaz));
+                continue;
+            }
         } else {
             log_warning(logger_kernel, "Tipo de IO desconocida. No quieras meter la pata");
         }
 
         int cod_op = recibir_operacion(obtener_file_descriptor(cliente_io));
-        char* tipo_interfaz = tipo_interfaz_to_string(obtener_tipo_conexion(cliente_io));
 
         switch (cod_op)
         {
