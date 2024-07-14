@@ -119,4 +119,8 @@ sem_t* obtener_semaforo_cola_bloqueados(t_IO_connection* conexion);
 
 pthread_mutex_t* obtener_mutex_cola_bloqueados(t_IO_connection* conexion);
 
+void* obtener_proceso_bloqueado(t_IO_connection* conexion);
+
+bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso);
+
 #endif // IO_INTERFACE_H
