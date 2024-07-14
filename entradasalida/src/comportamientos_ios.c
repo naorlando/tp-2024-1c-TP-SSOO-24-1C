@@ -8,7 +8,7 @@ bool ejecutar_unidades_de_trabajo(t_io_generica* io_generica)
 
     log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
 
-    sleep(tiempo_espera);
+    sleep(tiempo_espera / 1000);
 
     return true;
 }
