@@ -460,9 +460,6 @@ int send_io_generica(int fd, t_io_generica* io_generica)
     // Envio el paquete
     int bytes_enviados = package_send(package, fd);
 
-    // Elimino t_io_generica
-    destruir_io_generica(io_generica);
-
     //Elimino el paquete usado
     package_destroy(package);
 
@@ -493,9 +490,6 @@ int send_io_stdin(int fd, t_io_stdin* io_stdin)
     // Envio el paquete
     int bytes_enviados = package_send(package, fd);
 
-    // Elimino t_io_stdin
-    destruir_io_stdin(io_stdin);
-
     //Elimino el paquete usado
     package_destroy(package);
 
@@ -525,9 +519,6 @@ int send_io_stdout(int fd, t_io_stdout* io_stdout)
 
     // Envio el paquete
     int bytes_enviados = package_send(package, fd);
-
-    // Elimino t_io_stdout
-    destruir_io_stdout(io_stdout);
 
     //Elimino el paquete usado
     package_destroy(package);
