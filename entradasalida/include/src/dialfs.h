@@ -6,6 +6,7 @@
 #include <commons/bitarray.h>
 #include "utils/estructuras.h"
 #include "utils/buffer.h"
+#include "utils/protocolo.h"
 #include "variables_globales.h"
 
 typedef struct {

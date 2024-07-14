@@ -83,13 +83,13 @@ void atender_solicitudes_io_memoria() {
         int cod_operacion = recibir_operacion(fd_memoria);
         switch (cod_operacion) {
             case MSG_MEMORIA_IO_STDIN:
-                atender_solicitud_stdin();
+                atender_solicitud_stdin(fd_memoria);
                 break;
             case MSG_MEMORIA_IO_STDOUT:
-                atender_solicitud_stdout();
+                atender_solicitud_stdout(fd_memoria);
                 break;
             case MSG_MEMORIA_IO_DIALFS:
-                atender_solicitud_dialfs();
+                atender_solicitud_dialfs(fd_memoria);
                 break;
             case -1:
                 log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el módulo de memoria.");
@@ -117,7 +117,7 @@ void atender_solicitudes_io_kernel() {
                 atender_solicitud_stdout(fd_kernel);
                 break;
             case MSG_KERNEL_IO_DIALFS:
-                atender_instruccion_dialfs(fd_kernel);
+                atender_solicitud_dialfs(fd_kernel);
                 break;
             case -1:
                 log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el Kernel.");
