@@ -29,7 +29,7 @@ void destruir_dialfs(t_dialfs* fs) {
     free(fs);
 }
 
-bool crear_archivo(t_dialfs* fs, char* nombre) {
+/*bool crear_archivo(t_dialfs* fs, char* nombre) {
     // Implementar lógica para crear archivo
     // Buscar bloque libre en el bitmap
     // Actualizar bitmap y lista de archivos
@@ -53,7 +53,7 @@ bool escribir_archivo(t_dialfs* fs, char* nombre, void* datos, uint32_t tamanio,
 bool leer_archivo(t_dialfs* fs, char* nombre, void* buffer, uint32_t tamanio, uint32_t offset) {
     // Implementar lógica para leer de archivo
     // Manejar lectura que cruza múltiples bloques
-}
+}*/
 
 void compactar_fs(t_dialfs* fs) {
     // Implementar lógica de compactación

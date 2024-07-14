@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <commons/bitarray.h>
+#include <commons/collections/list.h>
 
 typedef struct {
     char* nombre;
