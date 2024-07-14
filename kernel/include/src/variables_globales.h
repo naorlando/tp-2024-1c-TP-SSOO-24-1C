@@ -41,7 +41,7 @@ extern pthread_mutex_t MUTEX_DICTIONARY;
 
 //SEMAFOROS
 extern sem_t SEM_READY;
-extern sem_t BLOQUEADOR;
+extern sem_t SEM_BLOCKED;
 extern sem_t SEM_EXIT;
 extern sem_t SEM_NEW;
 extern sem_t SEM_MULTIPROGRAMACION;
