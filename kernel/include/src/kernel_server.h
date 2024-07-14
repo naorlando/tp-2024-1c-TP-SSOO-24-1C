@@ -7,7 +7,6 @@
 #include "utils/sockets.h"
 //#include "utils/estructuras.h"
 //#include "utils/buffer.h"
-#include <commons/collections/dictionary.h>
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <pthread.h>
@@ -29,7 +28,7 @@ void atender_kernel_memoria();
 void atender_kernel_cpu_dispatch();
 
 // Funciones de manejo de conexiones I/O
-t_IO_connection* recibir_io_connection(int cliente_io);
+char* recibir_io_connection(int cliente_io);
 
 // Funciones de cierre
 void _cerrar_conexiones();
