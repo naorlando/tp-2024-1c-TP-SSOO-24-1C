@@ -63,14 +63,7 @@ procesar_solicitud_func obtener_procesador_solicitud(int tipo_conexion)
 
 void* obtener_siguiente_proceso(t_IO_connection* cliente_io)
 {
-    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(cliente_io);
-
-    pthread_mutex_lock(mutex_blocked);
-    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
-    void* solicitud = queue_pop(cola_bloqueados_io);
-    pthread_mutex_unlock(mutex_blocked);
-
-    return solicitud;
+    return obtener_proceso_bloqueado(cliente_io);
 }
 
 int procesar_solicitud_IO(int fd, void* solicitud, procesar_solicitud_func procesar_func) 
