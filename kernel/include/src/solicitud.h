@@ -34,5 +34,6 @@ void set_tipo(t_header_solicitud);
 void set_contenido(void*);
 bool procesar_solicitud(t_solicitud*);
 t_PCB* obtener_pcb_solicitud(t_solicitud*);
+void set_solicitud(t_header_solicitud, void*);
 
 #endif /*SOLICITUD_H_*/

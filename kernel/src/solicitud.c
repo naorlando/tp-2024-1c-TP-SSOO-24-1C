@@ -119,3 +119,9 @@ t_PCB* obtener_pcb_solicitud(t_solicitud* solicitud)
     }
     return pcb;
 }
+
+void set_solicitud(t_header_solicitud tipo, void* contenido) 
+{
+    set_tipo(tipo);
+    set_contenido(contenido);
+}
