@@ -23,8 +23,7 @@ void procesar_ios_genericas()
     }
 
     sem_post(&SEM_CPU);
-
-    set_contenido(solicitud_gen);
+    set_solicitud(SOLICITUD_GENERICA, solicitud_gen);
     sem_post(&SEM_BLOCKED);
     
     //1. Validar que la IO GENERICA este conectada
