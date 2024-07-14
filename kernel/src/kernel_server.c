@@ -288,7 +288,9 @@ void* esperar_conexiones_IO(void* arg)
         int cliente_io = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, server_fd);
         
         if (cliente_io != -1) {
-            t_IO_connection* io_connection = recibir_io_connection(cliente_io);
+            char* nombre_interfaz = recibir_io_connection(cliente_io);
+            t_IO_connection* io_connection = get_IO_connection(nombre_interfaz);
+
             if (io_connection != NULL) {
                 agregar_IO_connection(io_connection);
                 
@@ -297,7 +299,7 @@ void* esperar_conexiones_IO(void* arg)
                     log_error(logger_kernel, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
                     exit(EXIT_FAILURE);
                 }
-                log_info(logger_kernel, "Interfaz %s conectada con éxito", obtener_nombre_conexion(io_connection));
+                log_info(logger_kernel, "Nueva conexión de I/O establecida: %s de tipo %s", nombre_interfaz, tipo_interfaz_to_string(obtener_tipo_conexion(io_connection)));
                 pthread_detach(hilo_io);
             }
         } else {
@@ -307,45 +309,17 @@ void* esperar_conexiones_IO(void* arg)
     return NULL;
 }
 
-// Función para recibir un cliente IO y devolver la conexión
-t_IO_connection* recibir_io_connection(int cliente_io) 
+char* recibir_io_connection(int cliente_io) 
 {
     int cod_op = recibir_operacion(cliente_io);
 
     if(cod_op == MSG_IO_KERNEL) {
-        
-        t_IO_interface* io_interface = recv_IO_interface(cliente_io);
-        
-        if (io_interface == NULL) {
-            log_error(logger_kernel, "Error al recibir la interfaz de E/S del cliente.");
-            liberar_conexion(cliente_io);
-            return NULL;
-        }
-
-        t_IO_connection* io_connection = crear_IO_connection(
-            obtener_nombre_IO_interface(io_interface),
-            obtener_tipo_IO_interface(io_interface),
-            cliente_io
-        );
-
-        if (io_connection == NULL) {
-            log_error(logger_kernel, "Error al crear la conexión de E/S.");
-            liberar_IO_interface(io_interface);
-            liberar_conexion(cliente_io);
-            return NULL;
-        }
-
-        log_info(logger_kernel, "Nueva conexión de I/O establecida: %s de tipo %s", 
-                 obtener_nombre_conexion(io_connection),
-                 tipo_interfaz_to_string(obtener_tipo_conexion(io_connection)));
-
-        liberar_IO_interface(io_interface);
-        return io_connection;
+        return nuevo_IO_cliente_conectado(cliente_io);
     } else {
         log_error(logger_kernel, "Error al recibir un cliente IO. Operación incorrecta: %d", cod_op);
         liberar_conexion(cliente_io);
-        return NULL;
     }
+    return NULL;
 }
 
 void cerrar_servidor()
