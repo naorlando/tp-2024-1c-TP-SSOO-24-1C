@@ -252,6 +252,17 @@ void f_finalizar_proceso(u_int32_t pid){
         log_error(logger_kernel, "No se encontro el proceso con PID: %d", pid);
         return;
     }
+    // ##############################################################
+    // TODO: falta hacer la siguiente logica:
+    // En caso de que el proceso se encuentre ejecutando en CPU, 
+    // se deberá enviar una señal de interrupción a través de la conexión de interrupt con el mismo y 
+    // aguardar a que éste retorne el Contexto de Ejecución antes de iniciar la liberación de recursos.
+    if(EXECUTE != NULL && EXECUTE->pid == pid){
+        // enviar señal de interrupcion a CPU
+        // esperar a que retorne el contexto de ejecucion...
+    }
+
+    // ##############################################################
 
     // elimina el PCB para siempre (ver en largo_plazo.c)
     agregar_a_cola_exit(pcb);

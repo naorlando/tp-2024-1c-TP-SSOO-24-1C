@@ -126,6 +126,12 @@ void atender_kernel_cpu_dispatch()
 
                 break;
             case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
+
+            // hay que:
+            // hacer la logica de a que cola se manda (segun el quantum que le llega).. 
+            // previamente chequeando en que algoritmo estamos.
+
+
                 //TODO: agregar PCB donde este:
                 // 1-recibir pcb:
                 // t_PCB* pcb_interrupt = recv_pcb_interrupt();
