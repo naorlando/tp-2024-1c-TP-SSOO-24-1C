@@ -128,6 +128,9 @@ void blocked()
     while(1) {
         sem_wait(&SEM_BLOCKED);
 
-        procesar_solicitud(solicitud);
+        if(!procesar_solicitud(solicitud)) {
+            // la io no esta conectada desde el principio
+            agregar_a_cola_exit(obtener_pcb_solicitud(solicitud));
+        }
     }
 }
