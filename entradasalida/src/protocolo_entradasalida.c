@@ -57,13 +57,13 @@ void atender_solicitud_stdin(int fd) {
 
 // Función auxiliar que escribe en memoria el valor recibido
 void escribir_memoria(uint32_t direccion_fisica, char *valor, uint32_t tamanio) {
-    t_package *package = package_create(MSG_WRITE_MEMORY, sizeof(t_buffer));
+    /*t_package *package = package_create(MSG_WRITE_MEMORY, sizeof(t_buffer));
     t_buffer *buffer = get_buffer(package);
     buffer_add_uint32(buffer, direccion_fisica);
     buffer_add_uint32(buffer, tamanio);
     buffer_add_string(buffer, valor);
     package_send(package, fd_memoria);
-    package_destroy(package);
+    package_destroy(package);*/
 }
 
 //======================================================
@@ -97,7 +97,7 @@ void atender_solicitud_stdout(int fd) {
 
 // Función auxiliar que lee la memoria de la dirección física y devuelve el valor leído
 char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
-    t_package *package = package_create(MSG_READ_MEMORY, sizeof(t_buffer));
+    /*t_package *package = package_create(MSG_READ_MEMORY, sizeof(t_buffer));
     t_buffer *buffer = get_buffer(package);
     buffer_add_uint32(buffer, direccion_fisica);
     buffer_add_uint32(buffer, tamanio);
@@ -108,7 +108,9 @@ char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
     package_recv(response, fd_memoria);
     char *valor = strdup(extract_string_buffer(get_buffer(response)));
     package_destroy(response);
-    return valor;
+    return valor;*/
+
+    return "";
 }
 
 //======================================================
@@ -116,7 +118,7 @@ char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
 //======================================================
 
 void atender_instruccion_dialfs(int fd) {
-    t_io_dialfs* io_dialfs = deserializar_io_dialfs(recibir_buffer(&fd, sizeof(int)));
+    /*t_io_dialfs* io_dialfs = deserializar_io_dialfs(recibir_buffer(&fd, sizeof(int)));
     if (io_dialfs != NULL) {
         bool operacion_exitosa = false;
         
@@ -168,15 +170,15 @@ void atender_instruccion_dialfs(int fd) {
         log_info(logger_entradasalida, "Inicio Compactación.");
         compactar_fs(dialfs);
         log_info(logger_entradasalida, "Fin Compactación.");
-    }
+    }*/
 }
 
 void enviar_datos_leidos(int fd, void* buffer, uint32_t tamanio) {
-    t_package* package = package_create(MSG_DIALFS_DATA, tamanio);
+    /*t_package* package = package_create(MSG_DIALFS_DATA, tamanio);
     t_buffer* package_buffer = get_buffer(package);
     buffer_add_data(package_buffer, buffer, tamanio);
     package_send(package, fd);
-    package_destroy(package);
+    package_destroy(package);*/
 }
 
 
