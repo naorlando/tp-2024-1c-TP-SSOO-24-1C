@@ -102,11 +102,38 @@ void procesar_solicitud_stdout(int fd, t_solicitud_io_stdout* solicitud_io_stdou
     send_kernel_io_stdout(fd, nombre_interfaz, io_stdout);
 }
 
-// TODO: Terminar de implementar
-void procesar_solicitud_dialfs()
+void procesar_solicitud_dialfs(int fd, t_solicitud_io_dialfs* solicitud_io_dialfs) 
 {
+    char* nombre_interfaz = obtener_nombre_solicitud_dialfs(solicitud_io_dialfs);
+    t_io_dialfs* io_dialfs = obtener_io_solicitud_dialfs(solicitud_io_dialfs);
+    t_PCB* pcb = obtener_pcb_solicitud_dialfs(solicitud_io_dialfs);
 
+    // Verificar que la solicitud sea válida
+    if (!es_solicitud_dialfs_valida(io_dialfs)) {
+        log_error(logger_kernel, "PID: %d - Solicitud DialFS inválida para la interfaz %s", 
+                  io_dialfs->pid, nombre_interfaz);
+        return;
+    }
+
+    // Preparar y enviar la solicitud a la interfaz DialFS
+    switch(io_dialfs->operacion) 
+    {
+        case IO_FS_CREATE:
+        case IO_FS_DELETE:
+        case IO_FS_TRUNCATE:
+        case IO_FS_WRITE:
+        case IO_FS_READ:
+            send_kernel_io_dialfs(fd, nombre_interfaz, io_dialfs);
+            log_info(logger_kernel, "PID: %d - Solicitud %s enviada a la IO DIALFS %s", 
+                     io_dialfs->pid, get_operation_name(io_dialfs->operacion), nombre_interfaz);
+            break;
+        default:
+            log_error(logger_kernel, "PID: %d - Operación DialFS no reconocida para la interfaz %s", 
+                      io_dialfs->pid, nombre_interfaz);
+            break;
+    }
 }
+
 
 void procesar_respuesta_io(int fd, char* nombre_interfaz)
 {

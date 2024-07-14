@@ -292,13 +292,6 @@ void send_solicitud_io_dialfs(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_di
 //       Si ocurre un error o no se recibe ningún dato, retorna NULL.
 t_solicitud_io_dialfs* recv_solicitud_io_dialfs(int fd);
 
-// Obtiene el tamaño de una solicitud de I/O dialfs.
-// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_dialfs válida y no debe ser NULL.
-// Post: Retorna el tamaño de la solicitud de I/O dialfs en bytes.
-//      Si la solicitud es NULL, retorna 0.
-uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
-
-
 /*********** SEND AND RECIVE 'T_IO_INTERFACE' ***********/
 // Envía una estructura t_IO_interface a través de un socket especificado.
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.

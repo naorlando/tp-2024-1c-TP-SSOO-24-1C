@@ -314,16 +314,7 @@ void destruir_solicitud_io(void* solicitud, char* tipo_interfaz) {
 // FUNCIONES DE IO DIALFS
 //===============================================
 
-t_solicitud_io_dialfs* crear_solicitud_io_dialfs(t_PCB* pcb, char* nombre_interfaz, t_io_dialfs* io_dialfs) {
-    t_solicitud_io_dialfs* solicitud = malloc(sizeof(t_solicitud_io_dialfs));
-    if (solicitud == NULL) return NULL;
-    solicitud->pcb = pcb;
-    solicitud->nombre_interfaz = strdup(nombre_interfaz);
-    solicitud->io_dialfs = io_dialfs;
-    return solicitud;
-}
-
-t_io_dialfs* crear_io_dialfs(char* nombre_archivo, uint32_t tamanio, uint32_t offset, void* datos, t_name_instruction operacion) {
+t_io_dialfs* crear_io_dialfs(char* nombre_archivo, uint32_t tamanio, uint32_t offset, void* datos, t_name_instruction operacion, uint32_t pid) {
     t_io_dialfs* io_dialfs = malloc(sizeof(t_io_dialfs));
     if (io_dialfs == NULL) return NULL;
     io_dialfs->nombre_archivo = strdup(nombre_archivo);
@@ -331,15 +322,8 @@ t_io_dialfs* crear_io_dialfs(char* nombre_archivo, uint32_t tamanio, uint32_t of
     io_dialfs->offset = offset;
     io_dialfs->datos = datos;
     io_dialfs->operacion = operacion;
+    io_dialfs->pid = pid;
     return io_dialfs;
-}
-
-void destruir_solicitud_io_dialfs(t_solicitud_io_dialfs* solicitud) {
-    if (solicitud != NULL) {
-        free(solicitud->nombre_interfaz);
-        destruir_io_dialfs(solicitud->io_dialfs);
-        free(solicitud);
-    }
 }
 
 void destruir_io_dialfs(t_io_dialfs* io_dialfs) {
@@ -357,6 +341,7 @@ uint32_t obtener_tamanio_io_dialfs(t_io_dialfs* io_dialfs) {
     size += sizeof(uint32_t); // Tamaño
     size += sizeof(uint32_t); // Offset
     size += sizeof(uint32_t); // Operación
+    size += sizeof(uint32_t); // PID
     
     // Si es una operación de escritura, incluimos el tamaño de los datos
     if (io_dialfs->operacion == IO_FS_WRITE) {
@@ -364,4 +349,33 @@ uint32_t obtener_tamanio_io_dialfs(t_io_dialfs* io_dialfs) {
     }
     
     return size;
+}
+
+t_solicitud_io_dialfs* crear_solicitud_io_dialfs(t_PCB* pcb, char* nombre_interfaz, t_io_dialfs* io_dialfs) {
+    t_solicitud_io_dialfs* solicitud = malloc(sizeof(t_solicitud_io_dialfs));
+    if (solicitud == NULL) return NULL;
+    solicitud->pcb = pcb;
+    solicitud->nombre_interfaz = strdup(nombre_interfaz);
+    solicitud->io_dialfs = io_dialfs;
+    return solicitud;
+}
+
+void destruir_solicitud_io_dialfs(t_solicitud_io_dialfs* solicitud) {
+    if (solicitud != NULL) {
+        free(solicitud->nombre_interfaz);
+        destruir_io_dialfs(solicitud->io_dialfs);
+        free(solicitud);
+    }
+}
+
+t_PCB* obtener_pcb_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
+    return solicitud->pcb;
+}
+
+char* obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
+    return solicitud->nombre_interfaz;
+}
+
+t_io_dialfs* obtener_io_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
+    return solicitud->io_dialfs;
 }
