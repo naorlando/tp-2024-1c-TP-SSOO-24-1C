@@ -30,7 +30,7 @@ pthread_mutex_t MUTEX_EXECUTE;
 pthread_mutex_t MUTEX_DICTIONARY;
 
 sem_t SEM_READY;
-sem_t BLOQUEADOR;
+sem_t SEM_BLOCKED;
 sem_t SEM_EXIT;
 sem_t SEM_NEW;
 sem_t SEM_MULTIPROGRAMACION;
@@ -137,6 +137,15 @@ void inicializar_planificadores()
     else
     {
         log_error(logger_kernel, "ERROR CRITICO INICIANDO EL PLANIFICADOR DE CORTO PLAZO. ABORTANDO.");
+        exit(EXIT_FAILURE);
+    }
+
+    pthread_t THREAD_BLOCKED;
+    if (!pthread_create(&THREAD_BLOCKED, NULL, (void *) blocked, NULL))
+        pthread_detach(THREAD_BLOCKED);
+    else
+    {
+        log_error(logger_kernel, "ERROR CRITICO INICIANDO EL ESTADO BLOCKED. ABORTANDO.");
         exit(EXIT_FAILURE);
     }
 }
