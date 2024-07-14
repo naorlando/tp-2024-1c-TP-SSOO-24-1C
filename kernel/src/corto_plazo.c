@@ -120,3 +120,14 @@ t_planificador _obtener_planificador(char *str)
         return VRR;
     return -1;
 }
+
+void blocked()
+{
+    t_solicitud* solicitud = get_solicitud();
+
+    while(1) {
+        sem_wait(&SEM_BLOCKED);
+
+        procesar_solicitud(solicitud);
+    }
+}
