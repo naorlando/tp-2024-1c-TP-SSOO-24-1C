@@ -30,14 +30,6 @@ void atender_kernel_cpu_dispatch();
 
 // Funciones de manejo de conexiones I/O
 t_IO_connection* recibir_io_connection(int cliente_io);
-void agregar_IO_connection(t_IO_connection* io_connection);
-t_IO_connection* get_IO_connection(char* nombre_interfaz);
-void liberar_IO_connection(t_IO_connection* io_connection);
-
-// Funciones auxiliares
-int obtener_file_descriptor(t_IO_connection* conexion);
-char* obtener_nombre_conexion(t_IO_connection* conexion);
-tipo_interfaz_t obtener_tipo_conexion(t_IO_connection* conexion);
 
 // Funciones de cierre
 void _cerrar_conexiones();

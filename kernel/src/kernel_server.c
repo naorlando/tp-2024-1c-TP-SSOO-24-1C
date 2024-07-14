@@ -1,7 +1,5 @@
 #include "kernel_server.h"
 
-t_dictionary* io_connections = NULL;
-
 void atender_kernel_memoria()
 {
     bool control_key = 1;
@@ -41,6 +39,7 @@ void atender_kernel_IO(void* io_connection)
 
         if (procesar_func != NULL) {
             procesar_solicitud_IO(obtener_file_descriptor(cliente_io), solicitud, procesar_func);
+            // TODO: Armar el flujo para enviar el pcb a EXIT
         } else {
             log_warning(logger_kernel, "Tipo de IO desconocida. No quieras meter la pata");
         }
@@ -313,10 +312,7 @@ t_IO_connection* recibir_io_connection(int cliente_io)
 {
     int cod_op = recibir_operacion(cliente_io);
 
-    if(cod_op == MSG_IO_GENERICA_KERNEL || 
-       cod_op == MSG_IO_STDIN_KERNEL || 
-       cod_op == MSG_IO_STDOUT_KERNEL || 
-       cod_op == MSG_IO_DIALFS_KERNEL) {
+    if(cod_op == MSG_IO_KERNEL) {
         
         t_IO_interface* io_interface = recv_IO_interface(cliente_io);
         
@@ -341,7 +337,7 @@ t_IO_connection* recibir_io_connection(int cliente_io)
 
         log_info(logger_kernel, "Nueva conexión de I/O establecida: %s de tipo %s", 
                  obtener_nombre_conexion(io_connection),
-                 obtener_tipo_conexion(io_connection));
+                 tipo_interfaz_to_string(obtener_tipo_conexion(io_connection)));
 
         liberar_IO_interface(io_interface);
         return io_connection;
@@ -350,17 +346,6 @@ t_IO_connection* recibir_io_connection(int cliente_io)
         liberar_conexion(cliente_io);
         return NULL;
     }
-}
-
-void agregar_IO_connection(t_IO_connection* io_connection)
-{
-    char* nombre_interfaz = obtener_nombre_conexion(io_connection);
-    dictionary_put(io_connections, nombre_interfaz, io_connection);
-}
-
-t_IO_connection* get_IO_connection(char* nombre_interfaz) 
-{
-    return dictionary_get(io_connections, nombre_interfaz);
 }
 
 void cerrar_servidor()
@@ -398,25 +383,4 @@ void _cerrar_conexiones()
     }
 
     log_info(logger_kernel, "Todas las conexiones han sido cerradas correctamente.");
-}
-
-// Funciones auxiliares
-int obtener_file_descriptor(t_IO_connection* conexion) {
-    return conexion->file_descriptor;
-}
-
-char* obtener_nombre_conexion(t_IO_connection* conexion) {
-    return conexion->nombre_interfaz;
-}
-
-tipo_interfaz_t obtener_tipo_conexion(t_IO_connection* conexion) {
-    return conexion->tipo_interfaz;
-}
-
-void liberar_IO_connection(t_IO_connection* io_connection) {
-    if (io_connection != NULL) {
-        free(io_connection->nombre_interfaz);
-        // Liberar otros recursos si los hay
-        free(io_connection);
-    }
 }
