@@ -15,10 +15,12 @@ char* nuevo_IO_cliente_conectado(int cliente_io)
     t_IO_connection* io_connection = crear_IO_connection(obtener_nombre_IO_interface(io_interface), obtener_tipo_IO_interface(io_interface), cliente_io);
     if (io_connection == NULL) {
         log_error(logger_kernel, "Error al crear la conexión de E/S.");
-        liberar_IO_interface(io_interface);
         liberar_conexion(cliente_io);
         return NULL;
     }
+
+    // Libero la io_interface
+    liberar_IO_interface(io_interface);
 
     return obtener_nombre_conexion(io_connection);
 }
