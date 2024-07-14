@@ -112,3 +112,16 @@ void procesar_respuesta_io(int fd, char* nombre_interfaz)
         log_info(logger_kernel, "Procesamiento de la interfaz '%s': %s para el PID <%d>", nombre_interfaz, resultado_str, get_pid_response(response));
     }
 }
+
+t_IO_connection* recibir_io_connection(int cliente_io) 
+{
+    int cod_op = recibir_operacion(cliente_io);
+
+    if(cod_op == MSG_IO_KERNEL) {
+        return nuevo_IO_cliente_conectado(cliente_io);
+    } else {
+        log_error(logger_kernel, "Error al recibir un cliente IO. Operación incorrecta: %d", cod_op);
+        liberar_conexion(cliente_io);
+    }
+    return NULL;
+}

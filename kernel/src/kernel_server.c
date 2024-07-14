@@ -314,19 +314,6 @@ void* esperar_conexiones_IO(void* arg)
     return NULL;
 }
 
-t_IO_connection* recibir_io_connection(int cliente_io) 
-{
-    int cod_op = recibir_operacion(cliente_io);
-
-    if(cod_op == MSG_IO_KERNEL) {
-        return nuevo_IO_cliente_conectado(cliente_io);
-    } else {
-        log_error(logger_kernel, "Error al recibir un cliente IO. Operación incorrecta: %d", cod_op);
-        liberar_conexion(cliente_io);
-    }
-    return NULL;
-}
-
 void cerrar_servidor()
 {
     _cerrar_puertos();
