@@ -13,7 +13,7 @@ void initialize_semaphores()
 {
     sem_init(&SEM_READY, 0, 0);
     sem_init(&SEM_EXIT,0,0);
-    sem_init(&BLOQUEADOR, 0, 0);
+    sem_init(&SEM_BLOCKED, 0, 0);
     sem_init(&SEM_NEW,0,0);
     sem_init(&SEM_MULTIPROGRAMACION,0, kernel_config->GRADO_MULTIPROGRAMACION);
     sem_init(&SEM_CPU,0,1);
