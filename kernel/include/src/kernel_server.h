@@ -28,7 +28,7 @@ void atender_kernel_memoria();
 void atender_kernel_cpu_dispatch();
 
 // Funciones de manejo de conexiones I/O
-char* recibir_io_connection(int cliente_io);
+t_IO_connection* recibir_io_connection(int);
 
 // Funciones de cierre
 void _cerrar_conexiones();
