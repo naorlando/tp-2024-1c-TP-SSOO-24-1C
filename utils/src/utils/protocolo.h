@@ -343,6 +343,18 @@ int send_io_stdout(int fd, t_io_stdout* io_stdout);
 //       Si la recepción falla, retorna NULL.
 t_io_stdout* recv_io_stdout(int fd);
 
+/*********** SEND AND RECIVE 'T_IO_DIALFS' ***********/
+// Envía una estructura t_io_dialfs a un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido y io_dialfs debe ser un puntero a una estructura t_io_dialfs válida.
+// Post: La estructura t_io_dialfs se envía al descriptor de archivo fd.
+int send_io_dialfs(int fd, t_io_dialfs* io_dialfs);
+
+// Recibe una estructura t_io_dialfs desde un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a una estructura t_io_dialfs.
+//       Si la recepción falla, retorna NULL.
+t_io_dialfs* recv_io_dialfs(int fd);
+
 /*********** SEND AND RECIVE 'T_RESPONSE' ***********/
 // Envía una estructura t_response a través de un socket.
 // Pre: 'fd' debe ser un descriptor de archivo válido para un socket abierto.
@@ -504,6 +516,28 @@ void serializar_io_stdout(t_buffer* buffer, t_io_stdout* io_stdout);
 // Pre: El buffer debe ser válido y no NULL.
 // Post: Retorna un puntero a una estructura t_io_stdout deserializada.
 t_io_stdout* deserializar_io_stdout(t_buffer* buffer);
+
+/*********** SERIALIZE AND DESERIALIZE 'T_SOLICITUD_IO_DIALFS' ***********/
+// Función para serializar una solicitud de E/S DIALFS.
+// Pre: El buffer y la solicitud deben ser válidos y no NULL.
+// Post: La solicitud se serializa en el buffer.
+void serializar_solicitud_io_dialfs(t_buffer* buffer, t_solicitud_io_dialfs* solicitud);
+
+// Función para deserializar una solicitud de E/S DIALFS.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_solicitud_io_dialfs deserializada.
+t_solicitud_io_dialfs* deserializar_solicitud_io_dialfs(t_buffer* buffer);
+
+/*********** SERIALIZE AND DESERIALIZE 'T_IO_DIALFS' ***********/
+// Función para serializar una E/S DIALFS.
+// Pre: El buffer y la E/S DIALFS deben ser válidos y no NULL.
+// Post: La E/S DIALFS se serializa en el buffer.
+void serializar_io_dialfs(t_buffer* buffer, t_io_dialfs* io_dialfs);
+
+// Función para deserializar una E/S DIALFS.
+// Pre: El buffer debe ser válido y no NULL.
+// Post: Retorna un puntero a una estructura t_io_dialfs deserializada.
+t_io_dialfs* deserializar_io_dialfs(t_buffer* buffer);
 
 /*********** SERIALIZE AND DESERIALIZE 'T_IO_INTERFACE' ***********/
 // Serializar una estructura t_IO_interface en un buffer

@@ -914,6 +914,50 @@ t_io_stdout* deserializar_io_stdout(t_buffer* buffer) {
     return crear_io_stdout(direccion_fisica, tamanio, pid);
 }
 
+void serializar_solicitud_io_dialfs(t_buffer* buffer, t_solicitud_io_dialfs* solicitud) {
+    serialize_pcb(buffer, solicitud->pcb);
+    buffer_add_string(buffer, solicitud->nombre_interfaz);
+    serializar_io_dialfs(buffer, solicitud->io_dialfs);
+}
+
+t_solicitud_io_dialfs* deserializar_solicitud_io_dialfs(t_buffer* buffer) {
+    t_PCB* pcb = deserialize_pcb(buffer);
+    uint32_t length_string = buffer_read_uint32(buffer);
+    char* nombre_interfaz = buffer_read_string(buffer, length_string);
+    t_io_dialfs* io_dialfs = deserializar_io_dialfs(buffer);
+    return crear_solicitud_io_dialfs(pcb, nombre_interfaz, io_dialfs);
+}
+
+void serializar_io_dialfs(t_buffer* buffer, t_io_dialfs* io_dialfs) {
+    buffer_add_string(buffer, io_dialfs->nombre_archivo);
+    buffer_add_uint32(buffer, io_dialfs->tamanio);
+    buffer_add_uint32(buffer, io_dialfs->offset);
+    buffer_add_uint32(buffer, io_dialfs->operacion);
+    buffer_add_uint32(buffer, io_dialfs->pid);
+    
+    // Si es una operación de escritura, también serializamos los datos
+    if (io_dialfs->operacion == IO_FS_WRITE && io_dialfs->datos != NULL) {
+        buffer_add_data(buffer, io_dialfs->datos, io_dialfs->tamanio);
+    }
+}
+
+t_io_dialfs* deserializar_io_dialfs(t_buffer* buffer) {
+    uint32_t length_string = buffer_read_uint32(buffer);
+    char* nombre_archivo = buffer_read_string(buffer, length_string);
+    uint32_t tamanio = buffer_read_uint32(buffer);
+    uint32_t offset = buffer_read_uint32(buffer);
+    t_name_instruction operacion = buffer_read_uint32(buffer);
+    uint32_t pid = buffer_read_uint32(buffer);
+    
+    void* datos = NULL;
+    if (operacion == IO_FS_WRITE) {
+        datos = malloc(tamanio);
+        buffer_read_data(buffer, datos, tamanio);
+    }
+    
+    return crear_io_dialfs(nombre_archivo, tamanio, offset, datos, operacion, pid);
+}
+
 void serializar_IO_interface(t_buffer* buffer, t_IO_interface* interface)
 {
     buffer_add_string(buffer, obtener_nombre_IO_interface(interface));

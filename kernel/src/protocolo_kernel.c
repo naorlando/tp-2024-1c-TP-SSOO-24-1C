@@ -105,6 +105,22 @@ int send_kernel_io_stdout(int fd, char* nombre_interfaz, t_io_stdout* io_stdout)
     return bytes_enviados;
 }
 
+// Agrego la función que envía la instrucción IO_DIALFS al módulo de E/S
+int send_kernel_io_dialfs(int fd, char* nombre_interfaz, t_io_dialfs* io_dialfs) {
+    //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
+    int bytes_enviados = send_io_dialfs(fd, io_dialfs);
+    
+    if(bytes_enviados > 0) {
+        log_info(logger_kernel, "Solicitud enviada a la IO DIALFS %s para la operación %s con PID %d", 
+                 nombre_interfaz, get_operation_name(io_dialfs->operacion), io_dialfs->pid);
+    } else {
+        log_error(logger_kernel, "Hubo un error al enviar la solicitud a la IO DIALFS %s para la operación %s con PID %d", 
+                  nombre_interfaz, get_operation_name(io_dialfs->operacion), io_dialfs->pid);
+    }
+    
+    return bytes_enviados;
+}
+
 t_solicitud_io_generica* recv_solicitud_io_generica_cpu()
 {
     t_solicitud_io_generica* io_gen = recv_solicitud_io_generica(fd_cpu_dispatch);
