@@ -11,7 +11,6 @@
 #include "variables_globales.h"
 #include "utils/protocolo.h"
 #include "utils/buffer.h"
-#include "utils/package.h"
 
 //===============================================
 // FUNCIONES DE IO GENERICA

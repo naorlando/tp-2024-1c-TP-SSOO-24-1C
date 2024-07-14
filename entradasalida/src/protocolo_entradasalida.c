@@ -95,24 +95,24 @@ void atender_solicitud_dialfs(int fd) {
         
         switch(io_dialfs->operacion) {
             case IO_FS_CREATE:
-                operacion_exitosa = crear_archivo(dialfs, io_dialfs->nombre_archivo);
+                operacion_exitosa = crear_archivo(io_dialfs, io_dialfs->nombre_archivo);
                 log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
                 break;
             case IO_FS_DELETE:
-                operacion_exitosa = eliminar_archivo(dialfs, io_dialfs->nombre_archivo);
+                operacion_exitosa = eliminar_archivo(io_dialfs, io_dialfs->nombre_archivo);
                 log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
                 break;
             case IO_FS_TRUNCATE:
-                operacion_exitosa = truncar_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->tamanio);
+                operacion_exitosa = truncar_archivo(io_dialfs, io_dialfs->nombre_archivo, io_dialfs->tamanio);
                 log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio);
                 break;
             case IO_FS_WRITE:
-                operacion_exitosa = escribir_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->datos, io_dialfs->tamanio, io_dialfs->offset);
+                operacion_exitosa = escribir_archivo(io_dialfs, io_dialfs->nombre_archivo, io_dialfs->datos, io_dialfs->tamanio, io_dialfs->offset);
                 log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->offset);
                 break;
             case IO_FS_READ:
                 void* buffer = malloc(io_dialfs->tamanio);
-                operacion_exitosa = leer_archivo(dialfs, io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->offset);
+                operacion_exitosa = leer_archivo(io_dialfs, io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->offset);
                 if (operacion_exitosa) {
                     enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
                 }
