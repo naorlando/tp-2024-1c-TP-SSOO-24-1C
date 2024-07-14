@@ -21,6 +21,7 @@
 #include "protocolo_kernel.h"
 #include "datos_hilos.h"
 #include "utils/interruption.h"
+#include "utils_queue.h"
 
 typedef enum {
     FIFO,
