@@ -57,6 +57,7 @@ typedef enum
     MSG_IO_KERNEL_STDIN, // IO -> KERNEL (Respuesta de IO_STDIN)
     MSG_IO_KERNEL_STDOUT, // IO -> KERNEL (Respuesta de IO_STDOUT)
     MSG_IO_KERNEL_DIALFS, // IO -> KERNEL (Respuesta de IO_DIALFS)
+    MSG_DIALFS_DATA, // IO -> KERNEL (DialFS envia datos al kernel)
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
