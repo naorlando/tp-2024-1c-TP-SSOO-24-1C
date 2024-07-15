@@ -38,6 +38,7 @@ extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
 extern pthread_mutex_t MUTEX_EXECUTE;
 extern pthread_mutex_t MUTEX_DICTIONARY;
+extern pthread_mutex_t MUTEX_SOLICITUD;
 
 //SEMAFOROS
 extern sem_t SEM_READY;
