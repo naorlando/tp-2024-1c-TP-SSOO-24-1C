@@ -47,6 +47,7 @@ extern sem_t SEM_EXIT;
 extern sem_t SEM_NEW;
 extern sem_t SEM_MULTIPROGRAMACION;
 extern sem_t SEM_CPU;
+extern sem_t SEM_SOLICITUDES;
 
 //CONFIG
 extern t_config* config_kernel;
@@ -73,6 +74,7 @@ extern t_queue* COLA_NEW;
 //una variable para que el kernel conozca el pcb que este ejecutando:
 extern t_PCB* EXECUTE;
 extern t_list* LISTA_COLAS_DISPOSITIVOS; 
+extern t_queue* SOLICITUDES;
 
 
 //ESTADO PLANIFICADOR
