@@ -28,6 +28,7 @@ pthread_mutex_t MUTEX_EXIT;
 pthread_mutex_t MUTEX_NEW;
 pthread_mutex_t MUTEX_EXECUTE;
 pthread_mutex_t MUTEX_DICTIONARY;
+pthread_mutex_t MUTEX_SOLICITUD;
 
 sem_t SEM_READY;
 sem_t SEM_BLOCKED;
