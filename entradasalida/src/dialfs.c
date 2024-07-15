@@ -69,6 +69,15 @@ bool truncar_archivo(t_dialfs* fs, char* nombre, uint32_t nuevo_tamanio) {
     if (archivo == NULL) return false;
 
     if (nuevo_tamanio > archivo->tamanio) {
+        uint32_t espacio_necesario = nuevo_tamanio - archivo->tamanio;
+        uint32_t bloques_necesarios = (espacio_necesario + fs->block_size - 1) / fs->block_size;
+        
+        if (!hay_espacio_contiguo(fs, bloques_necesarios)) {
+            if (es_necesario_compactar(fs)) {
+                compactar_fs(fs);
+            }
+        }
+        
         if (!ampliar_archivo(fs, archivo, nuevo_tamanio)) {
             return false;
         }
@@ -260,4 +269,19 @@ void enviar_datos_leidos(int fd, void* buffer, uint32_t tamanio) {
     buffer_add_data(package_buffer, buffer, tamanio);
     package_send(package, fd);
     package_destroy(package);
+}
+
+bool hay_espacio_contiguo(t_dialfs* fs, uint32_t bloques_necesarios) {
+    uint32_t bloques_contiguos = 0;
+    for (uint32_t i = 0; i < fs->block_count; i++) {
+        if (!bitarray_test_bit(fs->bitmap, i)) {
+            bloques_contiguos++;
+            if (bloques_contiguos == bloques_necesarios) {
+                return true;
+            }
+        } else {
+            bloques_contiguos = 0;
+        }
+    }
+    return false;
 }
