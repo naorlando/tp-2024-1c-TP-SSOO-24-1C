@@ -123,4 +123,6 @@ void* obtener_proceso_bloqueado(t_IO_connection* conexion);
 
 bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso);
 
+bool tiene_procesos_bloqueados(t_IO_connection* cliente_io);
+
 #endif // IO_INTERFACE_H

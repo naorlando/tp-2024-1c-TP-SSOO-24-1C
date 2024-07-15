@@ -164,11 +164,11 @@ pthread_mutex_t* obtener_mutex_cola_bloqueados(t_IO_connection* conexion) {
 }
 
 bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso) {
+    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(conexion);
+
     t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(conexion);
 
     if(cola_bloqueados_io == NULL) return false;
-
-    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(conexion);
 
     pthread_mutex_lock(mutex_blocked);
     queue_push(cola_bloqueados_io, proceso);
@@ -177,4 +177,17 @@ bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso) {
     sem_post(obtener_semaforo_cola_bloqueados(conexion));
 
     return true;
+}
+
+bool tiene_procesos_bloqueados(t_IO_connection* cliente_io) 
+{
+    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(cliente_io);
+    bool is_empty;
+
+    pthread_mutex_lock(mutex_blocked);
+    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
+    is_empty = queue_is_empty(cola_bloqueados_io);
+    pthread_mutex_unlock(mutex_blocked);
+
+    return is_empty;
 }
