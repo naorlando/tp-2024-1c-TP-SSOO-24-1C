@@ -935,7 +935,7 @@ t_response* deserializar_response(t_buffer* buffer)
     uint32_t pid_response = buffer_read_uint32(buffer);
     bool process = buffer_read_bool(buffer);
 
-    t_response* response = create_response(pid_response, process);
+    t_response* response = create_response(process, pid_response);
 
     return response;
 }
