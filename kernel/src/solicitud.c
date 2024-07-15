@@ -22,7 +22,6 @@ t_solicitud* get_solicitud()
     if(solicitud == NULL){
         solicitud = create_solicitud(SOLICITUD_VACIA, NULL);
     }
-
     return solicitud;
 }
 
@@ -33,9 +32,9 @@ void destroy_solicitud()
     }
 }
 
-t_header_solicitud get_tipo()
+t_header_solicitud get_tipo(t_solicitud* solicitud_a_procesar)
 {
-    return solicitud->tipo;
+    return solicitud_a_procesar->tipo;
 }
 
 void* get_contenido(t_solicitud* solicitud_a_procesar)
@@ -43,14 +42,14 @@ void* get_contenido(t_solicitud* solicitud_a_procesar)
     return solicitud_a_procesar->contenido;
 }
 
-void set_tipo(t_header_solicitud tipo)
+void set_tipo(t_solicitud* solicitud_a_procesar, t_header_solicitud tipo)
 {
-    solicitud->tipo = tipo;
+    solicitud_a_procesar->tipo = tipo;
 }
 
-void set_contenido(void* contenido)
+void set_contenido(t_solicitud* solicitud_a_procesar, void* contenido)
 {
-    solicitud->contenido = contenido;
+    solicitud_a_procesar->contenido = contenido;
 }
 
 bool procesar_solicitud(t_solicitud* solicitud_a_procesar)
@@ -122,6 +121,9 @@ t_PCB* obtener_pcb_solicitud(t_solicitud* solicitud)
 
 void set_solicitud(t_header_solicitud tipo, void* contenido) 
 {
-    set_tipo(tipo);
-    set_contenido(contenido);
+    pthread_mutex_lock(&MUTEX_SOLICITUD);
+    t_solicitud* solicitud = get_solicitud();
+    set_tipo(solicitud, tipo);
+    set_contenido(solicitud, contenido);
+    pthread_mutex_unlock(&MUTEX_SOLICITUD);
 }
