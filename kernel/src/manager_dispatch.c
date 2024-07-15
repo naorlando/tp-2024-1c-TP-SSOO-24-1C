@@ -104,6 +104,7 @@ void handle_wait_request(){
         execute_to_null();
         cancelar_quantum_si_corresponde(pcb);
         agregar_a_cola_exit(pcb);
+        sem_post(&SEM_CPU);    
         return; 
     }
 
@@ -117,6 +118,7 @@ void handle_wait_request(){
     } else {
         bloquear_proceso(recurso, pcb);
         log_info(logger_kernel, "Recurso %s no tenía instancias disponibles. Proceso %d bloqueado", nombre_recurso, pcb->pid);
+        sem_post(&SEM_CPU);    
     }
 
     pthread_mutex_unlock(&MUTEX_RECURSOS);
@@ -143,6 +145,7 @@ void handle_signal_request()
         execute_to_null();
         cancelar_quantum_si_corresponde(pcb);
         agregar_a_cola_exit(pcb);
+        sem_post(&SEM_CPU);    
         return;
     }
 
@@ -153,9 +156,10 @@ void handle_signal_request()
         execute_to_null();
         cancelar_quantum_si_corresponde(pcb);
         agregar_a_cola_exit(pcb);
+        sem_post(&SEM_CPU);    
         return;
     }
-    // si el proceso esta en la lista de procesos asignados,se ELEMININA EL PID en la funcion remove_asignado_a_recurso() y 
+    // si el proceso esta en la lista de procesos asignados,se ELEMININA EL PID en la funcion remove_asignado_a_recurso() e 
     // incremento las instancias del recurso...
     incrementar_recurso(recurso); // recurso->instancias++;
     log_info(logger_kernel, "Recurso %s incrementado. Instancias actuales: %d", nombre_recurso, recurso->instancias);
@@ -164,11 +168,7 @@ void handle_signal_request()
 
     if (!queue_is_empty(recurso->cola_bloqueados)) {
         t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
-
-
-        asignar_proceso_a_recurso(nombre_recurso, pcb_desbloqueado->pid);
-
-
+        //asignar_proceso_a_recurso(nombre_recurso, pcb_desbloqueado->pid);
         log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
         agregar_a_cola_ready(pcb_desbloqueado);
     }

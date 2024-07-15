@@ -102,9 +102,6 @@ void atender_kernel_cpu_dispatch()
                 
                 break;
             case MSG_PCB_KERNEL_EXIT: // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
-                //TODO: ARMAR UNA FUNCION QUE SE ENCARGUE DE LA GESTION DE LIBERAR EL PCB QUE LLEGO A EXIT
-                // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
-
                 // t_PCB* pcb_exit= recv_pcb_cpu();
 
                 // // limpio la variable global

@@ -189,5 +189,5 @@ void inicializar_recursos() {
 void inicializar_cronometro()
 {
     cronometro_CPU = temporal_create_v2();
-    // acordarse de hacer temporal_destroy(cronometro_CPU) al finalizar el programa.
+    //TODO: acordarse de hacer temporal_destroy(cronometro_CPU) al finalizar el programa.
 }

@@ -355,23 +355,6 @@ bool manejar_interrupcion() {
     pthread_mutex_lock(&MUTEX_INTERRUPT);
     if (interrupcion_pendiente) {
         log_info(logger_cpu, "Interrupción de %s recibida, devolviendo PCB al Kernel",get_string_from_interruption(tipo_de_interrupcion));
-        //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
-        // de enviar de nuevo al kernel
-
-
-
-
-        // TODO: lo vamos a calcular siempre, el chequeo de el algoritmo que usamos, es decir, 
-        // la utilidad de este calculo lo hacemos en el kernel, cuando reciba todo el pcb
-        pcb->quantum - cronometrado = pcb->quantum;
-
-
-
-
-
-
-
-
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
         
         log_info(logger_cpu, "PCB enviado al Kernel");

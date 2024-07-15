@@ -45,7 +45,7 @@ void pcb_execute(t_PCB*);
 t_PCB* get_next_pcb_to_exec(t_queue*);
 t_planificador _obtener_planificador (char * str);
 void iniciar_cronometro();
-void actualizar_quantum();
+void actualizar_quantum(t_PCB* pcb);
 
 
 #endif
