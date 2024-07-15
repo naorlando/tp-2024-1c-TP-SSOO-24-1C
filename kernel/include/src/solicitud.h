@@ -23,10 +23,10 @@ typedef struct
     void* contenido;
 }t_solicitud;
 
-extern t_solicitud* solicitud;
+//extern t_solicitud* solicitud;
 
 t_solicitud* create_solicitud(t_header_solicitud, void*);
-void destroy_solicitud();
+void destroy_solicitud(t_solicitud*);
 t_solicitud* get_solicitud();
 t_header_solicitud get_tipo(t_solicitud*);
 void* get_contenido(t_solicitud*);
@@ -35,5 +35,8 @@ void set_contenido(t_solicitud*, void*);
 bool procesar_solicitud(t_solicitud*);
 t_PCB* obtener_pcb_solicitud(t_solicitud*);
 void set_solicitud(t_header_solicitud, void*);
+t_solicitud* get_next_solicitud();
+void push_solicitud(t_solicitud*);
+void add_new_solicitud(t_header_solicitud, void*);
 
 #endif /*SOLICITUD_H_*/

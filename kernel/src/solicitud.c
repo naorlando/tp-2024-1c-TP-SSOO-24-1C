@@ -1,6 +1,6 @@
 #include "solicitud.h"
 
-t_solicitud* solicitud;
+//t_solicitud* solicitud;
 
 t_solicitud* create_solicitud(t_header_solicitud tipo, void* contenido)
 {
@@ -19,16 +19,28 @@ t_solicitud* create_solicitud(t_header_solicitud tipo, void* contenido)
 
 t_solicitud* get_solicitud()
 {
-    if(solicitud == NULL){
+    /*if(solicitud == NULL){
         solicitud = create_solicitud(SOLICITUD_VACIA, NULL);
     }
+    return solicitud;*/
+    return NULL;
+}
+
+t_solicitud* get_next_solicitud()
+{
+    pthread_mutex_lock(&MUTEX_SOLICITUD);
+    t_solicitud* solicitud = queue_pop(SOLICITUDES);
+    pthread_mutex_unlock(&MUTEX_SOLICITUD);
+
+    sem_post(&SEM_SOLICITUDES);
+
     return solicitud;
 }
 
-void destroy_solicitud()
+void destroy_solicitud(t_solicitud* solicitud_a_procesar)
 {
-    if(solicitud != NULL) {
-        free(solicitud);
+    if(solicitud_a_procesar != NULL) {
+        free(solicitud_a_procesar);
     }
 }
 
@@ -56,7 +68,6 @@ bool procesar_solicitud(t_solicitud* solicitud_a_procesar)
 {
     t_IO_connection* io_connection;
     void* proceso;
-
     switch(get_tipo(solicitud_a_procesar)){
         case SOLICITUD_VACIA:
             
@@ -121,9 +132,25 @@ t_PCB* obtener_pcb_solicitud(t_solicitud* solicitud)
 
 void set_solicitud(t_header_solicitud tipo, void* contenido) 
 {
-    pthread_mutex_lock(&MUTEX_SOLICITUD);
+    /*pthread_mutex_lock(&MUTEX_SOLICITUD);
     t_solicitud* solicitud = get_solicitud();
     set_tipo(solicitud, tipo);
     set_contenido(solicitud, contenido);
+    pthread_mutex_unlock(&MUTEX_SOLICITUD);*/
+}
+
+void add_new_solicitud(t_header_solicitud tipo, void* contenido)
+{
+    t_solicitud* new_solicitud = create_solicitud(tipo, contenido);
+
+    if(new_solicitud != NULL) {
+        push_solicitud(new_solicitud);
+    }
+}
+
+void push_solicitud(t_solicitud* solicitud)
+{
+    pthread_mutex_lock(&MUTEX_SOLICITUD);
+    queue_push(SOLICITUDES, solicitud);
     pthread_mutex_unlock(&MUTEX_SOLICITUD);
 }
