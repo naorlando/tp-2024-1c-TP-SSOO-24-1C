@@ -36,10 +36,12 @@ void atender_kernel_IO(void* io_connection)
 
         while (true)
         {
-            void* solicitud = obtener_siguiente_proceso(cliente_io);
+            // Si la cola de bloqueados está vacía, romper el bucle interno
+            if (tiene_procesos_bloqueados(cliente_io)) {
+                break;
+            }
 
-            // Si no hay más solicitudes, romper el bucle interno
-            if (solicitud == NULL) break;
+            void* solicitud = obtener_siguiente_proceso(cliente_io);
             
             procesar_solicitud_func procesar_func = obtener_procesador_solicitud(obtener_tipo_conexion(cliente_io));
             char* tipo_interfaz = tipo_interfaz_to_string(obtener_tipo_conexion(cliente_io));
@@ -50,6 +52,7 @@ void atender_kernel_IO(void* io_connection)
                 //La IO esta desconectada, se pasa a EXIT el PCB y se procesa el siguiente que este en la cola
                 if(enviado == -1) {
                     agregar_a_cola_exit(obtener_pcb_de_solicitud(solicitud, tipo_interfaz));
+                    log_info(logger_kernel, "La IO %s no esta conectada, se manda a EXIT el Proceso", tipo_interfaz);
                     continue;
                 }
             } else {

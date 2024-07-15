@@ -22,9 +22,10 @@ void procesar_ios_genericas()
         cancelar_hilo_quantum(pcb_io_gen->pid);
     }
 
-    sem_post(&SEM_CPU);
-    set_solicitud(SOLICITUD_GENERICA, solicitud_gen);
+    //set_solicitud(SOLICITUD_GENERICA, solicitud_gen);
+    add_new_solicitud(SOLICITUD_GENERICA, solicitud_gen);
     sem_post(&SEM_BLOCKED);
+    sem_post(&SEM_CPU);
     
     //1. Validar que la IO GENERICA este conectada
     //2. 

@@ -111,6 +111,8 @@ void procesar_respuesta_io(int fd, char* nombre_interfaz)
         char* resultado_str = get_process_response(response) ? "true" : "false";
         log_info(logger_kernel, "Procesamiento de la interfaz '%s': %s para el PID <%d>", nombre_interfaz, resultado_str, get_pid_response(response));
     }
+
+    delete_response(response);
 }
 
 t_IO_connection* recibir_io_connection(int cliente_io) 

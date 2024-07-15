@@ -127,13 +127,14 @@ void blocked()
     while(1) {
         sem_wait(&SEM_BLOCKED);
         
-        pthread_mutex_lock(&MUTEX_SOLICITUD);
-        t_solicitud* solicitud = get_solicitud();
+        t_solicitud* solicitud = get_next_solicitud();
+
+        sem_wait(&SEM_SOLICITUDES);
 
         if(!procesar_solicitud(solicitud)) {
             // la io no esta conectada desde el principio
             agregar_a_cola_exit(obtener_pcb_solicitud(solicitud));
         }
-        pthread_mutex_unlock(&MUTEX_SOLICITUD);
+        
     }
 }
