@@ -23,6 +23,7 @@ bool planificador_status = true;
 t_dictionary* io_connections;
 t_dictionary *recursos_dictionary;
 t_dictionary *recursos_asignados_por_pid;
+t_temporal *cronometro_CPU;
 
 //pthread_mutex_t mutex_recursos;
 
@@ -58,6 +59,7 @@ void init()
     initialize_mutexes();
     initialize_semaphores();
     inicializar_planificadores();
+    inicializar_cronometro();
     inicializar_dictionarios();
     inicializar_recursos();
 }
@@ -182,4 +184,10 @@ void inicializar_recursos() {
     //string_array_destroy(instancias_recursos);
 
 
+}
+
+void inicializar_cronometro()
+{
+    cronometro_CPU = temporal_create_v2();
+    // acordarse de hacer temporal_destroy(cronometro_CPU) al finalizar el programa.
 }

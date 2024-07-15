@@ -14,6 +14,7 @@
 #include <semaphore.h>
 #include <utils/estructuras.h>
 #include <datos_hilos.h>
+#include <commons/temporal.h>
 
 #define SERVERNAME "KERNEL"
 #define SERVER_CPU "SERVER CPU"
@@ -32,6 +33,7 @@ extern bool interrupcion_enviada;
 extern t_dictionary* io_connections;
 extern t_dictionary* recursos_dictionary;
 extern t_dictionary* recursos_asignados_por_pid;
+extern t_temporal* cronometro_CPU;
 
 //MUTEXS
 extern pthread_mutex_t MUTEX_READY;

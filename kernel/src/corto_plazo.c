@@ -65,6 +65,7 @@ void planificador_VRR()
         pthread_detach(hilo_quantum);
 
         pcb_execute(pcb);
+        // iniciar_cronometro();
     }
     queue_destroy(COLA_AUX_READY);
 }
@@ -175,4 +176,44 @@ t_planificador _obtener_planificador(char *str)
     if (strcmp(str, "VRR") == 0)
         return VRR;
     return -1;
+}
+
+// ############################################################################################################
+//       CRONOMETRO: la idea es siempre ir actualizando el quantum del PCB en ejecucion
+// ############################################################################################################
+
+void iniciar_cronometro()
+{
+    // no usamos esto por que ya tenemos un cronometro global
+            //t_temporal *temporal = temporal_create();
+
+    // activamos el cronometro:
+    cronometro_CPU->status = TEMPORAL_STATUS_RUNNING;
+
+}
+
+// obtiene el tiempo en el que el pcb estuvo en ejecucion
+void actualizar_quantum()
+{
+    // paramos el cronometro:
+    cronometro_CPU->status = TEMPORAL_STATUS_STOPPED;
+
+    // obtengo el tiempo que estuvo el proceso ejecutando en cpu:
+    pcb->quantum = pcb->quntum - (uint32_t)temporal_gettime(cronometro_CPU);
+
+
+    // en vez de crear y destruir constantemente, ACTUALIZAMOS la variable global cronometro_CPU..,
+        //temporal_destroy(t_temporal* temporal);
+    cronometro_CPU->elapsed_ms = 0;
+}
+
+t_temporal* temporal_create_v2(void) {
+	t_temporal* self = malloc(sizeof(t_temporal));
+
+	self->elapsed_ms = 0;
+	self->status = TEMPORAL_STATUS_STOPPED;
+
+	clock_gettime(CLOCK_MONOTONIC_RAW, &self->current);
+
+	return self;
 }

@@ -10,6 +10,7 @@
 #include <commons/log.h>
 #include <commons/collections/list.h>
 #include <commons/string.h>
+#include <commons/temporal.h>
 
 // Libraries
 #include <semaphore.h>
@@ -43,6 +44,8 @@ void enviar_interrupcion_a_cpu(uint32_t);
 void pcb_execute(t_PCB*);
 t_PCB* get_next_pcb_to_exec(t_queue*);
 t_planificador _obtener_planificador (char * str);
+void iniciar_cronometro();
+void actualizar_quantum();
 
 
 #endif
