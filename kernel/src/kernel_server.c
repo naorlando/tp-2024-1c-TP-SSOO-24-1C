@@ -159,7 +159,7 @@ void atender_kernel_cpu_dispatch()
                 
                 //sem_post(&SEM_CPU);
 
-                procesar_interrupcion();
+                procesar_interrupcion_quantum();
 
                 break;
             case MSG_CPU_KERNEL_WAIT:

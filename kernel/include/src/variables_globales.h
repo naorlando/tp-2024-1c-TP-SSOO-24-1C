@@ -42,6 +42,7 @@ extern pthread_mutex_t MUTEX_NEW;
 extern pthread_mutex_t MUTEX_EXECUTE;
 extern pthread_mutex_t MUTEX_DICTIONARY;
 extern pthread_mutex_t MUTEX_RECURSOS;
+extern pthread_mutex_t MUTEX_AUX_READY;
 extern pthread_mutex_t MUTEX_COLA_RETORNO_PCB;
 
 //SEMAFOROS
@@ -51,6 +52,7 @@ extern sem_t SEM_EXIT;
 extern sem_t SEM_NEW;
 extern sem_t SEM_MULTIPROGRAMACION;
 extern sem_t SEM_CPU;
+extern sem_t SEM_AUX_READY;
 extern sem_t SEM_PCB_RETURNS;
 
 //CONFIG

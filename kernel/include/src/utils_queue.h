@@ -8,8 +8,8 @@
 
 void agregar_de_new_a_ready(t_PCB*);
 void agregar_a_cola_ready(t_PCB*);
-void agregar_a_ready_fin_quantum(t_PCB*);
 void agregar_de_blocked_a_ready(t_PCB*);
 void agregar_a_cola_exit(t_PCB*);
+void agregar_a_cola_aux_ready(t_PCB* pcb) ;
 
 #endif //UTILS_QUEUE_

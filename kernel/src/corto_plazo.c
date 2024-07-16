@@ -20,7 +20,7 @@ void planificador_corto_plazo()
 }
     
 // ############################################################################################################
-//      PLANIFICADORES:
+//  PLANIFICADORES:
 // ############################################################################################################
 
 //  FIFO:
@@ -59,50 +59,48 @@ void planificador_VRR()
             pcb->quantum = obtener_quantum(kernel_config);
         }
 
-        // Inicializar el hilo del quantum
-        pthread_t hilo_quantum;
-        if (pthread_create(&hilo_quantum, NULL, (void*)hilo_quantum_func, (void*)pcb) != 0) {
-            log_error(logger_kernel, "Error al crear el hilo de quantum");
-            continue;
-        }
-        pthread_detach(hilo_quantum);
-
         // Ejecutar PCB
         pcb_execute(pcb);
 
-        // Iniciar cronometro
+        // Lógica de interrupción por quantum:
+        interrupcion_quantum(pcb->pid, pcb->quantum);
+
+        // Iniciar cronometro:
         t_temporal *cronometro = temporal_create();
 
-        // Esperar a que el PCB retorne
+        // Esperar a que el PCB retorne:
         esperar_pcb_cpu(pcb);
 
-        // Detener cronometro
+        // Detener cronometro:
         temporal_stop(cronometro);
 
-        // retengo el tiempo transcurrido
+        // retengo el tiempo transcurrido:
             // TODO: CHEQUEAR POSIBLE CONFLICTO DE TIPOS...
                 uint32_t tiempo_transcurrido = (uint32_t)temporal_gettime(cronometro);
 
         // Destruir cronometro:
         temporal_destroy(cronometro);
 
-        // Actualizar el quantum basado en el tiempo transcurrido
-        if (tiempo_transcurrido < pcb->quantum) {
-            pcb->quantum -= tiempo_transcurrido;
-            queue_push(COLA_AUX_READY, pcb);
+        // Actualizar el quantum basado en el tiempo transcurrido:
+        // contemplamos el caso en donde el pcb se mando a exit, el cual no se debe actualizar el quantum ni agregar a ninguna otra cola
+        if(pcb->state == EXIT || pcb->state == BLOCKED || pcb = NULL) {
+                continue;
+        } else if (tiempo_transcurrido < pcb->quantum) {
+                pcb->quantum -= tiempo_transcurrido;
+                agregar_a_cola_aux_ready(pcb);
         } else {
-            pcb->quantum = obtener_quantum(kernel_config);
-            agregar_a_cola_ready(pcb);
+                pcb->quantum = obtener_quantum(kernel_config);
+                agregar_a_cola_ready(pcb);
         }
     }
 }
 
 // ############################################################################################################
-//      FUNCIONES AUXILIARES:
+//  FUNCIONES AUXILIARES:
 // ############################################################################################################
 
 // -----------------------------------------------------------------------------------------------
-//      RR:
+//  RR || VRR:
 // -----------------------------------------------------------------------------------------------
 
 void interrupcion_quantum(uint32_t pid, uint32_t quantum)
@@ -112,7 +110,9 @@ void interrupcion_quantum(uint32_t pid, uint32_t quantum)
     args.pid = pid;
     args.quantum = quantum;
     pthread_create(&hilo_de_quantum, NULL, funcion_hilo_quantum, &args);
-    pthread_join(hilo_de_quantum, NULL);  // Para que el hilo se limpie automáticamente al terminar
+    // Para que el hilo se limpie automáticamente al terminar.
+        // si hago un pthread_exit(), ¿no es mas performante?  ya que se borrarian todas las estructuras dentro del hilo.
+    pthread_join(hilo_de_quantum, NULL);  
 }
 
 // Función que ejecuta el hilo quantum
@@ -137,19 +137,6 @@ void* funcion_hilo_quantum(void* args)
     return NULL;
 }
 
-// -----------------------------------------------------------------------------------------------
-//      VRR:
-// -----------------------------------------------------------------------------------------------
-
-// todo: usamos esta misma funcion en el rr??
-void* hilo_quantum_func(void* arg) 
-{
-    t_PCB* pcb = (t_PCB*)arg;
-    usleep(pcb->quantum * 1000); // Quantum del PCB ya actualizado.
-    enviar_interrupcion_a_cpu(pcb->pid);
-    return NULL;
-}
-
 void enviar_interrupcion_a_cpu(uint32_t pid)
 {
     // enviar mensaje a cpu MSG_QUANTUM
@@ -159,10 +146,24 @@ void enviar_interrupcion_a_cpu(uint32_t pid)
     destroy_interruption(interrupcion);
 }
 
+// -----------------------------------------------------------------------------------------------
+//      VRR solamente:
+// -----------------------------------------------------------------------------------------------
+
+// todo: usamos esta misma funcion en el rr??
+// void* hilo_quantum_func(void* arg) 
+// {
+//     t_PCB* pcb = (t_PCB*)arg;
+//     usleep(pcb->quantum * 1000); // Quantum del PCB ya actualizado.
+//     enviar_interrupcion_a_cpu(pcb->pid);
+//     return NULL;
+// }
+
 void esperar_pcb_cpu(t_PCB *pcb) 
 {
     sem_wait(&SEM_PCB_RETURNS);
-    log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "EXEC", "READY");
+    pcb = queue_pop(COLA_RETORNO_PCB, pcb);
+    log_info(logger_kernel, "PID: %d - Llego de vuelta al VRR", pcb->pid);
 }
 
 // -----------------------------------------------------------------------------------------------

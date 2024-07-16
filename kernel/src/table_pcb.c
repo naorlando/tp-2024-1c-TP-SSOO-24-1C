@@ -80,3 +80,13 @@ bool _is_empty_table()
 {
     return dictionary_is_empty(table_pcb);
 }
+
+void update_pcb(pcb_interrupt)
+{
+    // actualizar el pcb en la tabla de pcb:
+    // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
+    // Elimino el PCB de la tabla de pcbs que gestiona el Kernel
+    delete_pcb(pcb_interrupt->pid);
+    // Agrego el PCB pero con su contexto nuevo
+    add_pcb(pcb_interrupt);
+}

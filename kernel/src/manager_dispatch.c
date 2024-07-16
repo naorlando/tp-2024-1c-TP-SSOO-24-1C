@@ -46,38 +46,36 @@ void procesar_pcb_exit()
     // Actualizo el estado del pcb en la cola correspondiente:
     agregar_a_cola_exit(pcb_exit);
     
+    // VRR:
+    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "VRR") != 0) {
+        logica_pcb_retorno_vrr(pcb_exit);
+    }
+    
     sem_post(&SEM_CPU);
 
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
     log_info(logger_kernel, "La cola de Exit tiene %d elementos", queue_size(COLA_EXIT));
 }
 
-void procesar_interrupcion()
+void procesar_interrupcion_quantum()
 {
     //TODO: agregar PCB donde este:
     // 1-recibir pcb:
     t_PCB* pcb_interrupt = recv_pcb_interrupt();
 
-    execute_to_null();
-
     log_info(logger_kernel, "Se recibio un PCB por interrupcion a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
 
     // 2-actualizar el pcb en la tabla de pcb:
-    // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
-    // hacemos un dictionary_remove_and_destroy() para liberar la memoria del pcb a actualizar...
-    // dictionary_remove_and_destroy(table_pcb, string_itoa(pcb_interrupt->pid), (void *)pcb_destroy);
-    
-    // Elimino el PCB de la tabla de pcbs que gestiona el Kernel
-    delete_pcb(pcb_interrupt->pid);
-
-    // Agrego el PCB pero con su contexto nuevo
-    add_pcb(pcb_interrupt);
-
-    //dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt);
+    update_pcb(pcb_interrupt);
+    //dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt); // es otra forma pero no se libera el pcb pisado
     log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_interrupt->pid);
 
-    // Actualizo el estado del pcb en la cola correspondiente:
-    agregar_a_ready_fin_quantum(pcb_interrupt);
+    // VRR:
+    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "VRR") != 0) {
+        logica_pcb_retorno_vrr(pcb_interrupt);
+    } else {
+        agregar_a_cola_ready(pcb_interrupt); // caso que sea por RR
+    }
 
     log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
@@ -191,11 +189,8 @@ void cancelar_quantum_si_corresponde(t_PCB *pcb_exit) {
 }
 
 void logica_pcb_retorno_vrr(t_PCB *pcb) {
-    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "VRR") != 0) {
     pthread_mutex_lock(&MUTEX_COLA_RETORNO_PCB);
-    queue_push(COLA_RETORNO_PCB, pcb);
+        queue_push(COLA_RETORNO_PCB, pcb);
     pthread_mutex_unlock(&MUTEX_COLA_RETORNO_PCB);
     sem_post(&SEM_PCB_RETURNS);  // Signal que el PCB ha retornado
-    return;
-    }
 }

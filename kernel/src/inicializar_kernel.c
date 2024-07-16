@@ -35,6 +35,7 @@ pthread_mutex_t MUTEX_EXECUTE;
 pthread_mutex_t MUTEX_DICTIONARY;
 pthread_mutex_t MUTEX_RECURSOS;
 pthread_mutex_t MUTEX_COLA_RETORNO_PCB;
+pthread_mutex_t MUTEX_AUX_READY;
 
 sem_t SEM_READY;
 sem_t BLOQUEADOR;
@@ -43,6 +44,7 @@ sem_t SEM_NEW;
 sem_t SEM_MULTIPROGRAMACION;
 sem_t SEM_CPU; 
 sem_t SEM_PCB_RETURNS;
+sem_t SEM_AUX_READY;
 
 t_queue *COLA_READY;
 t_queue *COLA_AUX_READY;

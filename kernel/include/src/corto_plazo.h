@@ -39,8 +39,10 @@ void planificador_corto_plazo ();
 void planificador_FIFO();
 void planificador_RR();
 void planificador_VRR();
-void interrupcion_quantum(uint32_t,uint32_t);
+void interrupcion_quantum(uint32_t pid,uint32_t quantum);
 void* funcion_hilo_quantum(void*);
+
+// envia una interrupcion a la cpu
 void enviar_interrupcion_a_cpu(uint32_t); 
 
 // Seteamos EXECUTE = pcb y mandamos pcb
