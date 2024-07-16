@@ -23,7 +23,7 @@ bool planificador_status = true;
 t_dictionary* io_connections;
 t_dictionary *recursos_dictionary;
 t_dictionary *recursos_asignados_por_pid;
-t_temporal *cronometro_CPU;
+
 
 //pthread_mutex_t mutex_recursos;
 
@@ -34,6 +34,7 @@ pthread_mutex_t MUTEX_NEW;
 pthread_mutex_t MUTEX_EXECUTE;
 pthread_mutex_t MUTEX_DICTIONARY;
 pthread_mutex_t MUTEX_RECURSOS;
+pthread_mutex_t MUTEX_COLA_RETORNO_PCB;
 
 sem_t SEM_READY;
 sem_t BLOQUEADOR;
@@ -41,11 +42,13 @@ sem_t SEM_EXIT;
 sem_t SEM_NEW;
 sem_t SEM_MULTIPROGRAMACION;
 sem_t SEM_CPU; 
+sem_t SEM_PCB_RETURNS;
 
 t_queue *COLA_READY;
 t_queue *COLA_AUX_READY;
 t_queue *COLA_EXIT;
 t_queue *COLA_NEW;
+t_queue *COLA_RETORNO_PCB;
 t_PCB *EXECUTE;
 t_list *LISTA_COLAS_DISPOSITIVOS;
 
@@ -59,7 +62,6 @@ void init()
     initialize_mutexes();
     initialize_semaphores();
     inicializar_planificadores();
-    inicializar_cronometro();
     inicializar_dictionarios();
     inicializar_recursos();
 }
@@ -184,10 +186,4 @@ void inicializar_recursos() {
     //string_array_destroy(instancias_recursos);
 
 
-}
-
-void inicializar_cronometro()
-{
-    cronometro_CPU = temporal_create_v2();
-    //TODO: acordarse de hacer temporal_destroy(cronometro_CPU) al finalizar el programa.
 }

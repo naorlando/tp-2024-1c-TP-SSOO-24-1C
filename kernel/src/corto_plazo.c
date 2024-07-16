@@ -20,8 +20,10 @@ void planificador_corto_plazo()
 }
     
 // ############################################################################################################
-// En los planificadores vamos a manipular la cola de ready nada mas.
+//      PLANIFICADORES:
 // ############################################################################################################
+
+//  FIFO:
 void planificador_FIFO()
 {
     while (1)
@@ -31,24 +33,25 @@ void planificador_FIFO()
     }
 } 
 
-// planificador ROUND ROBIN:
+//  ROUND ROBIN:
 void planificador_RR()
 {
     while (1)
-    {
+    {  
+        //TODO: interrupcion 
         t_PCB *pcb = get_next_pcb_to_exec(COLA_READY);
         pcb_execute(pcb);
         interrupcion_quantum(EXECUTE->pid, obtener_quantum(kernel_config));
     }
 }
 
-// planificador VRR:
+//  VIRTUAL ROUND ROBIN:
 void planificador_VRR()
 {
-    while (1)
-    {
+    while (1) {
         t_PCB *pcb = NULL;
-        
+
+        // Jerarquizamos las colas de READY
         if (!queue_is_empty(COLA_AUX_READY)) {
             pcb = queue_pop(COLA_AUX_READY);
         } else {
@@ -64,17 +67,83 @@ void planificador_VRR()
         }
         pthread_detach(hilo_quantum);
 
+        // Ejecutar PCB
         pcb_execute(pcb);
-        iniciar_cronometro();
 
-        // esperar que llegue el pcb y actualizar el quantum...
-        // hay que tener una especie de semaforo parecido al.. sem_wait(&SEM_CPU);
+        // Iniciar cronometro
+        t_temporal *cronometro = temporal_create();
 
+        // Esperar a que el PCB retorne
+        esperar_pcb_cpu(pcb);
+
+        // Detener cronometro
+        temporal_stop(cronometro);
+
+        // retengo el tiempo transcurrido
+            // TODO: CHEQUEAR POSIBLE CONFLICTO DE TIPOS...
+                uint32_t tiempo_transcurrido = (uint32_t)temporal_gettime(cronometro);
+
+        // Destruir cronometro:
+        temporal_destroy(cronometro);
+
+        // Actualizar el quantum basado en el tiempo transcurrido
+        if (tiempo_transcurrido < pcb->quantum) {
+            pcb->quantum -= tiempo_transcurrido;
+            queue_push(COLA_AUX_READY, pcb);
+        } else {
+            pcb->quantum = obtener_quantum(kernel_config);
+            agregar_a_cola_ready(pcb);
+        }
     }
-    queue_destroy(COLA_AUX_READY);
 }
 
-void* hilo_quantum_func(void* arg) {
+// ############################################################################################################
+//      FUNCIONES AUXILIARES:
+// ############################################################################################################
+
+// -----------------------------------------------------------------------------------------------
+//      RR:
+// -----------------------------------------------------------------------------------------------
+
+void interrupcion_quantum(uint32_t pid, uint32_t quantum)
+{
+    pthread_t hilo_de_quantum;
+    hilo_args args;
+    args.pid = pid;
+    args.quantum = quantum;
+    pthread_create(&hilo_de_quantum, NULL, funcion_hilo_quantum, &args);
+    pthread_join(hilo_de_quantum, NULL);  // Para que el hilo se limpie automáticamente al terminar
+}
+
+// Función que ejecuta el hilo quantum
+void* funcion_hilo_quantum(void* args) 
+{
+    hilo_args* argumentos = (hilo_args*) args;
+    uint32_t pid = argumentos->pid;
+    uint32_t quantum = argumentos->quantum;
+
+    // Suponiendo que esta función crea y devuelve un puntero a t_datos_hilo
+    datos_hilo_quantum = datos_hilo_create(pid, quantum, pthread_self()); // TODO: Se debe liberar la estructura si no se manda y se cancela
+    interrupcion_enviada = false; // TODO: Ver si es necesario usar un mutex!
+    usleep(quantum * 1000);
+
+    pthread_mutex_lock(&MUTEX_EXECUTE);
+    if (EXECUTE != NULL && EXECUTE->pid == get_pid_datos_hilo(datos_hilo_quantum)) {
+        enviar_interrupcion_a_cpu(get_pid_datos_hilo(datos_hilo_quantum));
+    }
+    pthread_mutex_unlock(&MUTEX_EXECUTE);
+    //free(hilo_quantum);
+    
+    return NULL;
+}
+
+// -----------------------------------------------------------------------------------------------
+//      VRR:
+// -----------------------------------------------------------------------------------------------
+
+// todo: usamos esta misma funcion en el rr??
+void* hilo_quantum_func(void* arg) 
+{
     t_PCB* pcb = (t_PCB*)arg;
     usleep(pcb->quantum * 1000); // Quantum del PCB ya actualizado.
     enviar_interrupcion_a_cpu(pcb->pid);
@@ -90,58 +159,26 @@ void enviar_interrupcion_a_cpu(uint32_t pid)
     destroy_interruption(interrupcion);
 }
 
-// Función que crea la interrupción quantum
-void interrupcion_quantum(uint32_t pid, uint32_t quantum) {
-    pthread_t hilo_de_quantum;
-    hilo_args args;
-    args.pid = pid;
-    args.quantum = quantum;
-    pthread_create(&hilo_de_quantum, NULL, funcion_hilo_quantum, &args);
-    pthread_join(hilo_de_quantum, NULL);  // Para que el hilo se limpie automáticamente al terminar
+void esperar_pcb_cpu(t_PCB *pcb) 
+{
+    sem_wait(&SEM_PCB_RETURNS);
+    log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "EXEC", "READY");
 }
 
-// // Función que ejecuta el hilo quantum
-// void* funcion_hilo_quantum(void* args) {
-//     hilo_args* argumentos = (hilo_args*) args;
-//     uint32_t pid = argumentos->pid;
-//     uint32_t quantum = argumentos->quantum;
+// -----------------------------------------------------------------------------------------------
+//      GENERALES:
+// -----------------------------------------------------------------------------------------------
+t_planificador _obtener_planificador(char *str)
+{
+    if (strcmp(str, "FIFO") == 0)
+        return FIFO;
+    if (strcmp(str, "RR") == 0)
+        return RR;
+    if (strcmp(str, "VRR") == 0)
+        return VRR;
+    return -1;
+}
 
-//     // Suponiendo que esta función crea y devuelve un puntero a t_datos_hilo
-//     datos_hilo_quantum = datos_hilo_create(pid, quantum, pthread_self()); // TODO: Se debe liberar la estructura si no se manda y se cancela
-//     interrupcion_enviada = false; // TODO: Ver si es necesario usar un mutex!
-//     usleep(quantum * 1000);
-
-//     pthread_mutex_lock(&MUTEX_EXECUTE);
-//     if (EXECUTE != NULL && EXECUTE->pid == get_pid_datos_hilo(datos_hilo_quantum)) {
-//         enviar_interrupcion_a_cpu(get_pid_datos_hilo(datos_hilo_quantum));
-//     }
-//     pthread_mutex_unlock(&MUTEX_EXECUTE);
-//     //free(hilo_quantum);
-    
-//     return NULL;
-// }
-// void interrupcion_quantum(uint32_t pid) {
-//     pthread_t hilo_de_quantum;
-//     pthread_create(&hilo_interrupt, NULL, (void *)funcion_hilo_quantum, &pid);
-//     hilo_de_quantum = hilo_interrupt;
-//     pthread_detach(hilo_de_quantum);  // Para que el hilo se limpie automáticamente al terminar
-// }
-
-// void funcion_hilo_quantum(void* pid) {
-
-//     hilo_quantum = datos_hilo_create((uint32_t)pid, kernel_config->QUANTUM, &hilo_interrupt); // TODO:get_quantum
-//     usleep(hilo_quantum->quantum / 1000);
-
-//     //pthread_mutex_lock(&MUTEX_EXECUTE);
-//     if (EXECUTE != NULL && EXECUTE->pid == get_pid_datos_hilo(hilo_quantum)) {
-//         enviar_interrupcion_a_cpu(hilo_quantum->pid);
-//     }
-//     //pthread_mutex_unlock(&MUTEX_EXECUTE);
-//     //free(hilo_quantum);
-// }
-
-
-// Setear pcb en EXECUTE y mandar a ejecutar a CPU
 void pcb_execute(t_PCB* pcb)
 {
     log_info(logger_kernel, "Se prepara para ejecutar el PCB con PID: <%d>", pcb->pid);
@@ -169,55 +206,4 @@ t_PCB *get_next_pcb_to_exec(t_queue* queue)
     pthread_mutex_unlock(&MUTEX_READY);
 
     return pcb_a_tomar;
-}
-
-t_planificador _obtener_planificador(char *str)
-{
-
-    if (strcmp(str, "FIFO") == 0)
-        return FIFO;
-    if (strcmp(str, "RR") == 0)
-        return RR;
-    if (strcmp(str, "VRR") == 0)
-        return VRR;
-    return -1;
-}
-
-// ############################################################################################################
-//       CRONOMETRO: la idea es siempre ir actualizando el quantum del PCB en ejecucion
-// ############################################################################################################
-
-void iniciar_cronometro()
-{
-    // no usamos esto por que ya tenemos un cronometro global
-            //t_temporal *temporal = temporal_create();
-
-    // activamos el cronometro:
-    cronometro_CPU->status = TEMPORAL_STATUS_RUNNING;
-}
-
-// obtiene el tiempo en el que el pcb estuvo en ejecucion
-void actualizar_quantum(t_PCB* pcb)
-{
-    // paramos el cronometro:
-    cronometro_CPU->status = TEMPORAL_STATUS_STOPPED;
-
-    // obtengo el tiempo que estuvo el proceso ejecutando en cpu:
-    pcb->quantum = pcb->quntum - (uint32_t)temporal_gettime(cronometro_CPU);
-
-    // en vez de crear y destruir constantemente, 
-    // ACTUALIZAMOS la variable global cronometro_CPU..,
-        //temporal_destroy(t_temporal* temporal);
-    cronometro_CPU->elapsed_ms = 0;
-}
-
-t_temporal* temporal_create_v2(void) {
-	t_temporal* self = malloc(sizeof(t_temporal));
-
-	self->elapsed_ms = 0;
-	self->status = TEMPORAL_STATUS_STOPPED;
-
-	clock_gettime(CLOCK_MONOTONIC_RAW, &self->current);
-
-	return self;
 }

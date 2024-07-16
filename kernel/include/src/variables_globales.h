@@ -33,7 +33,6 @@ extern bool interrupcion_enviada;
 extern t_dictionary* io_connections;
 extern t_dictionary* recursos_dictionary;
 extern t_dictionary* recursos_asignados_por_pid;
-extern t_temporal* cronometro_CPU;
 
 //MUTEXS
 extern pthread_mutex_t MUTEX_READY;
@@ -43,6 +42,7 @@ extern pthread_mutex_t MUTEX_NEW;
 extern pthread_mutex_t MUTEX_EXECUTE;
 extern pthread_mutex_t MUTEX_DICTIONARY;
 extern pthread_mutex_t MUTEX_RECURSOS;
+extern pthread_mutex_t MUTEX_COLA_RETORNO_PCB;
 
 //SEMAFOROS
 extern sem_t SEM_READY;
@@ -51,6 +51,7 @@ extern sem_t SEM_EXIT;
 extern sem_t SEM_NEW;
 extern sem_t SEM_MULTIPROGRAMACION;
 extern sem_t SEM_CPU;
+extern sem_t SEM_PCB_RETURNS;
 
 //CONFIG
 extern t_config* config_kernel;
@@ -75,6 +76,7 @@ extern t_queue* COLA_READY;
 extern t_queue *COLA_AUX_READY;
 extern t_queue* COLA_EXIT;
 extern t_queue* COLA_NEW;
+extern t_queue* COLA_RETORNO_PCB;
 //una variable para que el kernel conozca el pcb que este ejecutando:
 extern t_PCB* EXECUTE;
 extern t_list* LISTA_COLAS_DISPOSITIVOS; 

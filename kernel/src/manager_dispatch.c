@@ -189,3 +189,13 @@ void cancelar_quantum_si_corresponde(t_PCB *pcb_exit) {
         cancelar_hilo_quantum(pcb_exit->pid);
     }
 }
+
+void logica_pcb_retorno_vrr(t_PCB *pcb) {
+    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "VRR") != 0) {
+    pthread_mutex_lock(&MUTEX_COLA_RETORNO_PCB);
+    queue_push(COLA_RETORNO_PCB, pcb);
+    pthread_mutex_unlock(&MUTEX_COLA_RETORNO_PCB);
+    sem_post(&SEM_PCB_RETURNS);  // Signal que el PCB ha retornado
+    return;
+    }
+}
