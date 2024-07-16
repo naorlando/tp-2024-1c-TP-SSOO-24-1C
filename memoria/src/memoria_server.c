@@ -16,7 +16,8 @@ void requests_cpu()
     while (esperar)
     {
         int cod_operacion = recibir_operacion(fd_cpu);
-
+        t_package *package = package_create(NULL_HEADER,sizeof(sizeof(uint32_t)));
+        package_recv(package, fd_cpu);
         switch (cod_operacion)
         {
         case EXAMPLE:
@@ -52,6 +53,18 @@ void requests_cpu()
 
             log_info(logger_memoria, "Se recibio un mje del cpu");
             break;
+
+            // case MSG_CPU_MEMORIA_PAGE:
+            //     process_message_cpu_page(package->buffer);
+            //     break;
+
+        case MSG_CPU_MEMORIA_DATA_READ:
+            process_message_cpu_data_read(package->buffer);
+            break;
+
+        case MSG_CPU_MEMORIA_DATA_WRITE:
+            process_message_cpu_data_write(package->buffer);
+            break;
         case -1:
             log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
             esperar = false; // Cortamos la espera de solicitudes
@@ -60,6 +73,8 @@ void requests_cpu()
             log_warning(logger_memoria, "WARNING: El modulo de memoria ha recibido una solicitud con una operacion desconocida");
             break;
         }
+
+        package_destroy(package);
     }
 }
 
@@ -251,6 +266,46 @@ void cerrar_servidor()
 void _cerrar_puertos()
 {
     free(server_port);
+}
+
+// MSG_CPU_MEMORIA_DATA_READ
+int process_message_cpu_data_read(t_buffer *buffer)
+{
+
+    uint32_t pid = 0;
+    uint32_t page_number = 0;
+    uint32_t frame = 0;
+    uint32_t offset = 0;
+
+    recv_msg_cpu_memoria_data_read(buffer, &pid, &page_number, &frame, &offset);
+    t_entrada_tabla_de_paginas* pagina = get_page_data(pid, page_number);
+    pagina->uso = 1;
+    uint32_t value = read_data(frame, offset);
+    send_msg_memoria_cpu_data_read(value, fd_cpu);
+
+    log_info(logger_memoria, "PID: %u - Accion: LEER <%u> - Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u", pid, value, page_number, frame, offset);
+    return 0;
+}
+
+// MSG_CPU_MEMORIA_DATA_WRITE
+int process_message_cpu_data_write(t_buffer *buffer)
+{
+
+    uint32_t pid = 0;
+    uint32_t page_number = 0;
+    uint32_t frame = 0;
+    uint32_t offset = 0;
+    uint32_t value = 0;
+
+    recv_msg_cpu_memoria_data_write(buffer, &pid, &page_number, &frame, &offset, &value);
+    t_entrada_tabla_de_paginas* pagina = get_page_data(pid, page_number);
+    pagina->uso = 1;
+    pagina->modificado = 1;
+    write_data(frame, offset, value);
+
+    log_info(logger_memoria, "PID: %u - Accion: ESCRIBIR <%u> - Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u",
+             pid, value, page_number, frame, offset);
+    return 0;
 }
 
 void _cerrar_conexiones()

@@ -1,94 +1,111 @@
 #include "tlb.h"
 
+// Definición de variables globales
+t_TLB* TLB;
 
-static TLB tlb;  // Variable global de la TLB
+int32_t ultima_referencia = -1;
 
-algoritmoTLB parse_algoritmo_tlb(const char *policy_str) {
-    if (strcmp(policy_str, "FIFO") == 0) {
-        return FIFO;
-    } else if (strcmp(policy_str, "LRU") == 0) {
-        return LRU;
-    } else {
-        fprintf(stderr, "Unknown TLB replacement policy: %s\n", policy_str);
-        exit(EXIT_FAILURE);
+int32_t _proxima_referencia_tlb();
+
+void inicializar_TLB() {
+    if (cpu_config->CANTIDAD_ENTRADAS_TLB == 0) {
+        TLB = NULL;
+        return;
     }
-}
 
-void init_tlb(void) {
-    int max_entry = cpu_config->CANTIDAD_ENTRADAS_TLB;
-    algoritmoTLB policy = parse_algoritmo_tlb(cpu_config->ALGORITMO_TLB);
+    TLB = malloc(sizeof(t_TLB) * cpu_config->CANTIDAD_ENTRADAS_TLB);
 
-    tlb.entries = (TLBEntry *)malloc(sizeof(TLBEntry) * max_entry);
-    if (tlb.entries == NULL) {
-        perror("Error allocating memory for TLB entries");
-        exit(EXIT_FAILURE);
+    for (int i = 0; i < cpu_config->CANTIDAD_ENTRADAS_TLB; i++) {
+        TLB[i].pid = -1;
+        TLB[i].page = -1;
+        TLB[i].frame = -1;
+        TLB[i].cont_referencia = -1;
     }
-    tlb.size = 0;
-    tlb.max_entry = max_entry;
-    tlb.next_fifo = 0;
-    tlb.policy = policy;
 }
 
 bool obtener_marco(uint32_t pid, uint32_t page, uint32_t* frame) {
-    for (int i = 0; i < tlb.size; i++) {
-        if (tlb.entries[i].pagina == page && tlb.entries[i].pid == pid) {
-            *frame = tlb.entries[i].marco; // TLB HIT
-            log_info(logger_cpu, "PID: %d - TLB HIT - Pagina: %d", pid, page);
-            if (tlb.policy == LRU) {
-                tlb.entries[i].timestamp = (int)time(NULL); // Update timestamp for LRU
+    if (cpu_config->CANTIDAD_ENTRADAS_TLB == 0) {
+        printf("TLB deshabilitada\n");
+        return false;
+    }
+
+    printf("PID: %d - QUE BUSCO EN TLB? - Pagina: %d\n", pid, page);
+
+    for (int i = 0; i < cpu_config->CANTIDAD_ENTRADAS_TLB; i++) {
+        if (TLB[i].page == page && TLB[i].pid == pid) {
+            *frame = TLB[i].frame; // TLB HIT
+            printf("PID: %d - TLB HIT - Pagina: %d\n", pid, page);
+            
+            if (strcmp(cpu_config->ALGORITMO_TLB, "LRU") == 0) {
+                TLB[i].cont_referencia = _proxima_referencia_tlb();
             }
             return true;
         }
     }
-    log_info(logger_cpu, "PID: %d - TLB MISS - Pagina: %d", pid, page);
+
+    printf("PID: %d - TLB MISS - Pagina: %d\n", pid, page);
     return false; // TLB MISS
 }
 
-int search_tlb(int pid, int pagina) {
-    uint32_t frame;
-    if (obtener_marco(pid, pagina, &frame)) {
-        return frame;
-    } else {
-        return -1; // TLB Miss
-    }
-}
+void reemplazar(uint32_t pid, uint32_t page, uint32_t frame) {
+    if (cpu_config->CANTIDAD_ENTRADAS_TLB == 0) return;
 
-void add_tlb_entry(int pid, int pagina, int marco) {
-    if (tlb.size < tlb.max_entry) {
-      //no hay espacio en la tlb
-        tlb.entries[tlb.size].pid = pid;
-        tlb.entries[tlb.size].pagina = pagina;
-        tlb.entries[tlb.size].marco = marco;
-        tlb.entries[tlb.size].timestamp = (int)time(NULL);
-        tlb.size++;
-    } else {
-        // TLB : no hay espacio en la tlb, reemplazar siguiendo el algoritmo 
-        //configurado pudiendo elegir como víctima cualquier otra entrada (incluso de otro proceso)
-        int index_to_replace = 0;
-        if (tlb.policy == FIFO) {
-            index_to_replace = tlb.next_fifo;
-            tlb.next_fifo = (tlb.next_fifo + 1) % tlb.max_entry;
-        } else if (tlb.policy == LRU) {
-            int oldest_timestamp = INT_MAX;
-            for (int i = 0; i < tlb.max_entry; i++) {
-                if (tlb.entries[i].timestamp < oldest_timestamp) {
-                    oldest_timestamp = tlb.entries[i].timestamp;
-                    index_to_replace = i;
-                }
+    int32_t victima_a_reemplazar = 0;
+
+    if (strcmp(cpu_config->ALGORITMO_TLB, "FIFO") == 0) {
+        static int32_t fifo_index = 0;
+        victima_a_reemplazar = fifo_index;
+        fifo_index = (fifo_index + 1) % cpu_config->CANTIDAD_ENTRADAS_TLB;
+    } else if (strcmp(cpu_config->ALGORITMO_TLB, "LRU") == 0) {
+        int32_t referencia_actual = TLB[0].cont_referencia;
+        for (int i = 1; i < cpu_config->CANTIDAD_ENTRADAS_TLB; i++) {
+            if (referencia_actual > TLB[i].cont_referencia) {
+                referencia_actual = TLB[i].cont_referencia;
+                victima_a_reemplazar = i;
             }
         }
+    }
 
-        // Reemplazar la entrada seleccionada
-        tlb.entries[index_to_replace].pid = pid;
-        tlb.entries[index_to_replace].pagina = pagina;
-        tlb.entries[index_to_replace].marco = marco;
-        tlb.entries[index_to_replace].timestamp = (int)time(NULL);
+    // Se reemplaza la seleccionada
+    TLB[victima_a_reemplazar].pid = pid;
+    TLB[victima_a_reemplazar].page = page;
+    TLB[victima_a_reemplazar].frame = frame;
+    TLB[victima_a_reemplazar].cont_referencia = _proxima_referencia_tlb();
+
+    imprimir_tlb();
+}
+
+void limpiar_proceso_TLB(uint32_t pid) {
+    if (cpu_config->CANTIDAD_ENTRADAS_TLB == 0) return;
+
+    for (int i = 0; i < cpu_config->CANTIDAD_ENTRADAS_TLB; i++) {
+        if (pid == TLB[i].pid) {
+            TLB[i].pid = -1;
+            TLB[i].page = -1;
+            TLB[i].frame = -1;
+            TLB[i].cont_referencia = -1;
+        }
     }
 }
 
-void clear_tlb(void) {
-    free(tlb.entries);
-    tlb.entries = NULL;
-    tlb.size = 0;
-    tlb.max_entry = 0;
+void imprimir_tlb() {
+    if (cpu_config->CANTIDAD_ENTRADAS_TLB == 0) return;
+
+    char *string = malloc(1024); // Cambia el tamaño según sea necesario
+    strcpy(string, "=========================TLB===============================\n");
+    for (int i = 0; i < cpu_config->CANTIDAD_ENTRADAS_TLB; i++) {
+        char entrada_string[128];
+        sprintf(entrada_string, "| PID: %i | PAGINA: %i | MARCO: %i | contador: %i\n", 
+            TLB[i].pid, TLB[i].page, TLB[i].frame, TLB[i].cont_referencia);
+        strcat(string, entrada_string);
+    }
+    strcat(string, "===========================================================\n");
+    printf("%s\n", string);
+    free(string);
+}
+
+int32_t _proxima_referencia_tlb() {
+    static int32_t ultima_referencia = -1;
+    ultima_referencia++;
+    return ultima_referencia;
 }

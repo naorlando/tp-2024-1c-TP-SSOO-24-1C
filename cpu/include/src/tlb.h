@@ -1,58 +1,29 @@
 #ifndef TLB_H
 #define TLB_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
-#include <time.h>
-#include <commons/string.h>
-#include <commons/log.h>
-#include <commons/config.h>
+#include <stdint.h>
 #include <stdbool.h>
-#include <pthread.h>
-
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "variables_globales.h"
-#include "cpu_config.h"
-#include "cpu_dispatch.h"
-#include "cpu_interrupt.h"
 
-// Shared
-#include "protocolo_cpu.h"
+// Estructura de la TLB
 typedef struct {
-    int pid;    // Process ID
-    int pagina; // Página
-    int marco;  // Marco (Frame)
-    int timestamp; // Timestamp para LRU
-} TLBEntry;
+    uint32_t pid;
+    uint32_t page;
+    uint32_t frame;
+    int32_t cont_referencia; // Usado para LRU
+} t_TLB;
 
-typedef enum {
-    FIFO,
-    LRU
-} algoritmoTLB;
 
-typedef struct {
-    TLBEntry *entries;
-    int size;
-    int max_entry;
-    int next_fifo; // Index for the next FIFO replacement
-    algoritmoTLB policy;
-} TLB;
 
-// Inicializa la TLB con la capacidad y política de reemplazo dadas
-void init_tlb(void);
-
-// Busca una entrada en la TLB, devuelve el marco si se encuentra, -1 si no
-int search_tlb(int pid, int pagina);
-
-// Agrega una nueva entrada a la TLB
-void add_tlb_entry(int pid, int pagina, int marco);
-
-// Limpia la TLB y libera memoria
-void clear_tlb(void);
-
-// Convierte una cadena de caracteres a un valor del enumerado algoritmoTLB
-algoritmoTLB parse_algoritmo_tlb(const char *policy_str);
-
+// Prototipos de funciones
+void inicializar_TLB();
 bool obtener_marco(uint32_t pid, uint32_t page, uint32_t* frame);
+void reemplazar(uint32_t pid, uint32_t page, uint32_t frame);
+void limpiar_proceso_TLB(uint32_t pid);
+void imprimir_tlb();
+int32_t _proxima_referencia_tlb();
 
 #endif // TLB_H

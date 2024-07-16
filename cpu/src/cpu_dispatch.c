@@ -204,24 +204,23 @@ void remove_newline(char *str)
 // Una dirección lógica se traduce a una dirección física, pero al copiar un string/registro a memoria,
 // podría estar presente en más de una página (ver sección de MMU).
 // #############################################################################################################
-uint32_t leer_memoria(uint32_t direccion_logica, uint32_t* memory_value)
+uint32_t leer_memoria(uint32_t direccion_logica, uint32_t *memory_value)
 {
-// TODO: se relaciona con la MMU, implementar cuando la MMU esté desarrollada.
-    
-    t_datos_dir_logica* dir_logica = crear_dir_logica(direccion_logica);
+    // TODO: se relaciona con la MMU, implementar cuando la MMU esté desarrollada.
+
+    t_datos_dir_logica *dir_logica = crear_dir_logica(direccion_logica);
     uint32_t frame;
-    
-    //TLB
-     if(obtener_marco(pcb_execute->pid, dir_logica->num_pagina, &frame)){
-        //TLB HIT
-        
-        //consultar a la memoria para obtener el frame correspondiente
+
+    // TLB
+    if (obtener_marco(pcb_execute->pid, dir_logica->num_pagina, &frame))
+    {
+        // TLB HIT
+
+        // consultar a la memoria para obtener el frame correspondiente
         //(pid, dir_logica, frame, memory_value)
 
-
         free(dir_logica);
-      
-        
+
         return 1;
     }
     return 0;
@@ -364,4 +363,105 @@ void cargar_contexto_ejecucion_a_pcb(t_PCB *pcb)
     contexto->edx = cpu_registers->edx;
     contexto->si = cpu_registers->si;
     contexto->di = cpu_registers->di;
+}
+
+void _data_read(uint32_t pid, t_datos_dir_logica *dir_logica, uint32_t frame, uint32_t *memory_value)
+{
+    send_msg_cpu_memoria_data_read(pid, dir_logica->num_pagina, frame, dir_logica->desplazamiento_pagina, fd_memoria);
+
+    t_package *paquete = package_create(NULL_HEADER, sizeof(uint32_t));
+    package_recv(paquete, fd_memoria);
+
+    if (paquete->msg_header != MSG_MEMORIA_CPU_DATA_READ)
+    {
+        log_debug(logger_cpu, "Se espera recibir mensaje desde memoria de data read");
+        exit(EXIT_FAILURE);
+    }
+
+    recv_msg_memoria_cpu_data(paquete->buffer, memory_value);
+    package_destroy(paquete);
+}
+
+int read_from_memory(t_PCB *pcb, uint32_t pid, uint32_t logical_address, uint32_t *memory_value)
+{
+    uint32_t frame;
+    t_datos_dir_logica *dir_logica = crear_dir_logica(logical_address);
+
+    if (obtener_marco(pid, dir_logica->num_pagina, &frame))
+    {
+        // TLB HIT
+        _data_read(pid, dir_logica, frame, memory_value);
+
+        free(dir_logica);
+        // Retorno que no fue page fault
+
+        return 1;
+    }
+
+    // TLB MISS
+    send_msg_cpu_memoria_page(pid, dir_logica->num_pagina, fd_memoria);
+
+    t_package *paquete = package_create(NULL_HEADER, sizeof(uint32_t));
+    package_recv(paquete, fd_memoria);
+
+    if (paquete->msg_header == MSG_MEMORIA_CPU_FRAME)
+    {
+
+        recv_msg_memoria_cpu_frame(paquete->buffer, &frame);
+        reemplazar(pid, dir_logica->num_pagina, frame); // Reemplazamos en la TLB
+        _data_read(pid, dir_logica, frame, memory_value);
+        package_destroy(paquete);
+
+        free(dir_logica);
+        return 1;
+    }
+    else
+    {
+        log_debug(logger_cpu, "Se espera recibir mensaje desde memoria de page");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void _write_data(uint32_t pid, t_datos_dir_logica *dir_logica, uint32_t frame, uint32_t write_value)
+{
+    send_msg_cpu_memoria_data_write(pid, dir_logica->num_pagina, frame, dir_logica->desplazamiento_pagina, write_value, fd_memoria);
+}
+
+int write_into_memory(t_PCB *pcb, uint32_t pid, uint32_t logical_address, uint32_t cpu_register)
+{
+    uint32_t frame;
+    t_datos_dir_logica *dir_logica = crear_dir_logica(logical_address);
+
+    if (obtener_marco(pid, dir_logica->num_pagina, &frame))
+    {
+        // TLB HIT
+        _write_data(pid, dir_logica, frame, cpu_register);
+
+        free(dir_logica);
+        // Retorno que no fue page fault
+        return 1;
+    }
+
+    // TLB MISS
+    send_msg_cpu_memoria_page(pid, dir_logica->num_pagina, fd_memoria);
+
+    t_package *paquete = package_create(NULL_HEADER,sizeof(uint32_t));
+    package_recv(paquete, fd_memoria);
+
+    if (paquete->msg_header == MSG_MEMORIA_CPU_FRAME)
+    {
+        recv_msg_memoria_cpu_frame(paquete->buffer, &frame);
+        reemplazar(pid, dir_logica->num_pagina, frame); // Reemplazamos en la TLB
+        _write_data(pid, dir_logica, frame, cpu_register);
+        package_destroy(paquete);
+
+        free(dir_logica);
+        return 1;
+    }
+
+    else
+    {
+        log_debug(logger_cpu, "Se espera recibir mensaje desde memoria de page");
+        exit(EXIT_FAILURE);
+    }
 }

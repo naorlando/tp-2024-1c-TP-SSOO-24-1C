@@ -21,6 +21,9 @@ void _iniciar_logger();
 // Post: La configuración está cargada y almacenada en memoria_config.
 void _iniciar_config();
 
+
+void _inicar_espacio_memoria();
+
 // Crea la tabla de procesos para el módulo de memoria.
 // Pre: Ninguna.
 // Post: La tabla de procesos está creada y lista para almacenar procesos.

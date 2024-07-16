@@ -8,6 +8,7 @@
 #include "cpu_config.h"
 #include <semaphore.h>
 
+
 #define SERVERNAME "CPU"
 #define SERVER_MEMORIA "SERVER MEMORIA"
 #define CLIENTE_KERNEL "CLIENTE KERNEL"
@@ -19,6 +20,9 @@ extern t_cpu_registers* cpu_registers;
 extern t_PCB* pcb_execute;
 extern bool interrupcion_pendiente;
 extern int tipo_de_interrupcion;
+
+
+// Variables globales
 
 
 //PAGES
