@@ -90,15 +90,15 @@ void enviar_interrupcion_a_cpu(uint32_t pid)
     destroy_interruption(interrupcion);
 }
 
-// // Función que crea la interrupción quantum
-// void interrupcion_quantum(uint32_t pid, uint32_t quantum) {
-//     pthread_t hilo_de_quantum;
-//     hilo_args args;
-//     args.pid = pid;
-//     args.quantum = quantum;
-//     pthread_create(&hilo_de_quantum, NULL, funcion_hilo_quantum, &args);
-//     pthread_join(hilo_de_quantum, NULL);  // Para que el hilo se limpie automáticamente al terminar
-// }
+// Función que crea la interrupción quantum
+void interrupcion_quantum(uint32_t pid, uint32_t quantum) {
+    pthread_t hilo_de_quantum;
+    hilo_args args;
+    args.pid = pid;
+    args.quantum = quantum;
+    pthread_create(&hilo_de_quantum, NULL, funcion_hilo_quantum, &args);
+    pthread_join(hilo_de_quantum, NULL);  // Para que el hilo se limpie automáticamente al terminar
+}
 
 // // Función que ejecuta el hilo quantum
 // void* funcion_hilo_quantum(void* args) {
