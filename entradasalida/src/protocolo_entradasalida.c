@@ -79,11 +79,13 @@ void atender_solicitud_stdout(int fd) {
 //        FUNCIONES DE ENTRADA/SALIDA DIALFS
 //======================================================
 
-void atender_solicitud_dialfs(int fd, t_dialfs* dialfs) {
-    t_io_dialfs* io_dialfs = deserializar_io_dialfs(recibir_buffer(&fd, sizeof(int)));
+void atender_solicitud_dialfs(int fd) {
+    t_io_dialfs* io_dialfs = recv_io_dialfs(fd);
+    
     if (io_dialfs != NULL) {
-        bool operacion_exitosa = false;
+        log_info(logger_entradasalida, "PID: <%d> - Operacion: <%s>", io_dialfs->pid, get_operation_name(io_dialfs->operacion));
         
+        // Procesar la solicitud según la operación
         switch(io_dialfs->operacion) {
             case IO_FS_CREATE:
                 operacion_exitosa = crear_archivo(dialfs, io_dialfs->nombre_archivo);
@@ -115,6 +117,7 @@ void atender_solicitud_dialfs(int fd, t_dialfs* dialfs) {
                 break;
         }
         
+        // Enviar confirmación de la operación al kernel
         if (io_dialfs->operacion != IO_FS_READ || !operacion_exitosa) {
             t_response* response = create_response(operacion_exitosa, io_dialfs->pid);
             send_confirmacion_io(fd, MSG_IO_KERNEL_DIALFS, response);
@@ -122,7 +125,7 @@ void atender_solicitud_dialfs(int fd, t_dialfs* dialfs) {
         
         destruir_io_dialfs(io_dialfs);
     } else {
-        log_error(logger_entradasalida, "Error al recibir IO DialFS");
+        log_error(logger_entradasalida, "Error al recibir la solicitud IO DIALFS");
         t_response* response = create_response(false, 0);
         send_confirmacion_io(fd, MSG_IO_KERNEL_DIALFS, response);
     }

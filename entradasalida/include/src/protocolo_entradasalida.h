@@ -53,9 +53,8 @@ void atender_solicitud_stdout(int fd);
  * Maneja operaciones de creación, eliminación, truncado, lectura y escritura de archivos.
  *
  * @param fd Descriptor de archivo para la comunicación.
- * @param dialfs Puntero a la estructura t_dialfs que representa el sistema de archivos.
  */
-void atender_solicitud_dialfs(int fd, t_dialfs* dialfs);
+void atender_solicitud_dialfs(int fd);
 
 //======================================================
 //               FUNCIONES COMUNES

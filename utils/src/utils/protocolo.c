@@ -414,6 +414,17 @@ t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd)
     return solicitud;
 }
 
+
+
+t_io_dialfs* recv_io_dialfs(int fd) {
+    t_buffer* buffer = recive_full_buffer(fd);
+    if (buffer == NULL) return NULL;
+    
+    t_io_dialfs* io_dialfs = deserializar_io_dialfs(buffer);
+    buffer_destroy(buffer);
+    return io_dialfs;
+}
+
 void send_IO_interface(int fd, char* nombre_interfaz, char* tipo)
 {
     tipo_interfaz_t tipo_interfaz = string_to_tipo_interfaz(tipo);
@@ -820,6 +831,8 @@ void serialize_interruption(t_buffer* buffer, t_interruption* interruption)
     buffer_add_uint32(buffer, get_pid_interruption(interruption));
 }
 
+// IO Generica
+
 void serializar_solicitud_io_generica(t_buffer* buffer, t_solicitud_io_generica* solicitud) {
     serialize_pcb(buffer, solicitud->pcb);
     buffer_add_string(buffer, solicitud->nombre_interfaz);
@@ -854,6 +867,8 @@ t_io_generica* deserializar_io_generica(t_buffer* buffer) {
     return crear_io_generica(nombre_interfaz, tiempo_sleep, pid);
 }
 
+// IO Stdin
+
 void serializar_solicitud_io_stdin(t_buffer* buffer, t_solicitud_io_stdin* solicitud) {
     serialize_pcb(buffer, solicitud->pcb);
     buffer_add_string(buffer, solicitud->nombre_interfaz);
@@ -883,6 +898,8 @@ t_io_stdin* deserializar_io_stdin(t_buffer* buffer) {
     uint32_t pid = buffer_read_uint32(buffer);
     return crear_io_stdin(direccion_fisica, tamanio, pid);
 }
+
+// IO Stdout
 
 void serializar_solicitud_io_stdout(t_buffer* buffer, t_solicitud_io_stdout* solicitud) {
     serialize_pcb(buffer, solicitud->pcb);
@@ -914,6 +931,8 @@ t_io_stdout* deserializar_io_stdout(t_buffer* buffer) {
     return crear_io_stdout(direccion_fisica, tamanio, pid);
 }
 
+// IO DialFS
+
 void serializar_solicitud_io_dialfs(t_buffer* buffer, t_solicitud_io_dialfs* solicitud) {
     serialize_pcb(buffer, solicitud->pcb);
     buffer_add_string(buffer, solicitud->nombre_interfaz);
@@ -935,7 +954,7 @@ void serializar_io_dialfs(t_buffer* buffer, t_io_dialfs* io_dialfs) {
     buffer_add_uint32(buffer, io_dialfs->operacion);
     buffer_add_uint32(buffer, io_dialfs->pid);
     
-    // Si es una operación de escritura, también serializamos los datos
+    // Si la operacion es de escritura, serializo los datos
     if (io_dialfs->operacion == IO_FS_WRITE && io_dialfs->datos != NULL) {
         buffer_add_data(buffer, io_dialfs->datos, io_dialfs->tamanio);
     }
@@ -950,6 +969,8 @@ t_io_dialfs* deserializar_io_dialfs(t_buffer* buffer) {
     uint32_t pid = buffer_read_uint32(buffer);
     
     void* datos = NULL;
+
+    // Si la operacion es de escritura, deserializo los datos
     if (operacion == IO_FS_WRITE) {
         datos = malloc(tamanio);
         buffer_read_data(buffer, datos, tamanio);
@@ -957,6 +978,8 @@ t_io_dialfs* deserializar_io_dialfs(t_buffer* buffer) {
     
     return crear_io_dialfs(nombre_archivo, tamanio, offset, datos, operacion, pid);
 }
+
+// IO Interface
 
 void serializar_IO_interface(t_buffer* buffer, t_IO_interface* interface)
 {
