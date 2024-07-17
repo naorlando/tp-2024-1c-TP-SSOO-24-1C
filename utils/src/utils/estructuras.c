@@ -13,6 +13,7 @@ t_PCB *pcb_create(uint32_t pid, uint32_t quantum)
     pcb->quantum = quantum;
     pcb->program_counter = 0;
     pcb->cpu_registers = cpu_registers_create();
+    pcb->state = NEW;
 
     return pcb;
 }
@@ -31,7 +32,15 @@ t_cpu_registers* get_cpu_registers(t_PCB* pcb)
 
 uint32_t get_pcb_size(t_PCB* pcb)
 {
-    return (sizeof(uint32_t) * 3) + get_cpu_registers_size(get_cpu_registers(pcb));
+    return (sizeof(uint32_t) * 3) + get_cpu_registers_size(get_cpu_registers(pcb)) + sizeof(uint32_t);
+}
+
+t_state get_state(t_PCB* pcb){
+    return pcb->state;
+}
+
+void set_state(t_PCB* pcb, t_state state){
+    pcb->state = state;
 }
 
 // CPU registers
@@ -87,8 +96,7 @@ t_new_process* create_new_process(uint32_t pid,char* path)
     new_process->pid = pid;
     new_process->path = strdup(path);
 
-    return new_process;
-    
+    return new_process;  
 }
 
 void destroy_new_process(t_new_process* new_process) 
@@ -98,4 +106,38 @@ void destroy_new_process(t_new_process* new_process)
     }
 
     free(new_process);
+}
+
+char* get_path_new_process(t_new_process* new_process)
+{
+    return new_process->path;
+}
+
+uint32_t get_size_new_process(t_new_process* new_process) 
+{
+    return sizeof(uint32_t) + strlen(new_process->path) + 1 + sizeof(uint32_t);
+}
+
+t_manejo_recurso *manejo_recurso_create(t_PCB *pcb, char *nombre_recurso)
+{  
+    t_manejo_recurso *manejo_recurso = malloc(sizeof(t_manejo_recurso));
+
+    manejo_recurso->pcb = pcb;
+    manejo_recurso->nombre_recurso = strdup(nombre_recurso);
+
+    return manejo_recurso;
+}
+
+void manejo_recurso_destroy(t_manejo_recurso *manejo_recurso)
+{
+    if(manejo_recurso->nombre_recurso != NULL) {
+        free(manejo_recurso->nombre_recurso);
+    }
+
+    free(manejo_recurso);
+}
+
+u_int32_t get_manejo_recurso_size(t_manejo_recurso *manejo_recurso)
+{
+    return sizeof(u_int32_t) + strlen(manejo_recurso->nombre_recurso) + 1 + get_pcb_size(manejo_recurso->pcb);
 }

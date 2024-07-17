@@ -1,0 +1,15 @@
+make --no-print-directory -C include/ 3>&1 1>&2 2>&3 | sed -E 's,(src/)[^ ]+\.(c|h)\:,include/&,' 3>&2 2>&1 1>&3
+make[1]: *** No targets specified and no makefile found.  Stop.
+mkdir -pv obj/
+mkdir: created directory 'obj/'
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/proceso.o" src/proceso.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/memoria_server.o" src/memoria_server.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/memoria.o" src/memoria.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/inicializar_memoria.o" src/inicializar_memoria.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/gestion_procesos.o" src/gestion_procesos.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/protocolo_memoria.o" src/protocolo_memoria.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/memoria_config.o" src/memoria_config.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/tabla_procesos.o" src/tabla_procesos.c -I../utils/src -I./include/src -I./src
+mkdir -pv bin/
+mkdir: created directory 'bin/'
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -o "bin/memoria" obj/proceso.o obj/memoria_server.o obj/memoria.o obj/inicializar_memoria.o obj/gestion_procesos.o obj/protocolo_memoria.o obj/memoria_config.o obj/tabla_procesos.o -I../utils/src -I./include/src -I./src -L../utils/bin -L./include/bin -lutils -lcommons -lpthread -lreadline -lm

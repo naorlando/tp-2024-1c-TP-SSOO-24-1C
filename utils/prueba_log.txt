@@ -1,0 +1,31 @@
+
+2024-06-26 00:43:58 - Iniciando script
+2024-06-26 00:43:58 - Rutas de ejecutables configuradas
+2024-06-26 00:43:58 - Iniciando compilación de módulos
+2024-06-26 00:43:58 - Ejecutando make clean y make en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu
+2024-06-26 00:43:58 - Ejecutando make clean y make en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel
+2024-06-26 00:43:59 - Ejecutando make clean y make en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria
+2024-06-26 00:43:59 - Ejecutando make clean y make en /home/utnso/tp-2024-1c-TP-SSOO-24-1C/entradasalida
+2024-06-26 00:43:59 - Iniciando ejecución de módulos principales
+2024-06-26 00:43:59 - Intentando ejecutar módulo: /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria/bin/memoria
+2024-06-26 00:43:59 - Ejecutando sin archivo de configuración: /home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria/bin/memoria
+2024-06-26 00:44:01 - Esperando 2 segundos después de la ejecución
+2024-06-26 00:44:03 - Intentando ejecutar módulo: /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu/bin/cpu
+2024-06-26 00:44:03 - Ejecutando sin archivo de configuración: /home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu/bin/cpu
+2024-06-26 00:44:05 - Esperando 2 segundos después de la ejecución
+2024-06-26 00:44:08 - Intentando ejecutar módulo: /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel/bin/kernel
+2024-06-26 00:44:08 - Ejecutando sin archivo de configuración: /home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel/bin/kernel
+2024-06-26 00:44:10 - Esperando 2 segundos después de la ejecución
+2024-06-26 00:44:12 - Solicitando número de dispositivos de entrada/salida
+2024-06-26 00:44:18 - Número de dispositivos solicitados: 1
+2024-06-26 00:44:18 - Iniciando configuración del dispositivo 1
+2024-06-26 00:44:18 - Iniciando selección de dispositivo
+2024-06-26 00:44:22 - Nombre de interfaz ingresado: Jorge
+2024-06-26 00:44:24 - Opción seleccionada: 3
+2024-06-26 00:44:24 - Archivo de configuración encontrado: /home/utnso/tp-2024-1c-TP-SSOO-24-1C/entradasalida/cfg/interfaz_stdout.config
+2024-06-26 00:44:24 - Intentando ejecutar ENTRADASALIDA
+2024-06-26 00:44:24 - El ejecutable ENTRADASALIDA existe y tiene permisos de ejecución
+2024-06-26 00:44:24 - Comando a ejecutar: /home/utnso/tp-2024-1c-TP-SSOO-24-1C/entradasalida/bin/entradasalida "Jorge" /home/utnso/tp-2024-1c-TP-SSOO-24-1C/entradasalida/cfg/interfaz_stdout.config
+2024-06-26 00:44:24 - ENTRADASALIDA iniciado con PID 3698
+2024-06-26 00:44:26 - ENTRADASALIDA sigue ejecutándose después de 2 segundos
+2024-06-26 00:44:26 - Todos los módulos iniciados. Entrando en bucle de espera.

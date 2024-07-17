@@ -5,21 +5,29 @@
 #include "protocolo_kernel.h"
 #include "commons/string.h"
 #include "utils/sockets.h"
-#include "utils/estructuras.h"
-#include "utils/buffer.h"
+//#include "utils/estructuras.h"
+//#include "utils/buffer.h"
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <pthread.h>
+//#include "datos_hilos.h"
+#include "manager_dispatch.h"
+#include "manager_ios.h"
 
-
-void atender_kernel_memoria();
-void atender_kernel_IO(void*);
-void atender_kernel_cpu_dispatch();
 void levantar_servidor();
 void inicializar_sockets();
 void crear_hilos_conexiones();
 void cerrar_servidor();
-void* esperar_conexiones_IO(void*);
+void* esperar_conexiones_IO(void* arg);
+//void cancelar_hilo_quantum(uint32_t);
+
+// Funciones de manejo de conexiones memoria
+void atender_kernel_memoria();
+
+// Funciones de manejo de conexiones CPU
+void atender_kernel_cpu_dispatch();
+
+// Funciones de cierre
 void _cerrar_conexiones();
 void _cerrar_puertos();
 

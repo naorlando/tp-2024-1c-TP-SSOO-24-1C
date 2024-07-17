@@ -253,6 +253,16 @@ char *buffer_read_string(t_buffer *buffer, uint32_t length)
     return string;
 }
 
+bool buffer_read_bool(t_buffer *buffer)
+{
+    bool data;
+    uint32_t size = sizeof(bool);
+
+    buffer_read_data(buffer, &data, size);
+
+    return data;
+}
+
 //-----Funciones para escribir datos en el buffer-----
 void buffer_add_uint8(t_buffer *buffer, uint8_t data)
 {
@@ -276,6 +286,11 @@ void buffer_add_string(t_buffer *buffer, char *data)
     buffer_add_uint32(buffer, size_cadena);
 
     buffer_add_data(buffer, data, size_cadena);
+}
+
+void buffer_add_bool(t_buffer *buffer, bool data)
+{
+    buffer_add_data(buffer, &data, sizeof(bool));
 }
 
 void buffer_add_buffer(t_buffer* buffer_destination, t_buffer* buffer_source) {

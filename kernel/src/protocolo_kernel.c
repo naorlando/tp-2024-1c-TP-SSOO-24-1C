@@ -13,6 +13,16 @@ void send_pcb_cpu(t_PCB* pcb)
     send_pcb(MSG_PCB_CPU, fd_cpu_dispatch, pcb);
 }
 
+t_PCB* recv_pcb_cpu() 
+{
+    t_PCB* pcb = recv_pcb(fd_cpu_dispatch);
+    // detenemos.
+    // asignamos nuevo quantum al pcb.
+    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID <%d>", pcb->pid);
+
+    return pcb;
+}
+
 int send_example_memoria()
 {
     char *cadena = "KERNEL ENVIO MENSAJE A MEMORIA";
@@ -37,11 +47,78 @@ int recv_example_msg_entradasalida(int cliente_io)
 
 t_PCB* recv_pcb_interrupt()
 {
-    t_buffer* buffer = recive_full_buffer(fd_cpu_interrupt);
+    t_buffer* buffer = recive_full_buffer(fd_cpu_dispatch);
     t_PCB* pcb = deserialize_pcb(buffer);
-    log_info(logger_kernel, "Se recibio un PCB del CPU_INTERRUPT, PID => %d", pcb->pid);
     //pcb_destroy(pcb);
     buffer_destroy(buffer);
-
     return pcb;
+}
+
+// adapter:
+void send_interruption_cpu(t_interruption* interrupcion)
+{
+    // Seteo que se envio una interrupcion a CPU
+    interrupcion_enviada = true;
+    send_interruption(interrupcion, fd_cpu_interrupt);
+}
+
+// Agrego la función que envía la instrucción IO_GEN_SLEEP al módulo de E/S
+int send_kernel_io_gen_sleep(int fd, char* nombre_interfaz, t_io_generica* io_generica) {
+    
+    //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
+    int bytes_enviados = send_io_generica(fd, io_generica);
+
+    if(bytes_enviados > 0) {
+         log_info(logger_kernel, "Solicitud enviada a la IO GENERICA %s con pid %d", nombre_interfaz, obtener_pid_generica(io_generica));
+    }else {
+        log_error(logger_kernel, "Hubo un error al enviar la solicitud a la IO GENERICA %s con pid %d", nombre_interfaz, obtener_pid_generica(io_generica));
+    }
+    
+    return bytes_enviados;
+}
+
+// Agrego la función que envía la instrucción IO_STDIN al módulo de E/S
+int send_kernel_io_stdin(int fd, char* nombre_interfaz, t_io_stdin* io_stdin) {
+    
+    //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
+    int bytes_enviados = send_io_stdin(fd, io_stdin);
+
+    if(bytes_enviados > 0) {
+        log_info(logger_kernel, "Solicitud enviada a la IO STDIN %s con pid %d", nombre_interfaz, obtener_pid_stdin(io_stdin));
+    }else {
+        log_error(logger_kernel, "Hubo un error al enviar la solicitud a la IO STDIN %s con pid %d", nombre_interfaz, obtener_pid_stdin(io_stdin));
+    }
+    
+    return bytes_enviados;
+}
+
+// Agrego la función que envía la instrucción IO_STDOUT al módulo de E/S
+int send_kernel_io_stdout(int fd, char* nombre_interfaz, t_io_stdout* io_stdout) {
+    
+    //TODO: Modificar tipo de retorno para validar si la interfaz esta conectada
+    int bytes_enviados = send_io_stdout(fd, io_stdout);
+    
+    if(bytes_enviados > 0) {
+        log_info(logger_kernel, "Solicitud enviada a la IO STDOUT %s con pid %d", nombre_interfaz, obtener_pid_stdout(io_stdout));
+    }else {
+        log_error(logger_kernel, "Hubo un error al enviar la solicitud a la IO STDOUT %s con pid %d", nombre_interfaz, obtener_pid_stdout(io_stdout));
+    }
+    
+    return bytes_enviados;
+}
+
+t_solicitud_io_generica* recv_solicitud_io_generica_cpu()
+{
+    t_solicitud_io_generica* io_gen = recv_solicitud_io_generica(fd_cpu_dispatch);
+
+    return io_gen;
+}
+
+t_manejo_recurso*  recv_wait_or_signal_request()
+{
+    t_buffer* buffer = recive_full_buffer(fd_cpu_dispatch);
+    t_manejo_recurso* manejo_recurso_recibido = deserialize_manejo_recurso(buffer);
+    log_info(logger_kernel, "Se recibio una solicitud de WAIT o SIGNAL del CPU_DISPATCH, PID <%d> y  recurso: %s", manejo_recurso_recibido->pcb->pid, manejo_recurso_recibido->nombre_recurso);
+    buffer_destroy(buffer);
+    return manejo_recurso_recibido;
 }

@@ -25,8 +25,8 @@ void requests_cpu()
             recv_example_msg_cpu();
             // esperar = false; //Cortamos la espera de solicitudes
             break;
-        case MSG_NEXT_INSTRUCTION_CPU:
-            t_next_instruction *next = recv_next_instruction();
+            case MSG_NEXT_INSTRUCTION_CPU:
+                t_next_instruction* next = recv_next_instruction_cpu();
 
             if (next == NULL)
             {
@@ -47,7 +47,22 @@ void requests_cpu()
                 {
                     send_instrution(instruction);
                 }
-            }
+
+                t_proceso* proceso = obtener_proceso(obtener_pid_process(next));
+
+                if(proceso == NULL) {
+                    log_error(logger_memoria, "ERROR: Ha surgido un problema al buscar el proceso en la memoria.");
+                }else{
+                    t_instruction* instruction = obtener_siguiente_instruccion(proceso, obtener_pc_process(next));
+
+                    if(instruction != NULL){
+                        send_instrution_cpu(instruction);
+                    }
+                }
+            break;                     
+            case MSG_CPU_MEMORIA:
+
+                log_info(logger_memoria, "Se recibio un mje del cpu");
             break;
         case MSG_CPU_MEMORIA:
 
@@ -106,7 +121,7 @@ void requests_kernel()
 
         case MSG_KERNEL_CREATE_PROCESS:
 
-            t_new_process *new_process = recv_process_kernel();
+                t_new_process* new_process= recv_new_process_kernel();
 
             if (new_process == NULL)
             {
@@ -156,10 +171,7 @@ void requests_entradasalida(void *cliente_socket)
         /*
             Agregar operaciones a las que dara servicio el modulo
         */
-        case MSG_IO_MEMORIA:
-
-            log_info(logger_memoria, "Se recibio un mje del IO");
-            break;
+   
 
         case -1:
             log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");

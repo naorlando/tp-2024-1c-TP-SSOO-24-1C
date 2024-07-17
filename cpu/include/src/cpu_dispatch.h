@@ -9,6 +9,7 @@
 #include "mmu.h"
 #include "tlb.h"
 #include "request_memory.h"
+#include "utils/utils.h"
 
 void ejecutar_instruccion(t_instruction*, t_cpu_registers*);
 
@@ -50,12 +51,6 @@ void _establecer_registro(t_cpu_registers *, char *, uint32_t);
 // Post: Retorna el valor del registro correspondiente al nombre dado.
 uint32_t _obtener_valor_registro(t_cpu_registers *, char *);
 
-// TODO: localizarlo en utils?
-// Obtiene el valor de un registro dado un nombre.
-// Pre: Los registros deben ser válidos y no NULL.
-// Post: Retorna el valor del registro correspondiente al nombre dado.
-void remove_newline(char *);
-
 // Maneja las interrupciones de la CPU.
 // Pre: La variable interrupcion_pendiente debe estar correctamente inicializada.
 //      La variable global pcb_execute debe apuntar a un PCB válido y no NULL.
@@ -68,8 +63,21 @@ bool manejar_interrupcion();
 // Post: El contexto de ejecución de la CPU se carga en el PCB.
 void cargar_contexto_ejecucion_a_pcb(t_PCB*);
 
+// Finaliza el envío del PCB después de completar la ejecución.
+// Pre: `pcb_execute` debe ser un puntero válido a t_PCB y debe estar correctamente inicializado.
+//      `fd_kernel_dispatch` debe ser un descriptor de archivo válido.
+// Post: El PCB es enviado al kernel y cualquier interrupción pendiente es desestimada.
+void enviar_pcb_finalizado();
+
+// Envia una pcb y recurso al kernel por una instruccion de WAIT
+// post: envia un pcb y un recurso al kernel
+void handle_wait_or_signal(t_PCB * pcb, char * resource_name, t_name_instruction tipo_de_interrupcion);
+
 // TODO: Implementar.
 
 void informar_kernel_error(const char *mensaje);
 
+void copiar_cadena(uint32_t origen, uint32_t destino, int tamano);
+
+void aumentar_program_counter();
 #endif

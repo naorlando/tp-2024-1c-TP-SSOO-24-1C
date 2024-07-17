@@ -8,7 +8,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/bin/${workspaceFolderBasename}",
-      "args": [],
+      "args": ["Int1", "/home/utnso/tp-2024-1c-TP-SSOO-24-1C/entradasalida/cfg/interfaz_generica.config"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
