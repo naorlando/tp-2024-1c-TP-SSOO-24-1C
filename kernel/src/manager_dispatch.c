@@ -46,11 +46,6 @@ void procesar_pcb_exit()
     // Actualizo el estado del pcb en la cola correspondiente:
     agregar_a_cola_exit(pcb_exit);
     
-    // VRR:
-    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "VRR") != 0) {
-        logica_pcb_retorno_vrr(pcb_exit);
-    }
-    
     sem_post(&SEM_CPU);
 
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
@@ -63,19 +58,17 @@ void procesar_interrupcion_quantum()
     // 1-recibir pcb:
     t_PCB* pcb_interrupt = recv_pcb_interrupt();
 
-    log_info(logger_kernel, "Se recibio un PCB por interrupcion a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
+    log_info(logger_kernel, "Se recibio un PCB por interrupcion de QUANTUM a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
+
+    cronometro_detener(); // funciona en caso de VRR
 
     // 2-actualizar el pcb en la tabla de pcb:
     update_pcb(pcb_interrupt);
     //dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt); // es otra forma pero no se libera el pcb pisado
     log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_interrupt->pid);
 
-    // VRR:
-    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "VRR") != 0) {
-        logica_pcb_retorno_vrr(pcb_interrupt);
-    } else {
-        agregar_a_cola_ready(pcb_interrupt); // caso que sea por RR
-    }
+    // 3-actualizar el estado del pcb en la cola correspondiente:
+    agregar_de_execute_a_ready(pcb_interrupt);
 
     log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));

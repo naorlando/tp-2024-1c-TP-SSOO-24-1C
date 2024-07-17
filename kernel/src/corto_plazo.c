@@ -11,7 +11,7 @@ void planificador_corto_plazo()
         planificador_RR();
         break;
     case VRR:
-        //planificador_VRR();
+        planificador_VRR();
         break;
     default:
         log_warning(logger_kernel, "ALGORITMO DE PLANIFICACION desconocido. OJO LOCO, CUIDADO con el config!");
@@ -38,7 +38,6 @@ void planificador_RR()
 {
     while (1)
     {  
-        //TODO: interrupcion 
         t_PCB *pcb = get_next_pcb_to_exec(COLA_READY);
         pcb_execute(pcb);
         interrupcion_quantum(EXECUTE->pid, obtener_quantum(kernel_config));
@@ -53,6 +52,7 @@ void planificador_VRR()
 
         // Jerarquizamos las colas de READY
         if (!queue_is_empty(COLA_AUX_READY)) {
+            sem_wait(&SEM_AUX_READY);
             pcb = queue_pop(COLA_AUX_READY);
         } else {
             pcb = get_next_pcb_to_exec(COLA_READY);
@@ -62,36 +62,12 @@ void planificador_VRR()
         // Ejecutar PCB
         pcb_execute(pcb);
 
+        // iniciar cronomoetro:
+        cronometro_iniciar();
+
         // Lógica de interrupción por quantum:
         interrupcion_quantum(pcb->pid, pcb->quantum);
 
-        // Iniciar cronometro:
-        t_temporal *cronometro = temporal_create();
-
-        // Esperar a que el PCB retorne:
-        esperar_pcb_cpu(pcb);
-
-        // Detener cronometro:
-        temporal_stop(cronometro);
-
-        // retengo el tiempo transcurrido:
-            // TODO: CHEQUEAR POSIBLE CONFLICTO DE TIPOS...
-                uint32_t tiempo_transcurrido = (uint32_t)temporal_gettime(cronometro);
-
-        // Destruir cronometro:
-        temporal_destroy(cronometro);
-
-        // Actualizar el quantum basado en el tiempo transcurrido:
-        // contemplamos el caso en donde el pcb se mando a exit, el cual no se debe actualizar el quantum ni agregar a ninguna otra cola
-        if(pcb->state == FINISHED || pcb->state == BLOCKED || pcb == NULL) {
-                continue;
-        } else if (tiempo_transcurrido < pcb->quantum) {
-                pcb->quantum -= tiempo_transcurrido;
-                agregar_a_cola_aux_ready(pcb);
-        } else {
-                pcb->quantum = obtener_quantum(kernel_config);
-                agregar_a_cola_ready(pcb);
-        }
     }
 }
 
@@ -147,26 +123,6 @@ void enviar_interrupcion_a_cpu(uint32_t pid)
 }
 
 // -----------------------------------------------------------------------------------------------
-//      VRR solamente:
-// -----------------------------------------------------------------------------------------------
-
-// todo: usamos esta misma funcion en el rr??
-// void* hilo_quantum_func(void* arg) 
-// {
-//     t_PCB* pcb = (t_PCB*)arg;
-//     usleep(pcb->quantum * 1000); // Quantum del PCB ya actualizado.
-//     enviar_interrupcion_a_cpu(pcb->pid);
-//     return NULL;
-// }
-
-void esperar_pcb_cpu(t_PCB *pcb) 
-{
-    sem_wait(&SEM_PCB_RETURNS);
-    pcb = queue_pop(COLA_RETORNO_PCB, pcb);
-    log_info(logger_kernel, "PID: %d - Llego de vuelta al VRR", pcb->pid);
-}
-
-// -----------------------------------------------------------------------------------------------
 //      GENERALES:
 // -----------------------------------------------------------------------------------------------
 t_planificador _obtener_planificador(char *str)
@@ -182,7 +138,7 @@ t_planificador _obtener_planificador(char *str)
 
 void pcb_execute(t_PCB* pcb)
 {
-    log_info(logger_kernel, "Se prepara para ejecutar el PCB con PID: <%d>", pcb->pid);
+    //log_info(logger_kernel, "Se prepara para ejecutar el PCB con PID: <%d>", pcb->pid);
     
     sem_wait(&SEM_CPU);
 
@@ -200,10 +156,10 @@ t_PCB *get_next_pcb_to_exec(t_queue* queue)
     sem_wait(&SEM_READY); // Espera a que haya un PCB en la cola de READY
     t_PCB *pcb_a_tomar;
 
-    log_info(logger_kernel, "Se va a tomar el siguiente PCB de la cola de READY");
+    //log_info(logger_kernel, "Se va a tomar el siguiente PCB de la cola de READY");
 
     pthread_mutex_lock(&MUTEX_READY);
-    pcb_a_tomar = queue_pop(queue);
+        pcb_a_tomar = queue_pop(queue);
     pthread_mutex_unlock(&MUTEX_READY);
 
     return pcb_a_tomar;

@@ -15,7 +15,7 @@ void iniciar_consola_interactiva()
             log_error(logger_kernel, "Comando de CONSOLA no reconocido.");
             free(leido);
             leido = readline("> ");
-            continue; // Saltar y continuar con el resto de la iteración
+            continue; // Saltar y continuar con el resto de la iteración 
         }
 
         char *leido_copy = strdup(leido);
@@ -135,8 +135,6 @@ void f_iniciar_proceso(char *path)
 
     // Creor el PCB
     t_PCB *pcb = pcb_create(pid, obtener_quantum(kernel_config));
-    
-    log_info(logger_kernel, "Se crea el proceso <%d> en NEW", pcb->pid);
 
     // Cargo el pcb a la tabla de pcbs
     add_pcb(pcb);
@@ -203,6 +201,7 @@ int asignar_pid()
 }
 
 void f_mostrar_estado_procesos(){
+    printf("--------------------------------------------------------------------------------\n");
     printf("Mostrando estado de los procesos ...\n");
 
     // COLA NEW:
@@ -227,6 +226,7 @@ void f_mostrar_estado_procesos(){
     // COLA BLOCKED:
     // TODO...
     printf("\nCola BLOCKED: FALTA IMPLEMENTAR\n");
+    printf("--------------------------------------------------------------------------------\n");
     
 }
 
@@ -264,7 +264,7 @@ void f_finalizar_proceso(u_int32_t pid){
 
     // ##############################################################
 
-    // elimina el PCB para siempre (ver en largo_plazo.c)
+    // elimina el PCB para siempre (ver en largo_plazo.c, ACA SE LIBERAN LOS RECURSOS PARA SALIR DEL DEADLOCK)
     agregar_a_cola_exit(pcb);
 
     // Eliminar de la tabla de PCBs

@@ -10,6 +10,7 @@
 #include "utils/estructuras.h"
 #include "commons/collections/list.h"
 #include "commons/collections/dictionary.h"
+#include "table_pcb.h"
 
 // Declaraciones de funciones
 
@@ -42,6 +43,11 @@ bool recurso_match(void* recurso_ptr);
 
 void print_dictionary();
 bool remover_proceso_de_recurso(char *nombre_recurso, uint32_t pid);
+
+// Liberar los recursos que un proceso tiene asignados si corresponde
+// pre: un PCB!=NULL por liberar
+// post: se liberan los recursos que el proceso tiene asignados
+void liberar_recursos_de_proceso(u_int32_t pid);
 
 
 #endif // RESOURCES_H_

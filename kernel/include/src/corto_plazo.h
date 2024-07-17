@@ -22,6 +22,7 @@
 #include "protocolo_kernel.h"
 #include "datos_hilos.h"
 #include "utils/interruption.h"
+#include "cronometro.h"
 
 typedef enum {
     FIFO,
@@ -54,11 +55,4 @@ void pcb_execute(t_PCB*);
 // pre: queue != NULL
 // post: return pcb
 t_PCB* get_next_pcb_to_exec(t_queue*);
-
-// Esperamos a que la CPU nos devuelva el pcb
-// pre: pcb != NULL
-// post: sem_wait(&SEM_PCB_RETURNS)
-void esperar_pcb_cpu(t_PCB *pcb);
-
-
 #endif

@@ -28,6 +28,6 @@ void free_pcb(void *);
 // delete-create del pcb en la tabla de pcbs.
 // pre: pcb con el pid del proceso que termino.
 // post: se actualiza el pcb de la tabla de pcbs.
-void update_pcb(pcb_interrupt);
+void update_pcb(t_PCB *);
 
 #endif

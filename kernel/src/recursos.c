@@ -56,6 +56,7 @@ void decrementar_recurso(t_recurso *recurso) {
 }
 
 void bloquear_proceso(t_recurso *recurso, t_PCB *pcb) {
+    // semaforo: de DETENER_PLANIFICACION.
     queue_push(recurso->cola_bloqueados, pcb);
 }
 
@@ -120,4 +121,33 @@ void print_dictionary() {
         printf("\n");
     }
     dictionary_iterator(recursos_asignados_por_pid, print_item);
+}
+
+// manejo de chequeo de recursos al finalizar un proceso:
+void liberar_recursos_de_proceso(u_int32_t pid)
+{
+// chequeo que el proceso es valido y se encuentra en el diccionario de pcbs:
+    if(get_pcb(pid) == NULL){
+        log_error(logger_kernel, "No se encontro el proceso (con PID: %d) en el diccionario de PCBs ", pid);
+        return;
+    }
+// chequeo que el proceso tiene recursos asignados:
+    t_list *recursos = dictionary_get(recursos_asignados_por_pid, uint32_to_string(pid));
+    if (recursos == NULL) {
+        log_info(logger_kernel, "El proceso %d no tiene recursos asignados, se puede eliminar tranquilamente.", pid);
+        return;
+    }
+// Si tiene, les hago signal a los recursos en cuestión que no se habían liberado.
+    while (!list_is_empty(recursos)) {
+        char *nombre_recurso = (char *)list_get(recursos, 0);
+        t_recurso *recurso = get_recurso(nombre_recurso);
+        if (recurso != NULL) {
+            incrementar_recurso(recurso);
+            log_info(logger_kernel, "Se libera recurso %s (SIN PREVIAMENTE SER LIBERADO) del PID = %d", nombre_recurso, pid);
+            print_dictionary(); //antes
+            remover_proceso_de_recurso(nombre_recurso, pid);
+            //sem_post(&recurso->sem);
+        }
+        //free(nombre_recurso); // Si la memoria del nombre del recurso fue asignada dinámicamente, liberarla.
+    }
 }

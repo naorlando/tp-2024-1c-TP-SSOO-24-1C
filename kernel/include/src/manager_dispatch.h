@@ -13,6 +13,7 @@
 #include "utils_queue.h"
 #include "table_pcb.h"
 #include "recursos.h"
+#include "cronometro.h"
 
 void procesar_ios_genericas();
 void procesar_pcb_exit();

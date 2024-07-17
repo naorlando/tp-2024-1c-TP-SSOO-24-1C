@@ -16,10 +16,12 @@ void process_to_new(t_PCB *pcb)
 {
 
     pthread_mutex_lock(&MUTEX_NEW);
-    queue_push(COLA_NEW, pcb);
+        queue_push(COLA_NEW, pcb);
     pthread_mutex_unlock(&MUTEX_NEW);
+    // LOGs OBLIGATORIO:
+    log_info(logger_kernel, "Se crea el proceso <%d> en NEW", pcb->pid);
     log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "-", "NEW");
-    log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
+    // log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
     sem_post(&SEM_NEW);
 }
 
@@ -33,9 +35,9 @@ void send_new_to_ready()
         // descolar pcb de NEW
         t_PCB *pcb;
         pthread_mutex_lock(&MUTEX_NEW);
-        pcb = queue_pop(COLA_NEW);
+            pcb = queue_pop(COLA_NEW);
         pthread_mutex_unlock(&MUTEX_NEW);
-        log_info(logger_kernel, "Se paso un PCB de NEW -> READY \nCola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
+        log_info(logger_kernel, "Se paso un PCB de NEW -> READY");
 
         // encolar en ready
     // antes:
@@ -49,7 +51,7 @@ void send_new_to_ready()
     }
 }
 
-// deprecada
+// DEPRECADA
 void send_to_exit(t_PCB *pcb)
 {
     pthread_mutex_lock(&MUTEX_EXIT);
@@ -74,40 +76,13 @@ void end_process()
         // agregar logica de liberar recursos de prcesos de ser necesario AQUI...
         // chequeo de recursos no liberados:
         liberar_recursos_de_proceso(pcb_exit->pid);
+        dictionary_remove_and_destroy(recursos_asignados_por_pid, uint32_to_string(pcb_exit->pid), (void *)list_destroy);
+
         // -------------------------------------------------------------------
 
         // TODO eliminar otros contextos en tablas
 
         // liberar memoria de pcb:
         pcb_destroy(pcb_exit);
-    }
-}
-
-// manejo de chequeo de recursos al finalizar un proceso:
-void liberar_recursos_de_proceso(u_int32_t pid)
-{
-// chequeo que el proceso es valido y se encuentra en el diccionario de pcbs:
-    if(get_pcb(pid) == NULL){
-        log_error(logger_kernel, "No se encontro el proceso (con PID: %d) en el diccionario de PCBs ", pid);
-        return;
-    }
-// chequeo que el proceso tiene recursos asignados:
-    t_list *recursos = dictionary_get(recursos_asignados_por_pid, uint32_to_string(pid));
-    if (recursos == NULL) {
-        log_info(logger_kernel, "El proceso %d no tiene recursos asignados, se puede eliminar tranquilamente.", pid);
-        return;
-    }
-// Si tiene, les hago signal a los recursos en cuestión que no se habían liberado.
-    while (!list_is_empty(recursos)) {
-        char *nombre_recurso = (char *)list_get(recursos, 0);
-        t_recurso *recurso = get_recurso(nombre_recurso);
-        if (recurso != NULL) {
-            incrementar_recurso(recurso);
-            log_info(logger_kernel, "Se libera recurso %s (SIN PREVIAMENTE SER LIBERADO) del PID = %d", nombre_recurso, pid);
-            print_dictionary(); //antes
-            remover_proceso_de_recurso(nombre_recurso, pid);
-            //sem_post(&recurso->sem);
-        }
-        //free(nombre_recurso); // Si la memoria del nombre del recurso fue asignada dinámicamente, liberarla.
     }
 }
