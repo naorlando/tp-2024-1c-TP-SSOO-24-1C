@@ -10,6 +10,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 
+
 #define SERVERNAME "CPU"
 #define SERVER_MEMORIA "SERVER MEMORIA"
 #define CLIENTE_KERNEL "CLIENTE KERNEL"
@@ -24,6 +25,14 @@ extern bool interrupcion_pendiente;
 extern t_name_interruption tipo_de_interrupcion;
 extern bool llego_a_exit;
 extern bool solicitud_io;
+
+
+// Variables globales
+
+
+//PAGES
+extern uint32_t page_size;
+extern uint32_t page_table_entries_qty; 
 
 //Semaforos
 extern sem_t SEM_INTERRUPT; // BINARIO -> Revisar si sirve!

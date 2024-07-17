@@ -41,4 +41,7 @@ uint32_t obtener_pid(t_proceso*);
 // Post: Retorna un puntero a la cadena de texto con la ruta absoluta.
 char* obtener_path_absoluto(t_proceso*);
 
+int send_msg_memoria_cpu_init(uint32_t page_size, int fd);
+
+
 #endif

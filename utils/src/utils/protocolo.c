@@ -802,6 +802,55 @@ t_next_instruction* deserialize_next_instruction(t_buffer* buffer) {
     return crear_siguiente_instruccion(pid, pc);
 }
 
+
+
+// Serialize uint32_t with a variable number of arguments
+void serialize_uint32_t(t_buffer* buffer, int args_qty, ...) {
+
+    buffer->size = sizeof(uint32_t) * args_qty;
+    void* stream = malloc(buffer->size);
+    
+    va_list valist;
+    va_start(valist, args_qty);             // Inicializa valist con la cantidad de argumentos recibidos
+   
+    int offset = 0;
+    uint32_t value = 0;
+    
+    for (int i = 0; i < args_qty; i++) {    // Procesa argumentos de valist
+
+        value = va_arg(valist, uint32_t);
+        memcpy(stream + offset, &value, sizeof(uint32_t));
+        offset += sizeof(uint32_t);
+
+    }
+
+    va_end(valist);                         // Libera memoria reservada para valist
+
+    buffer->stream = stream;
+
+}
+
+void deserialize_uint32_t(t_buffer* buffer, int args_qty, ...) {
+
+    void* stream = buffer->stream;
+    
+    va_list valist;
+    va_start(valist, args_qty);             // Inicializa valist con la cantidad de argumentos recibidos
+
+    uint32_t* ptr_value;
+   
+    for (int i = 0; i < args_qty; i++) {    // Procesa argumentos de valist
+
+        ptr_value = va_arg(valist, uint32_t*);
+        memcpy(ptr_value, stream, sizeof(uint32_t));        
+        stream += sizeof(uint32_t);
+    
+    }
+
+    va_end(valist);                         // Libera memoria reservada para valist
+
+}
+
 t_interruption* deserialize_interruption(t_buffer* buffer)
 {
     // Obtengo el nombre de la interrupcion

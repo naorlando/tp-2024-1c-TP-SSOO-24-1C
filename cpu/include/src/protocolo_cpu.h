@@ -39,8 +39,28 @@ void send_get_next_instruction_memoria(uint32_t, uint32_t);
 // Recibe una instrucción desde la memoria.
 // Pre: El descriptor de archivo fd_memoria debe ser válido y estar abierto.
 // Post: Retorna un puntero a t_instruction que contiene la instrucción recibida.
-t_instruction* recv_instruction_memoria();
+t_instruction* recv_instruction();
 
-void send_solicitud_io_generica_kernel(t_PCB*, t_instruction*);
+int send_msg_cpu_memoria_init(int fd);
+
+int recv_msg_memoria_cpu_init(t_buffer*, uint32_t* );
+
+void send_interface_kernel(/*t_interface**/);
+
+int send_msg_cpu_memoria_data_read(uint32_t pid, uint32_t page, uint32_t frame, uint32_t offset, int fd);
+
+int recv_msg_memoria_cpu_data(t_buffer* buffer, uint32_t* value);
+
+
+// MEMORIA -> CPU :: MSG_MEMORIA_CPU_FRAME
+int recv_msg_memoria_cpu_frame(t_buffer* buffer, uint32_t* frame);
+
+// --   PAGE & FRAME    --
+// CPU -> MEMORIA :: MSG_CPU_MEMORIA_PAGE
+int send_msg_cpu_memoria_page(uint32_t pid, uint32_t page, int fd);
+
+// --   WRITE DATA   --
+// CPU -> MEMORIA :: MSG_CPU_MEMORIA_DATA_WRITE
+int send_msg_cpu_memoria_data_write(uint32_t pid, uint32_t page, uint32_t frame, uint32_t offset, uint32_t value, int fd);
 
 #endif

@@ -6,7 +6,8 @@
 #include "utils/estructuras.h"
 #include "protocolo_cpu.h"
 #include "cpu_interrupt.h"
-#include "utils/utils.h"
+#include "mmu.h"
+#include "tlb.h"
 
 void ejecutar_instruccion(t_instruction*, t_cpu_registers*);
 
@@ -67,7 +68,7 @@ void cargar_contexto_ejecucion_a_pcb(t_PCB*);
 void enviar_pcb_finalizado();
 
 // TODO: Implementar.
-uint32_t leer_memoria(uint32_t);
+uint32_t leer_memoria(uint32_t, uint32_t *);
 void escribir_memoria(uint32_t direccion_logica,uint32_t valor_datos);
 bool ajustar_tamano_proceso(t_cpu_registers *cpu_registers, int nuevo_tamano);
 void informar_kernel_error(const char *mensaje);

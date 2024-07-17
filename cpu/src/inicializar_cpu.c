@@ -27,6 +27,11 @@ char* server_port_interrupt;
 char* server_port_dispatch;
 char* memoria_port;
 
+
+
+uint32_t page_size;
+
+
 void init(){
     _iniciar_logger();
     _iniciar_config();
