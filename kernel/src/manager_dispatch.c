@@ -79,7 +79,7 @@ void procesar_interrupcion_quantum()
 
     log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
-    sem_post(&SEM_CPU);      
+    sem_post(&SEM_CPU);
 }
 
 // manejar instruccion WAIT

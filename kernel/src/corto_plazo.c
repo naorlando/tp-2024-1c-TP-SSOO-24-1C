@@ -83,7 +83,7 @@ void planificador_VRR()
 
         // Actualizar el quantum basado en el tiempo transcurrido:
         // contemplamos el caso en donde el pcb se mando a exit, el cual no se debe actualizar el quantum ni agregar a ninguna otra cola
-        if(pcb->state == EXIT || pcb->state == BLOCKED || pcb = NULL) {
+        if(pcb->state == FINISHED || pcb->state == BLOCKED || pcb == NULL) {
                 continue;
         } else if (tiempo_transcurrido < pcb->quantum) {
                 pcb->quantum -= tiempo_transcurrido;
@@ -187,9 +187,9 @@ void pcb_execute(t_PCB* pcb)
     sem_wait(&SEM_CPU);
 
     pthread_mutex_lock(&MUTEX_EXECUTE);
-    EXECUTE = pcb;
-    pcb->state = EXEC;
-    send_pcb_cpu(pcb);
+        EXECUTE = pcb;
+        pcb->state = EXEC;
+        send_pcb_cpu(pcb);
     pthread_mutex_unlock(&MUTEX_EXECUTE);
 
     log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "READY", "EXEC");
