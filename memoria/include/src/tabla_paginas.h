@@ -69,7 +69,7 @@ void agregar_pagina_a_memoria(uint32_t pid, uint32_t page_number);
 void finalizar_proceso(uint32_t pid);
 
 // Función para cambiar el tamaño de la memoria de un proceso
-void resize(uint32_t pid, uint32_t new_size);
+bool resize(uint32_t pid, uint32_t new_size); 
 
 // Funciones Internas
 t_pid_table *_find_pid(uint32_t pid, t_dictionary *diccionario);

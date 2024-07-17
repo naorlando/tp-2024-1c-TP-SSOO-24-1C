@@ -171,7 +171,7 @@ int send_msg_cpu_memoria_page(uint32_t pid, uint32_t page, int fd) {
 
     t_package* package = package_create(MSG_CPU_MEMORIA_PAGE, sizeof(uint32_t));
 
-    serialize_uint32_t(package->buffer, 3, pid,  page);
+    serialize_uint32_t(package->buffer, 2, pid,  page);
 
     package_send(package, fd);
 
@@ -196,6 +196,21 @@ int send_msg_cpu_memoria_data_write(uint32_t pid, uint32_t page, uint32_t frame,
     t_package* package = package_create(MSG_CPU_MEMORIA_DATA_WRITE,sizeof(u_int32_t)*5);
 
     serialize_uint32_t(package->buffer, 5, pid,  page, frame, offset, value);
+
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return EXIT_SUCCESS;
+}
+
+
+// --   RESIZE PROCESS   --
+int send_msg_cpu_memoria_resize(uint32_t pid, uint32_t new_size, int fd) {
+
+    t_package* package = package_create(MSG_CPU_MEMORIA_RESIZE,sizeof(uint32_t)*5);
+
+    serialize_uint32_t(package->buffer, 2, pid, new_size);
 
     package_send(package, fd);
 

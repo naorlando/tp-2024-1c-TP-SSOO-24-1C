@@ -65,6 +65,10 @@ void requests_cpu()
         case MSG_CPU_MEMORIA_DATA_WRITE:
             process_message_cpu_data_write(package->buffer);
             break;
+
+        case MSG_CPU_MEMORIA_RESIZE:
+            process_message_cpu_resize(package->buffer);
+            break;    
         case -1:
             log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
             esperar = false; // Cortamos la espera de solicitudes
@@ -305,6 +309,23 @@ int process_message_cpu_data_write(t_buffer *buffer)
 
     log_info(logger_memoria, "PID: %u - Accion: ESCRIBIR <%u> - Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u",
              pid, value, page_number, frame, offset);
+    return 0;
+}
+
+//RESIZE
+int process_message_cpu_resize(t_buffer *buffer)
+{
+
+    uint32_t pid = 0;
+    uint32_t new_size;
+
+    recv_msg_cpu_memoria_resize(buffer, &pid, &new_size);
+    bool resize_response = resize(pid, new_size);
+    send_msg_cpu_memoria_resize(resize_response,fd_cpu);
+   
+
+    log_info(logger_memoria, "PID: %u - Accion: RESIZE - Nuevo tamaño (<%u>)",
+             pid, new_size);
     return 0;
 }
 

@@ -22,9 +22,9 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         char *reg_direccion = (char *)list_get(instruccion->params, 1);
 
         uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+
         uint32_t valor_memoria = 0;
-        valor_memoria = leer_memoria(direccion_logica, &valor_memoria);
-        _establecer_registro(cpu_registers, reg_datos, valor_memoria);
+        exec_mov_in(direccion_logica, reg_datos, &valor_memoria);
 
         log_info(logger_cpu, "MOV_IN %s %s\n", reg_datos, reg_direccion);
         break;
@@ -36,7 +36,8 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
 
         uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
         uint32_t valor_datos = _obtener_valor_registro(cpu_registers, reg_datos);
-        escribir_memoria(direccion_logica, valor_datos);
+
+        exec_mov_out(direccion_logica, valor_datos, obtener_tamano_registro(reg_datos));
 
         log_info(logger_cpu, "MOV_OUT %s %s\n", reg_direccion, reg_datos);
         break;
@@ -83,7 +84,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         int nuevo_tamano = atoi((char *)list_get(instruccion->params, 0));
 
         // Función para solicitar a la memoria el ajuste de tamaño
-        if (!ajustar_tamano_proceso(cpu_registers, nuevo_tamano))
+        if (!ajustar_tamano_proceso(pcb_execute->pid, nuevo_tamano))
         {
             // TODO: Si la memoria devuelve Out of Memory, devolver el contexto al Kernel
             informar_kernel_error("Out of Memory");
@@ -204,46 +205,8 @@ void remove_newline(char *str)
 // Una dirección lógica se traduce a una dirección física, pero al copiar un string/registro a memoria,
 // podría estar presente en más de una página (ver sección de MMU).
 // #############################################################################################################
-uint32_t leer_memoria(uint32_t direccion_logica, uint32_t *memory_value)
-{
-    // TODO: se relaciona con la MMU, implementar cuando la MMU esté desarrollada.
 
-    t_datos_dir_logica *dir_logica = crear_dir_logica(direccion_logica);
-    uint32_t frame;
 
-    // TLB
-    if (obtener_marco(pcb_execute->pid, dir_logica->num_pagina, &frame))
-    {
-        // TLB HIT
-
-        // consultar a la memoria para obtener el frame correspondiente
-        //(pid, dir_logica, frame, memory_value)
-
-        free(dir_logica);
-
-        return 1;
-    }
-    return 0;
-}
-
-void escribir_memoria(uint32_t direccion_logica, uint32_t valor_datos)
-{
-    // TODO: se relaciona con la MMU, implementar cuando la MMU esté desarrollada.
-}
-
-bool ajustar_tamano_proceso(t_cpu_registers *cpu_registers, int nuevo_tamano)
-{
-    // TODO: Implementa la lógica para solicitar el ajuste de tamaño a la memoria
-    // Devuelve true si el ajuste es exitoso, false si hay un error (por ejemplo, Out of Memory)
-    // Ejemplo simplificado
-    // if (memoria_tiene_espacio(nuevo_tamano)) {
-    //     // Ajustar el tamaño en la memoria
-    //     return true;
-    // } else {
-    //     return false;
-    // }
-    return true;
-}
 
 void informar_kernel_error(const char *mensaje)
 {
@@ -251,10 +214,6 @@ void informar_kernel_error(const char *mensaje)
     printf("Kernel error: %s\n", mensaje);
 }
 
-void copiar_cadena(uint32_t origen, uint32_t destino, int tamano)
-{
-    // Implementa la lógica para copiar una cadena de bytes de origen a destino
-}
 
 void cargar_contexto_ejecucion(t_PCB *pcb)
 {
@@ -365,103 +324,3 @@ void cargar_contexto_ejecucion_a_pcb(t_PCB *pcb)
     contexto->di = cpu_registers->di;
 }
 
-void _data_read(uint32_t pid, t_datos_dir_logica *dir_logica, uint32_t frame, uint32_t *memory_value)
-{
-    send_msg_cpu_memoria_data_read(pid, dir_logica->num_pagina, frame, dir_logica->desplazamiento_pagina, fd_memoria);
-
-    t_package *paquete = package_create(NULL_HEADER, sizeof(uint32_t));
-    package_recv(paquete, fd_memoria);
-
-    if (paquete->msg_header != MSG_MEMORIA_CPU_DATA_READ)
-    {
-        log_debug(logger_cpu, "Se espera recibir mensaje desde memoria de data read");
-        exit(EXIT_FAILURE);
-    }
-
-    recv_msg_memoria_cpu_data(paquete->buffer, memory_value);
-    package_destroy(paquete);
-}
-
-int read_from_memory(t_PCB *pcb, uint32_t pid, uint32_t logical_address, uint32_t *memory_value)
-{
-    uint32_t frame;
-    t_datos_dir_logica *dir_logica = crear_dir_logica(logical_address);
-
-    if (obtener_marco(pid, dir_logica->num_pagina, &frame))
-    {
-        // TLB HIT
-        _data_read(pid, dir_logica, frame, memory_value);
-
-        free(dir_logica);
-        // Retorno que no fue page fault
-
-        return 1;
-    }
-
-    // TLB MISS
-    send_msg_cpu_memoria_page(pid, dir_logica->num_pagina, fd_memoria);
-
-    t_package *paquete = package_create(NULL_HEADER, sizeof(uint32_t));
-    package_recv(paquete, fd_memoria);
-
-    if (paquete->msg_header == MSG_MEMORIA_CPU_FRAME)
-    {
-
-        recv_msg_memoria_cpu_frame(paquete->buffer, &frame);
-        reemplazar(pid, dir_logica->num_pagina, frame); // Reemplazamos en la TLB
-        _data_read(pid, dir_logica, frame, memory_value);
-        package_destroy(paquete);
-
-        free(dir_logica);
-        return 1;
-    }
-    else
-    {
-        log_debug(logger_cpu, "Se espera recibir mensaje desde memoria de page");
-        exit(EXIT_FAILURE);
-    }
-}
-
-void _write_data(uint32_t pid, t_datos_dir_logica *dir_logica, uint32_t frame, uint32_t write_value)
-{
-    send_msg_cpu_memoria_data_write(pid, dir_logica->num_pagina, frame, dir_logica->desplazamiento_pagina, write_value, fd_memoria);
-}
-
-int write_into_memory(t_PCB *pcb, uint32_t pid, uint32_t logical_address, uint32_t cpu_register)
-{
-    uint32_t frame;
-    t_datos_dir_logica *dir_logica = crear_dir_logica(logical_address);
-
-    if (obtener_marco(pid, dir_logica->num_pagina, &frame))
-    {
-        // TLB HIT
-        _write_data(pid, dir_logica, frame, cpu_register);
-
-        free(dir_logica);
-        // Retorno que no fue page fault
-        return 1;
-    }
-
-    // TLB MISS
-    send_msg_cpu_memoria_page(pid, dir_logica->num_pagina, fd_memoria);
-
-    t_package *paquete = package_create(NULL_HEADER,sizeof(uint32_t));
-    package_recv(paquete, fd_memoria);
-
-    if (paquete->msg_header == MSG_MEMORIA_CPU_FRAME)
-    {
-        recv_msg_memoria_cpu_frame(paquete->buffer, &frame);
-        reemplazar(pid, dir_logica->num_pagina, frame); // Reemplazamos en la TLB
-        _write_data(pid, dir_logica, frame, cpu_register);
-        package_destroy(paquete);
-
-        free(dir_logica);
-        return 1;
-    }
-
-    else
-    {
-        log_debug(logger_cpu, "Se espera recibir mensaje desde memoria de page");
-        exit(EXIT_FAILURE);
-    }
-}

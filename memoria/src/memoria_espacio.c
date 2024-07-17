@@ -16,12 +16,6 @@ memory_t *initialize_memory(size_t total_size, size_t page_size)
     return mem;
 }
 
-void *get_memory_address(uint32_t frame_number, size_t offset)
-{
-    return 0;
-    // return (char *)espacio_memoria->memory_space + frame_number * espacio_memoria->page_size + offset;
-}
-
 uint32_t read_data(uint32_t frame_number, uint32_t offset)
 {
     if (!_es_operable_sobre_memoria(offset))
@@ -32,8 +26,10 @@ uint32_t read_data(uint32_t frame_number, uint32_t offset)
     uint32_t total_offset = frame_number * (espacio_memoria->page_size) + offset;
     uint32_t data_leida = 0;
 
+    uint32_t frame_restante = (espacio_memoria->page_size) - (espacio_memoria->page_size) + offset;
+
     pthread_mutex_lock(&MUTEX_MEMORY_SPACE);
-    memcpy(&data_leida, espacio_memoria->memory_space + total_offset, largo_tipo_de_dato);
+    memcpy(&data_leida, espacio_memoria->memory_space + total_offset, frame_restante);
     pthread_mutex_unlock(&MUTEX_MEMORY_SPACE);
 
     return data_leida;
@@ -47,9 +43,10 @@ void write_data(uint32_t frame_number, uint32_t offset, uint32_t data)
     }
 
     uint32_t total_offset = frame_number * espacio_memoria->page_size + offset;
+    uint32_t frame_restante = (espacio_memoria->page_size) - (espacio_memoria->page_size) + offset;
 
     pthread_mutex_lock(&MUTEX_MEMORY_SPACE);
-    memcpy(espacio_memoria->memory_space + total_offset, &data, largo_tipo_de_dato);
+    memcpy(espacio_memoria->memory_space + total_offset, &data, frame_restante);
     pthread_mutex_unlock(&MUTEX_MEMORY_SPACE);
 }
 
@@ -60,11 +57,11 @@ void *read_page(uint32_t frame_number)
         exit(EXIT_FAILURE);
     }
 
-    void *page_data = malloc(espacio_memoria->page_size );
-    uint32_t total_offset = frame_number * espacio_memoria->page_size ;
+    void *page_data = malloc(espacio_memoria->page_size);
+    uint32_t total_offset = frame_number * espacio_memoria->page_size;
 
     pthread_mutex_lock(&MUTEX_MEMORY_SPACE);
-    memcpy(page_data, espacio_memoria -> memory_space + total_offset, espacio_memoria->page_size );
+    memcpy(page_data, espacio_memoria->memory_space + total_offset, espacio_memoria->page_size);
     pthread_mutex_unlock(&MUTEX_MEMORY_SPACE);
 
     return page_data;
@@ -80,22 +77,14 @@ void write_page(uint32_t frame_number, void *page_data)
     uint32_t total_offset = frame_number * espacio_memoria->page_size;
 
     pthread_mutex_lock(&MUTEX_MEMORY_SPACE);
-    memcpy(espacio_memoria -> memory_space  + total_offset, page_data, espacio_memoria->page_size);
+    memcpy(espacio_memoria->memory_space + total_offset, page_data, espacio_memoria->page_size);
     pthread_mutex_unlock(&MUTEX_MEMORY_SPACE);
 }
 
 void destroy_memory(memory_t *mem)
 {
-    // for (size_t i = 0; i < mem->num_processes; ++i)
-    // {
-    //     if (espacio_memoria->page_tables[i] != NULL)
-    //     {
-    //         finalize_process(mem, i);
-    //     }
-    // }
-    // free(espacio_memoria->page_tables);
+
     free(espacio_memoria->memory_space);
-    // bitarray_destroy(espacio_memoria->frame_usage);
     free(mem);
 }
 
@@ -104,11 +93,6 @@ bool _es_operable_sobre_memoria(uint32_t offset)
     if (!is_memory_created)
     {
         log_error(logger_memoria, "Para escribir sobre la memoria primero debe crearse. Aborting...");
-        return false;
-    }
-    if (offset % largo_tipo_de_dato != 0 && offset != 0)
-    {
-        log_error(logger_memoria, "El offset debe ser divisible por el tamaño de dato guardado. Aborting...");
         return false;
     }
     if (offset >= espacio_memoria->page_size)

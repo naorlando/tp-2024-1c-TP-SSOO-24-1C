@@ -31,8 +31,6 @@ typedef struct {
 
 memory_t* initialize_memory(size_t total_size, size_t page_size);
 
-void* get_memory_address(uint32_t frame_number, size_t offset);
-
 uint32_t read_data(uint32_t frame_number, uint32_t offset);
 
 void write_data(uint32_t frame, uint32_t offset,uint32_t value);
@@ -44,5 +42,7 @@ void write_page(uint32_t frame_number, void *page_data);
 bool _es_operable_sobre_memoria(uint32_t offset);
 
 void destroy_memory(memory_t* mem);
+
+
 
 #endif

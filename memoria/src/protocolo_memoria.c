@@ -184,3 +184,24 @@ int send_msg_memoria_cpu_data_read(uint32_t value, int fd) {
     return EXIT_SUCCESS;
 }
 
+int recv_msg_cpu_memoria_resize(t_buffer* buffer, uint32_t* pid, uint32_t* new_size) {
+
+    deserialize_uint32_t(buffer, 2, pid, new_size);
+    
+    return EXIT_SUCCESS;
+}
+
+
+ int send_msg_cpu_memoria_resize(uint8_t resize_response,int fd){
+     t_package* package = package_create(MSG_MEMORIA_CPU_DATA_READ,sizeof(bool));
+
+    buffer_add_uint8(package -> buffer , resize_response);
+
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return EXIT_SUCCESS;
+
+ }
+

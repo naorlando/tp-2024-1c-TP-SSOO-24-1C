@@ -9,22 +9,41 @@ bool *bitarray_marcos_de_memoria;
 pthread_mutex_t MUTEX_BIT_ARRAY_MEMORY;
 bool is_structure_created = false;
 
-// Función para cambiar el tamaño de la memoria de un proceso
-void resize(uint32_t pid, uint32_t new_size) {
+
+
+bool resize(uint32_t pid, uint32_t new_size) {
     pthread_mutex_lock(&MUTEX_DICCIONARIO_TABLAS_PAGINAS);
     t_pid_table *pid_table = _find_pid(pid, diccionario_tablas_de_paginas_por_proceso);
     pthread_mutex_unlock(&MUTEX_DICCIONARIO_TABLAS_PAGINAS);
 
     if (pid_table == NULL) {
         log_error(logger_memoria, "Proceso con PID: %d no encontrado. Aborting...", pid);
-        return;
+        return false;
     }
 
     // Calcula el número de páginas necesarias para el nuevo tamaño
-    uint32_t new_page_count = (new_size + (espacio_memoria -> page_size) - 1) / espacio_memoria->page_size;
+    uint32_t new_page_count = (new_size + espacio_memoria->page_size - 1) / espacio_memoria->page_size;
     uint32_t old_page_count = list_size(pid_table->paginas);
 
     if (new_page_count > old_page_count) {
+        // Verificar si hay suficientes frames disponibles antes de aumentar el tamaño
+        uint32_t required_frames = new_page_count - old_page_count;
+        uint32_t available_frames = 0;
+
+        for (uint32_t i = 0; i < espacio_memoria->num_frames; i++) {
+            if (!bitarray_marcos_de_memoria[i]) {
+                available_frames++;
+                if (available_frames >= required_frames) {
+                    break;
+                }
+            }
+        }
+
+        if (available_frames < required_frames) {
+            log_error(logger_memoria, "No hay suficientes marcos disponibles para redimensionar el proceso PID: %d", pid);
+            return false;
+        }
+
         // Aumentar el tamaño
         for (uint32_t i = old_page_count; i < new_page_count; i++) {
             t_entrada_tabla_de_paginas *pagina = _create_default_page();
@@ -39,7 +58,6 @@ void resize(uint32_t pid, uint32_t new_size) {
                 _set_bitarray_value_memory(pagina->frame, false);
                 pthread_mutex_unlock(&MUTEX_BIT_ARRAY_MEMORY);
             }
-            // Liberar memoria de la página
             free(pagina);
         }
 
@@ -50,7 +68,9 @@ void resize(uint32_t pid, uint32_t new_size) {
     }
 
     log_info(logger_memoria, "PID: %d - Tamaño cambiado a %d páginas", pid, new_page_count);
+    return true;
 }
+
 
 // Función para crear la estructura de tablas de páginas
 void create_page_tables_structure() {
@@ -170,15 +190,7 @@ t_pid_table *_find_pid(uint32_t pid, t_dictionary *diccionario) {
     return dictionary_get(diccionario, (char *)&pid);
 }
 
-// Función interna para crear una página con valores por defecto
-t_entrada_tabla_de_paginas *_create_default_page() {
-    t_entrada_tabla_de_paginas *pagina = malloc(sizeof(t_entrada_tabla_de_paginas));
-    pagina->frame = UINT32_MAX; // Valor por defecto
-    pagina->modificado = false;
-    pagina->presencia = false;
-    pagina->uso = true;
-    return pagina;
-}
+
 
 // Función interna para obtener el valor del bitarray en una posición dada
 bool _get_bitarray_value_memory(uint32_t position) {
@@ -195,15 +207,6 @@ void _set_bitarray_value_memory(uint32_t position, bool value) {
     pthread_mutex_unlock(&MUTEX_BIT_ARRAY_MEMORY);
 }
 
-// Función interna para inicializar el bitarray de marcos de memoria
-void _initialize_bit_array_memory() {
-    pthread_mutex_init(&MUTEX_BIT_ARRAY_MEMORY, NULL);
-    uint32_t cantidad_marcos = espacio_memoria->num_frames;
-    bitarray_marcos_de_memoria = malloc(cantidad_marcos * sizeof(bool));
-    for (uint32_t i = 0; i < cantidad_marcos; i++) {
-        bitarray_marcos_de_memoria[i] = false;
-    }
-}
 
 // Función interna para encontrar un marco disponible en memoria
 int32_t _frame_disponible() {
@@ -211,4 +214,33 @@ int32_t _frame_disponible() {
         if (!_get_bitarray_value_memory(i)) return i;
     }
     return -1;
+}
+
+
+// Otras funciones internas...
+
+t_entrada_tabla_de_paginas *_create_default_page() {
+    t_entrada_tabla_de_paginas *pagina = malloc(sizeof(t_entrada_tabla_de_paginas));
+    if (pagina == NULL) {
+        log_error(logger_memoria, "Error al asignar memoria para la página.");
+        exit(EXIT_FAILURE); // Opcional: puedes manejar esto de otra manera si prefieres no terminar el programa
+    }
+    pagina->frame = UINT32_MAX; // Valor por defecto para indicar que aún no se ha asignado un frame
+    pagina->modificado = false;
+    pagina->presencia = false;
+    pagina->uso = true;
+    return pagina;
+}
+
+void _initialize_bit_array_memory() {
+    pthread_mutex_init(&MUTEX_BIT_ARRAY_MEMORY, NULL);
+    uint32_t cantidad_marcos = espacio_memoria->num_frames;
+    bitarray_marcos_de_memoria = malloc(cantidad_marcos * sizeof(bool));
+    if (bitarray_marcos_de_memoria == NULL) {
+        log_error(logger_memoria, "Error al asignar memoria para el bitarray de marcos.");
+        exit(EXIT_FAILURE); // Opcional: puedes manejar esto de otra manera si prefieres no terminar el programa
+    }
+    for (uint32_t i = 0; i < cantidad_marcos; i++) {
+        bitarray_marcos_de_memoria[i] = false;
+    }
 }

@@ -62,4 +62,8 @@ int send_msg_cpu_memoria_page(uint32_t pid, uint32_t page, int fd);
 // CPU -> MEMORIA :: MSG_CPU_MEMORIA_DATA_WRITE
 int send_msg_cpu_memoria_data_write(uint32_t pid, uint32_t page, uint32_t frame, uint32_t offset, uint32_t value, int fd);
 
+// -- RESIZE --
+// CPU -> MEMORIA ::  MSG_CPU_MEMORIA_RESIZE
+int send_msg_cpu_memoria_resize(uint32_t pid, uint32_t new_size, int fd) ;
+
 #endif

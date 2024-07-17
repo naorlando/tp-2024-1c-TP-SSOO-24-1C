@@ -18,7 +18,9 @@ typedef struct {
 } t_datos_dir_logica;
 
 
+
 t_datos_dir_logica* crear_dir_logica(uint32_t dir_logica_decimal);
 
+uint32_t traductor_cantidad_paginas(uint32_t dir_logica_decimal, uint32_t tamano); 
 
 #endif

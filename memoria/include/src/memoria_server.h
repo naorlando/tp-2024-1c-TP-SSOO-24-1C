@@ -26,6 +26,8 @@ int process_message_cpu_data_read(t_buffer *buffer);
 
 int process_message_cpu_data_write(t_buffer *buffer);
 
+int process_message_cpu_resize(t_buffer *buffer);
+
 void crear_hilos_conexiones();
 
 void* esperar_conexiones_IO(void*);
