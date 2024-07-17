@@ -222,4 +222,10 @@ void cargar_metadata_archivo(t_dialfs* fs, char* metadata_filename);
  */
 int comparar_bloques_iniciales(t_archivo_dialfs* a, t_archivo_dialfs* b);
 
+/**
+ * Destruye una estructura t_archivo_dialfs y libera su memoria.
+ * @param archivo Puntero al t_archivo_dialfs a destruir.
+ */
+void destruir_archivo_dialfs(t_archivo_dialfs* archivo);
+
 #endif // DIALFS_H

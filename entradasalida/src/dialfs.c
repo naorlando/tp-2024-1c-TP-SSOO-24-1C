@@ -381,3 +381,10 @@ void cargar_metadata_archivo(t_dialfs* fs, char* metadata_filename) {
 int comparar_bloques_iniciales(t_archivo_dialfs* a, t_archivo_dialfs* b) {
     return a->bloque_inicial - b->bloque_inicial;
 }
+
+void destruir_dialfs(t_dialfs* fs) {
+    free(fs->path_base);
+    bitarray_destroy(fs->bitmap);
+    list_destroy_and_destroy_elements(fs->archivos, (void*)destruir_archivo_dialfs);
+    free(fs);
+}
