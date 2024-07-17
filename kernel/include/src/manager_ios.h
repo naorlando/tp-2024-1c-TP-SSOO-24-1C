@@ -20,6 +20,7 @@ void* obtener_siguiente_proceso(t_IO_connection*);
 
 t_IO_connection* get_IO_connection(char*);
 void agregar_IO_connection(t_IO_connection*);
-char* nuevo_IO_cliente_conectado(int);
+t_IO_connection* nuevo_IO_cliente_conectado(int);
+t_IO_connection* recibir_io_connection(int);
 
 #endif //MANAGER_IOS_H_

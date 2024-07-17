@@ -14,10 +14,7 @@ void planificador_largo_plazo()
 
 void process_to_new(t_PCB *pcb)
 {
-
-    pthread_mutex_lock(&MUTEX_NEW);
-    queue_push(COLA_NEW, pcb);
-    pthread_mutex_unlock(&MUTEX_NEW);
+    agregar_a_cola_new(pcb);
     log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "-", "NEW");
     log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
     sem_post(&SEM_NEW);
@@ -31,18 +28,13 @@ void send_new_to_ready()
         sem_wait(&SEM_MULTIPROGRAMACION);
 
         // descolar pcb de NEW
-        t_PCB *pcb;
-        pthread_mutex_lock(&MUTEX_NEW);
-        pcb = queue_pop(COLA_NEW);
-        pthread_mutex_unlock(&MUTEX_NEW);
+        t_PCB *pcb = siguiente_pcb_cola_new();
+
         log_info(logger_kernel, "Se paso un PCB de NEW -> READY \nCola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
 
         // encolar en ready
-        pthread_mutex_lock(&MUTEX_READY);
-        queue_push(COLA_READY, pcb);
-        pthread_mutex_unlock(&MUTEX_READY);
+        agregar_de_new_a_ready(pcb);
         log_info(logger_kernel, "Cola READY tiene un total de %d elementos", queue_size(COLA_READY));
-        sem_post(&SEM_READY); //POST READY
     }
 }
 

@@ -154,3 +154,9 @@ void _cerrar_conexiones() {
     liberar_conexion(fd_memoria);
     // Liberar otras conexiones si es necesario
 }
+
+
+void enviar_io_interface()
+{
+    send_IO_interface_kernel();
+}

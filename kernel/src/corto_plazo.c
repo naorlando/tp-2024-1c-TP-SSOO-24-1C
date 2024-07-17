@@ -73,25 +73,6 @@ void* funcion_hilo_quantum(void* arg) {
     
     return NULL;
 }
-// void interrupcion_quantum(uint32_t pid) {
-//     pthread_t hilo_de_quantum;
-//     pthread_create(&hilo_interrupt, NULL, (void *)funcion_hilo_quantum, &pid);
-//     hilo_de_quantum = hilo_interrupt;
-//     pthread_detach(hilo_de_quantum);  // Para que el hilo se limpie automáticamente al terminar
-// }
-
-// void funcion_hilo_quantum(void* pid) {
-
-//     hilo_quantum = datos_hilo_create((uint32_t)pid, kernel_config->QUANTUM, &hilo_interrupt); // TODO:get_quantum
-//     usleep(hilo_quantum->quantum / 1000);
-
-//     //pthread_mutex_lock(&MUTEX_EXECUTE);
-//     if (EXECUTE != NULL && EXECUTE->pid == get_pid_datos_hilo(hilo_quantum)) {
-//         enviar_interrupcion_a_cpu(hilo_quantum->pid);
-//     }
-//     //pthread_mutex_unlock(&MUTEX_EXECUTE);
-//     //free(hilo_quantum);
-// }
 
 void enviar_interrupcion_a_cpu(uint32_t pid)
 {
@@ -123,15 +104,9 @@ void pcb_execute()
 
 t_PCB *get_next_pcb_to_exec()
 {
-    t_PCB *pcb_a_tomar;
-
     log_info(logger_kernel, "Se va a tomar el siguiente PCB de la cola de READY");
 
-    pthread_mutex_lock(&MUTEX_READY);
-    pcb_a_tomar = queue_pop(COLA_READY);
-    pthread_mutex_unlock(&MUTEX_READY);
-
-    return pcb_a_tomar;
+    return siguiente_pcb_cola_ready();
 }
 
 t_planificador _obtener_planificador(char *str)
@@ -144,4 +119,22 @@ t_planificador _obtener_planificador(char *str)
     if (strcmp(str, "VRR") == 0)
         return VRR;
     return -1;
+}
+
+void blocked()
+{
+
+    while(1) {
+        sem_wait(&SEM_BLOCKED);
+        
+        t_solicitud* solicitud = get_next_solicitud();
+
+        sem_wait(&SEM_SOLICITUDES);
+
+        if(!procesar_solicitud(solicitud)) {
+            // la io no esta conectada desde el principio
+            agregar_a_cola_exit(obtener_pcb_solicitud(solicitud));
+        }
+        
+    }
 }

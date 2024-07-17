@@ -55,7 +55,7 @@ int package_send(t_package *package, int fd)
 
     free(stream);
 
-    return (bytes_enviados > 0) ? EXIT_SUCCESS : -1;
+    return (bytes_enviados > 0) ? bytes_enviados : -1;
 }
 
 // Abstraction of sockets recv method. It should check if the connection has ended
@@ -471,9 +471,6 @@ int send_io_generica(int fd, t_io_generica* io_generica)
     // Envio el paquete
     int bytes_enviados = package_send(package, fd);
 
-    // Elimino t_io_generica
-    destruir_io_generica(io_generica);
-
     //Elimino el paquete usado
     package_destroy(package);
 
@@ -504,9 +501,6 @@ int send_io_stdin(int fd, t_io_stdin* io_stdin)
     // Envio el paquete
     int bytes_enviados = package_send(package, fd);
 
-    // Elimino t_io_stdin
-    destruir_io_stdin(io_stdin);
-
     //Elimino el paquete usado
     package_destroy(package);
 
@@ -536,9 +530,6 @@ int send_io_stdout(int fd, t_io_stdout* io_stdout)
 
     // Envio el paquete
     int bytes_enviados = package_send(package, fd);
-
-    // Elimino t_io_stdout
-    destruir_io_stdout(io_stdout);
 
     //Elimino el paquete usado
     package_destroy(package);
@@ -1011,7 +1002,7 @@ t_response* deserializar_response(t_buffer* buffer)
     uint32_t pid_response = buffer_read_uint32(buffer);
     bool process = buffer_read_bool(buffer);
 
-    t_response* response = create_response(pid_response, process);
+    t_response* response = create_response(process, pid_response);
 
     return response;
 }

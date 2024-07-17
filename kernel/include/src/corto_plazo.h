@@ -21,6 +21,8 @@
 #include "protocolo_kernel.h"
 #include "datos_hilos.h"
 #include "utils/interruption.h"
+#include "utils_queue.h"
+#include "solicitud.h"
 
 typedef enum {
     FIFO,
@@ -29,7 +31,8 @@ typedef enum {
 }t_planificador;
 
 
-void planificador_corto_plazo ();
+void planificador_corto_plazo();
+void blocked();
 void planificador_FIFO();
 void planificador_RR();
 void planificador_VRR();

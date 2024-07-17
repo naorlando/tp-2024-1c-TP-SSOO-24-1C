@@ -72,4 +72,6 @@ void escribir_memoria(uint32_t direccion_logica,uint32_t valor_datos);
 bool ajustar_tamano_proceso(t_cpu_registers *cpu_registers, int nuevo_tamano);
 void informar_kernel_error(const char *mensaje);
 void copiar_cadena(uint32_t origen, uint32_t destino, int tamano);
+
+void aumentar_program_counter();
 #endif

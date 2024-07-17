@@ -38,14 +38,16 @@ extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
 extern pthread_mutex_t MUTEX_EXECUTE;
 extern pthread_mutex_t MUTEX_DICTIONARY;
+extern pthread_mutex_t MUTEX_SOLICITUD;
 
 //SEMAFOROS
 extern sem_t SEM_READY;
-extern sem_t BLOQUEADOR;
+extern sem_t SEM_BLOCKED;
 extern sem_t SEM_EXIT;
 extern sem_t SEM_NEW;
 extern sem_t SEM_MULTIPROGRAMACION;
 extern sem_t SEM_CPU;
+extern sem_t SEM_SOLICITUDES;
 
 //CONFIG
 extern t_config* config_kernel;
@@ -72,6 +74,7 @@ extern t_queue* COLA_NEW;
 //una variable para que el kernel conozca el pcb que este ejecutando:
 extern t_PCB* EXECUTE;
 extern t_list* LISTA_COLAS_DISPOSITIVOS; 
+extern t_queue* SOLICITUDES;
 
 
 //ESTADO PLANIFICADOR

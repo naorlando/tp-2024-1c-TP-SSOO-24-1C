@@ -1,7 +1,7 @@
 #include "manager_ios.h"
 
 
-char* nuevo_IO_cliente_conectado(int cliente_io)
+t_IO_connection* nuevo_IO_cliente_conectado(int cliente_io)
 {
     t_IO_interface* io_interface = recv_IO_interface(cliente_io);
 
@@ -22,7 +22,7 @@ char* nuevo_IO_cliente_conectado(int cliente_io)
     // Libero la io_interface
     liberar_IO_interface(io_interface);
 
-    return obtener_nombre_conexion(io_connection);
+    return io_connection;
 }
 
 void agregar_IO_connection(t_IO_connection* io_connection)
@@ -63,14 +63,7 @@ procesar_solicitud_func obtener_procesador_solicitud(int tipo_conexion)
 
 void* obtener_siguiente_proceso(t_IO_connection* cliente_io)
 {
-    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(cliente_io);
-
-    pthread_mutex_lock(mutex_blocked);
-    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
-    void* solicitud = queue_pop(cola_bloqueados_io);
-    pthread_mutex_unlock(mutex_blocked);
-
-    return solicitud;
+    return obtener_proceso_bloqueado(cliente_io);
 }
 
 int procesar_solicitud_IO(int fd, void* solicitud, procesar_solicitud_func procesar_func) 
@@ -145,4 +138,19 @@ void procesar_respuesta_io(int fd, char* nombre_interfaz)
         char* resultado_str = get_process_response(response) ? "true" : "false";
         log_info(logger_kernel, "Procesamiento de la interfaz '%s': %s para el PID <%d>", nombre_interfaz, resultado_str, get_pid_response(response));
     }
+
+    delete_response(response);
+}
+
+t_IO_connection* recibir_io_connection(int cliente_io) 
+{
+    int cod_op = recibir_operacion(cliente_io);
+
+    if(cod_op == MSG_IO_KERNEL) {
+        return nuevo_IO_cliente_conectado(cliente_io);
+    } else {
+        log_error(logger_kernel, "Error al recibir un cliente IO. Operación incorrecta: %d", cod_op);
+        liberar_conexion(cliente_io);
+    }
+    return NULL;
 }
