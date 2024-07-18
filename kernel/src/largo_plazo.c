@@ -32,7 +32,8 @@ void send_new_to_ready()
         // descolar pcb de NEW
         t_PCB *pcb = siguiente_pcb_cola_new();
 
-        log_info(logger_kernel, "Se paso un PCB de NEW -> READY \nCola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
+        log_info(logger_kernel, "Se paso el PCB <%d> de NEW -> READY ",pcb->pid);
+        log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
 
         // encolar en ready
         agregar_de_new_a_ready(pcb);
