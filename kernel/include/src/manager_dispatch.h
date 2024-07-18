@@ -12,6 +12,7 @@
 #include "datos_hilos.h"
 #include "utils_queue.h"
 #include "table_pcb.h"
+#include "solicitud.h"
 #include "recursos.h"
 #include "cronometro.h"
 
@@ -21,11 +22,6 @@ void cancelar_hilo_quantum(uint32_t);
 void procesar_interrupcion_quantum();
 void execute_to_null();
 void cancelar_quantum_si_corresponde(t_PCB *pcb_exit);
-
-
-
-// forma planteada por el tipo:
-void manejar_wait_signal(int cod_op);
 
 // Función para manejar la operación WAIT
 void handle_wait_request();

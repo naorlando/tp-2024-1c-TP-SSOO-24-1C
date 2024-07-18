@@ -28,7 +28,6 @@
 void planificador_largo_plazo();
 void process_to_new(t_PCB * pcb);
 void send_new_to_ready();
-void send_to_exit(t_PCB * pcb);
 void end_process();
 
 #endif

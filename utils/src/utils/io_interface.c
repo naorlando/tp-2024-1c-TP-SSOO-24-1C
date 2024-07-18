@@ -18,6 +18,21 @@ tipo_interfaz_t string_to_tipo_interfaz(char* str) {
     }
 }
 
+char* tipo_interfaz_to_string(tipo_interfaz_t tipo) {
+    switch (tipo) {
+        case GENERICA:
+            return "GENERICA";
+        case STDIN:
+            return "STDIN";
+        case STDOUT:
+            return "STDOUT";
+        case DIALFS:
+            return "DIALFS";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 //===============================================
 // FUNCIONES DE T_IO_INTERFACE
 //===============================================
@@ -79,6 +94,8 @@ t_IO_connection* crear_IO_connection(const char* nombre, tipo_interfaz_t tipo, i
     nueva_conexion->file_descriptor = fd;
     nueva_conexion->cola_procesos_bloqueados = queue_create();
     sem_init(&(nueva_conexion->sem_cola_bloqueados), 0, 0);
+    pthread_mutex_init(&(nueva_conexion->mutex_cola_bloqueados), NULL);
+
     return nueva_conexion;
 }
 
@@ -118,9 +135,59 @@ t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion) {
     return NULL;
 }
 
+void* obtener_proceso_bloqueado(t_IO_connection* conexion) {
+    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(conexion);
+
+    if(cola_bloqueados_io == NULL) return NULL;
+
+    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(conexion);
+
+    pthread_mutex_lock(mutex_blocked);
+    void* proceso_bloqueado = queue_pop(cola_bloqueados_io);
+    pthread_mutex_unlock(mutex_blocked);
+
+    return proceso_bloqueado;
+}
+
 sem_t* obtener_semaforo_cola_bloqueados(t_IO_connection* conexion) {
     if (conexion) {
         return &(conexion->sem_cola_bloqueados);
     }
     return NULL;
+}
+
+pthread_mutex_t* obtener_mutex_cola_bloqueados(t_IO_connection* conexion) {
+    if (conexion) {
+        return &(conexion->mutex_cola_bloqueados);
+    }
+    return NULL;
+}
+
+bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso) {
+    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(conexion);
+
+    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(conexion);
+
+    if(cola_bloqueados_io == NULL) return false;
+
+    pthread_mutex_lock(mutex_blocked);
+    queue_push(cola_bloqueados_io, proceso);
+    pthread_mutex_unlock(mutex_blocked);
+
+    sem_post(obtener_semaforo_cola_bloqueados(conexion));
+
+    return true;
+}
+
+bool tiene_procesos_bloqueados(t_IO_connection* cliente_io) 
+{
+    pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(cliente_io);
+    bool is_empty;
+
+    pthread_mutex_lock(mutex_blocked);
+    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
+    is_empty = queue_is_empty(cola_bloqueados_io);
+    pthread_mutex_unlock(mutex_blocked);
+
+    return is_empty;
 }

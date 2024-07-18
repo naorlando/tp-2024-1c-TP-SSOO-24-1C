@@ -33,15 +33,17 @@ pthread_mutex_t MUTEX_EXIT;
 pthread_mutex_t MUTEX_NEW;
 pthread_mutex_t MUTEX_EXECUTE;
 pthread_mutex_t MUTEX_DICTIONARY;
+pthread_mutex_t MUTEX_SOLICITUD;
 pthread_mutex_t MUTEX_RECURSOS;
 pthread_mutex_t MUTEX_COLA_RETORNO_PCB;
 pthread_mutex_t MUTEX_AUX_READY;
 
 sem_t SEM_READY;
-sem_t BLOQUEADOR;
+sem_t SEM_BLOCKED;
 sem_t SEM_EXIT;
 sem_t SEM_NEW;
 sem_t SEM_MULTIPROGRAMACION;
+sem_t SEM_SOLICITUDES;
 sem_t SEM_CPU; 
 sem_t SEM_PCB_RETURNS;
 sem_t SEM_AUX_READY;
@@ -53,6 +55,7 @@ t_queue *COLA_NEW;
 t_queue *COLA_RETORNO_PCB;
 t_PCB *EXECUTE;
 t_list *LISTA_COLAS_DISPOSITIVOS;
+t_queue *SOLICITUDES;
 
 void init()
 {
@@ -152,6 +155,15 @@ void inicializar_planificadores()
         log_error(logger_kernel, "ERROR CRITICO INICIANDO EL PLANIFICADOR DE CORTO PLAZO. ABORTANDO.");
         exit(EXIT_FAILURE);
     }
+
+    pthread_t THREAD_BLOCKED;
+    if (!pthread_create(&THREAD_BLOCKED, NULL, (void *) blocked, NULL))
+        pthread_detach(THREAD_BLOCKED);
+    else
+    {
+        log_error(logger_kernel, "ERROR CRITICO INICIANDO EL ESTADO BLOCKED. ABORTANDO.");
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -162,6 +174,7 @@ void initialize_lists()
     COLA_EXIT = queue_create();
     COLA_NEW = queue_create();
     LISTA_COLAS_DISPOSITIVOS = list_create();
+    SOLICITUDES = queue_create();
 }
 
 void inicializar_dictionarios()

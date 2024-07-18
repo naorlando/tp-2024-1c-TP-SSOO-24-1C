@@ -110,6 +110,11 @@ uint16_t buffer_read_uint16(t_buffer* buffer);
 // Post: Se lee la cadena de caracteres del buffer y se devuelve.
 char* buffer_read_string(t_buffer*, uint32_t);
 
+// Lee un valor booleano desde un buffer.
+// Pre: 'buffer' debe ser un puntero válido a una estructura t_buffer que contiene datos serializados.
+// Post: Retorna el valor booleano leído desde el buffer.
+bool buffer_read_bool(t_buffer*);
+
 // Agrega un entero de 8 bits al buffer.
 // Pre: El buffer ha sido creado previamente y tiene espacio suficiente.
 // Post: Se agrega el entero de 8 bits al buffer.
@@ -130,6 +135,12 @@ void buffer_add_uint32(t_buffer*, uint32_t);
 // Pre: El buffer ha sido creado previamente y tiene espacio suficiente.
 // Post: Se agrega la cadena de caracteres al buffer.
 void buffer_add_string(t_buffer*, char*);
+
+// Añade un valor booleano a un buffer.
+// Pre: 'buffer' debe ser un puntero válido a una estructura t_buffer.
+//      'data' debe ser un valor booleano a añadir al buffer.
+// Post: El valor booleano 'data' se añade al buffer.
+void buffer_add_bool(t_buffer*, bool);
 
 // Añade el contenido de un buffer a otro buffer.
 // Pre: Ambos buffers han sido creados previamente.

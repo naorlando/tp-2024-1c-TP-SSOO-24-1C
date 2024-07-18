@@ -1,24 +1,28 @@
 #include "protocolo_entradasalida.h"
-#include "utils/solicitudes_io.h"
-#include <readline/readline.h>
+
 
 //======================================================
 //        FUNCIONES DE ENTRADA/SALIDA GENERICA
 //======================================================
 
-// Función que atiende una instrucción genérica de entrada/salida, 
+// Función que atiende una solicitud genérica de entrada/salida, 
 // la cual consiste en esperar un tiempo determinado
-void atender_instruccion_generica(int fd) {
-    t_io_generica *io_generica = deserializar_io_generica(recibir_buffer(&fd, sizeof(int)));
+void atender_solicitud_generica(int fd) {
+    t_io_generica *io_generica = recv_io_generica(fd);
+
     if (io_generica != NULL) {
-        int tiempo_espera = io_generica->tiempo_sleep * obtener_tiempo_unidad_trabajo(entradasalida_config);
-        log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
-        sleep(tiempo_espera);
+        log_info(logger_entradasalida, "PID: <%d> - Operacion: <SLEEP>", obtener_pid_generica(io_generica));
+
+        bool resultado = ejecutar_unidades_de_trabajo(io_generica);
+        
         log_info(logger_entradasalida, "Operacion IO_GEN_SLEEP finalizada");
-        enviar_confirmacion_io(fd);
+
+        t_response* response = create_response(resultado, obtener_pid_generica(io_generica));
+        send_confirmacion_io(fd, MSG_IO_KERNEL_GENERICA, response);
+
         destruir_io_generica(io_generica);
     } else {
-        log_error(logger_entradasalida, "Error al recibir IO genérica");
+        log_error(logger_entradasalida, "Error al recibir la solicitud IO GENERICA. ABORTANDO");
     }
 }
 
@@ -26,15 +30,25 @@ void atender_instruccion_generica(int fd) {
 //          FUNCIONES DE ENTRADA/SALIDA STDIN
 //======================================================
 
-// Función que atiende una instrucción de entrada/salida STDIN,
+// Función que atiende una solicitud de entrada/salida STDIN,
 // la cual consiste en leer un texto desde la consola y guardarlo en memoria
-void atender_instruccion_stdin(int fd) {
-    t_io_stdin *io_stdin = deserializar_io_stdin(recibir_buffer(&fd, sizeof(int)));
+void atender_solicitud_stdin(int fd) {
+    t_io_stdin *io_stdin = recv_io_stdin(fd);
+
     if (io_stdin != NULL) {
+        log_info(logger_entradasalida, "PID: <%d> - Operacion: <READ>", obtener_pid_stdin(io_stdin));
+
         char *input = readline("Ingrese un texto: ");
+
         escribir_memoria(io_stdin->direccion_fisica, input, io_stdin->tamanio);
         free(input);
-        enviar_confirmacion_io(fd);
+
+        log_info(logger_entradasalida, "Operacion READ finalizada");
+
+        //TODO: modificar la funcion para que no este harcodeado el 'true'
+        t_response* response = create_response(true, obtener_pid_stdin(io_stdin));
+        send_confirmacion_io(fd, MSG_IO_KERNEL_STDIN, response);
+
         destruir_io_stdin(io_stdin);
     } else {
         log_error(logger_entradasalida, "Error al recibir IO STDIN");
@@ -43,28 +57,38 @@ void atender_instruccion_stdin(int fd) {
 
 // Función auxiliar que escribe en memoria el valor recibido
 void escribir_memoria(uint32_t direccion_fisica, char *valor, uint32_t tamanio) {
-    t_package *package = package_create(MSG_WRITE_MEMORY, sizeof(t_buffer));
+    /*t_package *package = package_create(MSG_WRITE_MEMORY, sizeof(t_buffer));
     t_buffer *buffer = get_buffer(package);
     buffer_add_uint32(buffer, direccion_fisica);
     buffer_add_uint32(buffer, tamanio);
     buffer_add_string(buffer, valor);
     package_send(package, fd_memoria);
-    package_destroy(package);
+    package_destroy(package);*/
 }
 
 //======================================================
 //          FUNCIONES DE ENTRADA/SALIDA STDOUT
 //======================================================
 
-// Función que atiende una instrucción de entrada/salida STDOUT,
+// Función que atiende una solicitud de entrada/salida STDOUT,
 // la cual consiste en leer un texto desde memoria y mostrarlo por consola
-void atender_instruccion_stdout(int fd) {
-    t_io_stdout *io_stdout = deserializar_io_stdout(recibir_buffer(&fd, sizeof(int)));
+void atender_solicitud_stdout(int fd) {
+    t_io_stdout* io_stdout = recv_io_stdout(fd);
+
     if (io_stdout != NULL) {
+        log_info(logger_entradasalida, "PID: <%d> - Operacion: <WRITE>", obtener_pid_stdout(io_stdout));
+
         char *valor = leer_memoria(io_stdout->direccion_fisica, io_stdout->tamanio);
         printf("%.*s", io_stdout->tamanio, valor);
+
         free(valor);
-        enviar_confirmacion_io(fd);
+
+        //TODO: modificar la funcion para que no este harcodeado el 'true'
+        t_response* response = create_response(true, obtener_pid_stdout(io_stdout));
+        send_confirmacion_io(fd, MSG_IO_KERNEL_STDOUT, response);
+
+        log_info(logger_entradasalida, "Operacion WRITE finalizada");
+
         destruir_io_stdout(io_stdout);
     } else {
         log_error(logger_entradasalida, "Error al recibir IO STDOUT");
@@ -73,7 +97,7 @@ void atender_instruccion_stdout(int fd) {
 
 // Función auxiliar que lee la memoria de la dirección física y devuelve el valor leído
 char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
-    t_package *package = package_create(MSG_READ_MEMORY, sizeof(t_buffer));
+    /*t_package *package = package_create(MSG_READ_MEMORY, sizeof(t_buffer));
     t_buffer *buffer = get_buffer(package);
     buffer_add_uint32(buffer, direccion_fisica);
     buffer_add_uint32(buffer, tamanio);
@@ -84,15 +108,78 @@ char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
     package_recv(response, fd_memoria);
     char *valor = strdup(extract_string_buffer(get_buffer(response)));
     package_destroy(response);
-    return valor;
+    return valor;*/
+
+    return "";
 }
 
 //======================================================
 //          FUNCIONES DE ENTRADA/SALIDA DIALFS
 //======================================================
 
-// A implementar!
+void atender_instruccion_dialfs(int fd) {
+    /*t_io_dialfs* io_dialfs = deserializar_io_dialfs(recibir_buffer(&fd, sizeof(int)));
+    if (io_dialfs != NULL) {
+        bool operacion_exitosa = false;
+        
+        switch(io_dialfs->operacion) {
+            case IO_FS_CREATE:
+                operacion_exitosa = crear_archivo(dialfs, io_dialfs->nombre_archivo);
+                log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
+                break;
+            case IO_FS_DELETE:
+                operacion_exitosa = eliminar_archivo(dialfs, io_dialfs->nombre_archivo);
+                log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
+                break;
+            case IO_FS_TRUNCATE:
+                operacion_exitosa = truncar_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->tamanio);
+                log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio);
+                break;
+            case IO_FS_WRITE:
+                operacion_exitosa = escribir_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->datos, io_dialfs->tamanio, io_dialfs->offset);
+                log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->offset);
+                break;
+            case IO_FS_READ:
+                void* buffer = malloc(io_dialfs->tamanio);
+                operacion_exitosa = leer_archivo(dialfs, io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->offset);
+                if (operacion_exitosa) {
+                    enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
+                }
+                free(buffer);
+                log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->offset);
+                break;
+            default:
+                log_error(logger_entradasalida, "Operación DialFS no reconocida");
+                break;
+        }
+        
+        if (io_dialfs->operacion == IO_FS_READ && operacion_exitosa) {
+            // Ya se enviaron los datos leídos, no es necesario enviar confirmación adicional
+        } else {
+            enviar_confirmacion_io(fd, operacion_exitosa);
+        }
+        
+        destruir_io_dialfs(io_dialfs);
+    } else {
+        log_error(logger_entradasalida, "Error al recibir IO DialFS");
+        enviar_confirmacion_io(fd, false);
+    }
+    
+    // Comprobamos si es necesario realizar una compactación
+    if (es_necesario_compactar(dialfs)) {
+        log_info(logger_entradasalida, "Inicio Compactación.");
+        compactar_fs(dialfs);
+        log_info(logger_entradasalida, "Fin Compactación.");
+    }*/
+}
 
+void enviar_datos_leidos(int fd, void* buffer, uint32_t tamanio) {
+    /*t_package* package = package_create(MSG_DIALFS_DATA, tamanio);
+    t_buffer* package_buffer = get_buffer(package);
+    buffer_add_data(package_buffer, buffer, tamanio);
+    package_send(package, fd);
+    package_destroy(package);*/
+}
 
 
 //======================================================
@@ -100,10 +187,8 @@ char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio) {
 //======================================================
 
 // Función auxiliar que envía una confirmación de la operación de entrada/salida
-void enviar_confirmacion_io(int fd) {
-    t_package *package = package_create(MSG_KERNEL_IO, 0);
-    package_send(package, fd);
-    package_destroy(package);
+void send_confirmacion_io(int fd, t_msg_header header, t_response* response) {
+    send_response(fd, header, response);
 }
 
 void send_IO_interface_kernel() 

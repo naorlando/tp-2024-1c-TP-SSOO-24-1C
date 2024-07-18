@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <commons/collections/queue.h>
 #include <semaphore.h>
+#include <pthread.h>
 
 // Definición del enum tipo_interfaz_t
 typedef enum {
@@ -29,6 +30,7 @@ typedef struct {
     int file_descriptor;
     t_queue* cola_procesos_bloqueados;
     sem_t sem_cola_bloqueados;
+    pthread_mutex_t mutex_cola_bloqueados;
 } t_IO_connection;
 
 
@@ -41,6 +43,12 @@ typedef struct {
 // Post: La función retorna el valor correspondiente del enum tipo_interfaz_t.
 //       Si el string no coincide con ningún tipo de interfaz, se retorna -1.
 tipo_interfaz_t string_to_tipo_interfaz(char*);
+
+// Convierte un valor de tipo_interfaz_t a su representación en cadena de caracteres.
+// Pre: El parámetro tipo debe ser un valor válido de tipo_interfaz_t.
+// Post: Retorna una cadena de caracteres que representa el tipo de interfaz.
+//       Si el valor de tipo no corresponde a ningún caso conocido, retorna "UNKNOWN".
+char* tipo_interfaz_to_string(tipo_interfaz_t);
 
 //===============================================
 // FUNCIONES DE T_IO_INTERFACE
@@ -108,5 +116,13 @@ int obtener_file_descriptor(t_IO_connection* conexion);
 t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion);
 
 sem_t* obtener_semaforo_cola_bloqueados(t_IO_connection* conexion);
+
+pthread_mutex_t* obtener_mutex_cola_bloqueados(t_IO_connection* conexion);
+
+void* obtener_proceso_bloqueado(t_IO_connection* conexion);
+
+bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso);
+
+bool tiene_procesos_bloqueados(t_IO_connection* cliente_io);
 
 #endif // IO_INTERFACE_H

@@ -51,11 +51,11 @@ int package_send(t_package *package, int fd)
     offset += sizeof(uint32_t);
     memcpy(stream + offset, package->buffer->stream, package->buffer->size);
 
-    send(fd, stream, size, 0);
+    int bytes_enviados = send(fd, stream, size, 0);
 
     free(stream);
 
-    return EXIT_SUCCESS;
+    return (bytes_enviados > 0) ? bytes_enviados : -1;
 }
 
 // Abstraction of sockets recv method. It should check if the connection has ended
@@ -453,6 +453,127 @@ t_IO_interface* recv_IO_interface(int fd)
     return interface;
 }
 
+int send_io_generica(int fd, t_io_generica* io_generica)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_IO_GENERICA, obtener_tamanio_io_generica(io_generica));
+
+    // Serializo en el buffer el t_io_generica
+    serializar_io_generica(get_buffer(package), io_generica);
+
+    // Envio el paquete
+    int bytes_enviados = package_send(package, fd);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+
+    return bytes_enviados;
+} 
+
+t_io_generica* recv_io_generica(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_io_generica* io_generica= deserializar_io_generica(buffer);
+
+    buffer_destroy(buffer);
+
+    return io_generica;
+}
+
+int send_io_stdin(int fd, t_io_stdin* io_stdin)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_IO_STDIN, obtener_tamanio_io_stdin(io_stdin));
+
+    // Serializo en el buffer el t_io_generica
+    serializar_io_stdin(get_buffer(package), io_stdin);
+
+    // Envio el paquete
+    int bytes_enviados = package_send(package, fd);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+
+    return bytes_enviados;
+} 
+
+t_io_stdin* recv_io_stdin(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_io_stdin* io_stdin= deserializar_io_stdin(buffer);
+
+    buffer_destroy(buffer);
+
+    return io_stdin;
+}
+
+int send_io_stdout(int fd, t_io_stdout* io_stdout)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_IO_STDOUT, obtener_tamanio_io_stdout(io_stdout));
+
+    // Serializo en el buffer el t_io_stdout
+    serializar_io_stdout(get_buffer(package), io_stdout);
+
+    // Envio el paquete
+    int bytes_enviados = package_send(package, fd);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+
+    return bytes_enviados;
+} 
+
+t_io_stdout* recv_io_stdout(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_io_stdout* io_stdout= deserializar_io_stdout(buffer);
+
+    buffer_destroy(buffer);
+
+    return io_stdout;
+}
+
+void send_response(int fd, t_msg_header header, t_response* response)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(header, get_size_response(response));
+
+    // Serializo en el buffer el t_response
+    serializar_response(get_buffer(package), response);
+
+    // Envio el paquete
+    package_send(package, fd);
+
+    // Elimino t_response
+    delete_response(response);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+} 
+
+t_response* recv_response(int fd)
+{
+    t_buffer* buffer = recive_full_buffer(fd);
+
+    if(buffer == NULL) return NULL;
+
+    t_response* response= deserializar_response(buffer);
+
+    buffer_destroy(buffer);
+
+    return response;
+}
+
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)
@@ -714,6 +835,7 @@ t_solicitud_io_generica* deserializar_solicitud_io_generica(t_buffer* buffer) {
 void serializar_io_generica(t_buffer* buffer, t_io_generica* io_generica) {
     buffer_add_string(buffer, io_generica->nombre_interfaz);
     buffer_add_uint32(buffer, io_generica->tiempo_sleep);
+    buffer_add_uint32(buffer, io_generica->pid);
 }
 
 t_io_generica* deserializar_io_generica(t_buffer* buffer) {
@@ -722,7 +844,9 @@ t_io_generica* deserializar_io_generica(t_buffer* buffer) {
 
     uint32_t tiempo_sleep = buffer_read_uint32(buffer);
 
-    return crear_io_generica(nombre_interfaz, tiempo_sleep);
+    uint32_t pid = buffer_read_uint32(buffer);
+
+    return crear_io_generica(nombre_interfaz, tiempo_sleep, pid);
 }
 
 void serializar_solicitud_io_stdin(t_buffer* buffer, t_solicitud_io_stdin* solicitud) {
@@ -745,12 +869,14 @@ t_solicitud_io_stdin* deserializar_solicitud_io_stdin(t_buffer* buffer) {
 void serializar_io_stdin(t_buffer* buffer, t_io_stdin* io_stdin) {
     buffer_add_uint32(buffer, io_stdin->direccion_fisica);
     buffer_add_uint32(buffer, io_stdin->tamanio);
+    buffer_add_uint32(buffer, io_stdin->pid);
 }
 
 t_io_stdin* deserializar_io_stdin(t_buffer* buffer) {
     uint32_t direccion_fisica = buffer_read_uint32(buffer);
     uint32_t tamanio = buffer_read_uint32(buffer);
-    return crear_io_stdin(direccion_fisica, tamanio);
+    uint32_t pid = buffer_read_uint32(buffer);
+    return crear_io_stdin(direccion_fisica, tamanio, pid);
 }
 
 void serializar_solicitud_io_stdout(t_buffer* buffer, t_solicitud_io_stdout* solicitud) {
@@ -773,12 +899,14 @@ t_solicitud_io_stdout* deserializar_solicitud_io_stdout(t_buffer* buffer) {
 void serializar_io_stdout(t_buffer* buffer, t_io_stdout* io_stdout) {
     buffer_add_uint32(buffer, io_stdout->direccion_fisica);
     buffer_add_uint32(buffer, io_stdout->tamanio);
+    buffer_add_uint32(buffer, io_stdout->pid);
 }
 
 t_io_stdout* deserializar_io_stdout(t_buffer* buffer) {
     uint32_t direccion_fisica = buffer_read_uint32(buffer);
     uint32_t tamanio = buffer_read_uint32(buffer);
-    return crear_io_stdout(direccion_fisica, tamanio);
+    uint32_t pid = buffer_read_uint32(buffer);
+    return crear_io_stdout(direccion_fisica, tamanio, pid);
 }
 
 void serializar_IO_interface(t_buffer* buffer, t_IO_interface* interface)
@@ -798,6 +926,22 @@ t_IO_interface* deserializar_IO_interface(t_buffer* buffer)
     free(nombre_interfaz);
 
     return interfaz;
+}
+
+void serializar_response(t_buffer* buffer, t_response* response)
+{
+    buffer_add_uint32(buffer, get_pid_response(response));
+    buffer_add_bool(buffer, get_process_response(response));
+}
+
+t_response* deserializar_response(t_buffer* buffer)
+{
+    uint32_t pid_response = buffer_read_uint32(buffer);
+    bool process = buffer_read_bool(buffer);
+
+    t_response* response = create_response(process, pid_response);
+
+    return response;
 }
 
 void serialize_manejo_recurso(t_buffer* buffer, t_manejo_recurso* manejo_recurso)

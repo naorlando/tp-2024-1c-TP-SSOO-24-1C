@@ -111,11 +111,6 @@ void requests_entradasalida(void* cliente_socket)
             /*
                 Agregar operaciones a las que dara servicio el modulo
             */
-            case MSG_IO_MEMORIA:
-
-                log_info(logger_memoria, "Se recibio un mje del IO");
-            break;
- 
             case -1:
                 log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
                 esperar = false; //Cortamos la espera de solicitudes

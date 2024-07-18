@@ -14,11 +14,8 @@ void planificador_largo_plazo()
 
 void process_to_new(t_PCB *pcb)
 {
+    agregar_a_cola_new(pcb);
 
-    pthread_mutex_lock(&MUTEX_NEW);
-        queue_push(COLA_NEW, pcb);
-    pthread_mutex_unlock(&MUTEX_NEW);
-    // LOGs OBLIGATORIO:
     log_info(logger_kernel, "Se crea el proceso <%d> en NEW", pcb->pid);
     log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "-", "NEW");
     // log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
@@ -33,31 +30,14 @@ void send_new_to_ready()
         sem_wait(&SEM_MULTIPROGRAMACION);
 
         // descolar pcb de NEW
-        t_PCB *pcb;
-        pthread_mutex_lock(&MUTEX_NEW);
-            pcb = queue_pop(COLA_NEW);
-        pthread_mutex_unlock(&MUTEX_NEW);
-        log_info(logger_kernel, "Se paso un PCB de NEW -> READY");
+        t_PCB *pcb = siguiente_pcb_cola_new();
+
+        log_info(logger_kernel, "Se paso un PCB de NEW -> READY \nCola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
 
         // encolar en ready
-    // antes:
-        // pthread_mutex_lock(&MUTEX_READY);
-        // queue_push(COLA_READY, pcb);
-        // pthread_mutex_unlock(&MUTEX_READY);
-        // log_info(logger_kernel, "Cola READY tiene un total de %d elementos", queue_size(COLA_READY));
-        // sem_post(&SEM_READY); //POST READY
-    //despues:
-        agregar_a_cola_ready(pcb);
+        agregar_de_new_a_ready(pcb);
+        log_info(logger_kernel, "Cola READY tiene un total de %d elementos", queue_size(COLA_READY));
     }
-}
-
-// DEPRECADA
-void send_to_exit(t_PCB *pcb)
-{
-    pthread_mutex_lock(&MUTEX_EXIT);
-    queue_push(COLA_EXIT, pcb);
-    pthread_mutex_unlock(&MUTEX_EXIT);
-    sem_post(&SEM_EXIT);
 }
 
 void end_process()
@@ -68,6 +48,7 @@ void end_process()
         t_PCB *pcb_exit;  
 
         log_info(logger_kernel, "empieza a terminar el proceso");
+        //TODO: Hacer una abstraccion para obtener el siguiente PCB de la cola de EXIT
         pthread_mutex_lock(&MUTEX_EXIT);
         pcb_exit = queue_pop(COLA_EXIT);
         pthread_mutex_unlock(&MUTEX_EXIT);

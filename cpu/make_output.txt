@@ -1,0 +1,15 @@
+make --no-print-directory -C include/ 3>&1 1>&2 2>&3 | sed -E 's,(src/)[^ ]+\.(c|h)\:,include/&,' 3>&2 2>&1 1>&3
+make[1]: *** No targets specified and no makefile found.  Stop.
+mkdir -pv obj/
+mkdir: created directory 'obj/'
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/cpu_syncro.o" src/cpu_syncro.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/protocolo_cpu.o" src/protocolo_cpu.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/cpu_config.o" src/cpu_config.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/cpu_dispatch.o" src/cpu_dispatch.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/cpu_server.o" src/cpu_server.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/cpu_interrupt.o" src/cpu_interrupt.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/cpu.o" src/cpu.c -I../utils/src -I./include/src -I./src
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -c -o "obj/inicializar_cpu.o" src/inicializar_cpu.c -I../utils/src -I./include/src -I./src
+mkdir -pv bin/
+mkdir: created directory 'bin/'
+gcc -g -Wall -DDEBUG -fdiagnostics-color=always -o "bin/cpu" obj/cpu_syncro.o obj/protocolo_cpu.o obj/cpu_config.o obj/cpu_dispatch.o obj/cpu_server.o obj/cpu_interrupt.o obj/cpu.o obj/inicializar_cpu.o -I../utils/src -I./include/src -I./src -L../utils/bin -L./include/bin -lutils -lcommons -lpthread -lreadline -lm

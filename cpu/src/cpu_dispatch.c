@@ -326,18 +326,16 @@ void manejar_ciclo_de_instruccion() {
         return;
     }
 
-    // actualizar PC:
-    cpu_registers->pc++;
-    pcb_execute->program_counter = cpu_registers->pc;
-    
-    //SOlo para seguir el flujo
-    log_info(logger_cpu, "El PCB de pid <%d> tiene el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
-
     // se debe hacer un "return;", si el proceso solicito una io
     if(solicitud_io){
         solicitud_io = false;
         return;
     }
+
+    aumentar_program_counter();
+    
+    //SOlo para seguir el flujo
+    log_info(logger_cpu, "El PCB de pid <%d> tiene el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
 
 
     // INTERRUPT: verificar y manejar interrupciones después de ejecutar la instrucción
@@ -375,6 +373,7 @@ void solicitar_IO(t_instruction* instruccion)
 {
     // t_interface interface = create_interface(pcb_execute, instruccion);
     //send_interface_kernel(/*interface*/);
+    aumentar_program_counter();
     cargar_contexto_ejecucion_a_pcb(pcb_execute);
 
     switch(obtener_nombre_instruccion(instruccion))
@@ -460,6 +459,13 @@ void enviar_pcb_finalizado()
     }
 }
 
+void aumentar_program_counter() 
+{
+    // actualizar PC:
+    cpu_registers->pc++;
+    pcb_execute->program_counter = cpu_registers->pc;
+}
+
 void handle_wait_or_signal(t_PCB * pcb, char * resource_name, t_name_instruction tipo_de_interrupcion) {
 
     t_msg_header msg_header;
@@ -475,9 +481,9 @@ void handle_wait_or_signal(t_PCB * pcb, char * resource_name, t_name_instruction
     remove_newline(resource_name);
 
     // actualizar PC:
+    aumentar_program_counter();
     cargar_contexto_ejecucion_a_pcb(pcb);
-    pcb->cpu_registers->pc++;
-    pcb->program_counter = pcb->cpu_registers->pc;
+
     t_manejo_recurso *t_manejo_recurso = manejo_recurso_create(pcb, resource_name);
     // Crear un paquete con el PCB y el nombre del recurso (t_manjejo_recurso) y enviarlo al Kernel:
 

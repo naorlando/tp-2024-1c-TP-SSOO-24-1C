@@ -51,20 +51,26 @@ typedef enum
     // KERNEL <-> IO
     MSG_IO_KERNEL, // REVISAR
     MSG_KERNEL_IO, // REVISAR
-    MSG_IO_KERNEL_GEN_SLEEP,
     MSG_KERNEL_IO_GENERICA, // KERNEL -> IO (Se solicita interactuar con una IO_GENERICA)
     MSG_KERNEL_IO_STDIN, // KERNEL -> IO (Se solicita interactuar con una IO_STDIN)
     MSG_KERNEL_IO_STDOUT, // KERNEL -> IO (Se solicita interactuar con una IO_STDOUT)
     MSG_KERNEL_IO_DIALFS, // KERNEL -> IO (Se solicita interactuar con una IO_DIALFS)
+    MSG_IO_KERNEL_GENERICA, // IO -> KERNEL (Respuesta de IO_GENERICA)
+    MSG_IO_KERNEL_STDIN, // IO -> KERNEL (Respuesta de IO_STDIN)
+    MSG_IO_KERNEL_STDOUT, // IO -> KERNEL (Respuesta de IO_STDOUT)
+    MSG_IO_KERNEL_DIALFS, // IO -> KERNEL (Respuesta de IO_DIALFS)
     //CPU <-> MEMORIA
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
     MSG_INSTRUCTION_MEMORIA,
     MSG_NEXT_INSTRUCTION_CPU,
     //IO <-> MEMORIA
-    MSG_IO_MEMORIA,
-    MSG_READ_MEMORY,
-    MSG_WRITE_MEMORY,
+    MSG_MEMORIA_IO_STDIN,
+    MSG_MEMORIA_IO_STDOUT,
+    MSG_MEMORIA_IO_DIALFS,
+    MSG_IO_STDIN_MEMORIA,
+    MSG_IO_STDOUT_MEMORIA,
+    MSG_IO_DIALFS_MEMORIA,
     // HEADER_EXAMPLE
     EXAMPLE,
     //Empty package
@@ -223,6 +229,13 @@ void send_solicitud_io_generica(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_
 //       Si ocurre un error o no se recibe ningún dato, retorna NULL.
 t_solicitud_io_generica* recv_solicitud_io_generica(int fd);
 
+// Obtiene el tamaño de una solicitud de I/O genérica.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_generica válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O genérica en bytes.
+//      Si la solicitud es NULL, retorna 0.
+uint32_t obtener_tamanio_solicitud_generica(t_solicitud_io_generica* solicitud);
+
+
 /*********** SEND AND RECIVE 'T_SOLICITUD_IO_STDIN' ***********/
 // Envía una solicitud de I/O stdin a través de un socket especificado.
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
@@ -237,6 +250,12 @@ void send_solicitud_io_stdin(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_std
 // Post: Retorna un puntero a una estructura t_solicitud_io_stdin recibida desde el socket.
 //       Si ocurre un error o no se recibe ningún dato, retorna NULL.
 t_solicitud_io_stdin* recv_solicitud_io_stdin(int fd);
+
+// Obtiene el tamaño de una solicitud de I/O stdin.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdin válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O stdin en bytes.
+//      Si la solicitud es NULL, retorna 0.
+uint32_t obtener_tamanio_solicitud_stdin(t_solicitud_io_stdin* solicitud);
 
 /*********** SEND AND RECIVE 'T_SOLICITUD_IO_STDOUT' ***********/
 // Envía una solicitud de I/O stdout a través de un socket especificado.
@@ -253,6 +272,35 @@ void send_solicitud_io_stdout(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_st
 //       Si ocurre un error o no se recibe ningún dato, retorna NULL.
 t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd);
 
+// Obtiene el tamaño de una solicitud de I/O stdout.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_stdout válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O stdout en bytes.
+//      Si la solicitud es NULL, retorna 0.
+uint32_t obtener_tamanio_solicitud_stdout(t_solicitud_io_stdout* solicitud);
+
+/*********** SEND AND RECIVE 'T_SOLICITUD_IO_DIALFS' ***********/
+
+// Envía una solicitud de I/O dialfs a través de un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+//      El puntero pcb debe apuntar a un bloque de control de proceso válido y no debe ser NULL.
+//      El puntero nombre_interfaz debe apuntar a una cadena de caracteres válida y no debe ser NULL.
+//      El puntero io_dialfs debe apuntar a una estructura t_io_dialfs válida y no debe ser NULL.
+// Post: La solicitud de I/O dialfs se serializa y se envía a través del socket especificado.
+void send_solicitud_io_dialfs(int fd, t_PCB* pcb, char* nombre_interfaz, t_io_dialfs* io_dialfs);
+
+// Recibe una solicitud de I/O dialfs desde un socket especificado.
+// Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
+// Post: Retorna un puntero a una estructura t_solicitud_io_dialfs recibida desde el socket.
+//       Si ocurre un error o no se recibe ningún dato, retorna NULL.
+t_solicitud_io_dialfs* recv_solicitud_io_dialfs(int fd);
+
+// Obtiene el tamaño de una solicitud de I/O dialfs.
+// Pre: El puntero solicitud debe apuntar a una estructura t_solicitud_io_dialfs válida y no debe ser NULL.
+// Post: Retorna el tamaño de la solicitud de I/O dialfs en bytes.
+//      Si la solicitud es NULL, retorna 0.
+uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
+
+
 /*********** SEND AND RECIVE 'T_IO_INTERFACE' ***********/
 // Envía una estructura t_IO_interface a través de un socket especificado.
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
@@ -267,6 +315,56 @@ void send_IO_interface(int, char*, char*);
 //       La función retorna un puntero a la estructura t_IO_interface recibida.
 //       Si hay un error durante la recepción, se retorna NULL.
 t_IO_interface* recv_IO_interface(int);
+
+/*********** SEND AND RECIVE 'T_IO_GENERICA' ***********/
+// Recibe una estructura t_io_generica desde un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a una estructura t_io_generica.
+//       Si la recepción falla, retorna NULL.
+t_io_generica* recv_io_generica(int fd);
+
+// Envía una estructura t_io_generica a un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido y io_generica debe ser un puntero a una estructura t_io_generica válida.
+// Post: La estructura t_io_generica se envía al descriptor de archivo fd.
+int send_io_generica(int fd, t_io_generica* io_generica);
+
+/*********** SEND AND RECIVE 'T_IO_STDIN' ***********/
+// Envía una estructura t_io_stdin a un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido y io_stdin debe ser un puntero a una estructura t_io_stdin válida.
+// Post: La estructura t_io_stdin se envía al descriptor de archivo fd.
+int send_io_stdin(int fd, t_io_stdin* io_stdin);
+
+// Recibe una estructura t_io_stdin desde un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a una estructura t_io_stdin.
+//       Si la recepción falla, retorna NULL.
+t_io_stdin* recv_io_stdin(int fd);
+
+/*********** SEND AND RECIVE 'T_IO_STDOUT' ***********/
+// Envía una estructura t_io_stdout a un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido y io_stdout debe ser un puntero a una estructura t_io_stdout válida.
+// Post: La estructura t_io_stdout se envía al descriptor de archivo fd.
+int send_io_stdout(int fd, t_io_stdout* io_stdout);
+
+// Recibe una estructura t_io_stdout desde un descriptor de archivo.
+// Pre: fd debe ser un descriptor de archivo válido.
+// Post: Retorna un puntero a una estructura t_io_stdout.
+//       Si la recepción falla, retorna NULL.
+t_io_stdout* recv_io_stdout(int fd);
+
+/*********** SEND AND RECIVE 'T_RESPONSE' ***********/
+// Envía una estructura t_response a través de un socket.
+// Pre: 'fd' debe ser un descriptor de archivo válido para un socket abierto.
+//      'header' debe ser un t_msg_header valido.
+//      'response' debe ser un puntero válido a una estructura t_response.
+// Post: La estructura t_response se serializa y se envía a través del socket especificado por 'fd'.
+void send_response(int, t_msg_header, t_response*);
+
+// Recibe una estructura t_response desde un socket.
+// Pre: 'fd' debe ser un descriptor de archivo válido para un socket abierto.
+// Post: Retorna un puntero a una estructura t_response deserializada recibida desde el socket especificado por 'fd'.
+//       Si no se puede recibir el buffer, retorna NULL.
+t_response* recv_response(int);
 
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 
@@ -427,6 +525,18 @@ void serializar_IO_interface(t_buffer*, t_IO_interface*);
 // Pre: El buffer debe ser válido y no NULL.
 // Post: Retorna un puntero a una estructura t_IO_interface deserializada.
 t_IO_interface* deserializar_IO_interface(t_buffer*);
+
+/*********** SERIALIZE AND DESERIALIZE 'T_RESPONSE' ***********/
+// Serializa una estructura t_response en un buffer.
+// Pre: 'buffer' debe ser un puntero válido a una estructura t_buffer.
+//      'response' debe ser un puntero válido a una estructura t_response.
+// Post: Los datos de la estructura t_response se añaden al buffer en formato serializado.
+void serializar_response(t_buffer*, t_response*);
+
+// Deserializa una estructura t_response desde un buffer.
+// Pre: 'buffer' debe ser un puntero válido a una estructura t_buffer que contiene datos serializados de t_response.
+// Post: Retorna un puntero a una estructura t_response con los datos deserializados desde el buffer.
+t_response* deserializar_response(t_buffer*);
 
 void serialize_manejo_recurso(t_buffer* buffer, t_manejo_recurso* manejo_recurso);
 t_manejo_recurso* deserialize_manejo_recurso(t_buffer* buffer);

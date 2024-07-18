@@ -22,6 +22,8 @@
 #include "protocolo_kernel.h"
 #include "datos_hilos.h"
 #include "utils/interruption.h"
+#include "utils_queue.h"
+#include "solicitud.h"
 #include "cronometro.h"
 
 typedef enum {
@@ -35,8 +37,9 @@ typedef struct {
     uint32_t quantum;
 } hilo_args;
 
+void planificador_corto_plazo();
+void blocked();
 t_planificador _obtener_planificador (char * str);
-void planificador_corto_plazo ();
 void planificador_FIFO();
 void planificador_RR();
 void planificador_VRR();
