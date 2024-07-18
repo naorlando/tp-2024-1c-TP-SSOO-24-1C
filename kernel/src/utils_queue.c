@@ -66,7 +66,7 @@ void agregar_a_cola_exit(t_PCB* pcb){
         queue_push(COLA_EXIT, pcb);
         //log_debug(logger_kernel, "Se agregó el proceso %d a la cola EXIT", pcb->pid);
     pthread_mutex_unlock(&MUTEX_EXIT);
-    cronometro_reiniciar(); // funciona en caso de VRR
+
     sem_post(&SEM_EXIT);
 }
 
