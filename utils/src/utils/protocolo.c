@@ -132,6 +132,10 @@ uint32_t get_message_example_size(t_message_example* example)
     return sizeof(uint32_t) + (strlen(example->cadena) + 1) + sizeof(example->entero);
 }
 
+uint32_t get_message_recurso_size(char* nombre_recurso){\
+    return sizeof(uint32_t) + (strlen(nombre_recurso) + 1);
+}
+
 void message_example_destroy(t_message_example* example)
 {
     if (example->cadena != NULL)
@@ -938,4 +942,20 @@ t_response* deserializar_response(t_buffer* buffer)
     t_response* response = create_response(process, pid_response);
 
     return response;
+}
+
+void serialize_manejo_recurso(t_buffer* buffer, t_manejo_recurso* manejo_recurso)
+{
+    serialize_pcb(buffer, manejo_recurso->pcb);
+    buffer_add_string(buffer, manejo_recurso->nombre_recurso);
+}
+
+t_manejo_recurso* deserialize_manejo_recurso(t_buffer* buffer)
+{
+    t_PCB* pcb = deserialize_pcb(buffer);
+
+    uint32_t length_string = buffer_read_uint32(buffer);
+    char* nombre_recurso = buffer_read_string(buffer, length_string);
+
+    return manejo_recurso_create(pcb, nombre_recurso);
 }

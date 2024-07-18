@@ -41,6 +41,8 @@ void send_get_next_instruction_memoria(uint32_t, uint32_t);
 // Post: Retorna un puntero a t_instruction que contiene la instrucción recibida.
 t_instruction* recv_instruction_memoria();
 
+
+
 void send_solicitud_io_generica_kernel(t_PCB*, t_instruction*);
 
 #endif

@@ -142,9 +142,6 @@ void atender_kernel_cpu_dispatch()
                 
                 break;
             case MSG_PCB_KERNEL_EXIT: // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
-                //TODO: ARMAR UNA FUNCION QUE SE ENCARGUE DE LA GESTION DE LIBERAR EL PCB QUE LLEGO A EXIT
-                // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
-
                 // t_PCB* pcb_exit= recv_pcb_cpu();
 
                 // // limpio la variable global
@@ -166,6 +163,12 @@ void atender_kernel_cpu_dispatch()
 
                 break;
             case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
+
+            // hay que:
+            // hacer la logica de a que cola se manda (segun el quantum que le llega).. 
+            // previamente chequeando en que algoritmo estamos.
+
+
                 //TODO: agregar PCB donde este:
                 // 1-recibir pcb:
                 // t_PCB* pcb_interrupt = recv_pcb_interrupt();
@@ -196,8 +199,14 @@ void atender_kernel_cpu_dispatch()
                 
                 //sem_post(&SEM_CPU);
 
-                procesar_interrupcion();
+                procesar_interrupcion_quantum();
 
+                break;
+            case MSG_CPU_KERNEL_WAIT:
+                handle_wait_request() ;
+                break;
+            case MSG_CPU_KERNEL_SIGNAL:
+                handle_signal_request();
                 break;
             case -1:
                 log_error(logger_kernel, "CPU DISPATCH se desconecto. Terminando servidor");
@@ -209,7 +218,6 @@ void atender_kernel_cpu_dispatch()
         }
     }
 }
-
 
 void levantar_servidor()
 {

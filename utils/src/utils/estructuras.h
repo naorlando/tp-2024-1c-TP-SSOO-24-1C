@@ -7,6 +7,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <sys/socket.h>
+#include <commons/collections/queue.h>
 
 
 typedef struct
@@ -30,7 +31,7 @@ typedef enum
     READY,
     EXEC,
     BLOCKED,
-    FINISHED //ex EXIT
+    FINISHED //ex EXIT, por que existe ya la instruccion EXIT
 } t_state;
 typedef struct
 {
@@ -50,6 +51,17 @@ typedef struct
 
 // t_dictionary
 
+// Estructura para los recursos
+typedef struct {
+    char *nombre;
+    int instancias;
+    t_queue *cola_bloqueados;
+} t_recurso;
+
+typedef struct {
+    t_PCB *pcb;
+    char *nombre_recurso;
+} t_manejo_recurso;
 
 
 t_PCB* pcb_create(uint32_t pid,  uint32_t quantum);
@@ -79,5 +91,9 @@ void destroy_new_process(t_new_process*);
 
 char* get_path_new_process(t_new_process*);
 uint32_t get_size_new_process(t_new_process*);
+
+t_manejo_recurso *manejo_recurso_create(t_PCB *pcb, char *nombre_recurso);
+void manejo_recurso_destroy(t_manejo_recurso *manejo_recurso);
+u_int32_t get_manejo_recurso_size(t_manejo_recurso *manejo_recurso);
 
 #endif

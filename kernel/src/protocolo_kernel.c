@@ -16,6 +16,8 @@ void send_pcb_cpu(t_PCB* pcb)
 t_PCB* recv_pcb_cpu() 
 {
     t_PCB* pcb = recv_pcb(fd_cpu_dispatch);
+    // detenemos.
+    // asignamos nuevo quantum al pcb.
     log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID <%d>", pcb->pid);
 
     return pcb;
@@ -110,4 +112,13 @@ t_solicitud_io_generica* recv_solicitud_io_generica_cpu()
     t_solicitud_io_generica* io_gen = recv_solicitud_io_generica(fd_cpu_dispatch);
 
     return io_gen;
+}
+
+t_manejo_recurso*  recv_wait_or_signal_request()
+{
+    t_buffer* buffer = recive_full_buffer(fd_cpu_dispatch);
+    t_manejo_recurso* manejo_recurso_recibido = deserialize_manejo_recurso(buffer);
+    log_info(logger_kernel, "Se recibio una solicitud de WAIT o SIGNAL del CPU_DISPATCH, PID <%d> y  recurso: %s", manejo_recurso_recibido->pcb->pid, manejo_recurso_recibido->nombre_recurso);
+    buffer_destroy(buffer);
+    return manejo_recurso_recibido;
 }

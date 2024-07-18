@@ -15,7 +15,7 @@ void iniciar_consola_interactiva()
             log_error(logger_kernel, "Comando de CONSOLA no reconocido.");
             free(leido);
             leido = readline("> ");
-            continue; // Saltar y continuar con el resto de la iteración
+            continue; // Saltar y continuar con el resto de la iteración 
         }
 
         char *leido_copy = strdup(leido);
@@ -93,6 +93,8 @@ void _atender_instruccion(void *args)
     else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0)
     {
         // código correspondiente
+        uint32_t pid = atoi(comando_consola[1]);
+        f_finalizar_proceso(pid);
     }
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {
@@ -109,7 +111,7 @@ void _atender_instruccion(void *args)
     }
     else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0)
     {
-        // código correspondiente
+        f_mostrar_estado_procesos();
     }
     else if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0)
     {
@@ -119,7 +121,7 @@ void _atender_instruccion(void *args)
     }
     else
     {
-        log_error(logger_kernel, "Comando no reconocido, pero que paso el filtro ???");
+        log_error(logger_kernel, "Comando no reconocido, pero que paso con el filtro ???");
         exit(EXIT_FAILURE);
     }
 
@@ -133,8 +135,6 @@ void f_iniciar_proceso(char *path)
 
     // Creor el PCB
     t_PCB *pcb = pcb_create(pid, obtener_quantum(kernel_config));
-    
-    log_info(logger_kernel, "Se crea el proceso <%d> en NEW", pcb->pid);
 
     // Cargo el pcb a la tabla de pcbs
     add_pcb(pcb);
@@ -186,7 +186,6 @@ void f_ejecutar_script(const char *filename)
         // Ejecutar el comando leído
         _atender_instruccion(linea_copy);
     }
-
     free(linea);
     fclose(file);
 }
@@ -200,3 +199,76 @@ int asignar_pid()
     pthread_mutex_unlock(&mutex_pid);
     return valor_pid;
 }
+
+void f_mostrar_estado_procesos(){
+    printf("--------------------------------------------------------------------------------\n");
+    printf("Mostrando estado de los procesos ...\n");
+
+    // COLA NEW:
+    printf("\nCola NEW:\n");
+        listar_pids_de_queue(COLA_NEW);
+
+    // COLA READY:
+    printf("\nCola READY:\n");
+        listar_pids_de_queue(COLA_READY);
+
+    // pcb en EXECUTE:
+    printf("\nEn EXECUTE:\n");
+        if(EXECUTE != NULL){
+            printf("PID: %d", EXECUTE->pid);
+        } else {
+            printf("No hay procesos en EXECUTE\n");
+        }
+
+    //COLA EXIT:
+    printf("\nCola EXIT:\n");
+        listar_pids_de_queue(COLA_EXIT);
+    // COLA BLOCKED:
+    // TODO...
+    printf("\nCola BLOCKED: FALTA IMPLEMENTAR\n");
+    printf("--------------------------------------------------------------------------------\n");
+    
+}
+
+void listar_pids_de_queue(t_queue *queue) {
+    if (queue == NULL || queue_is_empty(queue)) {
+        printf("La cola está vacía o es nula.");
+        return;
+    }
+
+    int size = queue_size(queue);
+    //log_info(logger_kernel,"PIDs en la cola:\n");
+
+    for (int i = 0; i < size; i++) {
+        t_PCB *pcb = (t_PCB *) list_get(queue->elements, i);
+        printf("PID: %d\n", pcb->pid);
+    }
+}
+
+
+void f_finalizar_proceso(u_int32_t pid){
+    t_PCB *pcb = get_pcb(pid);
+    if(pcb == NULL){
+        log_error(logger_kernel, "No se encontro el proceso con PID: %d", pid);
+        return;
+    }
+    // ##############################################################
+    // TODO: falta hacer la siguiente logica:
+    // En caso de que el proceso se encuentre ejecutando en CPU, 
+    // se deberá enviar una señal de interrupción a través de la conexión de interrupt con el mismo y 
+    // aguardar a que éste retorne el Contexto de Ejecución antes de iniciar la liberación de recursos.
+    if(EXECUTE != NULL && EXECUTE->pid == pid){
+        // enviar señal de interrupcion a CPU
+        // esperar a que retorne el contexto de ejecucion...
+    }
+
+    // ##############################################################
+
+    // elimina el PCB para siempre (ver en largo_plazo.c, ACA SE LIBERAN LOS RECURSOS PARA SALIR DEL DEADLOCK)
+    agregar_a_cola_exit(pcb);
+
+    // Eliminar de la tabla de PCBs
+    // TODO: verificar si se genera un doble free (del diccionario... ).
+    delete_pcb(pid);
+}
+

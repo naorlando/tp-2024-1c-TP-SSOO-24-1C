@@ -101,6 +101,28 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             solicitud_io = true;
             break;
         }
+        case WAIT: {
+            log_info(logger_cpu, "WAIT\n");
+            // variable con nombre de recurso
+            char* nombre_recurso = (char*)list_get(instruccion->params, 0);
+            // logica de WAIT de un recurso:
+            // mandar mensaje a kernel para que haga cositas con el recurso
+            handle_wait_or_signal(pcb_execute, nombre_recurso, WAIT);
+            // activo flag:
+            solicitud_recurso = true;
+            break;
+        }
+        case SIGNAL: {
+            log_info(logger_cpu, "SIGNAL\n");
+            // variable con nombre de recurso
+            char* nombre_recurso = (char*)list_get(instruccion->params, 0);
+            // logica de SIGNAL de un recurso:
+            // mandar mensaje a kernel para que haga cositas con el recurso
+            handle_wait_or_signal(pcb_execute, nombre_recurso,  SIGNAL);
+            // activo flag:
+            solicitud_recurso = true;
+            break;
+        }
         case EXIT: {
             log_info(logger_cpu, "EXIT\n");
             // sem_wait(&SEM_INTERRUPT); //BINARIO
@@ -235,24 +257,6 @@ void copiar_cadena(uint32_t origen, uint32_t destino, int tamano) {
 
 }
 
-
-void cargar_contexto_ejecucion(t_PCB* pcb) {
-    t_cpu_registers* contexto = get_cpu_registers(pcb);
-
-    // Cargo el contexto de ejecucion del pcb en la CPU
-    cpu_registers->pc = contexto->pc;
-    cpu_registers->ax = contexto->ax;
-    cpu_registers->bx = contexto->bx;
-    cpu_registers->cx = contexto->cx;
-    cpu_registers->dx = contexto->dx;
-    cpu_registers->eax = contexto->eax;
-    cpu_registers->ebx = contexto->ebx;
-    cpu_registers->ecx = contexto->ecx;
-    cpu_registers->edx = contexto->edx;
-    cpu_registers->si = contexto->si;
-    cpu_registers->di = contexto->di;
-}
-
 void solicitar_instruccion(uint32_t pid, uint32_t pc) 
 {
     // Pido la siguiente instruccion a memoria
@@ -281,13 +285,13 @@ void manejar_ciclo_de_instruccion() {
     log_info(logger_cpu, "antes: AX: %u", cpu_registers->ax);
     log_info(logger_cpu, "antes: BX: %u", cpu_registers->bx);
     log_info(logger_cpu, "antes: CX: %u", cpu_registers->cx);
-    log_info(logger_cpu, "antes: DX: %u", cpu_registers->dx);
-    log_info(logger_cpu, "antes: EAX: %u", cpu_registers->eax);
-    log_info(logger_cpu, "antes: EBX: %u", cpu_registers->ebx);
-    log_info(logger_cpu, "antes: ECX: %u", cpu_registers->ecx);
-    log_info(logger_cpu, "antes: EDX: %u", cpu_registers->edx);
-    log_info(logger_cpu, "antes: SI: %u", cpu_registers->si);
-    log_info(logger_cpu, "antes: DI: %u", cpu_registers->di);
+    // log_info(logger_cpu, "antes: DX: %u", cpu_registers->dx);
+    // log_info(logger_cpu, "antes: EAX: %u", cpu_registers->eax);
+    // log_info(logger_cpu, "antes: EBX: %u", cpu_registers->ebx);
+    // log_info(logger_cpu, "antes: ECX: %u", cpu_registers->ecx);
+    // log_info(logger_cpu, "antes: EDX: %u", cpu_registers->edx);
+    // log_info(logger_cpu, "antes: SI: %u", cpu_registers->si);
+    // log_info(logger_cpu, "antes: DI: %u", cpu_registers->di);
 
 
     // EXECUTE: Ejecuto la instruccion recibida
@@ -297,13 +301,13 @@ void manejar_ciclo_de_instruccion() {
     log_info(logger_cpu, "despues: AX: %u", cpu_registers->ax);
     log_info(logger_cpu, "despues: BX: %u", cpu_registers->bx);
     log_info(logger_cpu, "despues: CX: %u", cpu_registers->cx);
-    log_info(logger_cpu, "despues: DX: %u", cpu_registers->dx);
-    log_info(logger_cpu, "despues: EAX: %u", cpu_registers->eax);
-    log_info(logger_cpu, "despues: EBX: %u", cpu_registers->ebx);
-    log_info(logger_cpu, "despues: ECX: %u", cpu_registers->ecx);
-    log_info(logger_cpu, "despues: EDX: %u", cpu_registers->edx);
-    log_info(logger_cpu, "despues: SI: %u", cpu_registers->si);
-    log_info(logger_cpu, "despues: DI: %u", cpu_registers->di);
+    // log_info(logger_cpu, "despues: DX: %u", cpu_registers->dx);
+    // log_info(logger_cpu, "despues: EAX: %u", cpu_registers->eax);
+    // log_info(logger_cpu, "despues: EBX: %u", cpu_registers->ebx);
+    // log_info(logger_cpu, "despues: ECX: %u", cpu_registers->ecx);
+    // log_info(logger_cpu, "despues: EDX: %u", cpu_registers->edx);
+    // log_info(logger_cpu, "despues: SI: %u", cpu_registers->si);
+    // log_info(logger_cpu, "despues: DI: %u", cpu_registers->di);
 
  
     eliminar_instruccion(instruccion);
@@ -311,6 +315,14 @@ void manejar_ciclo_de_instruccion() {
     // se debe hacer un "return;", si el proceso llego a exit
     if(llego_a_exit) {
         llego_a_exit = false; // seteamos en false para el siguiente pcb
+        log_info(logger_cpu, "El PCB de pid <%d> se retira del ciclo de instruccion por una instruccion EXIT", pcb_execute->pid);
+        return;
+    }
+    // se debe hacer un "return;", si el proceso maneja un recurso:
+    if(solicitud_recurso) {
+        solicitud_recurso = false;
+        // log: se envio el proceso a kernel para el manejo de recursos
+        log_info(logger_cpu, "El PCB de pid <%d> se envio al KERNEL para hacer un WAIT/SIGNAL un recurso (puede no volver) ", pcb_execute->pid);
         return;
     }
 
@@ -341,8 +353,6 @@ bool manejar_interrupcion() {
     pthread_mutex_lock(&MUTEX_INTERRUPT);
     if (interrupcion_pendiente) {
         log_info(logger_cpu, "Interrupción de %s recibida, devolviendo PCB al Kernel",get_string_from_interruption(tipo_de_interrupcion));
-        //TODO: se debe cargar el nuevo contexto de ejecucion asociado al PCB antes
-        // de enviar de nuevo al kernel
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
         
         log_info(logger_cpu, "PCB enviado al Kernel");
@@ -400,6 +410,22 @@ void solicitar_IO(t_instruction* instruccion)
     sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 }
 
+void cargar_contexto_ejecucion(t_PCB* pcb) {
+    t_cpu_registers* contexto = get_cpu_registers(pcb);
+
+    // Cargo el contexto de ejecucion del pcb en la CPU
+    cpu_registers->pc = contexto->pc;
+    cpu_registers->ax = contexto->ax;
+    cpu_registers->bx = contexto->bx;
+    cpu_registers->cx = contexto->cx;
+    cpu_registers->dx = contexto->dx;
+    cpu_registers->eax = contexto->eax;
+    cpu_registers->ebx = contexto->ebx;
+    cpu_registers->ecx = contexto->ecx;
+    cpu_registers->edx = contexto->edx;
+    cpu_registers->si = contexto->si;
+    cpu_registers->di = contexto->di;
+}
 // cargar contexto de ejecucion del cpu a los registros del pcb
 void  cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
     t_cpu_registers* contexto = get_cpu_registers(pcb);
@@ -421,6 +447,7 @@ void  cargar_contexto_ejecucion_a_pcb(t_PCB* pcb) {
 void enviar_pcb_finalizado() 
 {
     cargar_contexto_ejecucion_a_pcb(pcb_execute);
+    log_info(logger_cpu, "se envia un PCB al Kernel por EXIT con PC= %d", pcb_execute->program_counter);
     send_pcb_kernel();
     sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
 
@@ -437,4 +464,36 @@ void aumentar_program_counter()
     // actualizar PC:
     cpu_registers->pc++;
     pcb_execute->program_counter = cpu_registers->pc;
+}
+
+void handle_wait_or_signal(t_PCB * pcb, char * resource_name, t_name_instruction tipo_de_interrupcion) {
+
+    t_msg_header msg_header;
+    if(tipo_de_interrupcion == WAIT){
+        msg_header = MSG_CPU_KERNEL_WAIT;
+    }else if(tipo_de_interrupcion == SIGNAL) {
+        msg_header = MSG_CPU_KERNEL_SIGNAL;
+    } else {
+        log_error(logger_cpu, "Tipo de interrupcion invalido para recurso.");
+        return;
+    }
+
+    remove_newline(resource_name);
+
+    // actualizar PC:
+    aumentar_program_counter();
+    cargar_contexto_ejecucion_a_pcb(pcb);
+
+    t_manejo_recurso *t_manejo_recurso = manejo_recurso_create(pcb, resource_name);
+    // Crear un paquete con el PCB y el nombre del recurso (t_manjejo_recurso) y enviarlo al Kernel:
+
+    t_package * package = package_create(msg_header, get_manejo_recurso_size(t_manejo_recurso));
+    serialize_manejo_recurso(package->buffer, t_manejo_recurso);
+
+    // Enviar el paquete al Kernel:
+    package_send(package, fd_kernel_dispatch);
+    package_destroy(package);
+    sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
+
+    manejo_recurso_destroy(t_manejo_recurso);
 }

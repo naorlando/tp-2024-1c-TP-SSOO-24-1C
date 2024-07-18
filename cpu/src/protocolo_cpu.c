@@ -73,6 +73,13 @@ void send_pcb_kernel_interruption(t_name_interruption tipo_de_interrupcion)
     case QUANTUM_INTERRUPT:
             send_pcb(MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, fd_kernel_dispatch, pcb_execute);
         break;
+
+    //TODO : mandarle el RECURSO.
+    // camino de la interrupcion a la negativa, ya sea  que no haya recursos disponibles, o el signal termino bien.
+    // case RECURSO_INTERRUPT:
+    //         send_pcb(MSG_PCB_KERNEL_INTERRUPTION_RECURSO, fd_kernel_dispatch, pcb_execute);
+    //     break;
+
     // case MSG_IO:
     //         send_pcb(MSG_PCB_KERNEL_INTERRUPTION_IO, fd_kernel_dispatch, pcb_execute);
     //     break;
@@ -80,3 +87,4 @@ void send_pcb_kernel_interruption(t_name_interruption tipo_de_interrupcion)
         break;
     }
 }
+

@@ -66,6 +66,10 @@ void cargar_contexto_ejecucion_a_pcb(t_PCB*);
 // Post: El PCB es enviado al kernel y cualquier interrupción pendiente es desestimada.
 void enviar_pcb_finalizado();
 
+// Envia una pcb y recurso al kernel por una instruccion de WAIT
+// post: envia un pcb y un recurso al kernel
+void handle_wait_or_signal(t_PCB * pcb, char * resource_name, t_name_instruction tipo_de_interrupcion);
+
 // TODO: Implementar.
 uint32_t leer_memoria(uint32_t);
 void escribir_memoria(uint32_t direccion_logica,uint32_t valor_datos);

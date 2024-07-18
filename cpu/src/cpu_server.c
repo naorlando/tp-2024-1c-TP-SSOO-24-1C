@@ -44,7 +44,7 @@ void atender_cpu_memoria()
         {
         case MSG_INSTRUCTION_MEMORIA:
             manejar_ciclo_de_instruccion();
-            log_info(logger_cpu, "Se recibio una instruccion de memoria");
+            //log_info(logger_cpu, "Se recibio una instruccion de memoria");
             break;
         
         case MSG_MEMORIA_CPU:
