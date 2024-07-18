@@ -6,18 +6,23 @@
 #include "utils/estructuras.h"
 #include "kernel_config.h"
 #include "cronometro.h"
+#include "utils/utils.h"
+
+// ############################################################################################################
+// PUSH:
+// ############################################################################################################
 
 void agregar_de_new_a_ready(t_PCB*);
 void agregar_a_cola_ready(t_PCB*);
 void agregar_de_blocked_a_ready(t_PCB*);
 void agregar_a_cola_exit(t_PCB*);
-t_PCB* siguiente_pcb_cola_new();
-t_PCB* siguiente_pcb_cola_ready();
 void agregar_a_cola_aux_ready(t_PCB* pcb);
+
 // funcion mas general que agrega de execute a ready dependiendo del algoritmo de planificacion
 // pre: pcb != NULL
 // post: agrega el pcb a la cola de ready
 void agregar_de_execute_a_ready(t_PCB* pcb);
+
 
 // logica de planificacion VRR en el envio de colas
 // pre: pcb != NULL
@@ -25,5 +30,38 @@ void agregar_de_execute_a_ready(t_PCB* pcb);
 void agregar_a_cola_ready_VRR(t_PCB* pcb);
 
 void agregar_a_cola_new(t_PCB*);
+
+// ############################################################################################################
+// POP:
+// ############################################################################################################
+
+// Obtenemos el siguiente pcb a ejecutar de una determinada cola NEW
+// pre: queue != NULL
+// post: return pcb
+t_PCB* siguiente_pcb_cola_new();
+
+// Obtenemos el siguiente pcb a ejecutar de una determinada cola READY
+// pre: queue != NULL
+// post: return pcb
+t_PCB* get_next_pcb_ready_to_exec();
+
+// obtiene el siguiente pcb a ejecutar de la cola auxiliar de ready
+// pre: cola_aux_ready != NULL
+// post: return pcb
+t_PCB *get_next_pcb_aux_ready_to_exec();
+
+// obtiene el siguiente pcb a ejecutar de la cola de EXIT
+// pre: cola_exit != NULL
+// post: return pcb
+t_PCB *get_next_pcb_exit();
+
+// ############################################################################################################
+// Funciones auxiliares:
+// ############################################################################################################
+
+// lista los pids de una cola
+// pre: queue != NULL
+// post: return lista de pids
+t_list* listar_pids_de_queue(t_queue *queue);
 
 #endif //UTILS_QUEUE_

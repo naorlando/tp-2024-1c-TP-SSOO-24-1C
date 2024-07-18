@@ -28,7 +28,7 @@ void planificador_FIFO()
 {
     while (1)
     {
-        t_PCB *pcb = get_next_pcb_to_exec(COLA_READY);
+        t_PCB *pcb = get_next_pcb_ready_to_exec();
         pcb_execute(pcb);
     }
 } 
@@ -38,7 +38,7 @@ void planificador_RR()
 {
     while (1)
     {  
-        t_PCB *pcb = get_next_pcb_to_exec(COLA_READY);
+        t_PCB *pcb = get_next_pcb_ready_to_exec();
         pcb_execute(pcb);
         interrupcion_quantum(EXECUTE->pid, obtener_quantum(kernel_config));
     }
@@ -52,10 +52,9 @@ void planificador_VRR()
 
         // Jerarquizamos las colas de READY
         if (!queue_is_empty(COLA_AUX_READY)) {
-            sem_wait(&SEM_AUX_READY);
-            pcb = queue_pop(COLA_AUX_READY);
+            pcb = get_next_pcb_aux_ready_to_exec();
         } else {
-            pcb = get_next_pcb_to_exec(COLA_READY);
+            pcb = get_next_pcb_ready_to_exec();
             pcb->quantum = obtener_quantum(kernel_config);
         }
 
@@ -153,7 +152,7 @@ void blocked()
         
     }
 }
-void pcb_execute(t_PCB* pcb)
+void pcb_execute( t_PCB* pcb)
 {
     //log_info(logger_kernel, "Se prepara para ejecutar el PCB con PID: <%d>", pcb->pid);
     
@@ -166,18 +165,4 @@ void pcb_execute(t_PCB* pcb)
     pthread_mutex_unlock(&MUTEX_EXECUTE);
 
     log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "READY", "EXEC");
-}
-
-t_PCB *get_next_pcb_to_exec(t_queue* queue)
-{
-    sem_wait(&SEM_READY); // Espera a que haya un PCB en la cola de READY
-    t_PCB *pcb_a_tomar;
-
-    //log_info(logger_kernel, "Se va a tomar el siguiente PCB de la cola de READY");
-
-    pthread_mutex_lock(&MUTEX_READY);
-        pcb_a_tomar = queue_pop(queue);
-    pthread_mutex_unlock(&MUTEX_READY);
-
-    return pcb_a_tomar;
 }

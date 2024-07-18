@@ -50,9 +50,7 @@ void end_process()
 
         log_info(logger_kernel, "empieza a terminar el proceso");
         //TODO: Hacer una abstraccion para obtener el siguiente PCB de la cola de EXIT
-        pthread_mutex_lock(&MUTEX_EXIT);
-        pcb_exit = queue_pop(COLA_EXIT);
-        pthread_mutex_unlock(&MUTEX_EXIT);
+        pcb_exit = get_next_pcb_exit();
         sem_post(&SEM_MULTIPROGRAMACION);
         // -------------------------------------------------------------------
         // agregar logica de liberar recursos de prcesos de ser necesario AQUI...
@@ -62,9 +60,7 @@ void end_process()
 
         // -------------------------------------------------------------------
 
-        // TODO eliminar otros contextos en tablas
-
-        // liberar memoria de pcb:
-        pcb_destroy(pcb_exit);
+        // liberar memoria de pcb: TODO: chequear donde liberar PCBs
+        //pcb_destroy(pcb_exit);
     }
 }

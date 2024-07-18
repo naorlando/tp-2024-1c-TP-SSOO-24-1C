@@ -165,3 +165,25 @@ void remove_newline(char *str) {
         str[len - 1] = '\0';
     }
 }
+
+char* lista_a_string(t_list* pid_list) {
+    if (list_is_empty(pid_list)) {
+        return strdup("[]");
+    }
+
+    char* pid_string = strdup("[");
+    for (int i = 0; i < list_size(pid_list); i++) {
+        uint32_t* pid = list_get(pid_list, i);
+        char* pid_char = malloc(12); // Espacio suficiente para un entero de 32 bits y caracteres adicionales
+        sprintf(pid_char, "%d", *pid);
+        pid_string = realloc(pid_string, strlen(pid_string) + strlen(pid_char) + 3); // +3 para la coma, espacio y el corchete final
+        strcat(pid_string, pid_char);
+        if (i < list_size(pid_list) - 1) {
+            strcat(pid_string, ", ");
+        }
+        free(pid_char);
+    }
+    strcat(pid_string, "]");
+
+    return pid_string;
+}
