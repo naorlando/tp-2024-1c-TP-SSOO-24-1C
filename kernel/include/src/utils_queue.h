@@ -24,4 +24,6 @@ void agregar_de_execute_a_ready(t_PCB* pcb);
 // post: agrega el pcb a la cola de ready que corresponde
 void agregar_a_cola_ready_VRR(t_PCB* pcb);
 
+void agregar_a_cola_new(t_PCB*);
+
 #endif //UTILS_QUEUE_
