@@ -1,5 +1,7 @@
 #include "protocolo_entradasalida.h"
 
+bool operacion_exitosa = false;
+
 //======================================================
 //        FUNCIONES DE ENTRADA/SALIDA GENERICA
 //======================================================
@@ -88,7 +90,7 @@ void atender_solicitud_dialfs(int fd) {
         // Procesar la solicitud según la operación
         switch(io_dialfs->operacion) {
             case IO_FS_CREATE:
-                operacion_exitosa = crear_archivo(dialfs, io_dialfs->nombre_archivo);
+                operacion_exitosa = crear_archivo(DIALFS, io_dialfs->nombre_archivo);
                 log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
                 break;
             case IO_FS_DELETE:

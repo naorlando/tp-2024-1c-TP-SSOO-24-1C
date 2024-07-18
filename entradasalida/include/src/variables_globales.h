@@ -5,6 +5,7 @@
 #include <commons/config.h>
 #include "entradasalida_config.h"
 
+
 #define SERVER_MEMORIA "SERVER MEMORIA"
 #define SERVER_KERNEL "SERVER KERNEL"
 
@@ -12,6 +13,7 @@
 extern t_log *logger_entradasalida;
 extern t_log *logger_entradasalida_debug;
 extern char* nombre_interfaz;
+extern t_dialfs* DIALFS; // Sistema de archivos DialFS
 
 //FD
 extern int fd_memoria;

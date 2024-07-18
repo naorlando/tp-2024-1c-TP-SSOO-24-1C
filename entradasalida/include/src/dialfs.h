@@ -13,12 +13,14 @@
 #include "utils/protocolo.h"
 #include "variables_globales.h"
 
+// Estructura para almacenar los datos de un archivo en el sistema DialFS.
 typedef struct {
     char* nombre;
     uint32_t bloque_inicial;
     uint32_t tamanio;
 } t_archivo_dialfs;
 
+// Estructura para almacenar los datos del sistema de archivos DialFS.
 typedef struct {
     char* path_base;
     uint32_t block_size;
@@ -63,7 +65,7 @@ void crear_bitmap(const char* path, uint32_t block_count);
  * @param retraso_compactacion Tiempo de espera después de la compactación en ms.
  * @return Puntero a la nueva instancia de t_dialfs o NULL si falla la inicialización.
  */
-t_dialfs* inicializar_dialfs(char* path_base, uint32_t block_size, uint32_t block_count, uint32_t retraso_compactacion);
+t_dialfs* crear_dialfs(char* path_base, uint32_t block_size, uint32_t block_count, uint32_t retraso_compactacion);
 
 /**
  * Libera los recursos asociados con una instancia de DialFS.

@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
+#include <unistd.h> // Librería para usleep
+#include <sys/stat.h> // Librería para manejo de archivos
 
 
 //===============================================
@@ -48,7 +48,7 @@ void crear_bitmap(const char* path, uint32_t block_count) {
     fclose(file); // Cerrar archivo
 }
 
-t_dialfs* inicializar_dialfs(char* path_base, uint32_t block_size, uint32_t block_count, uint32_t retraso_compactacion) {
+t_dialfs* crear_dialfs(char* path_base, uint32_t block_size, uint32_t block_count, uint32_t retraso_compactacion) {
     t_dialfs* fs = malloc(sizeof(t_dialfs)); // Crear instancia de DialFS
     fs->path_base = strdup(path_base); // Copiar ruta base
     fs->block_size = block_size; // Asignar tamaño de bloque
@@ -382,9 +382,9 @@ int comparar_bloques_iniciales(t_archivo_dialfs* a, t_archivo_dialfs* b) {
     return a->bloque_inicial - b->bloque_inicial;
 }
 
-void destruir_dialfs(t_dialfs* fs) {
-    free(fs->path_base);
-    bitarray_destroy(fs->bitmap);
-    list_destroy_and_destroy_elements(fs->archivos, (void*)destruir_archivo_dialfs);
-    free(fs);
+void destruir_archivo_dialfs(t_archivo_dialfs* archivo) {
+    if (archivo != NULL) {
+        free(archivo->nombre);
+        free(archivo);
+    }
 }

@@ -1,12 +1,15 @@
 #ifndef PROTOCOLO_ENTRADASALIDA_H_
 #define PROTOCOLO_ENTRADASALIDA_H_
 
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "variables_globales.h"
 #include "utils/protocolo.h"
 #include "utils/estructuras.h"
 #include "comportamientos_ios.h"
 #include "utils/solicitudes_io.h" 
 #include "dialfs.h"
+
 
 //======================================================
 //        FUNCIONES DE ENTRADA/SALIDA GENERICA
@@ -73,5 +76,26 @@ void send_confirmacion_io(int fd, t_msg_header header, t_response* response);
  * Envía la información de la interfaz de E/S al kernel.
  */
 void send_IO_interface_kernel();
+
+
+//======================================================
+//               FUNCIONES AUXILIARES
+//======================================================
+
+/**
+ * Obtiene el nombre de una operación de entrada/salida.
+ * @param operacion Operación de entrada/salida.
+ * @return Nombre de la operación.
+ * @note Esta función es utilizada para mostrar información en los logs.
+ */
+const char* get_operation_name(t_name_instruction operacion);
+
+/**
+ * Envia los datos leidos al kernel
+ * @param fd Descriptor de archivo para la comunicación.
+ * @param buffer Buffer con los datos leidos.
+ * @param tamanio Tamaño de los datos leidos.
+ */
+void enviar_datos_leidos(int fd, void* buffer, uint32_t tamanio);
 
 #endif // PROTOCOLO_ENTRADASALIDA_H_

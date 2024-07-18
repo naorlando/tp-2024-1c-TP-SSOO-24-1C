@@ -57,14 +57,22 @@ typedef struct {
     uint32_t pid;
 } t_response;
 
-// INTERFAZ DIALFS
+/* PARÁMETROS DE UNA OPERACIÓN DE DIALFS
+Esta estructura ajusta a lo que el enunciado requiere para las solicitudes del Kernel al IO DialFS:
+ *IO_FS_CREATE: Usa nombre_interfaz, nombre_archivo, pid.
+ *IO_FS_DELETE: Usa nombre_interfaz, nombre_archivo, pid.
+ *IO_FS_TRUNCATE: Usa nombre_interfaz, nombre_archivo, tamanio, pid.
+ *IO_FS_WRITE: Usa nombre_interfaz, nombre_archivo, direccion_logica, tamanio, puntero_archivo, pid.
+ *IO_FS_READ: Usa nombre_interfaz, nombre_archivo, direccion_logica, tamanio, puntero_archivo, pid.
+*/
 typedef struct {
-    char* nombre_archivo;
-    uint32_t tamanio;
-    uint32_t offset;
-    void* datos;
-    t_name_instruction operacion;
-    uint32_t pid;  // Añadido el PID
+    char* nombre_interfaz;      // Nombre de la interfaz DialFS
+    char* nombre_archivo;       // Nombre del archivo a operar
+    uint32_t pid;               // PID del proceso que realiza la operación
+    t_name_instruction operacion; // Tipo de operación a realizar
+    uint32_t tamanio;           // Tamaño para operaciones de lectura/escritura/truncado
+    uint32_t direccion_logica;  // Dirección lógica para operaciones de lectura/escritura
+    uint32_t puntero_archivo;   // Puntero del archivo para operaciones de lectura/escritura
 } t_io_dialfs;
 
 // SOLICITUD DIALFS
@@ -311,7 +319,7 @@ t_solicitud_io_dialfs* crear_solicitud_io_dialfs(t_PCB* pcb, char* nombre_interf
 //      datos puede ser NULL si no es una operación de escritura, operacion debe ser una operación DialFS válida.
 // Post: Retorna un puntero a una nueva estructura t_io_dialfs inicializada.
 //       Si hay un error en la asignación de memoria, retorna NULL.
-t_io_dialfs* crear_io_dialfs(char* nombre_archivo, uint32_t tamanio, uint32_t offset, void* datos, t_name_instruction operacion, uint32_t pid);
+t_io_dialfs* crear_io_dialfs(char* nombre_interfaz, char* nombre_archivo, uint32_t pid, t_name_instruction operacion, uint32_t tamanio, uint32_t direccion_logica, uint32_t puntero_archivo);
 
 // Destruye una solicitud de E/S DialFS y libera la memoria asociada.
 // Pre: El puntero a solicitud debe ser válido y no NULL.

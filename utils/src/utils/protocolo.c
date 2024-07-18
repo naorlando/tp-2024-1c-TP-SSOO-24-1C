@@ -414,14 +414,33 @@ t_solicitud_io_stdout* recv_solicitud_io_stdout(int fd)
     return solicitud;
 }
 
+int send_io_dialfs(int fd, t_io_dialfs* io_dialfs)
+{
+    // Creo el paquete que se va a enviar
+    t_package* package = package_create(MSG_KERNEL_IO_DIALFS, obtener_tamanio_io_dialfs(io_dialfs));
 
+    // Serializo en el buffer el t_io_dialfs
+    serializar_io_dialfs(get_buffer(package), io_dialfs);
 
-t_io_dialfs* recv_io_dialfs(int fd) {
+    // Envio el paquete
+    int bytes_enviados = package_send(package, fd);
+
+    //Elimino el paquete usado
+    package_destroy(package);
+
+    return bytes_enviados;
+}
+
+t_io_dialfs* recv_io_dialfs(int fd)
+{
     t_buffer* buffer = recive_full_buffer(fd);
-    if (buffer == NULL) return NULL;
-    
+
+    if(buffer == NULL) return NULL;
+
     t_io_dialfs* io_dialfs = deserializar_io_dialfs(buffer);
+
     buffer_destroy(buffer);
+
     return io_dialfs;
 }
 
@@ -988,35 +1007,29 @@ t_solicitud_io_dialfs* deserializar_solicitud_io_dialfs(t_buffer* buffer) {
 }
 
 void serializar_io_dialfs(t_buffer* buffer, t_io_dialfs* io_dialfs) {
+    buffer_add_string(buffer, io_dialfs->nombre_interfaz);
     buffer_add_string(buffer, io_dialfs->nombre_archivo);
-    buffer_add_uint32(buffer, io_dialfs->tamanio);
-    buffer_add_uint32(buffer, io_dialfs->offset);
-    buffer_add_uint32(buffer, io_dialfs->operacion);
     buffer_add_uint32(buffer, io_dialfs->pid);
-    
-    // Si la operacion es de escritura, serializo los datos
-    if (io_dialfs->operacion == IO_FS_WRITE && io_dialfs->datos != NULL) {
-        buffer_add_data(buffer, io_dialfs->datos, io_dialfs->tamanio);
-    }
+    buffer_add_uint32(buffer, io_dialfs->operacion);
+    buffer_add_uint32(buffer, io_dialfs->tamanio);
+    buffer_add_uint32(buffer, io_dialfs->direccion_logica);
+    buffer_add_uint32(buffer, io_dialfs->puntero_archivo);
 }
 
 t_io_dialfs* deserializar_io_dialfs(t_buffer* buffer) {
-    uint32_t length_string = buffer_read_uint32(buffer);
-    char* nombre_archivo = buffer_read_string(buffer, length_string);
-    uint32_t tamanio = buffer_read_uint32(buffer);
-    uint32_t offset = buffer_read_uint32(buffer);
-    t_name_instruction operacion = buffer_read_uint32(buffer);
+    uint32_t length_nombre_interfaz = buffer_read_uint32(buffer);
+    char* nombre_interfaz = buffer_read_string(buffer, length_nombre_interfaz);
+    
+    uint32_t length_nombre_archivo = buffer_read_uint32(buffer);
+    char* nombre_archivo = buffer_read_string(buffer, length_nombre_archivo);
+    
     uint32_t pid = buffer_read_uint32(buffer);
+    t_name_instruction operacion = buffer_read_uint32(buffer);
+    uint32_t tamanio = buffer_read_uint32(buffer);
+    uint32_t direccion_logica = buffer_read_uint32(buffer);
+    uint32_t puntero_archivo = buffer_read_uint32(buffer);
     
-    void* datos = NULL;
-
-    // Si la operacion es de escritura, deserializo los datos
-    if (operacion == IO_FS_WRITE) {
-        datos = malloc(tamanio);
-        buffer_read_data(buffer, datos, tamanio);
-    }
-    
-    return crear_io_dialfs(nombre_archivo, tamanio, offset, datos, operacion, pid);
+    return crear_io_dialfs(nombre_interfaz, nombre_archivo, pid, operacion, tamanio, direccion_logica, puntero_archivo);
 }
 
 // IO Interface
