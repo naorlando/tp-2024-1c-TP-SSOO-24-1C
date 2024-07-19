@@ -59,9 +59,17 @@ t_PCB *get_next_pcb_exit();
 // Funciones auxiliares:
 // ############################################################################################################
 
+// Muestra los elementos de una cola
+// pre: queue != NULL and char* de nombre de la cola.
+// post: imprime los elementos de la cola
+void mostrar_elementos_de_cola(t_queue *COLA, char *nombre_cola);
+
 // lista los pids de una cola
 // pre: queue != NULL
 // post: return lista de pids
 t_list* listar_pids_de_queue(t_queue *queue);
+
+
+
 
 #endif //UTILS_QUEUE_

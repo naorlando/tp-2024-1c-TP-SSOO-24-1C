@@ -151,3 +151,8 @@ void liberar_recursos_de_proceso(u_int32_t pid)
         //free(nombre_recurso); // Si la memoria del nombre del recurso fue asignada dinámicamente, liberarla.
     }
 }
+
+void free_resource(t_PCB *pcb) {
+    liberar_recursos_de_proceso(pcb->pid);
+    dictionary_remove_and_destroy(recursos_asignados_por_pid, uint32_to_string(pcb->pid), (void *)list_destroy);
+}

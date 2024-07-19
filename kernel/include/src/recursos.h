@@ -49,5 +49,10 @@ bool remover_proceso_de_recurso(char *nombre_recurso, uint32_t pid);
 // post: se liberan los recursos que el proceso tiene asignados
 void liberar_recursos_de_proceso(u_int32_t pid);
 
+// free general que lemina el recurso asignado y lo remueve del diccionario
+// pre: un PCB!=NULL por liberar
+// post: se libera el recurso asignado al proceso
+void free_resource(t_PCB *pcb);
+
 
 #endif // RESOURCES_H_

@@ -27,8 +27,11 @@ void send_new_to_ready()
     while (1)
     {
         sem_wait(&SEM_NEW);
-        sem_wait(&SEM_MULTIPROGRAMACION);
 
+        sem_wait(&SEM_MULTIPROGRAMACION);
+        // Control de PLANIFICACION:
+        sem_wait(&SEM_PLANIFICACION_NEW_READY_INICIADA);
+        
         // descolar pcb de NEW
         t_PCB *pcb = siguiente_pcb_cola_new();
 
@@ -37,6 +40,8 @@ void send_new_to_ready()
 
         // encolar en ready
         agregar_de_new_a_ready(pcb);
+
+        sem_post(&SEM_PLANIFICACION_NEW_READY_INICIADA);
         log_info(logger_kernel, "Cola READY tiene un total de %d elementos", queue_size(COLA_READY));
     }
 }
@@ -49,18 +54,15 @@ void end_process()
         t_PCB *pcb_exit;  
 
         log_info(logger_kernel, "empieza a terminar el proceso");
-        //TODO: Hacer una abstraccion para obtener el siguiente PCB de la cola de EXIT
+        // tomar pcb de exit
         pcb_exit = get_next_pcb_exit();
         sem_post(&SEM_MULTIPROGRAMACION);
         // -------------------------------------------------------------------
-        // agregar logica de liberar recursos de prcesos de ser necesario AQUI...
         // chequeo de recursos no liberados:
-        liberar_recursos_de_proceso(pcb_exit->pid);
-        dictionary_remove_and_destroy(recursos_asignados_por_pid, uint32_to_string(pcb_exit->pid), (void *)list_destroy);
-
+        free_resource(pcb_exit);
         // -------------------------------------------------------------------
 
         // liberar memoria de pcb: TODO: chequear donde liberar PCBs
-        //pcb_destroy(pcb_exit);
+        // pcb_destroy(pcb_exit);
     }
 }

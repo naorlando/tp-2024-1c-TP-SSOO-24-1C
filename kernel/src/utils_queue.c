@@ -2,11 +2,17 @@
 
 void agregar_de_execute_a_ready(t_PCB* pcb)
 {
+
+    sem_wait(&SEM_PLANIFICACION_READY_INICIADA);
+
     if(strcmp(obtener_algoritmo_planificacion(kernel_config), "VRR") == 0) {
         agregar_a_cola_ready_VRR(pcb);
     } else {
         agregar_a_cola_ready(pcb);
     }
+
+    sem_post(&SEM_PLANIFICACION_READY_INICIADA);
+
 }
 
 void agregar_a_cola_ready_VRR(t_PCB* pcb){
@@ -28,10 +34,7 @@ void agregar_a_cola_ready(t_PCB* pcb)
 
     // LOG obligatorio:
     // Ingreso a Ready: "Cola Ready / Ready Prioridad: [<LISTA DE PIDS>]"
-    t_list *lista_pids = listar_pids_de_queue(COLA_READY);
-    char *lista_pids_string = lista_a_string(lista_pids);
-    log_info(logger_kernel, "Cola Ready / Ready Prioridad: %s", lista_pids_string);
-    listar_pids_de_queue(COLA_READY); // en realidad lo estamos sacando del diccionario pero a fines practicos es lo mismo
+    mostrar_elementos_de_cola(COLA_READY, "Ready");
 
     sem_post(&SEM_READY);
 }
@@ -54,6 +57,8 @@ t_PCB* siguiente_pcb_cola_new()
 
 t_PCB *get_next_pcb_ready_to_exec()
 {
+    sem_wait(&SEM_PLANIFICACION_EXEC_INICIADA);
+
     sem_wait(&SEM_READY); // Espera a que haya un PCB en la cola de READY
     t_PCB *pcb_a_tomar;
 
@@ -62,6 +67,8 @@ t_PCB *get_next_pcb_ready_to_exec()
     pthread_mutex_lock(&MUTEX_READY);
         pcb_a_tomar = queue_pop(COLA_READY);
     pthread_mutex_unlock(&MUTEX_READY);
+
+    sem_post(&SEM_PLANIFICACION_EXEC_INICIADA);
 
     return pcb_a_tomar;
 }
@@ -86,11 +93,16 @@ void agregar_a_cola_aux_ready(t_PCB* pcb)
         queue_push(COLA_AUX_READY, pcb);
     pthread_mutex_unlock(&MUTEX_AUX_READY);
 
+    // LOG obligatorio:
+    // Ingreso a Ready: "Cola Ready / Ready Prioridad: [<LISTA DE PIDS>]"
+    mostrar_elementos_de_cola(COLA_AUX_READY, "Aux Ready");
+
     sem_post(&SEM_AUX_READY);
 }
 
 void agregar_de_new_a_ready(t_PCB* pcb)
 {
+    // semaforo:
     agregar_a_cola_ready(pcb);
 }
 
@@ -133,6 +145,18 @@ t_PCB *get_next_pcb_exit()
     pthread_mutex_unlock(&MUTEX_EXIT);
 
     return pcb_a_tomar;
+}
+\
+
+// FUNCIONES AUXILIARES: TODO: llevar a modulo correspondiente
+
+void mostrar_elementos_de_cola(t_queue *COLA, char *nombre_cola) 
+{
+
+    t_list *lista_pids = listar_pids_de_queue(COLA);
+    char *lista_pids_string = lista_a_string(lista_pids);
+    log_info(logger_kernel, "Cola %s / %s Prioridad: %s",nombre_cola, nombre_cola, lista_pids_string);
+    listar_pids_de_queue(COLA); // en realidad lo estamos sacando del diccionario pero a fines practicos es lo mismo
 }
 
 t_list* listar_pids_de_queue(t_queue *queue) {

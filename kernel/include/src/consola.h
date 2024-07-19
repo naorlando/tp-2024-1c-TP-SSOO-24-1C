@@ -8,6 +8,7 @@
 #include "table_pcb.h"
 #include "protocolo_kernel.h"
 #include "largo_plazo.h"
+#include "syncro.h"
 
 
 
@@ -37,6 +38,19 @@ void listar_pids_por_estado(t_state state);
 //      FINALIZAR_PROCESO:
 // ----------------------------------------------
 void f_finalizar_proceso(u_int32_t pid);
+
+// ----------------------------------------------
+//      INICIAR_PLANIFICACION:
+// ----------------------------------------------
+
+// funcion que activa los semaforos de planificacion
+// pre: -
+// post: activa los semaforos de planificacion
+void f_iniciar_planificacion();
+// funcion que desactiva los semaforos de planificacion
+// pre: -
+// post: desactiva los semaforos de planificacion
+void f_detener_planificacion();
 
 
 #endif //CONSOLA_H_
