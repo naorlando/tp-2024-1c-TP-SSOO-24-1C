@@ -23,6 +23,7 @@ void esperar_clientes();
 void crear_hilos_conexiones();
 void _cerrar_conexiones();
 void _cerrar_puertos();
+void establecer_handshake_memoria();
 
 
 #endif //CPU_SERVER_H_
