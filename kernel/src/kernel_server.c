@@ -222,7 +222,7 @@ void atender_kernel_cpu_dispatch()
 void levantar_servidor()
 {
     server_port = string_itoa(kernel_config->PUERTO_ESCUCHA);
-    fd_server = iniciar_servidor(logger_kernel, NULL, NULL, server_port);
+    fd_server = iniciar_servidor(logger_kernel, SERVERNAME, NULL, server_port);
 
     if (fd_server != -1)
     {
