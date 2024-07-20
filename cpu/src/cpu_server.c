@@ -94,7 +94,7 @@ void atender_cpu_kernel_interrupt()
 void levantar_servidor()
 {
     server_port_dispatch = string_itoa(obtener_puerto_escucha_dispatch(cpu_config));
-    fd_server_dispatch = iniciar_servidor(logger_cpu, NULL, NULL, server_port_dispatch);
+    fd_server_dispatch = iniciar_servidor(logger_cpu, SERVERNAME, NULL, server_port_dispatch);
 
     if (fd_server_dispatch != -1)
     {
