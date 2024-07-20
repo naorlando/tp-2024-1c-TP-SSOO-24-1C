@@ -388,3 +388,64 @@ void destruir_archivo_dialfs(t_archivo_dialfs* archivo) {
         free(archivo);
     }
 }
+
+void* obtener_datos_de_memoria(uint32_t direccion_logica, uint32_t tamanio) {
+    void* datos = malloc(tamanio);
+    if (datos == NULL) {
+        log_error(logger_entradasalida, "Error al asignar memoria para obtener datos");
+        return NULL;
+    }
+
+    uint32_t pagina_inicial = direccion_logica / DIALFS->block_size;
+    uint32_t offset_inicial = direccion_logica % DIALFS->block_size;
+    uint32_t bytes_copiados = 0;
+
+    while (bytes_copiados < tamanio) {
+        uint32_t pagina_actual = pagina_inicial + bytes_copiados / DIALFS->block_size;
+        uint32_t offset_actual = (bytes_copiados == 0) ? offset_inicial : 0;
+        uint32_t bytes_restantes = tamanio - bytes_copiados;
+        uint32_t bytes_en_pagina = DIALFS->block_size - offset_actual;
+        uint32_t bytes_a_copiar = (bytes_restantes < bytes_en_pagina) ? bytes_restantes : bytes_en_pagina;
+
+        t_entrada_tabla_de_paginas* entrada = get_page_data(DIALFS->pid_actual, pagina_actual);
+        if (entrada == NULL || !entrada->presencia) {
+            log_error(logger_entradasalida, "Error: página no presente en memoria");
+            free(datos);
+            return NULL;
+        }
+
+        void* direccion_fisica = get_memory_address(entrada->frame, offset_actual);
+        memcpy(datos + bytes_copiados, direccion_fisica, bytes_a_copiar);
+
+        bytes_copiados += bytes_a_copiar;
+    }
+
+    return datos;
+}
+
+bool escribir_datos_en_memoria(uint32_t direccion_logica, void* datos, uint32_t tamanio) {
+    uint32_t pagina_inicial = direccion_logica / DIALFS->block_size;
+    uint32_t offset_inicial = direccion_logica % DIALFS->block_size;
+    uint32_t bytes_escritos = 0;
+
+    while (bytes_escritos < tamanio) {
+        uint32_t pagina_actual = pagina_inicial + bytes_escritos / DIALFS->block_size;
+        uint32_t offset_actual = (bytes_escritos == 0) ? offset_inicial : 0;
+        uint32_t bytes_restantes = tamanio - bytes_escritos;
+        uint32_t bytes_en_pagina = DIALFS->block_size - offset_actual;
+        uint32_t bytes_a_escribir = (bytes_restantes < bytes_en_pagina) ? bytes_restantes : bytes_en_pagina;
+
+        t_entrada_tabla_de_paginas* entrada = get_page_data(DIALFS->pid_actual, pagina_actual);
+        if (entrada == NULL || !entrada->presencia) {
+            log_error(logger_entradasalida, "Error: página no presente en memoria");
+            return false;
+        }
+
+        void* direccion_fisica = get_memory_address(entrada->frame, offset_actual);
+        memcpy(direccion_fisica, datos + bytes_escritos, bytes_a_escribir);
+
+        bytes_escritos += bytes_a_escribir;
+    }
+
+    return true;
+}
