@@ -266,9 +266,6 @@ void inicializar_sockets()
         log_error(logger_kernel, "Error al conectar con la MEMORIA. ABORTANDO");
         exit(EXIT_FAILURE);
     }
-
-    // Inicializar el diccionario de conexiones I/O
-    io_connections = dictionary_create();
 }
 
 void crear_hilos_conexiones() 
