@@ -43,7 +43,7 @@ t_instruction* recv_instruction_memoria();
 
 int send_msg_cpu_memoria_init(int fd);
 
-int recv_msg_memoria_cpu_init(t_buffer*, uint32_t* );
+int recv_msg_memoria_cpu_init(uint32_t* );
 
 void send_interface_kernel(/*t_interface**/);
 

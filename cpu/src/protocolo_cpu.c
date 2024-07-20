@@ -21,10 +21,13 @@ int send_msg_cpu_memoria_init(int fd)
     return EXIT_SUCCESS;
 }
 
-int recv_msg_memoria_cpu_init(t_buffer *buffer, uint32_t *page_size)
+int recv_msg_memoria_cpu_init(uint32_t *page_size)
 {
+    t_buffer *buffer = recive_full_buffer(fd_memoria);
 
     deserialize_uint32_t(buffer, 1, page_size);
+
+    buffer_destroy(buffer);
 
     return EXIT_SUCCESS;
 }
