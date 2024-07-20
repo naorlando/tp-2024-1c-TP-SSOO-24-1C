@@ -148,9 +148,9 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
     case EXIT:
     {
         log_info(logger_cpu, "EXIT\n");
-        // sem_wait(&SEM_INTERRUPT); //BINARIO
-        // interrupcion_pendiente = true;
-        // tipo_de_interrupcion = EXIT_INTERRUPT;
+        sem_wait(&SEM_INTERRUPT); //BINARIO
+        interrupcion_pendiente = true;
+        tipo_de_interrupcion = EXIT_INTERRUPT;
         enviar_pcb_finalizado();
         llego_a_exit = true;
         break;
@@ -379,7 +379,7 @@ bool manejar_interrupcion()
 
         log_info(logger_cpu, "PCB enviado al Kernel");
         send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
-        // sem_post(&SEM_INTERRUPT);
+        sem_post(&SEM_INTERRUPT);
         interrupcion_pendiente = false;
         pthread_mutex_unlock(&MUTEX_INTERRUPT);
         sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
