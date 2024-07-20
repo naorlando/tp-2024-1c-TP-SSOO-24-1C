@@ -8,176 +8,183 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
 
     switch (instruccion->name)
     {
-    case SET:
-    {
-        log_info(logger_cpu, "EJECUTANDO SET");
-        char *reg = (char *)list_get(instruccion->params, 0);
-        int value = atoi((char *)list_get(instruccion->params, 1));
-        _establecer_registro(cpu_registers, reg, value);
-        log_info(logger_cpu, "SET %s %d\n", reg, value);
-        break;
-    }
-    case MOV_IN:
-    {
-        log_info(logger_cpu, "EJECUTANDO MOV IN");
-        char *reg_datos = (char *)list_get(instruccion->params, 0);
-        char *reg_direccion = (char *)list_get(instruccion->params, 1);
-
-        uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
-
-        uint32_t valor_memoria = 0;
-        exec_mov_in(direccion_logica, reg_datos, &valor_memoria);
-        _establecer_registro(cpu_registers, reg_datos, valor_memoria);
-        log_info(logger_cpu, "MOV_IN %s %s\n", reg_datos, reg_direccion);
-        break;
-    }
-    case MOV_OUT:
-    {
-        log_info(logger_cpu, "EJECUTANDO MOV OUT");
-        char *reg_direccion = (char *)list_get(instruccion->params, 0);
-        char *reg_datos = (char *)list_get(instruccion->params, 1);
-
-        uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
-        uint32_t valor_datos = _obtener_valor_registro(cpu_registers, reg_datos);
-
-        exec_mov_out(direccion_logica, &valor_datos, obtener_tamano_registro(reg_datos));
-
-        log_info(logger_cpu, "MOV_OUT %s %s\n", reg_direccion, reg_datos);
-        break;
-    }
-    case SUM:
-    {
-        char *reg_dest = (char *)list_get(instruccion->params, 0);
-        char *reg_src = (char *)list_get(instruccion->params, 1);
-        uint8_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
-        uint8_t valor_operacion = _obtener_valor_registro(cpu_registers, reg_dest) + valor_src;
-        _establecer_registro(cpu_registers, reg_dest, valor_operacion);
-        log_info(logger_cpu, "SUM %s %s\n", reg_dest, reg_src);
-        break;
-    }
-    case SUB:
-    {
-        char *reg_dest = (char *)list_get(instruccion->params, 0);
-        char *reg_src = (char *)list_get(instruccion->params, 1);
-        uint32_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
-        uint32_t valor_operacion = _obtener_valor_registro(cpu_registers, reg_dest) - valor_src;
-        _establecer_registro(cpu_registers, reg_dest, valor_operacion);
-        log_info(logger_cpu, "SUB %s %s\n", reg_dest, reg_src);
-        break;
-    }
-    case JNZ: 
-        char *reg = (char *)list_get(instruccion->params, 0);
-        int instruction_index = atoi((char *)list_get(instruccion->params, 1));
-        uint32_t valor_reg = _obtener_valor_registro(cpu_registers, reg);
-        uint32_t valor_cero = 0;
-        if (valor_reg != valor_cero) {
-            cpu_registers->pc = instruction_index;
-            log_info(logger_cpu, "el registro %s era igual a cero, por lo tanto se salto a %d (JNZ)\n", reg, instruction_index);            
-            cambio_pc = true;   
-        }
-            log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
-        break;
-    case RESIZE:
-    {
-        log_info(logger_cpu, "EJECUTANDO RESIZE");
-        int nuevo_tamano = atoi((char *)list_get(instruccion->params, 0));
-
-        // Función para solicitar a la memoria el ajuste de tamaño
-        if (!ajustar_tamano_proceso(pcb_execute->pid, nuevo_tamano))
+        case SET:
         {
-            // TODO: Si la memoria devuelve Out of Memory, devolver el contexto al Kernel
-            
-            informar_kernel_error("Out of Memory");
+            log_info(logger_cpu, "EJECUTANDO SET");
+            char *reg = (char *)list_get(instruccion->params, 0);
+            int value = atoi((char *)list_get(instruccion->params, 1));
+            _establecer_registro(cpu_registers, reg, value);
+            log_info(logger_cpu, "SET %s %d\n", reg, value);
+            break;
         }
-        else
+        case MOV_IN:
         {
-            log_info(logger_cpu, "RESIZE %d\n", nuevo_tamano);
+            log_info(logger_cpu, "EJECUTANDO MOV IN");
+            char *reg_datos = (char *)list_get(instruccion->params, 0);
+            char *reg_direccion = (char *)list_get(instruccion->params, 1);
+
+            uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+
+            uint32_t valor_memoria = 0;
+            exec_mov_in(direccion_logica, reg_datos, &valor_memoria);
+            _establecer_registro(cpu_registers, reg_datos, valor_memoria);
+            log_info(logger_cpu, "MOV_IN %s %s\n", reg_datos, reg_direccion);
+            break;
         }
-        break;
-    }
-    case COPY_STRING:
-    {
-        int tamano = atoi((char *)list_get(instruccion->params, 0));
+        case MOV_OUT:
+        {
+            log_info(logger_cpu, "EJECUTANDO MOV OUT");
+            char *reg_direccion = (char *)list_get(instruccion->params, 0);
+            char *reg_datos = (char *)list_get(instruccion->params, 1);
 
-        uint32_t direccion_origen = cpu_registers->si;
-        uint32_t direccion_destino = cpu_registers->di;
+            uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+            uint32_t valor_datos = _obtener_valor_registro(cpu_registers, reg_datos);
 
-        copiar_cadena(direccion_origen, direccion_destino, tamano);
+            exec_mov_out(direccion_logica, &valor_datos, obtener_tamano_registro(reg_datos));
 
-        log_info(logger_cpu, "COPY_STRING %d\n", tamano);
-        break;
-    }
-    case IO_GEN_SLEEP:
-    {
-        char *interface = (char *)list_get(instruccion->params, 0);
-        int units = atoi((char *)list_get(instruccion->params, 1));
+            log_info(logger_cpu, "MOV_OUT %s %s\n", reg_direccion, reg_datos);
+            break;
+        }
+        case SUM:
+        {
+            log_info(logger_cpu, "EJECUTANDO SUM");
+            char *reg_dest = (char *)list_get(instruccion->params, 0);
+            char *reg_src = (char *)list_get(instruccion->params, 1);
+            uint8_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
+            uint8_t valor_operacion = _obtener_valor_registro(cpu_registers, reg_dest) + valor_src;
+            _establecer_registro(cpu_registers, reg_dest, valor_operacion);
+            log_info(logger_cpu, "SUM %s %s\n", reg_dest, reg_src);
+            break;
+        }
+        case SUB:
+        {
+            log_info(logger_cpu, "EJECUTANDO SUB");
+            char *reg_dest = (char *)list_get(instruccion->params, 0);
+            char *reg_src = (char *)list_get(instruccion->params, 1);
+            uint32_t valor_src = _obtener_valor_registro(cpu_registers, reg_src);
+            uint32_t valor_operacion = _obtener_valor_registro(cpu_registers, reg_dest) - valor_src;
+            _establecer_registro(cpu_registers, reg_dest, valor_operacion);
+            log_info(logger_cpu, "SUB %s %s\n", reg_dest, reg_src);
+            break;
+        }
+        case JNZ:
+        {
+            log_info(logger_cpu, "EJECUTANDO JNZ");
+            char *reg = (char *)list_get(instruccion->params, 0);
+            int instruction_index = atoi((char *)list_get(instruccion->params, 1));
+            uint32_t valor_reg = _obtener_valor_registro(cpu_registers, reg);
+            uint32_t valor_cero = 0;
+            if (valor_reg != valor_cero) {
+                cpu_registers->pc = instruction_index;
+                log_info(logger_cpu, "El registro %s era igual a cero, por lo tanto se salto a %d (JNZ)\n", reg, instruction_index);            
+                cambio_pc = true;   
+            }
+                log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
+            break;
+        }
+        case RESIZE:
+        {
+            log_info(logger_cpu, "EJECUTANDO RESIZE");
+            int nuevo_tamano = atoi((char *)list_get(instruccion->params, 0));
 
-        // Enviar el PCB al kernel con el tipo de interfaz
-        log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
-        solicitar_IO(instruccion);
-        solicitud_io = true;
-        break;
-    }
-    case WAIT:
-    {
-        log_info(logger_cpu, "WAIT\n");
-        // variable con nombre de recurso
-        char *nombre_recurso = (char *)list_get(instruccion->params, 0);
-        // logica de WAIT de un recurso:
-        // mandar mensaje a kernel para que haga cositas con el recurso
-        handle_wait_or_signal(pcb_execute, nombre_recurso, WAIT);
-        // activo flag:
-        solicitud_recurso = true;
-        break;
-    }
-    case SIGNAL:
-    {
-        log_info(logger_cpu, "SIGNAL\n");
-        // variable con nombre de recurso
-        char *nombre_recurso = (char *)list_get(instruccion->params, 0);
-        // logica de SIGNAL de un recurso:
-        // mandar mensaje a kernel para que haga cositas con el recurso
-        handle_wait_or_signal(pcb_execute, nombre_recurso, SIGNAL);
-        // activo flag:
-        solicitud_recurso = true;
-        break;
-    }
-    case IO_STDIN_READ:
-    {
-        char *interface = (char *)list_get(instruccion->params, 0);
-        char *reg_direccion = (char *)list_get(instruccion->params, 1);
-        char *reg_tamano = (char *)list_get(instruccion->params, 2);
+            // Función para solicitar a la memoria el ajuste de tamaño
+            if (!ajustar_tamano_proceso(pcb_execute->pid, nuevo_tamano))
+            {
+                // TODO: Si la memoria devuelve Out of Memory, devolver el contexto al Kernel
+                
+                informar_kernel_error("Out of Memory");
+            }
+            else
+            {
+                log_info(logger_cpu, "RESIZE %d\n", nuevo_tamano);
+            }
+            break;
+        }
+        case COPY_STRING:
+        {
+            log_info(logger_cpu, "EJECUTANDO COPY_STRING");
+            int tamano = atoi((char *)list_get(instruccion->params, 0));
 
-        // Enviar el PCB al kernel con el tipo de interfaz
-        log_info(logger_cpu, "IO_STDIN_READ %s %s %s\n", interface, reg_direccion, reg_tamano);
-        solicitar_IO(instruccion);
-        solicitud_io = true;
-        break;
-    }
-    case IO_STDOUT_WRITE:
-    {
-        char *interface = (char *)list_get(instruccion->params, 0);
-        int units = atoi((char *)list_get(instruccion->params, 1));
+            uint32_t direccion_origen = cpu_registers->si;
+            uint32_t direccion_destino = cpu_registers->di;
 
-        // Enviar el PCB al kernel con el tipo de interfaz
-        log_info(logger_cpu, "IO_STDOUT_WRITE %s %d\n", interface, units);
-        solicitar_IO(instruccion);
-        solicitud_io = true;
-        break;
-    }
-    case EXIT:
-    {
-        log_info(logger_cpu, "EXIT\n");
-        // sem_wait(&SEM_INTERRUPT); //BINARIO
-        // interrupcion_pendiente = true;
-        // tipo_de_interrupcion = EXIT_INTERRUPT;
-        enviar_pcb_finalizado();
-        llego_a_exit = true;
-        break;
-    }
-    default:
-        printf("Instrucción no reconocida\n");
-        break;
+            copiar_cadena(direccion_origen, direccion_destino, tamano);
+
+            log_info(logger_cpu, "COPY_STRING %d\n", tamano);
+            break;
+        }
+        case IO_GEN_SLEEP:
+        {
+            char *interface = (char *)list_get(instruccion->params, 0);
+            int units = atoi((char *)list_get(instruccion->params, 1));
+
+            // Enviar el PCB al kernel con el tipo de interfaz
+            log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
+            solicitar_IO(instruccion);
+            solicitud_io = true;
+            break;
+        }
+        case WAIT:
+        {
+            log_info(logger_cpu, "EJECUTANDO WAIT\n");
+            // variable con nombre de recurso
+            char *nombre_recurso = (char *)list_get(instruccion->params, 0);
+            // logica de WAIT de un recurso:
+            // mandar mensaje a kernel para que haga cositas con el recurso
+            handle_wait_or_signal(pcb_execute, nombre_recurso, WAIT);
+            // activo flag:
+            solicitud_recurso = true;
+            break;
+        }
+        case SIGNAL:
+        {
+            log_info(logger_cpu, "EJECUTANDO SIGNAL\n");
+            // variable con nombre de recurso
+            char *nombre_recurso = (char *)list_get(instruccion->params, 0);
+            // logica de SIGNAL de un recurso:
+            // mandar mensaje a kernel para que haga cositas con el recurso
+            handle_wait_or_signal(pcb_execute, nombre_recurso, SIGNAL);
+            // activo flag:
+            solicitud_recurso = true;
+            break;
+        }
+        case IO_STDIN_READ:
+        {
+            log_info(logger_cpu, "EJECUTANDO IO_STDIN_READ\n");
+            char *interface = (char *)list_get(instruccion->params, 0);
+            char *reg_direccion = (char *)list_get(instruccion->params, 1);
+            char *reg_tamano = (char *)list_get(instruccion->params, 2);
+
+            // Enviar el PCB al kernel con el tipo de interfaz
+            log_info(logger_cpu, "IO_STDIN_READ %s %s %s\n", interface, reg_direccion, reg_tamano);
+            solicitar_IO(instruccion);
+            solicitud_io = true;
+            break;
+        }
+        case IO_STDOUT_WRITE:
+        {
+            log_info(logger_cpu, "EJECUTANDO IO_STDOUT_WRITE\n");
+            char *interface = (char *)list_get(instruccion->params, 0);
+            int units = atoi((char *)list_get(instruccion->params, 1));
+
+            // Enviar el PCB al kernel con el tipo de interfaz
+            log_info(logger_cpu, "IO_STDOUT_WRITE %s %d\n", interface, units);
+            solicitar_IO(instruccion);
+            solicitud_io = true;
+            break;
+        }
+        case EXIT:
+        { 
+            log_info(logger_cpu, "EJECUTANDO EXIT\n");
+            enviar_pcb_finalizado();
+            llego_a_exit = true;
+            break;
+        }
+        default:
+        {
+            printf("Instrucción no reconocida\n");
+            break;
+        }
     }
 }
 
@@ -239,12 +246,6 @@ uint32_t* _obtener_registro(t_cpu_registers *registros, const char *nombre) {
     return NULL;
 }
 
-
-// Función para establecer el valor de un registro
-// void _establecer_registro(t_cpu_registers *registros, const char *nombre, uint32_t valor) {
-//     uint32_t *reg = _obtener_registro(registros, nombre);
-//     if (reg) *reg = valor;
-// }
 void _establecer_registro(t_cpu_registers *registros, char *nombre, uint32_t valor) {
     if (strcmp(nombre, "PC") == 0) {
         registros->pc = valor;
@@ -269,13 +270,6 @@ uint32_t _obtener_valor_registro(t_cpu_registers *registros, char *nombre)
     uint32_t *reg = _obtener_registro(registros, nombre);
     return reg ? *reg : 0;
 }
-
-// #############################################################################################################
-// TP:
-// Es importante tener en cuenta las siguientes aclaraciones:
-// Una dirección lógica se traduce a una dirección física, pero al copiar un string/registro a memoria,
-// podría estar presente en más de una página (ver sección de MMU).
-// #############################################################################################################
 
 void informar_kernel_error(const char *mensaje)
 {
@@ -402,40 +396,38 @@ bool manejar_interrupcion()
 
 void solicitar_IO(t_instruction *instruccion)
 {
-    // t_interface interface = create_interface(pcb_execute, instruccion);
-    // send_interface_kernel(/*interface*/);
     aumentar_program_counter();
     cargar_contexto_ejecucion_a_pcb(pcb_execute);
 
     switch (obtener_nombre_instruccion(instruccion))
     {
-    case IO_GEN_SLEEP:
-        send_solicitud_io_generica_kernel(pcb_execute, instruccion);
-        break;
-    case IO_STDIN_READ:
-        send_solicitud_io_stdin_kernel(pcb_execute,instruccion);
-        break;
-    case IO_STDOUT_WRITE:
+        case IO_GEN_SLEEP:
+            send_solicitud_io_generica_kernel(pcb_execute, instruccion);
+            break;
+        case IO_STDIN_READ:
+            send_solicitud_io_stdin_kernel(pcb_execute,instruccion);
+            break;
+        case IO_STDOUT_WRITE:
 
-        break;
-    case IO_FS_CREATE:
+            break;
+        case IO_FS_CREATE:
 
-        break;
-    case IO_FS_DELETE:
+            break;
+        case IO_FS_DELETE:
 
-        break;
-    case IO_FS_TRUNCATE:
+            break;
+        case IO_FS_TRUNCATE:
 
-        break;
-    case IO_FS_WRITE:
+            break;
+        case IO_FS_WRITE:
 
-        break;
-    case IO_FS_READ:
+            break;
+        case IO_FS_READ:
 
-        break;
-    default:
+            break;
+        default:
 
-        break;
+            break;
     }
     log_info(logger_cpu, "El PCB de pid <%d> se envio al KERNEL para solicitar una IO", pcb_execute->pid);
     sem_post(&SEM_SOCKET_KERNEL_DISPATCH);
@@ -508,7 +500,6 @@ void aumentar_program_counter()
 
 void handle_wait_or_signal(t_PCB *pcb, char *resource_name, t_name_instruction tipo_de_interrupcion)
 {
-
     t_msg_header msg_header;
     if (tipo_de_interrupcion == WAIT)
     {
