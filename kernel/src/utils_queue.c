@@ -57,6 +57,7 @@ t_PCB* siguiente_pcb_cola_new()
 
 t_PCB *get_next_pcb_ready_to_exec()
 {
+    sem_wait(&SEM_CPU);
     sem_wait(&SEM_READY); // Espera a que haya un PCB en la cola de READY
     t_PCB *pcb_a_tomar;
 
@@ -70,6 +71,7 @@ t_PCB *get_next_pcb_ready_to_exec()
 }
 
 t_PCB *get_next_pcb_aux_ready_to_exec(){
+    sem_wait(&SEM_CPU);
     sem_wait(&SEM_AUX_READY); // Espera a que haya un PCB en la cola de READY
     t_PCB *pcb_a_tomar;
 
@@ -85,8 +87,8 @@ t_PCB *get_next_pcb_aux_ready_to_exec(){
 void agregar_a_cola_aux_ready(t_PCB* pcb) 
 {
     pthread_mutex_lock(&MUTEX_AUX_READY);
-        pcb->state = READY;
-        queue_push(COLA_AUX_READY, pcb);
+    pcb->state = READY;
+    queue_push(COLA_AUX_READY, pcb);
     pthread_mutex_unlock(&MUTEX_AUX_READY);
 
     // LOG obligatorio:
@@ -121,9 +123,9 @@ void agregar_de_blocked_a_ready(t_PCB* pcb)
 void agregar_a_cola_exit(t_PCB* pcb)
 {
     pthread_mutex_lock(&MUTEX_EXIT);
-        pcb->state = FINISHED;
-        queue_push(COLA_EXIT, pcb);
-        //log_debug(logger_kernel, "Se agregó el proceso %d a la cola EXIT", pcb->pid);
+    pcb->state = FINISHED;
+    queue_push(COLA_EXIT, pcb);
+    //log_debug(logger_kernel, "Se agregó el proceso %d a la cola EXIT", pcb->pid);
     pthread_mutex_unlock(&MUTEX_EXIT);
 
     sem_post(&SEM_EXIT);
@@ -142,10 +144,8 @@ t_PCB *get_next_pcb_exit()
 
     return pcb_a_tomar;
 }
-\
 
 // FUNCIONES AUXILIARES: TODO: llevar a modulo correspondiente
-
 void mostrar_elementos_de_cola(t_queue *COLA, char *nombre_cola) 
 {
 
