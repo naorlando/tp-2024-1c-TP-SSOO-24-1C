@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "*.c": "c",
+        "list.h": "c",
+        "tlb.h": "c",
+        "request_memory.h": "c",
+        "instruccion.h": "c",
+        "io_frames_lib.h": "c",
+        "protocolo_cpu.h": "c",
+        "solicitudes_io.h": "c",
+        "protocolo.h": "c",
+        "manager_dispatch.h": "c"
+    }
+}
