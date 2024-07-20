@@ -290,21 +290,21 @@ void f_finalizar_proceso(u_int32_t pid){
 }
 
 void f_iniciar_planificacion(){
-    if(!planificador_status){
-    //printf("iniciar_planificacion \n");
-    planificador_status = true;
+    if(!planificador_status)
+    {
+        planificador_status = true;
 
-    sem_post(&SEM_PLANIFICACION_NEW_READY_INICIADA);
-    sem_post(&SEM_PLANIFICACION_READY_INICIADA);
-    sem_post(&SEM_PLANIFICACION_EXEC_INICIADA);
-    sem_post(&SEM_PLANIFICACION_BLOCKED_INICIADA);
+        sem_post(&SEM_PLANIFICACION_NEW_READY_INICIADA);
+        sem_post(&SEM_PLANIFICACION_READY_INICIADA);
+        sem_post(&SEM_PLANIFICACION_EXEC_INICIADA);
+        sem_post(&SEM_PLANIFICACION_BLOCKED_INICIADA);
 
-    log_info(logger_kernel, "Planificación %s iniciada", obtener_algoritmo_planificacion(kernel_config));
+        log_info(logger_kernel, "Planificación %s iniciada", obtener_algoritmo_planificacion(kernel_config));
     }
 }
 
 void f_detener_planificacion(){
-    //printf("detener_planificador \n");
+    
     if(planificador_status)
     {
         planificador_status = false;

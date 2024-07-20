@@ -57,8 +57,6 @@ t_PCB* siguiente_pcb_cola_new()
 
 t_PCB *get_next_pcb_ready_to_exec()
 {
-    sem_wait(&SEM_PLANIFICACION_EXEC_INICIADA);
-
     sem_wait(&SEM_READY); // Espera a que haya un PCB en la cola de READY
     t_PCB *pcb_a_tomar;
 
@@ -67,8 +65,6 @@ t_PCB *get_next_pcb_ready_to_exec()
     pthread_mutex_lock(&MUTEX_READY);
         pcb_a_tomar = queue_pop(COLA_READY);
     pthread_mutex_unlock(&MUTEX_READY);
-
-    sem_post(&SEM_PLANIFICACION_EXEC_INICIADA);
 
     return pcb_a_tomar;
 }

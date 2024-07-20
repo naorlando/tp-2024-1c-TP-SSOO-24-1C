@@ -155,9 +155,10 @@ void blocked()
 
 void pcb_execute( t_PCB* pcb)
 {
-    //log_info(logger_kernel, "Se prepara para ejecutar el PCB con PID: <%d>", pcb->pid);
+    log_info(logger_kernel, "Se prepara para ejecutar el PCB con PID: <%d>", pcb->pid);
     
     sem_wait(&SEM_CPU);
+    sem_wait(&SEM_PLANIFICACION_EXEC_INICIADA);
 
     pthread_mutex_lock(&MUTEX_EXECUTE);
         EXECUTE = pcb;
@@ -165,5 +166,6 @@ void pcb_execute( t_PCB* pcb)
         send_pcb_cpu(pcb);
     pthread_mutex_unlock(&MUTEX_EXECUTE);
 
+    sem_post(&SEM_PLANIFICACION_EXEC_INICIADA);
     log_info(logger_kernel, "PID: %d - Estado Anterior: %s - Estado Actual: %s", pcb->pid, "READY", "EXEC");
 }
