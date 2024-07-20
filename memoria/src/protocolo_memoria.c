@@ -182,3 +182,10 @@ int send_msg_cpu_memoria_resize(uint8_t resize_response, int fd)
 
     return EXIT_SUCCESS;
 }
+
+int recv_msg_cpu_memoria_handshake(t_buffer *buffer, uint32_t *handshake)
+{
+    deserialize_uint32_t(buffer, 1, handshake);
+
+    return EXIT_SUCCESS;
+}

@@ -13,7 +13,7 @@ bool *bitarray_marcos_de_memoria;
 pthread_mutex_t MUTEX_BIT_ARRAY_MEMORY;
 pthread_mutex_t MUTEX_MEMORY_SPACE;
 bool is_structure_created = false;
-
+bool handshake_cpu = false;
 
 int fd_server;
 int fd_entradasalida;

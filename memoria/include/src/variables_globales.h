@@ -45,4 +45,7 @@ extern int fd_kernel;
 //PORTS
 extern char* server_port;
 
+//HANDSHAKE
+extern bool handshake_cpu;
+
 #endif /*VARIABLES_GLOBALES_H_*/
