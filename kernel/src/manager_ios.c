@@ -127,3 +127,8 @@ t_IO_connection* recibir_io_connection(int cliente_io)
     }
     return NULL;
 }
+
+void proceso_solicita_io(void* solicitud)
+{
+    
+}

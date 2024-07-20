@@ -23,4 +23,6 @@ void agregar_IO_connection(t_IO_connection*);
 t_IO_connection* nuevo_IO_cliente_conectado(int);
 t_IO_connection* recibir_io_connection(int);
 
+void proceso_solicita_io(void*);
+
 #endif //MANAGER_IOS_H_
