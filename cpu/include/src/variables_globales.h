@@ -27,6 +27,7 @@ extern t_name_interruption tipo_de_interrupcion;
 extern bool llego_a_exit;
 extern bool solicitud_io;
 extern bool solicitud_recurso;
+extern bool cambio_pc;
 
 
 // Variables globales

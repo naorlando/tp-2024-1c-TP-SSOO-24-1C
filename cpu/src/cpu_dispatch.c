@@ -65,22 +65,18 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         log_info(logger_cpu, "SUB %s %s\n", reg_dest, reg_src);
         break;
     }
-    case JNZ:
-    {
+    case JNZ: 
         char *reg = (char *)list_get(instruccion->params, 0);
         int instruction_index = atoi((char *)list_get(instruccion->params, 1));
         uint32_t valor_reg = _obtener_valor_registro(cpu_registers, reg);
         uint32_t valor_cero = 0;
-        if (valor_reg != valor_cero)
-        {
+        if (valor_reg != valor_cero) {
             cpu_registers->pc = instruction_index;
-            log_info(logger_cpu, "el registro %s era igual a cero, por lo tanto se salto a %d (JNZ)\n", reg, instruction_index);
-            // le restamos uno al PC ya que al finalizar Execute se le va a sumar 1 al PC: entonces esto se cancela.
-            cpu_registers->pc--;
+            log_info(logger_cpu, "el registro %s era igual a cero, por lo tanto se salto a %d (JNZ)\n", reg, instruction_index);            
+            cambio_pc = true;   
         }
-        log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
+            log_info(logger_cpu, "JNZ %s %d\n", reg, instruction_index);
         break;
-    }
     case RESIZE:
     {
         log_info(logger_cpu, "EJECUTANDO RESIZE");
@@ -226,7 +222,10 @@ uint32_t* _obtener_registro(t_cpu_registers *registros, const char *nombre) {
 //     if (reg) *reg = valor;
 // }
 void _establecer_registro(t_cpu_registers *registros, char *nombre, uint32_t valor) {
-    if (strcmp(nombre, "PC") == 0) registros->pc = valor;
+    if (strcmp(nombre, "PC") == 0) {
+        registros->pc = valor;
+        cambio_pc = true;
+    }    
     if (strcmp(nombre, "AX") == 0) registros->ax = valor;
     if (strcmp(nombre, "BX") == 0) registros->bx = valor;
     if (strcmp(nombre, "CX") == 0) registros->cx = valor;
@@ -470,8 +469,14 @@ void enviar_pcb_finalizado()
     }
 }
 
-void aumentar_program_counter()
-{
+void aumentar_program_counter() 
+{   
+    // si se toca el pc, ya sea por SET o por JNZ...
+    if(cambio_pc){
+        cambio_pc = false;
+        pcb_execute->program_counter = cpu_registers->pc;
+        return;
+    }
     // actualizar PC:
     cpu_registers->pc++;
     pcb_execute->program_counter = cpu_registers->pc;
