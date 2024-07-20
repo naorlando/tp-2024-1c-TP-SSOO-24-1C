@@ -9,6 +9,7 @@
 #include "cpu_config.h"
 #include <semaphore.h>
 #include <pthread.h>
+#include "inicializar_tlb.h"
 
 
 #define SERVERNAME "CPU"
@@ -30,6 +31,8 @@ extern bool solicitud_recurso;
 
 // Variables globales
 
+//TLB
+extern t_list* TLB_list; 
 
 //PAGES
 extern uint32_t page_size;

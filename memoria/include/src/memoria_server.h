@@ -6,11 +6,14 @@
 #include "utils/sockets.h"
 #include "utils/buffer.h"
 #include "utils/estructuras.h"
-#include "memoria_config.h"
 #include "protocolo_memoria.h"
 #include <commons/log.h>
 #include <commons/string.h>
 #include <pthread.h>
+
+#include "memoria_config.h"
+#include "tabla_paginas.h"
+#include "memoria_espacio.h"
 
 void requests_cpu();
 
@@ -22,11 +25,13 @@ void levantar_servidor();
 
 void esperar_clientes();
 
-int process_message_cpu_data_read(t_buffer *buffer);
+int process_message_cpu_page();
 
-int process_message_cpu_data_write(t_buffer *buffer);
+int process_message_cpu_data_read();
 
-int process_message_cpu_resize(t_buffer *buffer);
+int process_message_cpu_data_write();
+
+int process_message_cpu_resize();
 
 void crear_hilos_conexiones();
 

@@ -1,8 +1,11 @@
 #include "memoria_server.h"
 
+
+
 void requests_cpu()
 {
     bool esperar = true;
+    // TODO SACAR ESTO APARTE
     t_package *packageHandshake = package_create(NULL_HEADER, sizeof(uint32_t));
     package_recv(packageHandshake, fd_cpu);
     if (packageHandshake->msg_header != MSG_CPU_MEMORIA_INIT)
@@ -12,12 +15,11 @@ void requests_cpu()
     }
     send_msg_memoria_cpu_init(memoria_config->TAM_PAGINA, fd_cpu);
     package_destroy(packageHandshake);
-
+    // ---------------------------
     while (esperar)
     {
         int cod_operacion = recibir_operacion(fd_cpu);
-        t_package *package = package_create(NULL_HEADER,sizeof(sizeof(uint32_t)));
-        package_recv(package, fd_cpu);
+
         switch (cod_operacion)
         {
         case EXAMPLE:
@@ -25,8 +27,8 @@ void requests_cpu()
             recv_example_msg_cpu();
             // esperar = false; //Cortamos la espera de solicitudes
             break;
-            case MSG_NEXT_INSTRUCTION_CPU:
-                t_next_instruction* next = recv_next_instruction_cpu();
+        case MSG_NEXT_INSTRUCTION_CPU:
+            t_next_instruction *next = recv_next_instruction_cpu();
 
             if (next == NULL)
             {
@@ -45,45 +47,31 @@ void requests_cpu()
 
                 if (instruction != NULL)
                 {
-                    send_instrution(instruction);
+                    send_instrution_cpu(instruction);
                 }
-
-                t_proceso* proceso = obtener_proceso(obtener_pid_process(next));
-
-                if(proceso == NULL) {
-                    log_error(logger_memoria, "ERROR: Ha surgido un problema al buscar el proceso en la memoria.");
-                }else{
-                    t_instruction* instruction = obtener_siguiente_instruccion(proceso, obtener_pc_process(next));
-
-                    if(instruction != NULL){
-                        send_instrution_cpu(instruction);
-                    }
-                }
-            break;                     
-            case MSG_CPU_MEMORIA:
-
-                log_info(logger_memoria, "Se recibio un mje del cpu");
+            }
             break;
+
         case MSG_CPU_MEMORIA:
 
             log_info(logger_memoria, "Se recibio un mje del cpu");
             break;
 
-            // case MSG_CPU_MEMORIA_PAGE:
-            //     process_message_cpu_page(package->buffer);
-            //     break;
+        case MSG_CPU_MEMORIA_PAGE:
+            process_message_cpu_page();
+            break;
 
         case MSG_CPU_MEMORIA_DATA_READ:
-            process_message_cpu_data_read(package->buffer);
+            process_message_cpu_data_read();
             break;
 
         case MSG_CPU_MEMORIA_DATA_WRITE:
-            process_message_cpu_data_write(package->buffer);
+            process_message_cpu_data_write();
             break;
 
         case MSG_CPU_MEMORIA_RESIZE:
-            process_message_cpu_resize(package->buffer);
-            break;    
+            process_message_cpu_resize();
+            break;
         case -1:
             log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
             esperar = false; // Cortamos la espera de solicitudes
@@ -92,8 +80,6 @@ void requests_cpu()
             log_warning(logger_memoria, "WARNING: El modulo de memoria ha recibido una solicitud con una operacion desconocida");
             break;
         }
-
-        package_destroy(package);
     }
 }
 
@@ -121,7 +107,7 @@ void requests_kernel()
 
         case MSG_KERNEL_CREATE_PROCESS:
 
-                t_new_process* new_process= recv_new_process_kernel();
+            t_new_process *new_process = recv_new_process_kernel();
 
             if (new_process == NULL)
             {
@@ -167,11 +153,10 @@ void requests_entradasalida(void *cliente_socket)
             recv_example_msg_entradasalida();
             // esperar = false; //Cortamos la espera de solicitudes
             break;
-        // TODO:
-        /*
-            Agregar operaciones a las que dara servicio el modulo
-        */
-   
+            // TODO:
+            /*
+                Agregar operaciones a las que dara servicio el modulo
+            */
 
         case -1:
             log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
@@ -284,60 +269,81 @@ void _cerrar_puertos()
     free(server_port);
 }
 
-// MSG_CPU_MEMORIA_DATA_READ
-int process_message_cpu_data_read(t_buffer *buffer)
+// MSG_CPU_MEMORIA_PAGE
+int process_message_cpu_page()
 {
+    t_buffer *buffer = recive_full_buffer(fd_cpu);
+    uint32_t pid = 0;
+    uint32_t page_number = 0;
+    recv_msg_cpu_memoria_page(buffer, &pid, &page_number);
+    t_entrada_tabla_de_paginas *pagina = get_page_data(pid, page_number);
+    send_msg_memoria_cpu(fd_cpu, pagina->frame);
+    return 0;
+}
 
+// MSG_CPU_MEMORIA_DATA_READ
+int process_message_cpu_data_read()
+{
+    t_buffer *buffer = recive_full_buffer(fd_cpu);
     uint32_t pid = 0;
     uint32_t page_number = 0;
     uint32_t frame = 0;
     uint32_t offset = 0;
+    uint32_t size_value = 0;
 
-    recv_msg_cpu_memoria_data_read(buffer, &pid, &page_number, &frame, &offset);
-    t_entrada_tabla_de_paginas* pagina = get_page_data(pid, page_number);
-    pagina->uso = 1;
-    uint32_t value = read_data(frame, offset);
-    send_msg_memoria_cpu_data_read(value, fd_cpu);
+    recv_msg_cpu_memoria_data_read(buffer, &pid, &frame, &offset, &size_value);
+    // t_entrada_tabla_de_paginas *pagina = get_page_data(pid, page_number);
+    // pagina->uso = 1;
+    void *value = read_data(frame, offset, size_value);
 
-    log_info(logger_memoria, "PID: %u - Accion: LEER <%u> - Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u", pid, value, page_number, frame, offset);
+    send_msg_memoria_cpu_data_read(value, size_value, fd_cpu);
+
+    log_info(logger_memoria, "PID: %u - Accion: LEER <%u> BYTES - Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u", pid, size_value, page_number, frame, offset);
+    buffer_destroy(buffer);
+    free(value);
     return 0;
 }
 
 // MSG_CPU_MEMORIA_DATA_WRITE
-int process_message_cpu_data_write(t_buffer *buffer)
+int process_message_cpu_data_write()
 {
-
+    t_buffer *buffer = recive_full_buffer(fd_cpu);
     uint32_t pid = 0;
     uint32_t page_number = 0;
     uint32_t frame = 0;
     uint32_t offset = 0;
-    uint32_t value = 0;
+    uint32_t value_size = 0;
 
-    recv_msg_cpu_memoria_data_write(buffer, &pid, &page_number, &frame, &offset, &value);
-    t_entrada_tabla_de_paginas* pagina = get_page_data(pid, page_number);
+    recv_msg_cpu_memoria_data_write(buffer, &pid, &page_number, &frame, &offset, &value_size);
+
+    void *value = malloc(value_size);
+    buffer_read_data(buffer, value, value_size);
+    t_entrada_tabla_de_paginas *pagina = get_page_data(pid, page_number);
     pagina->uso = 1;
     pagina->modificado = 1;
-    write_data(frame, offset, value);
+    write_data(frame, offset, value, value_size);
 
-    log_info(logger_memoria, "PID: %u - Accion: ESCRIBIR <%u> - Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u",
-             pid, value, page_number, frame, offset);
+    log_info(logger_memoria, "PID: %u - Accion: ESCRIBIR <%u> BYTES- Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u",
+             pid, value_size, page_number, frame, offset);
+    buffer_destroy(buffer);
+    free(value);
     return 0;
 }
 
-//RESIZE
-int process_message_cpu_resize(t_buffer *buffer)
+// RESIZE
+int process_message_cpu_resize()
 {
-
+    t_buffer *buffer = recive_full_buffer(fd_cpu);
     uint32_t pid = 0;
     uint32_t new_size;
 
     recv_msg_cpu_memoria_resize(buffer, &pid, &new_size);
-    bool resize_response = resize(pid, new_size);
-    send_msg_cpu_memoria_resize(resize_response,fd_cpu);
-   
+    uint8_t resize_response = resize(pid, new_size);
+    send_msg_cpu_memoria_resize(resize_response, fd_cpu);
 
     log_info(logger_memoria, "PID: %u - Accion: RESIZE - Nuevo tamaño (<%u>)",
              pid, new_size);
+    buffer_destroy(buffer);
     return 0;
 }
 

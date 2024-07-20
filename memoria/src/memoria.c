@@ -3,7 +3,7 @@
 int main(void)
 {
     init();
-
+   
     levantar_servidor();
 
     esperar_clientes();

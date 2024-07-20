@@ -10,6 +10,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
     {
     case SET:
     {
+        log_info(logger_cpu, "EJECUTANDO SET");
         char *reg = (char *)list_get(instruccion->params, 0);
         int value = atoi((char *)list_get(instruccion->params, 1));
         _establecer_registro(cpu_registers, reg, value);
@@ -18,6 +19,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
     }
     case MOV_IN:
     {
+        log_info(logger_cpu, "EJECUTANDO MOV IN");
         char *reg_datos = (char *)list_get(instruccion->params, 0);
         char *reg_direccion = (char *)list_get(instruccion->params, 1);
 
@@ -25,19 +27,20 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
 
         uint32_t valor_memoria = 0;
         exec_mov_in(direccion_logica, reg_datos, &valor_memoria);
-
+        _establecer_registro(cpu_registers, reg_datos, valor_memoria);
         log_info(logger_cpu, "MOV_IN %s %s\n", reg_datos, reg_direccion);
         break;
     }
     case MOV_OUT:
     {
+        log_info(logger_cpu, "EJECUTANDO MOV OUT");
         char *reg_direccion = (char *)list_get(instruccion->params, 0);
         char *reg_datos = (char *)list_get(instruccion->params, 1);
 
         uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
         uint32_t valor_datos = _obtener_valor_registro(cpu_registers, reg_datos);
 
-        exec_mov_out(direccion_logica, valor_datos, obtener_tamano_registro(reg_datos));
+        exec_mov_out(direccion_logica, &valor_datos, obtener_tamano_registro(reg_datos));
 
         log_info(logger_cpu, "MOV_OUT %s %s\n", reg_direccion, reg_datos);
         break;
@@ -80,6 +83,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
     }
     case RESIZE:
     {
+        log_info(logger_cpu, "EJECUTANDO RESIZE");
         int nuevo_tamano = atoi((char *)list_get(instruccion->params, 0));
 
         // Función para solicitar a la memoria el ajuste de tamaño
@@ -112,8 +116,43 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         int units = atoi((char *)list_get(instruccion->params, 1));
 
         // Enviar el PCB al kernel con el tipo de interfaz
-        solicitar_IO(instruccion);
         log_info(logger_cpu, "IO_GEN_SLEEP %s %d\n", interface, units);
+        solicitar_IO(instruccion);
+        solicitud_io = true;
+        break;
+    }
+    case WAIT:
+    {
+        log_info(logger_cpu, "WAIT\n");
+        // variable con nombre de recurso
+        char *nombre_recurso = (char *)list_get(instruccion->params, 0);
+        // logica de WAIT de un recurso:
+        // mandar mensaje a kernel para que haga cositas con el recurso
+        handle_wait_or_signal(pcb_execute, nombre_recurso, WAIT);
+        // activo flag:
+        solicitud_recurso = true;
+        break;
+    }
+    case SIGNAL:
+    {
+        log_info(logger_cpu, "SIGNAL\n");
+        // variable con nombre de recurso
+        char *nombre_recurso = (char *)list_get(instruccion->params, 0);
+        // logica de SIGNAL de un recurso:
+        // mandar mensaje a kernel para que haga cositas con el recurso
+        handle_wait_or_signal(pcb_execute, nombre_recurso, SIGNAL);
+        // activo flag:
+        solicitud_recurso = true;
+        break;
+    }
+    case EXIT:
+    {
+        log_info(logger_cpu, "EXIT\n");
+        // sem_wait(&SEM_INTERRUPT); //BINARIO
+        // interrupcion_pendiente = true;
+        // tipo_de_interrupcion = EXIT_INTERRUPT;
+        enviar_pcb_finalizado();
+        llego_a_exit = true;
         break;
     }
     default:
@@ -224,7 +263,6 @@ uint32_t _obtener_valor_registro(t_cpu_registers *registros, char *nombre)
     return reg ? *reg : 0;
 }
 
-
 // #############################################################################################################
 // TP:
 // Es importante tener en cuenta las siguientes aclaraciones:
@@ -237,8 +275,6 @@ void informar_kernel_error(const char *mensaje)
     // TODO: Implementa la lógica para informar al Kernel sobre un error.
     printf("Kernel error: %s\n", mensaje);
 }
-
-
 
 void solicitar_instruccion(uint32_t pid, uint32_t pc)
 {
@@ -269,13 +305,13 @@ void manejar_ciclo_de_instruccion()
     log_info(logger_cpu, "antes: AX: %u", cpu_registers->ax);
     log_info(logger_cpu, "antes: BX: %u", cpu_registers->bx);
     log_info(logger_cpu, "antes: CX: %u", cpu_registers->cx);
-    // log_info(logger_cpu, "antes: DX: %u", cpu_registers->dx);
-    // log_info(logger_cpu, "antes: EAX: %u", cpu_registers->eax);
-    // log_info(logger_cpu, "antes: EBX: %u", cpu_registers->ebx);
-    // log_info(logger_cpu, "antes: ECX: %u", cpu_registers->ecx);
-    // log_info(logger_cpu, "antes: EDX: %u", cpu_registers->edx);
-    // log_info(logger_cpu, "antes: SI: %u", cpu_registers->si);
-    // log_info(logger_cpu, "antes: DI: %u", cpu_registers->di);
+    log_info(logger_cpu, "antes: DX: %u", cpu_registers->dx);
+    log_info(logger_cpu, "antes: EAX: %u", cpu_registers->eax);
+    log_info(logger_cpu, "antes: EBX: %u", cpu_registers->ebx);
+    log_info(logger_cpu, "antes: ECX: %u", cpu_registers->ecx);
+    log_info(logger_cpu, "antes: EDX: %u", cpu_registers->edx);
+    log_info(logger_cpu, "antes: SI: %u", cpu_registers->si);
+    log_info(logger_cpu, "antes: DI: %u", cpu_registers->di);
 
     // EXECUTE: Ejecuto la instruccion recibida
     ejecutar_instruccion(instruccion, cpu_registers);
@@ -284,13 +320,13 @@ void manejar_ciclo_de_instruccion()
     log_info(logger_cpu, "despues: AX: %u", cpu_registers->ax);
     log_info(logger_cpu, "despues: BX: %u", cpu_registers->bx);
     log_info(logger_cpu, "despues: CX: %u", cpu_registers->cx);
-    // log_info(logger_cpu, "despues: DX: %u", cpu_registers->dx);
-    // log_info(logger_cpu, "despues: EAX: %u", cpu_registers->eax);
-    // log_info(logger_cpu, "despues: EBX: %u", cpu_registers->ebx);
-    // log_info(logger_cpu, "despues: ECX: %u", cpu_registers->ecx);
-    // log_info(logger_cpu, "despues: EDX: %u", cpu_registers->edx);
-    // log_info(logger_cpu, "despues: SI: %u", cpu_registers->si);
-    // log_info(logger_cpu, "despues: DI: %u", cpu_registers->di);
+    log_info(logger_cpu, "despues: DX: %u", cpu_registers->dx);
+    log_info(logger_cpu, "despues: EAX: %u", cpu_registers->eax);
+    log_info(logger_cpu, "despues: EBX: %u", cpu_registers->ebx);
+    log_info(logger_cpu, "despues: ECX: %u", cpu_registers->ecx);
+    log_info(logger_cpu, "despues: EDX: %u", cpu_registers->edx);
+    log_info(logger_cpu, "despues: SI: %u", cpu_registers->si);
+    log_info(logger_cpu, "despues: DI: %u", cpu_registers->di);
 
     eliminar_instruccion(instruccion);
 
@@ -327,7 +363,7 @@ void manejar_ciclo_de_instruccion()
         return;
 
     // SOlo para seguir el flujo
-    log_info(logger_cpu, "El PCB de pid <%d> solicito la siguiente intruccion a memoria con el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
+    // log_info(logger_cpu, "El PCB de pid <%d> solicito la siguiente intruccion a memoria con el pc en <%d>", pcb_execute->pid, pcb_execute->program_counter);
 
     // TODO: Se debe actualizar el PC antes de pedir la siguiente instruccion a memoria
     solicitar_instruccion(pcb_execute->pid, pcb_execute->program_counter);

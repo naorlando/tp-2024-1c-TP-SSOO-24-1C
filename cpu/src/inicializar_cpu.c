@@ -12,6 +12,8 @@ int fd_kernel_dispatch;
 int fd_kernel_interrupt;
 int fd_memoria;
 
+t_list* TLB_list; 
+
 t_cpu_registers* cpu_registers;
 bool interrupcion_pendiente= false;
 t_name_interruption tipo_de_interrupcion;
@@ -37,6 +39,7 @@ void init(){
     _iniciar_logger();
     _iniciar_config();
     _init_cpu_registers();
+    inicializar_TLB(cpu_config->CANTIDAD_ENTRADAS_TLB, &TLB_list);
     imprimir_config();
     initializeSemaphores(); // TODO: Revisar si sirve
     initialize_mutexes();
@@ -101,6 +104,10 @@ void _iniciar_config(){
 
 }
 
+
+
 void imprimir_config() {
     log_trace(logger_cpu_debug, "PUERTO DE ESCUCHA DE LA CPU: %d", obtener_puerto_escucha_dispatch(cpu_config));
 }
+
+

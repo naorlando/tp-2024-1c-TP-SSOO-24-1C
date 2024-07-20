@@ -106,19 +106,10 @@ int send_msg_memoria_cpu_init(uint32_t page_size, int fd)
 // --   PAGE & FRAME   --
 
 // CPU -> MEMORIA :: MSG_CPU_MEMORIA_PAGE
-int recv_msg_cpu_memoria_page(t_buffer *buffer, uint32_t *pid, uint32_t *page_table_id, uint32_t *page)
+int recv_msg_cpu_memoria_page(t_buffer *buffer, uint32_t *pid, uint32_t *page)
 {
 
-    deserialize_uint32_t(buffer, 3, pid, page_table_id, page);
-
-    return EXIT_SUCCESS;
-}
-
-// MEMORIA -> CPU :: MSG_MEMORIA_CPU_FRAME
-int recv_msg_memoria_cpu_frame(t_buffer *buffer, uint32_t *frame)
-{
-
-    deserialize_uint32_t(buffer, 1, frame);
+    deserialize_uint32_t(buffer, 2, pid, page);
 
     return EXIT_SUCCESS;
 }
@@ -126,19 +117,10 @@ int recv_msg_memoria_cpu_frame(t_buffer *buffer, uint32_t *frame)
 // --   READ DATA    --
 
 // CPU -> MEMORIA :: MSG_CPU_MEMORIA_DATA_READ
-int recv_msg_cpu_memoria_data_read(t_buffer *buffer, uint32_t *pid, uint32_t *page, uint32_t *frame, uint32_t *offset)
+int recv_msg_cpu_memoria_data_read(t_buffer *buffer, uint32_t *pid, uint32_t *frame, uint32_t *offset, uint32_t *size_value)
 {
 
-    deserialize_uint32_t(buffer, 5, pid, page, frame, offset);
-
-    return EXIT_SUCCESS;
-}
-
-// MEMORIA -> CPU :: MSG_MEMORIA_CPU_DATA_READ
-int recv_msg_memoria_cpu_data(t_buffer *buffer, uint32_t *value)
-{
-
-    deserialize_uint32_t(buffer, 1, value);
+    deserialize_uint32_t(buffer, 4, pid, frame, offset, size_value);
 
     return EXIT_SUCCESS;
 }
@@ -146,21 +128,32 @@ int recv_msg_memoria_cpu_data(t_buffer *buffer, uint32_t *value)
 // --   WRITE DATA    --
 
 // CPU -> MEMORIA :: MSG_MEMORIA_CPU_DATA_WRITE
-int recv_msg_cpu_memoria_data_write(t_buffer *buffer, uint32_t *pid, uint32_t *page, uint32_t *frame, uint32_t *offset, uint32_t *value)
-{
+int recv_msg_cpu_memoria_data_write(t_buffer *buffer, uint32_t *pid, uint32_t *page, uint32_t *frame, uint32_t *offset, uint32_t *size_value) {
+    deserialize_uint32_t(buffer, 5, pid, page, frame, offset, size_value);
+  
 
-    deserialize_uint32_t(buffer, 6, pid, page, frame, offset, value);
+    return EXIT_SUCCESS;
+}
+
+// MEMORIA -> CPU :: MSG_MEMORIA_CPU_FRAME
+int send_msg_memoria_cpu(int fd, uint32_t frame)
+{
+    t_package *package = package_create(MSG_MEMORIA_CPU_FRAME, sizeof(u_int32_t));
+
+    serialize_uint32_t(package->buffer, 1, frame);
+    package_send(package, fd);
+
+    package_destroy(package);
 
     return EXIT_SUCCESS;
 }
 
 // MEMORIA -> CPU :: MSG_MEMORIA_CPU_DATA_READ
-int send_msg_memoria_cpu_data_read(uint32_t value, int fd)
+int send_msg_memoria_cpu_data_read(void *value, uint32_t size_value, int fd)
 {
 
-    t_package *package = package_create(MSG_MEMORIA_CPU_DATA_READ, sizeof(u_int32_t));
-
-    serialize_uint32_t(package->buffer, 1, value);
+    t_package *package = package_create(MSG_MEMORIA_CPU_DATA_READ, size_value);
+    buffer_add_data(package->buffer,value,size_value);
 
     package_send(package, fd);
 
@@ -179,7 +172,7 @@ int recv_msg_cpu_memoria_resize(t_buffer *buffer, uint32_t *pid, uint32_t *new_s
 
 int send_msg_cpu_memoria_resize(uint8_t resize_response, int fd)
 {
-    t_package *package = package_create(MSG_MEMORIA_CPU_DATA_READ, sizeof(bool));
+    t_package *package = package_create(MSG_MEMORIA_CPU_RESIZE, sizeof(uint8_t));
 
     buffer_add_uint8(package->buffer, resize_response);
 

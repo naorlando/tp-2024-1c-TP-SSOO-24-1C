@@ -2,7 +2,7 @@
 #define TABLA_PAGINAS_H
 
 
-#include "variables_globales.h"
+
 // Standard library
 #include <stdio.h>
 #include <stdint.h>
@@ -21,6 +21,11 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+
+// Project
+#include "utils/utils.h"
+#include "variables_globales.h"
 
 
 
@@ -69,13 +74,16 @@ void agregar_pagina_a_memoria(uint32_t pid, uint32_t page_number);
 void finalizar_proceso(uint32_t pid);
 
 // Función para cambiar el tamaño de la memoria de un proceso
-bool resize(uint32_t pid, uint32_t new_size); 
+uint8_t resize(uint32_t pid, uint32_t new_size); 
 
 // Funciones Internas
 t_pid_table *_find_pid(uint32_t pid, t_dictionary *diccionario);
 t_entrada_tabla_de_paginas *_create_default_page();
 void _set_bitarray_value_memory(uint32_t position, bool value);
-void _initialize_bit_array_memory();
+bool* _initialize_bit_array_memory();
 int32_t _frame_disponible();
+bool process_exists(uint32_t pid);
+bool has_sufficient_frames(uint32_t required_frames);
+uint32_t calculate_page_count(uint32_t size);
 
 #endif /* TABLA_PAGINAS_H_ */

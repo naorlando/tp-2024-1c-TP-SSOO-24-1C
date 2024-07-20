@@ -19,10 +19,10 @@
 size_t obtener_tamano_registro(const char *nombre);
 
 
-void exec_mov_in(uint32_t direccion_logica, char *nombre, uint32_t *memory_value);
-void exec_mov_out(uint32_t direccion_logica, uint32_t write_value, uint32_t tamanio);
-int read_from_memory(uint32_t pid, uint32_t logical_address, uint32_t *memory_value,  uint32_t cantidad_paginas);
-int write_into_memory(uint32_t pid, uint32_t logical_address, uint32_t cpu_register,  uint32_t cantidad_paginas);
+void exec_mov_in(uint32_t direccion_logica, char *nombre, void *memory_value);
+void exec_mov_out(uint32_t direccion_logica, void* write_value, uint32_t tamanio);
+int read_from_memory(uint32_t pid, uint32_t logical_address, void *memory_value,  uint32_t cantidad_paginas,uint32_t tamano);
+int write_into_memory(uint32_t pid, uint32_t logical_address, void* write_value, uint32_t cantidad_paginas, uint32_t tamano);
 uint8_t ajustar_tamano_proceso(uint32_t pid, uint32_t  nuevo_tamano);
 void exec_io_stdin_read(uint32_t interfaz ,uint32_t direccion_logica , uint32_t tamano );
 void copiar_cadena(uint32_t origen, uint32_t destino, int tamano);

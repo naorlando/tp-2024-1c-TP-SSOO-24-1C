@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "variables_globales.h"
 #include "tabla_procesos.h"
+#include "tabla_paginas.h"
 
 // Inicializa el módulo de memoria configurando los logs, la configuración y la tabla de procesos.
 // Pre: Ninguna.

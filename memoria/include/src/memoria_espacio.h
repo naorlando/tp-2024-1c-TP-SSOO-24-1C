@@ -1,8 +1,6 @@
-#ifndef MEMORIA_ESPACIO_H
-#define MEMORIA_ESPACIO_H
+#ifndef MEMORIA_ESPACIO_H_
+#define MEMORIA_ESPACIO_H_
 
-
-#include "variables_globales.h"
 // Standard library
 #include <stdio.h>
 #include <stdint.h>
@@ -18,30 +16,23 @@
 #include <string.h>
 
 //project
-#include "tabla_paginas.h"
+#include "variables_globales.h"
 
 
-typedef struct {
-    void* memory_space;
-    size_t page_size;
-    size_t num_frames;
-
-} memory_t;
 
 
-memory_t* initialize_memory(size_t total_size, size_t page_size);
+void* read_data(uint32_t frame_number, uint32_t offset, uint32_t size);
 
-uint32_t read_data(uint32_t frame_number, uint32_t offset);
-
-void write_data(uint32_t frame, uint32_t offset,uint32_t value);
+void write_data(uint32_t frame, uint32_t offset, void* value, uint32_t data_size);
 
 void *read_page(uint32_t frame_number);
 
 void write_page(uint32_t frame_number, void *page_data);
 
-bool _es_operable_sobre_memoria(uint32_t offset);
-
 void destroy_memory(memory_t* mem);
+
+uint32_t calcular_frame_restante(uint32_t frame_number, uint32_t page_size, uint32_t offset);
+
 
 
 

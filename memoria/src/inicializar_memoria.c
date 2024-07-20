@@ -5,7 +5,15 @@ t_log *logger_memoria_debug;
 t_config *config_memoria;
 t_memoria_config *memoria_config;
 t_dictionary *tabla_procesos;
+
 memory_t * espacio_memoria;
+t_dictionary *diccionario_tablas_de_paginas_por_proceso;
+pthread_mutex_t MUTEX_DICCIONARIO_TABLAS_PAGINAS;
+bool *bitarray_marcos_de_memoria;
+pthread_mutex_t MUTEX_BIT_ARRAY_MEMORY;
+pthread_mutex_t MUTEX_MEMORY_SPACE;
+bool is_structure_created = false;
+
 
 int fd_server;
 int fd_entradasalida;
@@ -75,6 +83,9 @@ void _iniciar_config()
 void _inicar_espacio_memoria()
 {
    espacio_memoria = initialize_memory(memoria_config->TAM_MEMORIA,memoria_config->TAM_PAGINA);
+   create_page_tables_structure();
+
+
 }
 
 void _iniciar_tabla_procesos()
@@ -95,3 +106,4 @@ void imprimir_config()
 {
     log_trace(logger_memoria_debug, "PUERTO DE ESCUCHA DE LA MEMORIA: %d", obtener_puerto_escucha(memoria_config));
 }
+

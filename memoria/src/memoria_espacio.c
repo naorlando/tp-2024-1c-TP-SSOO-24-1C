@@ -1,61 +1,30 @@
 #include "memoria_espacio.h"
 
-extern memory_t *espacio_memoria;
-bool is_memory_created = false;
 uint16_t largo_tipo_de_dato = sizeof(uint32_t);
-pthread_mutex_t MUTEX_MEMORY_SPACE;
 
-memory_t *initialize_memory(size_t total_size, size_t page_size)
-{
-    memory_t *mem = malloc(sizeof(memory_t));
-    mem->memory_space = malloc(total_size);
-    mem->page_size = page_size;
-    mem->num_frames = total_size / page_size;
-
-    is_memory_created = true;
-    return mem;
-}
-
-uint32_t read_data(uint32_t frame_number, uint32_t offset)
-{
-    if (!_es_operable_sobre_memoria(offset))
-    {
-        exit(EXIT_FAILURE);
-    }
-
+void* read_data(uint32_t frame_number, uint32_t offset, uint32_t size_value) {
     uint32_t total_offset = frame_number * (espacio_memoria->page_size) + offset;
-    uint32_t data_leida = 0;
-
-    uint32_t frame_restante = (espacio_memoria->page_size) - (espacio_memoria->page_size) + offset;
-
+    void* data_leida = malloc(size_value);
+    
     pthread_mutex_lock(&MUTEX_MEMORY_SPACE);
-    memcpy(&data_leida, espacio_memoria->memory_space + total_offset, frame_restante);
+    memcpy(data_leida, (uint8_t*)espacio_memoria->memory_space + total_offset, size_value);
     pthread_mutex_unlock(&MUTEX_MEMORY_SPACE);
-
+    
     return data_leida;
 }
 
-void write_data(uint32_t frame_number, uint32_t offset, uint32_t data)
-{
-    if (!_es_operable_sobre_memoria(offset))
-    {
-        exit(EXIT_FAILURE);
-    }
-
+// Función para escribir datos en la memoria
+void write_data(uint32_t frame_number, uint32_t offset, void* data, uint32_t data_size) {
     uint32_t total_offset = frame_number * espacio_memoria->page_size + offset;
-    uint32_t frame_restante = (espacio_memoria->page_size) - (espacio_memoria->page_size) + offset;
-
+    
     pthread_mutex_lock(&MUTEX_MEMORY_SPACE);
-    memcpy(espacio_memoria->memory_space + total_offset, &data, frame_restante);
+    memcpy((uint8_t*)espacio_memoria->memory_space + total_offset, data, data_size);
     pthread_mutex_unlock(&MUTEX_MEMORY_SPACE);
 }
 
+
 void *read_page(uint32_t frame_number)
 {
-    if (!_es_operable_sobre_memoria(0))
-    {
-        exit(EXIT_FAILURE);
-    }
 
     void *page_data = malloc(espacio_memoria->page_size);
     uint32_t total_offset = frame_number * espacio_memoria->page_size;
@@ -69,10 +38,6 @@ void *read_page(uint32_t frame_number)
 
 void write_page(uint32_t frame_number, void *page_data)
 {
-    if (!_es_operable_sobre_memoria(0))
-    {
-        exit(EXIT_FAILURE);
-    }
 
     uint32_t total_offset = frame_number * espacio_memoria->page_size;
 
@@ -88,17 +53,15 @@ void destroy_memory(memory_t *mem)
     free(mem);
 }
 
-bool _es_operable_sobre_memoria(uint32_t offset)
+uint32_t calcular_frame_restante(uint32_t frame_number, uint32_t page_size, uint32_t offset)
 {
-    if (!is_memory_created)
+    uint32_t temp = frame_number * page_size + offset;
+    if (temp >= page_size)
     {
-        log_error(logger_memoria, "Para escribir sobre la memoria primero debe crearse. Aborting...");
-        return false;
+        return temp - page_size + 1;
     }
-    if (offset >= espacio_memoria->page_size)
+    else
     {
-        log_error(logger_memoria, "El offset ser menor que el marco. Aborting...");
-        return false;
+        return page_size - temp + 1;
     }
-    return true;
 }
