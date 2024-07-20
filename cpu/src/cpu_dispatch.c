@@ -86,6 +86,7 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         if (!ajustar_tamano_proceso(pcb_execute->pid, nuevo_tamano))
         {
             // TODO: Si la memoria devuelve Out of Memory, devolver el contexto al Kernel
+            
             informar_kernel_error("Out of Memory");
         }
         else
@@ -139,6 +140,29 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         handle_wait_or_signal(pcb_execute, nombre_recurso, SIGNAL);
         // activo flag:
         solicitud_recurso = true;
+        break;
+    }
+    case IO_STDIN_READ:
+    {
+        char *interface = (char *)list_get(instruccion->params, 0);
+        char *reg_direccion = (char *)list_get(instruccion->params, 1);
+        char *reg_tamano = (char *)list_get(instruccion->params, 2);
+
+        // Enviar el PCB al kernel con el tipo de interfaz
+        log_info(logger_cpu, "IO_STDIN_READ %s %s %s\n", interface, reg_direccion, reg_tamano);
+        solicitar_IO(instruccion);
+        solicitud_io = true;
+        break;
+    }
+    case IO_STDOUT_WRITE:
+    {
+        char *interface = (char *)list_get(instruccion->params, 0);
+        int units = atoi((char *)list_get(instruccion->params, 1));
+
+        // Enviar el PCB al kernel con el tipo de interfaz
+        log_info(logger_cpu, "IO_STDOUT_WRITE %s %d\n", interface, units);
+        solicitar_IO(instruccion);
+        solicitud_io = true;
         break;
     }
     case EXIT:
@@ -389,7 +413,7 @@ void solicitar_IO(t_instruction *instruccion)
         send_solicitud_io_generica_kernel(pcb_execute, instruccion);
         break;
     case IO_STDIN_READ:
-
+        send_solicitud_io_stdin_kernel(pcb_execute,instruccion);
         break;
     case IO_STDOUT_WRITE:
 

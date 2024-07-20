@@ -1,6 +1,5 @@
 #include "solicitudes_io.h"
-#include <stdlib.h>
-#include <string.h>
+
 
 //===============================================
 // FUNCIONES DE IO GENERICA
@@ -37,15 +36,12 @@ t_solicitud_io_stdin* crear_solicitud_io_stdin(t_PCB* pcb, char* nombre_interfaz
     return solicitud;
 }
 
-t_io_stdin* crear_io_stdin(uint32_t direccion_fisica, uint32_t tamanio, uint32_t pid) {
+t_io_stdin* crear_io_stdin( t_io_frames* io_frames_stdin) {
     t_io_stdin* io_stdin = malloc(sizeof(t_io_stdin));
 
     if(io_stdin == NULL) return NULL;
-
-    io_stdin->direccion_fisica = direccion_fisica;
-    io_stdin->tamanio = tamanio;
-    io_stdin->pid = pid;
-
+    io_stdin->frames_data = io_frames_stdin;
+   
     return io_stdin;
 }
 
@@ -109,24 +105,25 @@ uint32_t obtener_tamanio_io_generica(t_io_generica* io_generica)
 }
 
 /*********** Functiones 't_io_stdin' ***********/
-uint32_t obtener_direccion_fisica_stdin(t_io_stdin* io_stdin)
+t_frame_data* obtener_frame_stdin(t_io_stdin *io_stdin, int index)
 {
-    return io_stdin->direccion_fisica;
+    return get_frame_data(io_stdin->frames_data, index);
+
 }
 
 uint32_t obtener_tamanio_stdin(t_io_stdin* io_stdin)
 {
-    return io_stdin->tamanio;
+    return get_tamano_total_io_frames(io_stdin -> frames_data);
 }
 
 uint32_t obtener_pid_stdin(t_io_stdin* io_stdin)
 {
-    return io_stdin->pid;
+    return get_pid_io_frames(io_stdin -> frames_data);
 }
 
 uint32_t obtener_tamanio_io_stdin(t_io_stdin* io_stdin)
 {
-    return sizeof(io_stdin->direccion_fisica) + sizeof(io_stdin->tamanio) + sizeof(io_stdin->pid);
+    return get_bytes_io_frames(io_stdin->frames_data);
 }
 
 /*********** Functiones 't_io_stdout' ***********/
@@ -262,7 +259,7 @@ void destruir_solicitud_io_stdin(t_solicitud_io_stdin* solicitud) {
 }
 
 void destruir_io_stdin(t_io_stdin* io_stdin) {
-    free(io_stdin);
+    destroy_io_frames(io_stdin->frames_data);
 }
 
 void destruir_solicitud_io_stdout(t_solicitud_io_stdout* solicitud) {

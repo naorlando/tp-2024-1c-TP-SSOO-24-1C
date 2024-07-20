@@ -7,6 +7,7 @@
 #include "utils/instruccion.h"
 #include "utils/next_instruction.h"
 #include "utils/solicitudes_io.h"
+#include "request_memory.h"
 
 int send_example_memoria();
 int recv_example_msg_kernel();
@@ -54,7 +55,7 @@ int send_msg_cpu_memoria_data_read(uint32_t pid,  uint32_t frame, uint32_t offse
 
 int recv_msg_memoria_cpu_data(t_buffer *buffer, void *value, uint32_t value_size);
 
-
+void send_solicitud_io_stdin_kernel(t_PCB *pcb, t_instruction *instruccion);
 
 
 // --   PAGE & FRAME    --

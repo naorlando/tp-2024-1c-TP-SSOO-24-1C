@@ -12,7 +12,6 @@ void _data_read(uint32_t pid, t_datos_dir_logica *dir_logica, uint32_t frame, vo
         exit(EXIT_FAILURE);
     }
 
-
     recv_msg_memoria_cpu_data(buffer, memory_value, size_value);
     buffer_destroy(buffer);
 }
@@ -132,8 +131,7 @@ int write_into_memory(uint32_t pid, uint32_t logical_address, void *write_value,
         // Actualizar contadores
         bytes_written += bytes_a_escribir;
         remaining_bytes -= bytes_a_escribir;
-        offset +=  bytes_a_escribir;
-
+        offset += bytes_a_escribir;
 
         // Mover al siguiente frame si es necesario
         if (remaining_bytes > 0)
@@ -232,19 +230,54 @@ void copiar_cadena(uint32_t origen, uint32_t destino, int tamano)
     }
 }
 
-void exec_io_stdin_read(uint32_t interfaz, uint32_t direccion_logica, uint32_t tamano)
+
+t_io_frames *exec_io_frames(uint32_t pid, uint32_t direccion_logica, uint32_t tamano)
 {
 
-    //  if (obtener_marco(pid, dir_logica->num_pagina, &frame))
-    //     {
-    //         //TLB HIT
+    t_datos_dir_logica *dir_logica = crear_dir_logica(direccion_logica);
+    uint32_t frame;
+    uint32_t remaining_bytes = tamano;
+    t_io_frames *io_frames = create_io_frames(pid,tamano);
 
-    //     }
-    //     else
-    //     {
-    //         // TLB MISS
-    //         send_msg_cpu_memoria_page(pid, dir_logica->num_pagina, fd_memoria);
+    while (remaining_bytes > 0)
+    {
 
-    //         t_package *paquete = package_create(NULL_HEADER, sizeof(uint32_t));
-    //         package_recv(paquete, fd_memoria);
+        // Obtener el marco correspondiente a la página actual
+        if (!obtener_marco(pid, dir_logica->num_pagina, &frame))
+        {
+            // TLB MISS, obtener el marco desde la memoria
+            send_msg_cpu_memoria_page(pid, dir_logica->num_pagina, fd_memoria);
+            int cod_op = recibir_operacion(fd_memoria);
+            t_buffer *buffer = recive_full_buffer(fd_memoria);
+
+            if (cod_op == MSG_MEMORIA_CPU_FRAME)
+            {
+                recv_msg_memoria_cpu_frame(buffer, &frame);
+                reemplazar(pid, dir_logica->num_pagina, frame); // Reemplazar en la TLB
+                buffer_destroy(buffer);
+            }
+            else
+            {
+                log_debug(logger_cpu, "Se espera recibir mensaje desde memoria de page");
+                free(dir_logica);
+                return NULL; // Error
+            }
+        }
+
+        uint32_t bytes_disponibles = page_size - dir_logica->desplazamiento_pagina + 1;
+        uint32_t bytes_a_escribir = (remaining_bytes < bytes_disponibles) ? remaining_bytes : bytes_disponibles;
+
+        t_frame_data *frame_data = create_frame_data(frame,bytes_a_escribir,dir_logica->desplazamiento_pagina);
+
+        add_frame_data(io_frames,frame_data);
+
+        remaining_bytes -= bytes_a_escribir;
+
+        if (remaining_bytes > 0)
+        {
+            dir_logica->num_pagina++;
+            dir_logica->desplazamiento_pagina = 0;
+        }
+    }
+    return io_frames;
 }
