@@ -89,6 +89,7 @@ void atender_kernel_IO(void* io_connection)
             // Obtener el PCB de la solicitud y moverlo a ready
             t_PCB* pcb = obtener_pcb_de_solicitud(solicitud, tipo_interfaz);
             if (pcb != NULL) {
+                sem_wait(&SEM_PLANIFICACION_READY_INICIADA);
                 agregar_de_blocked_a_ready(pcb);
                 destruir_solicitud_io(solicitud, tipo_interfaz);
             } else {
