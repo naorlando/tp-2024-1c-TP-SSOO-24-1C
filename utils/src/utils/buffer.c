@@ -313,3 +313,4 @@ void buffer_add_partial_buffer(t_buffer* buffer_destination, t_buffer* buffer_so
 
     free(stream);
 }
+

@@ -41,8 +41,33 @@ void send_get_next_instruction_memoria(uint32_t, uint32_t);
 // Post: Retorna un puntero a t_instruction que contiene la instrucción recibida.
 t_instruction* recv_instruction_memoria();
 
+int send_msg_cpu_memoria_init(int fd);
+
+int recv_msg_memoria_cpu_init(t_buffer*, uint32_t* );
+
+void send_interface_kernel(/*t_interface**/);
 
 
 void send_solicitud_io_generica_kernel(t_PCB*, t_instruction*);
+
+int send_msg_cpu_memoria_data_read(uint32_t pid,  uint32_t frame, uint32_t offset, uint32_t size_value, int fd);
+
+int recv_msg_memoria_cpu_data(t_buffer *buffer, void *value, uint32_t value_size);
+
+
+
+
+// --   PAGE & FRAME    --
+int recv_msg_memoria_cpu_frame(t_buffer* buffer, uint32_t * frame);
+// CPU -> MEMORIA :: MSG_CPU_MEMORIA_PAGE
+int send_msg_cpu_memoria_page(uint32_t pid, uint32_t page, int fd);
+
+// --   WRITE DATA   --
+// CPU -> MEMORIA :: MSG_CPU_MEMORIA_DATA_WRITE
+int send_msg_cpu_memoria_data_write(uint32_t pid, uint32_t page, uint32_t frame, uint32_t offset, void* value, uint32_t size_valor ,int fd);
+
+// -- RESIZE --
+// CPU -> MEMORIA ::  MSG_CPU_MEMORIA_RESIZE
+int send_msg_cpu_memoria_resize(uint32_t pid, uint32_t new_size, int fd) ;
 
 #endif

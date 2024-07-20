@@ -16,4 +16,5 @@ void _iniciar_config();
 void _init_cpu_registers();
 void imprimir_config();
 
+
 #endif /*INICIALIZAR_CPU_H_*/

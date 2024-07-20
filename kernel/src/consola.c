@@ -267,6 +267,7 @@ void f_finalizar_proceso(u_int32_t pid){
     // elimina el PCB para siempre (ver en largo_plazo.c, ACA SE LIBERAN LOS RECURSOS PARA SALIR DEL DEADLOCK)
     agregar_a_cola_exit(pcb);
 
+    if(pid == EXECUTE->pid) cronometro_reiniciar(); // funciona en caso de VRR
     // Eliminar de la tabla de PCBs
     // TODO: verificar si se genera un doble free (del diccionario... ).
     delete_pcb(pid);

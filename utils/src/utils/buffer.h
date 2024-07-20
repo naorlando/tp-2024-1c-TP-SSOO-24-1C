@@ -156,4 +156,6 @@ void buffer_add_buffer(t_buffer*, t_buffer*);
 //      length es la cantidad de datos a copiar desde buffer_source.
 // Post: Los datos con el tamaño de length en buffer_source se añaden al final de buffer_destination.
 void buffer_add_partial_buffer(t_buffer*, t_buffer*, uint32_t);
+
+
 #endif

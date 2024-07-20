@@ -9,6 +9,8 @@
 #include "cpu_config.h"
 #include <semaphore.h>
 #include <pthread.h>
+#include "inicializar_tlb.h"
+
 
 #define SERVERNAME "CPU"
 #define SERVER_MEMORIA "SERVER MEMORIA"
@@ -25,6 +27,16 @@ extern t_name_interruption tipo_de_interrupcion;
 extern bool llego_a_exit;
 extern bool solicitud_io;
 extern bool solicitud_recurso;
+
+
+// Variables globales
+
+//TLB
+extern t_list* TLB_list; 
+
+//PAGES
+extern uint32_t page_size;
+extern uint32_t page_table_entries_qty; 
 
 //Semaforos
 extern sem_t SEM_INTERRUPT; // BINARIO -> Revisar si sirve!

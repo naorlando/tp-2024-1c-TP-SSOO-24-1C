@@ -97,7 +97,7 @@ bool remover_proceso_de_recurso(char *nombre_recurso, uint32_t pid) {
         bool recurso_match(void* recurso_ptr) {
             return strcmp((char*) recurso_ptr, nombre_recurso) == 0;
         }
-        char *recurso_borrado = (char*)list_remove_by_condition(recursos, recurso_match);
+        (char*)list_remove_by_condition(recursos, recurso_match);
         // if (list_is_empty(recursos)) {
         //     dictionary_remove_and_destroy(recursos_asignados_por_pid, pid_str, (void *) list_destroy);
         // }

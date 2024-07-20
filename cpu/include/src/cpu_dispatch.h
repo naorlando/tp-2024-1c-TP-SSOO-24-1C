@@ -6,6 +6,9 @@
 #include "utils/estructuras.h"
 #include "protocolo_cpu.h"
 #include "cpu_interrupt.h"
+#include "mmu.h"
+#include "tlb.h"
+#include "request_memory.h"
 #include "utils/utils.h"
 
 void ejecutar_instruccion(t_instruction*, t_cpu_registers*);
@@ -71,10 +74,9 @@ void enviar_pcb_finalizado();
 void handle_wait_or_signal(t_PCB * pcb, char * resource_name, t_name_instruction tipo_de_interrupcion);
 
 // TODO: Implementar.
-uint32_t leer_memoria(uint32_t);
-void escribir_memoria(uint32_t direccion_logica,uint32_t valor_datos);
-bool ajustar_tamano_proceso(t_cpu_registers *cpu_registers, int nuevo_tamano);
+
 void informar_kernel_error(const char *mensaje);
+
 void copiar_cadena(uint32_t origen, uint32_t destino, int tamano);
 
 void aumentar_program_counter();

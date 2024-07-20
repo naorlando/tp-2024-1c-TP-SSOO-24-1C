@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "variables_globales.h"
 #include "tabla_procesos.h"
+#include "tabla_paginas.h"
 
 // Inicializa el módulo de memoria configurando los logs, la configuración y la tabla de procesos.
 // Pre: Ninguna.
@@ -20,6 +21,9 @@ void _iniciar_logger();
 // Pre: El archivo de configuración debe existir y ser accesible.
 // Post: La configuración está cargada y almacenada en memoria_config.
 void _iniciar_config();
+
+
+void _inicar_espacio_memoria();
 
 // Crea la tabla de procesos para el módulo de memoria.
 // Pre: Ninguna.

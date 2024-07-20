@@ -49,6 +49,8 @@ void procesar_pcb_exit()
     // Actualizo el estado del pcb en la cola correspondiente:
     agregar_a_cola_exit(pcb_exit);
     
+    cronometro_reiniciar(); // funciona en caso de VRR
+    
     sem_post(&SEM_CPU);
 
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
