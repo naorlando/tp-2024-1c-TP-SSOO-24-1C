@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <inttypes.h> // Para las macros de formato como PRIu8, PRIu16, etc.
 #include <limits.h> // Para los valores máximos como UINT8_MAX, UINT16_MAX, etc.
+#include <commons/collections/list.h>
 
 int get_max_length_uint(uint64_t );
 uint32_t* convert_string_array_to_int_array(char** array_of_strings);
@@ -37,6 +38,11 @@ char* my_strdup(const char*);
 // Pre: Los registros deben ser válidos y no NULL.
 // Post: Retorna el valor del registro correspondiente al nombre dado.
 void remove_newline(char *);
+
+// dado una lista, devuelve un string
+// pre: pid_list != NULL
+// post: return string
+char* lista_a_string(t_list* pid_list);
 
 #define GET_MAX_LENGTH(type) get_max_length_uint(type##_MAX)
 

@@ -11,4 +11,10 @@
 void initialize_semaphores();
 void initialize_mutexes();
 
+// administracion de planificacion:
+void detener_cola_new(void* arg);
+void detener_cola_ready(void* arg);
+void detener_cola_exec(void* arg);
+void detener_cola_blocked(void* arg);
+
 #endif

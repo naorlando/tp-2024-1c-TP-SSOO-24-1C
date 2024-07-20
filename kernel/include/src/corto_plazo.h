@@ -53,9 +53,4 @@ void enviar_interrupcion_a_cpu(uint32_t);
 // pre: pcb != NULL
 // post: pcb->estado = EXEC and send_pcb_cpu(pcb)
 void pcb_execute(t_PCB*);
-
-// Obtenemos el siguiente pcb a ejecutar de una determinada cola READY
-// pre: queue != NULL
-// post: return pcb
-t_PCB* get_next_pcb_to_exec(t_queue*);
 #endif

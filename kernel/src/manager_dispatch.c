@@ -39,7 +39,7 @@ void procesar_pcb_exit()
 {
     //TODO: ARMAR UNA FUNCION QUE SE ENCARGUE DE LA GESTION DE LIBERAR EL PCB QUE LLEGO A EXIT
     // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
-    t_PCB* pcb_exit= recv_pcb_cpu();
+    t_PCB* pcb_exit= recv_pcb_cpu(); // DATO: aca dentro se crea otro malloc de pcb(se usa pcb_create())..
 
     execute_to_null();
     cancelar_quantum_si_corresponde(pcb_exit);
@@ -50,6 +50,10 @@ void procesar_pcb_exit()
     agregar_a_cola_exit(pcb_exit);
     
     cronometro_reiniciar(); // funciona en caso de VRR
+    
+    // actualizar el pcb en la tabla de pcb:
+    update_pcb(pcb_exit);
+    log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_exit->pid);
     
     sem_post(&SEM_CPU);
 
@@ -67,13 +71,13 @@ void procesar_interrupcion_quantum()
 
     cronometro_detener(); // funciona en caso de VRR
 
-    // 2-actualizar el pcb en la tabla de pcb:
+    // 2-actualizar el estado del pcb en la cola correspondiente:
+    agregar_de_execute_a_ready(pcb_interrupt);
+
+    // 3-actualizar el pcb en la tabla de pcb:
     update_pcb(pcb_interrupt);
-    //dictionary_put(table_pcb, string_itoa(pcb_interrupt->pid), pcb_interrupt); // es otra forma pero no se libera el pcb pisado
     log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_interrupt->pid);
 
-    // 3-actualizar el estado del pcb en la cola correspondiente:
-    agregar_de_execute_a_ready(pcb_interrupt);
 
     log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));

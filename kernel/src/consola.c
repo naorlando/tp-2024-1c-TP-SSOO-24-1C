@@ -98,12 +98,11 @@ void _atender_instruccion(void *args)
     }
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {
-        planificador_status = false;
+        f_detener_planificacion();
     }
     else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0)
     {
-        if(!planificador_status)
-        planificador_status = true;
+        f_iniciar_planificacion();
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {
@@ -144,7 +143,6 @@ void f_iniciar_proceso(char *path)
     // Se envia un t_new_process a memoria
     send_new_process(fd_kernel_memoria, pid, path);
 
-    // SEMAFORO PLANIFICADOR
     // Agregar PCB a la cola de NEW
     process_to_new(pcb);
 }
@@ -201,48 +199,66 @@ int asignar_pid()
 }
 
 void f_mostrar_estado_procesos(){
+
+    // posibles estados: 
+    // NEW,
+    // READY,
+    // EXEC,
+    // BLOCKED,
+    // FINISHED 
+
+    // prototipo de Logs: Ingreso a Ready: "Cola Ready / Ready Prioridad: [<LISTA DE PIDS>]"
     printf("--------------------------------------------------------------------------------\n");
     printf("Mostrando estado de los procesos ...\n");
+    // NEW
+    printf("Estado NEW: ");
+    listar_pids_por_estado(NEW);
 
-    // COLA NEW:
-    printf("\nCola NEW:\n");
-        listar_pids_de_queue(COLA_NEW);
+    // READY
+    printf("Estado READY: ");
+    listar_pids_por_estado(READY);
 
-    // COLA READY:
-    printf("\nCola READY:\n");
-        listar_pids_de_queue(COLA_READY);
+    // EXEC
+    printf("Estado EXEC: ");
+    listar_pids_por_estado(EXEC);
 
-    // pcb en EXECUTE:
-    printf("\nEn EXECUTE:\n");
-        if(EXECUTE != NULL){
-            printf("PID: %d", EXECUTE->pid);
-        } else {
-            printf("No hay procesos en EXECUTE\n");
-        }
+    // BLOCKED
+    printf("Estado BLOCKED: ");
+    listar_pids_por_estado(BLOCKED);
 
-    //COLA EXIT:
-    printf("\nCola EXIT:\n");
-        listar_pids_de_queue(COLA_EXIT);
-    // COLA BLOCKED:
-    // TODO...
-    printf("\nCola BLOCKED: FALTA IMPLEMENTAR\n");
+    // FINISHED
+    printf("Estado FINISHED: ");
+    listar_pids_por_estado(FINISHED);
     printf("--------------------------------------------------------------------------------\n");
-    
 }
 
-void listar_pids_de_queue(t_queue *queue) {
-    if (queue == NULL || queue_is_empty(queue)) {
-        printf("La cola está vacía o es nula.");
-        return;
+void listar_pids_por_estado(t_state state) {
+
+    t_list* pids = list_create();  // Crear una lista para almacenar los PIDs
+
+    void closure(char* key, void* element) {
+        t_PCB* pcb = (t_PCB*) element;
+        if (pcb->state == state) {
+            uint32_t* pid = malloc(sizeof(uint32_t));
+            *pid = pcb->pid;
+            list_add(pids, pid);
+        }
     }
 
-    int size = queue_size(queue);
-    //log_info(logger_kernel,"PIDs en la cola:\n");
+    dictionary_iterator(table_pcb, closure);  // Iterar sobre el diccionario
 
-    for (int i = 0; i < size; i++) {
-        t_PCB *pcb = (t_PCB *) list_get(queue->elements, i);
-        printf("PID: %d\n", pcb->pid);
+    printf("[");
+    for (int i = 0; i < list_size(pids); i++) {
+        uint32_t* pid = list_get(pids, i);
+        printf("%d", *pid);
+        if (i < list_size(pids) - 1) {
+            printf(", ");
+        }
+        free(pid);  // Liberar la memoria asignada para el PID
     }
+    printf("]\n");
+
+    list_destroy(pids);  // Destruir la lista
 }
 
 
@@ -273,3 +289,41 @@ void f_finalizar_proceso(u_int32_t pid){
     delete_pcb(pid);
 }
 
+void f_iniciar_planificacion(){
+    if(!planificador_status){
+    //printf("iniciar_planificacion \n");
+    planificador_status = true;
+
+    sem_post(&SEM_PLANIFICACION_NEW_READY_INICIADA);
+    sem_post(&SEM_PLANIFICACION_READY_INICIADA);
+    sem_post(&SEM_PLANIFICACION_EXEC_INICIADA);
+    sem_post(&SEM_PLANIFICACION_BLOCKED_INICIADA);
+
+    log_info(logger_kernel, "Planificación %s iniciada", obtener_algoritmo_planificacion(kernel_config));
+    }
+}
+
+void f_detener_planificacion(){
+    //printf("detener_planificador \n");
+    if(planificador_status)
+    {
+        planificador_status = false;
+        
+        pthread_t detener_new, detener_ready, detener_exec, detener_blocked;
+        pthread_create(&detener_new,NULL,(void*) detener_cola_new,NULL);
+        pthread_create(&detener_ready,NULL,(void*) detener_cola_ready,NULL);
+        pthread_create(&detener_exec,NULL,(void*) detener_cola_exec,NULL);
+        pthread_create(&detener_blocked,NULL,(void*) detener_cola_blocked,NULL);
+        pthread_detach(detener_new);
+        pthread_detach(detener_ready);
+        pthread_detach(detener_exec);
+        pthread_detach(detener_blocked);
+        
+        
+        log_info(logger_kernel, "Se detuvo la planificacion en %s", obtener_algoritmo_planificacion(kernel_config));
+    }else
+    {
+        log_info(logger_kernel,"la planificacion ya se encuentra pausada");
+    }
+    
+}

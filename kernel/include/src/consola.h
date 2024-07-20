@@ -8,6 +8,7 @@
 #include "table_pcb.h"
 #include "protocolo_kernel.h"
 #include "largo_plazo.h"
+#include "syncro.h"
 
 
 
@@ -28,14 +29,28 @@ int asignar_pid();
 // ----------------------------------------------
 // funcion para atender el comando de la consola: PROCESO_ESTADO
 void f_mostrar_estado_procesos();
-// funcion para obtener los PID de las t_queue de cada estado posible
-void listar_pids_de_queue(t_queue *queue);
-
+// funcion para listar los PID segun su estado en el diccionarios de PCBs
+// pre: estado a buscar
+// post: estado : [lista de pids]
+void listar_pids_por_estado(t_state state);
 
 // ----------------------------------------------
 //      FINALIZAR_PROCESO:
 // ----------------------------------------------
 void f_finalizar_proceso(u_int32_t pid);
+
+// ----------------------------------------------
+//      INICIAR_PLANIFICACION:
+// ----------------------------------------------
+
+// funcion que activa los semaforos de planificacion
+// pre: -
+// post: activa los semaforos de planificacion
+void f_iniciar_planificacion();
+// funcion que desactiva los semaforos de planificacion
+// pre: -
+// post: desactiva los semaforos de planificacion
+void f_detener_planificacion();
 
 
 #endif //CONSOLA_H_
