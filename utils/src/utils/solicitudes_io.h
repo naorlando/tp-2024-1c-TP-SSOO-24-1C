@@ -8,7 +8,80 @@
 // ESTRUCTURAS
 //===============================================
 
-// ... (mantener las estructuras como estaban)
+// INTERFAZ GENERICA
+typedef struct {
+    char* nombre_interfaz;
+    uint32_t tiempo_sleep;
+    uint32_t pid;
+} t_io_generica;
+
+// INTERFAZ STDIN
+typedef struct {
+    uint32_t direccion_logica;  // Cambiado de direccion_fisica a direccion_logica
+    uint32_t tamanio;
+    uint32_t pid;
+    char* nombre_interfaz;  // Añadido nombre_interfaz
+} t_io_stdin;
+
+// INTERFAZ STDOUT
+typedef struct {
+    uint32_t direccion_logica;  // Cambiado de direccion_fisica a direccion_logica
+    uint32_t tamanio;
+    uint32_t pid;
+    char* nombre_interfaz;  // Añadido nombre_interfaz
+} t_io_stdout;
+
+// SOLICITUD GENERICA
+typedef struct {
+    t_PCB* pcb;
+    char* nombre_interfaz;
+    t_io_generica* generica;
+} t_solicitud_io_generica;
+
+// SOLICITUD STDIN
+typedef struct {
+    t_PCB* pcb;
+    char* nombre_interfaz;
+    t_io_stdin* io_stdin;
+} t_solicitud_io_stdin;
+
+// SOLICITUD STDOUT
+typedef struct {
+    t_PCB* pcb;
+    char* nombre_interfaz;
+    t_io_stdout* io_stdout;
+} t_solicitud_io_stdout;
+
+// RESPONSE
+typedef struct {
+    bool process;
+    uint32_t pid;
+} t_response;
+
+/* PARÁMETROS DE UNA OPERACIÓN DE DIALFS
+Esta estructura ajusta a lo que el enunciado requiere para las solicitudes del Kernel al IO DialFS:
+ *IO_FS_CREATE: Usa nombre_interfaz, nombre_archivo, pid.
+ *IO_FS_DELETE: Usa nombre_interfaz, nombre_archivo, pid.
+ *IO_FS_TRUNCATE: Usa nombre_interfaz, nombre_archivo, tamanio, pid.
+ *IO_FS_WRITE: Usa nombre_interfaz, nombre_archivo, direccion_logica, tamanio, puntero_archivo, pid.
+ *IO_FS_READ: Usa nombre_interfaz, nombre_archivo, direccion_logica, tamanio, puntero_archivo, pid.
+*/
+typedef struct {
+    char* nombre_interfaz;      // Nombre de la interfaz DialFS
+    char* nombre_archivo;       // Nombre del archivo a operar
+    uint32_t pid;               // PID del proceso que realiza la operación
+    t_name_instruction operacion; // Tipo de operación a realizar
+    uint32_t tamanio;           // Tamaño para operaciones de lectura/escritura/truncado
+    uint32_t direccion_logica;  // Dirección lógica para operaciones de lectura/escritura
+    uint32_t puntero_archivo;   // Puntero del archivo para operaciones de lectura/escritura
+} t_io_dialfs;
+
+// SOLICITUD DIALFS
+typedef struct {
+    t_PCB* pcb;
+    char* nombre_interfaz;
+    t_io_dialfs* io_dialfs;
+} t_solicitud_io_dialfs;
 
 //===============================================
 // FUNCIONES DE IO GENERICA
