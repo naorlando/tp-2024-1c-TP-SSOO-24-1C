@@ -520,6 +520,7 @@ void handle_wait_or_signal(t_PCB *pcb, char *resource_name, t_name_instruction t
     t_manejo_recurso *t_manejo_recurso = manejo_recurso_create(pcb, resource_name);
     // Crear un paquete con el PCB y el nombre del recurso (t_manjejo_recurso) y enviarlo al Kernel:
 
+    //TODO: MODULARIZAR ESTA PARTE
     t_package *package = package_create(msg_header, get_manejo_recurso_size(t_manejo_recurso));
     serialize_manejo_recurso(package->buffer, t_manejo_recurso);
 
