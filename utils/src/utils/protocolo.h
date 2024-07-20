@@ -43,7 +43,8 @@ typedef enum
     MSG_CPU_KERNEL_SIGNAL, // CPU -> KERNEL (se envia mensaje indicando un SIGNAL recurso)
     MSG_CPU_IO_GEN_SLEEP, // CPU -> KERNEL (Se solicita interactuar con IO GENENRICA) 
     MSG_CPU_IO_STDIN_READ, // CPU -> KERNEL (Se solicita interactuar con IO STDIN) 
-    MSG_CPU_IO_STDOUT_WRITE, // CPU -> KERNEL (Se solicita interactuar con IO STDOUT) 
+    MSG_CPU_IO_STDOUT_WRITE, // CPU -> KERNEL (Se solicita interactuar con IO STDOUT)
+    MSG_CPU_OUT_OF_MEMORY, //CPU -> KERNEL (Fallo instruccion resize, eliminar PCB) 
     // KERNEL <-> MEMORIA
     MSG_KERNEL_MEMORIA, // SE LLAMA PERO NO SE USA!
     MSG_MEMORIA_KERNEL, // SE LLAMA PERO NO SE USA!
@@ -554,6 +555,9 @@ t_response* deserializar_response(t_buffer*);
 
 void serialize_manejo_recurso(t_buffer* buffer, t_manejo_recurso* manejo_recurso);
 t_manejo_recurso* deserialize_manejo_recurso(t_buffer* buffer);
+
+void serializar_io_frames(t_buffer* buffer, t_io_frames* io_frames);
+t_io_frames* deserializar_io_frames(t_buffer* buffer);
 
 
 #endif

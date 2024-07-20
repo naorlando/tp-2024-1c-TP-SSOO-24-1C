@@ -192,3 +192,11 @@ void logica_pcb_retorno_vrr(t_PCB *pcb) {
     pthread_mutex_unlock(&MUTEX_COLA_RETORNO_PCB);
     sem_post(&SEM_PCB_RETURNS);  // Signal que el PCB ha retornado
 }
+
+//TODO terminar de implementar
+void procesar_ios_stdin(){}
+//TODO terminar de implementar
+void procesar_ios_stdout(){}
+//TODO terminar de implementar
+void procesar_out_memory(){}
+

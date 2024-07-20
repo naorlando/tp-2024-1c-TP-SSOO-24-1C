@@ -208,6 +208,17 @@ void atender_kernel_cpu_dispatch()
             case MSG_CPU_KERNEL_SIGNAL:
                 handle_signal_request();
                 break;
+
+            case MSG_CPU_IO_STDIN_READ: 
+                procesar_ios_stdin();
+                break;
+
+            case MSG_CPU_IO_STDOUT_WRITE: 
+                procesar_ios_stdout();
+                break;
+            case MSG_CPU_OUT_OF_MEMORY:
+                procesar_out_memory();
+                break;        
             case -1:
                 log_error(logger_kernel, "CPU DISPATCH se desconecto. Terminando servidor");
                 control_key = 0;

@@ -87,6 +87,23 @@ void send_solicitud_io_generica_kernel(t_PCB *pcb, t_instruction *instruccion)
     send_solicitud_io_generica(fd_kernel_dispatch, pcb, nombre, generica);
 }
 
+void send_solicitud_io_stdin_kernel(t_PCB *pcb, t_instruction *instruccion)
+{
+    t_list *parametros = obtener_parametros(instruccion);
+    char *interface = (char *)list_get(parametros, 0);
+    char *reg_direccion = (char *)list_get(parametros, 1);
+    char *reg_tamano = (char *)list_get(parametros, 2);
+
+    uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+    uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
+
+    t_io_frames* io_frames_stdin = exec_io_frames(pcb->pid,direccion_logica,tamano);
+
+    t_io_stdin* io_stdin = crear_io_stdin(io_frames_stdin);
+   
+    send_solicitud_io_stdin(fd_kernel_dispatch, pcb, interface, io_stdin);
+}
+
 void send_pcb_kernel_interruption(t_name_interruption tipo_de_interrupcion)
 {
     switch (tipo_de_interrupcion)
@@ -126,7 +143,7 @@ int send_msg_cpu_memoria_data_read(uint32_t pid, uint32_t frame, uint32_t offset
 int recv_msg_memoria_cpu_data(t_buffer *buffer, void *value, uint32_t value_size)
 {
 
-    buffer_read_data(buffer,value,value_size);
+    buffer_read_data(buffer, value, value_size);
 
     return EXIT_SUCCESS;
 }
@@ -135,7 +152,7 @@ int recv_msg_memoria_cpu_data(t_buffer *buffer, void *value, uint32_t value_size
 int send_msg_cpu_memoria_page(uint32_t pid, uint32_t page, int fd)
 {
 
-    t_package *package = package_create(MSG_CPU_MEMORIA_PAGE, sizeof(uint32_t)*2);
+    t_package *package = package_create(MSG_CPU_MEMORIA_PAGE, sizeof(uint32_t) * 2);
 
     serialize_uint32_t(package->buffer, 2, pid, page);
 
@@ -163,9 +180,8 @@ int send_msg_cpu_memoria_data_write(uint32_t pid, uint32_t page, uint32_t frame,
     t_package *package = package_create(MSG_CPU_MEMORIA_DATA_WRITE, (sizeof(uint32_t) * 5) + size_valor);
 
     serialize_uint32_t(package->buffer, 5, pid, page, frame, offset, size_valor);
-    buffer_add_data(package->buffer,value,size_valor);
+    buffer_add_data(package->buffer, value, size_valor);
     package_send(package, fd);
-
 
     package_destroy(package);
 

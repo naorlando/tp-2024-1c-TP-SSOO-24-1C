@@ -34,4 +34,10 @@ void handle_signal_request();
 // post: activa el semaforo de retorno de pcb y agraga a la cola de retorno al pcb
 void logica_pcb_retorno_vrr(t_PCB *pcb);
 
+void procesar_ios_stdin();
+
+void procesar_ios_stdout();
+
+void procesar_out_memory();
+
 #endif //MANAGER_DISPATCH_
