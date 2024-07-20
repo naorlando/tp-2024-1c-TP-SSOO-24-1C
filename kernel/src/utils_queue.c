@@ -114,7 +114,7 @@ void agregar_de_blocked_a_ready(t_PCB* pcb)
     }
     else if(strcmp(algoritmo_plani, "VRR") == 0){
         //TODO: Se debe agregar a la cola auxiliar?
-
+        
     }
 }
 
