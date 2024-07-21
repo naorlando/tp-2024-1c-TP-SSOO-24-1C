@@ -97,38 +97,6 @@ void requests_kernel()
     }
 }
 
-void requests_entradasalida(void *cliente_socket)
-{
-    int cliente_io = *(int *)cliente_socket;
-    bool esperar = true;
-
-    while (esperar)
-    {
-        int cod_operacion = recibir_operacion(cliente_io);
-
-        switch (cod_operacion)
-        {
-        case EXAMPLE:
-            // Se procesa el request
-            recv_example_msg_entradasalida();
-            // esperar = false; //Cortamos la espera de solicitudes
-            break;
-            // TODO:
-            /*
-                Agregar operaciones a las que dara servicio el modulo
-            */
-
-        case -1:
-            log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
-            esperar = false; // Cortamos la espera de solicitudes
-            break;
-        default:
-            log_warning(logger_memoria, "WARNING: El modulo de memoria ha recibido una solicitud con una operacion desconocida");
-            break;
-        }
-    }
-}
-
 void levantar_servidor()
 {
     server_port = string_itoa(obtener_puerto_escucha(memoria_config));
@@ -198,16 +166,21 @@ void *esperar_conexiones_IO(void *arg)
 
         if (cliente_io != -1)
         {
-            // add_io_client(cliente_io, "IOClient");
+            t_IO_connection* io_connection = recibir_io_connection(cliente_io, logger_memoria, MSG_IO_KERNEL);
 
-            pthread_t hilo_entradasalida;
-            if (pthread_create(&hilo_entradasalida, NULL, (void *)requests_entradasalida, &cliente_io) != 0)
-            {
-                log_error(logger_memoria, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
-                exit(EXIT_FAILURE);
+            if (io_connection != NULL) {
+                agregar_IO_connection(io_connection, ios_conectadas, &MUTEX_DICTIONARY_IOS);
+
+                pthread_t hilo_entradasalida;
+                if (pthread_create(&hilo_entradasalida, NULL, (void *)atender_memoria_IO, io_connection) != 0)
+                {
+                    log_error(logger_memoria, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
+                    exit(EXIT_FAILURE);
+                }
+                char* nombre_interfaz = obtener_nombre_conexion(io_connection);
+                log_info(logger_memoria, "Nueva conexión de I/O establecida: %s de tipo %s", nombre_interfaz, tipo_interfaz_to_string(obtener_tipo_conexion(io_connection)));
+                pthread_detach(hilo_entradasalida);
             }
-            pthread_detach(hilo_entradasalida);
-            log_info(logger_memoria, "Se conecto una interfaz IO");
         }
         else
         {
@@ -215,6 +188,32 @@ void *esperar_conexiones_IO(void *arg)
         }
     }
     return NULL;
+}
+
+void atender_memoria_IO(void* io_connection)
+{
+    t_IO_connection* cliente_io = (t_IO_connection*)io_connection;
+    bool control_key = 1;
+
+    while (control_key)
+    {
+        int cod_op = recibir_operacion(obtener_file_descriptor(cliente_io));
+
+        switch (cod_op)
+        {
+            case EXAMPLE:
+                recv_example_msg_entradasalida();
+                // esperar = false; //Cortamos la espera de solicitudes
+                break;
+            case -1:
+                log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
+                control_key = false; // Cortamos la espera de solicitudes
+                break;
+            default:
+                log_warning(logger_memoria, "WARNING: El modulo de memoria ha recibido una solicitud con una operacion desconocida");
+                break;
+        }
+    }
 }
 
 void cerrar_servidor()

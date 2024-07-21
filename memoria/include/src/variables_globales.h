@@ -35,6 +35,8 @@ extern bool *bitarray_marcos_de_memoria;
 extern pthread_mutex_t MUTEX_BIT_ARRAY_MEMORY;
 extern pthread_mutex_t MUTEX_MEMORY_SPACE;
 
+extern t_dictionary* ios_conectadas;
+extern pthread_mutex_t MUTEX_DICTIONARY_IOS;
 
 //FD
 extern int fd_server;

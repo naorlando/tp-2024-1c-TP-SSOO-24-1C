@@ -15,6 +15,9 @@ pthread_mutex_t MUTEX_MEMORY_SPACE;
 bool is_structure_created = false;
 bool handshake_cpu = false;
 
+t_dictionary* ios_conectadas;
+pthread_mutex_t MUTEX_DICTIONARY_IOS;
+
 int fd_server;
 int fd_entradasalida;
 int fd_cpu;
@@ -28,6 +31,8 @@ void init()
     _iniciar_config();
     _inicar_espacio_memoria();
     _iniciar_tabla_procesos();
+    _iniciar_dictionarios();
+    initialize_mutexes();
     imprimir_config();
 }
 
@@ -84,8 +89,6 @@ void _inicar_espacio_memoria()
 {
    espacio_memoria = initialize_memory(memoria_config->TAM_MEMORIA,memoria_config->TAM_PAGINA);
    create_page_tables_structure();
-
-
 }
 
 void _iniciar_tabla_procesos()
@@ -100,6 +103,11 @@ void _iniciar_tabla_procesos()
     {
         log_error(logger_memoria, "Error al crear la tabla de procesos.");
     }
+}
+
+void _iniciar_dictionarios()
+{
+    ios_conectadas = dictionary_create();
 }
 
 void imprimir_config()

@@ -6,6 +6,7 @@
 #include "variables_globales.h"
 #include "tabla_procesos.h"
 #include "tabla_paginas.h"
+#include "syncro.h"
 
 // Inicializa el módulo de memoria configurando los logs, la configuración y la tabla de procesos.
 // Pre: Ninguna.
@@ -34,5 +35,7 @@ void _iniciar_tabla_procesos();
 // Pre: La configuración debe estar cargada en memoria_config.
 // Post: La configuración se ha registrado en el log de debug.
 void imprimir_config();
+
+void _iniciar_dictionarios();
 
 #endif /*INICIALIZAR_MEMORIA_H_*/
