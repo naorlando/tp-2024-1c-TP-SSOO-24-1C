@@ -11,6 +11,9 @@
 #include "commons/collections/list.h"
 #include "commons/collections/dictionary.h"
 #include "table_pcb.h"
+#include "protocolo_kernel.h"
+#include "utils_queue.h"
+#include "manager_dispatch.h"
 
 // Declaraciones de funciones
 
@@ -54,5 +57,13 @@ void liberar_recursos_de_proceso(u_int32_t pid);
 // post: se libera el recurso asignado al proceso
 void free_resource(t_PCB *pcb);
 
+//Manda el proceso a exit
+void enviar_proceso_a_exit(t_PCB* pcb);
+
+void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal);
+
+void handle_signal(t_PCB *pcb, char *nombre_recurso);
+
+void remover_proceso_de_todas_las_colas_de_bloqueados(char* nombre_recurso, t_recurso* recurso, void* pid_ptr);
 
 #endif // RESOURCES_H_

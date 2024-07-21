@@ -84,12 +84,10 @@ void procesar_interrupcion_quantum()
     sem_post(&SEM_CPU);
 }
 
-// manejar instruccion WAIT
-void handle_wait_request(){
-    //recibo el paquete con el recurso a manejar
-    pthread_mutex_lock(&MUTEX_RECURSOS);
+void handle_wait_request() {
+    //recibo el paquete con el recurso a manejar    
 
-    t_manejo_recurso * manejo_recurso_recv = recv_wait_or_signal_request();
+    t_manejo_recurso *manejo_recurso_recv = recv_wait_or_signal_request();
 
     t_PCB *pcb = manejo_recurso_recv->pcb;
     char *nombre_recurso = manejo_recurso_recv->nombre_recurso;
@@ -99,39 +97,13 @@ void handle_wait_request(){
     log_info(logger_kernel, "CX: %u", pcb->cpu_registers->cx);
     log_info(logger_kernel, "Nombre de recurso: %s", nombre_recurso);
 
-    t_recurso *recurso = get_recurso(nombre_recurso);
-    if(recurso == NULL) {
-        execute_to_null();
-        cancelar_quantum_si_corresponde(pcb);
-        agregar_a_cola_exit(pcb);
-        sem_post(&SEM_CPU);    
-        return; 
-    }
+    handle_wait(pcb, nombre_recurso,false);
 
-    if (recurso->instancias > 0) {
-        decrementar_recurso(recurso); // recurso->instancias--;
-        // ----------------------------------------------------------------------------------------------
-        asignar_proceso_a_recurso(nombre_recurso, pcb->pid);
-        // ----------------------------------------------------------------------------------------------
-        log_info(logger_kernel, "Recurso %s tenía instancias disponibles. Instancias restantes: %d", nombre_recurso, recurso->instancias);
-        send_pcb_cpu(pcb);
-    } else {
-        bloquear_proceso(recurso, pcb);
-        log_info(logger_kernel, "Recurso %s no tenía instancias disponibles. Proceso %d bloqueado", nombre_recurso, pcb->pid);
-        sem_post(&SEM_CPU);    
-    }
-
-    pthread_mutex_unlock(&MUTEX_RECURSOS);
 }
 
-// manejar instruccion SIGNAL
-void handle_signal_request()
-{
-    //recibo el paquete con el recurso a manejar
-    pthread_mutex_lock(&MUTEX_RECURSOS);
+void handle_signal_request() {
 
-    t_manejo_recurso * manejo_recurso_recv = recv_wait_or_signal_request();
-
+    t_manejo_recurso *manejo_recurso_recv = recv_wait_or_signal_request();
     t_PCB *pcb = manejo_recurso_recv->pcb;
     char *nombre_recurso = manejo_recurso_recv->nombre_recurso;
 
@@ -140,49 +112,105 @@ void handle_signal_request()
     log_info(logger_kernel, "CX: %u", pcb->cpu_registers->cx);
     log_info(logger_kernel, "Nombre de recurso: %s", nombre_recurso);
 
-    t_recurso *recurso = get_recurso(nombre_recurso);
-    if(recurso == NULL) {
-        execute_to_null();
-        cancelar_quantum_si_corresponde(pcb);
-        agregar_a_cola_exit(pcb);
-        sem_post(&SEM_CPU);    
-        return;
-    }
+    handle_signal(pcb, nombre_recurso);
 
-    // Verificar si el proceso que hace SIGNAL está en la lista de procesos asignados
-    // si el proceso NO esta en la lista de procesos asignados, lo mando a EXIT...
-    if (!remover_proceso_de_recurso(nombre_recurso, pcb->pid)) {
-        log_info(logger_kernel, "Proceso %d no tiene asignado el recurso %s. Proceso enviado a EXIT", pcb->pid, nombre_recurso);
-        execute_to_null();
-        cancelar_quantum_si_corresponde(pcb);
-        agregar_a_cola_exit(pcb);
-        sem_post(&SEM_CPU);    
-        return;
-    }
-    // si el proceso esta en la lista de procesos asignados,se ELEMININA EL PID en la funcion remove_asignado_a_recurso() e 
-    // incremento las instancias del recurso...
-    incrementar_recurso(recurso); // recurso->instancias++;
-    log_info(logger_kernel, "Recurso %s incrementado. Instancias actuales: %d", nombre_recurso, recurso->instancias);
+}
+
+// // manejar instruccion WAIT
+// void handle_wait_request(){
+//     //recibo el paquete con el recurso a manejar
+//     pthread_mutex_lock(&MUTEX_RECURSOS);
+
+//     t_manejo_recurso * manejo_recurso_recv = recv_wait_or_signal_request();
+
+//     t_PCB *pcb = manejo_recurso_recv->pcb;
+//     char *nombre_recurso = manejo_recurso_recv->nombre_recurso;
+
+//     log_info(logger_kernel, "AX: %u", pcb->cpu_registers->ax);
+//     log_info(logger_kernel, "BX: %u", pcb->cpu_registers->bx);
+//     log_info(logger_kernel, "CX: %u", pcb->cpu_registers->cx);
+//     log_info(logger_kernel, "Nombre de recurso: %s", nombre_recurso);
+
+//     t_recurso *recurso = get_recurso(nombre_recurso);
+//     if(recurso == NULL) {
+//         execute_to_null();
+//         cancelar_quantum_si_corresponde(pcb);
+//         agregar_a_cola_exit(pcb);
+//         sem_post(&SEM_CPU);    
+//         return; 
+//     }
+
+//     if (recurso->instancias > 0) {
+//         decrementar_recurso(recurso); // recurso->instancias--;
+//         // ----------------------------------------------------------------------------------------------
+//         asignar_proceso_a_recurso(nombre_recurso, pcb->pid);
+//         // ----------------------------------------------------------------------------------------------
+//         log_info(logger_kernel, "Recurso %s tenía instancias disponibles. Instancias restantes: %d", nombre_recurso, recurso->instancias);
+//         send_pcb_cpu(pcb);
+//     } else {
+//         bloquear_proceso(recurso, pcb);
+//         log_info(logger_kernel, "Recurso %s no tenía instancias disponibles. Proceso %d bloqueado", nombre_recurso, pcb->pid);
+//         sem_post(&SEM_CPU);    
+//     }
+
+//     pthread_mutex_unlock(&MUTEX_RECURSOS);
+// }
+
+
+// manejar instruccion SIGNAL
+// void handle_signal_request()
+// {
+//     //recibo el paquete con el recurso a manejar
+//     pthread_mutex_lock(&MUTEX_RECURSOS);
+
+//     t_manejo_recurso * manejo_recurso_recv = recv_wait_or_signal_request();
+
+//     t_PCB *pcb = manejo_recurso_recv->pcb;
+//     char *nombre_recurso = manejo_recurso_recv->nombre_recurso;
+
+//     log_info(logger_kernel, "AX: %u", pcb->cpu_registers->ax);
+//     log_info(logger_kernel, "BX: %u", pcb->cpu_registers->bx);
+//     log_info(logger_kernel, "CX: %u", pcb->cpu_registers->cx);
+//     log_info(logger_kernel, "Nombre de recurso: %s", nombre_recurso);
+
+//     t_recurso *recurso = get_recurso(nombre_recurso);
+//     if(recurso == NULL) {
+//         execute_to_null();
+//         cancelar_quantum_si_corresponde(pcb);
+//         agregar_a_cola_exit(pcb);
+//         sem_post(&SEM_CPU);    
+//         return;
+//     }
+
+//     // Verificar si el proceso que hace SIGNAL está en la lista de procesos asignados
+//     // si el proceso NO esta en la lista de procesos asignados, lo mando a EXIT...
+//     if (!remover_proceso_de_recurso(nombre_recurso, pcb->pid)) {
+//         log_info(logger_kernel, "Proceso %d no tiene asignado el recurso %s. Proceso enviado a EXIT", pcb->pid, nombre_recurso);
+//         execute_to_null();
+//         cancelar_quantum_si_corresponde(pcb);
+//         agregar_a_cola_exit(pcb);
+//         sem_post(&SEM_CPU);    
+//         return;
+//     }
+//     // si el proceso esta en la lista de procesos asignados,se ELEMININA EL PID en la funcion remove_asignado_a_recurso() e 
+//     // incremento las instancias del recurso...
+//     incrementar_recurso(recurso); // recurso->instancias++;
+//     log_info(logger_kernel, "Recurso %s incrementado. Instancias actuales: %d", nombre_recurso, recurso->instancias);
 
  
 
-    if (!queue_is_empty(recurso->cola_bloqueados)) {
-        t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
-        //asignar_proceso_a_recurso(nombre_recurso, pcb_desbloqueado->pid);
-        log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
-        agregar_a_cola_ready(pcb_desbloqueado);
-    }
+//     if (!queue_is_empty(recurso->cola_bloqueados)) {
+//         t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
+//         //asignar_proceso_a_recurso(nombre_recurso, pcb_desbloqueado->pid);
+//         log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
+//         agregar_a_cola_ready(pcb_desbloqueado);
+//     }
 
-    send_pcb_cpu(pcb);
+//     send_pcb_cpu(pcb);
 
-    pthread_mutex_unlock(&MUTEX_RECURSOS);
-}
+//     pthread_mutex_unlock(&MUTEX_RECURSOS);
+// }
 
-void execute_to_null() {
-    pthread_mutex_lock(&MUTEX_EXECUTE);
-    EXECUTE = NULL;
-    pthread_mutex_unlock(&MUTEX_EXECUTE);
-}
 
 void cancelar_quantum_si_corresponde(t_PCB *pcb_exit) {
     if (strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {

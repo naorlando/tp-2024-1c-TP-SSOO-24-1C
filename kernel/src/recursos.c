@@ -1,7 +1,7 @@
 #include "recursos.h"
 
 bool add_recurso(t_recurso *new_recurso) {
-    char *key = strdup(new_recurso->nombre);
+    char *key = my_strdup(new_recurso->nombre);
     if (key == NULL)
         return false;
 
@@ -58,11 +58,13 @@ void decrementar_recurso(t_recurso *recurso) {
 void bloquear_proceso(t_recurso *recurso, t_PCB *pcb) {
     // semaforo: de DETENER_PLANIFICACION.
     queue_push(recurso->cola_bloqueados, pcb);
+    log_info(logger_kernel, "Proceso %d bloqueado por recurso %s", pcb->pid, recurso->nombre);
 }
 
 t_PCB* desbloquear_proceso(t_recurso *recurso) {
     return queue_pop(recurso->cola_bloqueados);
 }
+
 
 void asignar_proceso_a_recurso(char *nombre_recurso, uint32_t pid) {
     t_list *recursos = dictionary_get(recursos_asignados_por_pid, uint32_to_string(pid));
@@ -73,21 +75,6 @@ void asignar_proceso_a_recurso(char *nombre_recurso, uint32_t pid) {
     list_add(recursos, (void *) nombre_recurso);
     print_dictionary();
 }
-
-// bool remover_proceso_de_recurso(char *nombre_recurso, u_int32_t pid) {
-//     t_list *recursos = dictionary_get(recursos_asignados_por_pid, uint32_to_string(pid));
-//     if (recursos != NULL) {
-//         list_remove_element(recursos, (void *) nombre_recurso);
-//         if (list_is_empty(recursos)) {
-//             dictionary_remove_and_destroy(recursos_asignados_por_pid, uint32_to_string(pid), (void *) list_destroy);
-//         }
-//         print_dictionary();
-//         return true;
-//     }else{
-//         log_error(logger_kernel, "No se encontró el proceso %d en la lista de recursos asignados.", pid);
-//         return false;
-//     }
-// }
 
 bool remover_proceso_de_recurso(char *nombre_recurso, uint32_t pid) {
     char* pid_str = uint32_to_string(pid);
@@ -153,6 +140,99 @@ void liberar_recursos_de_proceso(u_int32_t pid)
 }
 
 void free_resource(t_PCB *pcb) {
+    log_info(logger_kernel, "Liberando recursos del proceso %d", pcb->pid);
+
+    // Liberar recursos asociados al proceso
     liberar_recursos_de_proceso(pcb->pid);
-    dictionary_remove_and_destroy(recursos_asignados_por_pid, uint32_to_string(pcb->pid), (void *)list_destroy);
+
+    // Verificar si el proceso está en el diccionario antes de eliminarlo
+    char* pid_str = uint32_to_string(pcb->pid);
+    if (dictionary_has_key(recursos_asignados_por_pid, pid_str)) {
+        dictionary_remove_and_destroy(recursos_asignados_por_pid, pid_str, (void *)list_destroy);
+        log_info(logger_kernel, "Proceso %d eliminado del diccionario de recursos asignados.", pcb->pid);
+    } else {
+        log_warning(logger_kernel, "Proceso %d no se encontró en el diccionario de recursos asignados.", pcb->pid);
+    }
+    free(pid_str);
 }
+
+
+
+void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal) {
+
+    pthread_mutex_lock(&MUTEX_RECURSOS);
+
+    t_recurso *recurso = get_recurso(nombre_recurso);
+    
+    if (recurso == NULL) {
+        log_error(logger_kernel, "Recurso %s no encontrado. Proceso %d enviado a EXIT.", nombre_recurso, pcb->pid);
+        enviar_proceso_a_exit(pcb);
+        return;
+    }
+
+    if (recurso->instancias > 0) {
+        decrementar_recurso(recurso); // recurso->instancias--;
+        // ----------------------------------------------------------------------------------------------
+        asignar_proceso_a_recurso(nombre_recurso, pcb->pid);
+        // ----------------------------------------------------------------------------------------------
+        log_info(logger_kernel, "Recurso %s tenía instancias disponibles. Instancias restantes: %d", nombre_recurso, recurso->instancias);
+        if (!from_signal) {
+            send_pcb_cpu(pcb);
+        } else {
+            agregar_a_cola_ready(pcb);
+        }
+    } else {
+        bloquear_proceso(recurso, pcb);
+        log_info(logger_kernel, "Recurso %s no tenía instancias disponibles. Proceso %d bloqueado", nombre_recurso, pcb->pid);
+        sem_post(&SEM_CPU);    
+    }
+
+    pthread_mutex_unlock(&MUTEX_RECURSOS);
+}
+
+void handle_signal(t_PCB *pcb, char *nombre_recurso) {
+
+    pthread_mutex_lock(&MUTEX_RECURSOS);
+
+    t_recurso *recurso = get_recurso(nombre_recurso);
+    if (recurso == NULL) {
+        log_error(logger_kernel, "Recurso %s no encontrado. Proceso %d enviado a EXIT.", nombre_recurso, pcb->pid);
+        enviar_proceso_a_exit(pcb);
+        return;
+    }
+
+    if (!remover_proceso_de_recurso(nombre_recurso, pcb->pid)) {
+        log_error(logger_kernel, "Proceso %d no tiene asignado el recurso %s. Enviado a EXIT.", pcb->pid, nombre_recurso);
+        enviar_proceso_a_exit(pcb);
+        return;
+    }
+
+    incrementar_recurso(recurso);
+    log_info(logger_kernel, "Recurso %s liberado por proceso %d. Instancias actuales: %d", nombre_recurso, pcb->pid, recurso->instancias);
+
+
+    t_PCB *pcb_desbloqueado = NULL;
+    bool desbloquear = !queue_is_empty(recurso->cola_bloqueados);
+    if (desbloquear) {
+        pcb_desbloqueado = desbloquear_proceso(recurso);
+        log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
+    }
+
+    pthread_mutex_unlock(&MUTEX_RECURSOS);
+
+    if (desbloquear) {
+        handle_wait(pcb_desbloqueado, nombre_recurso, true);
+    }
+
+    send_pcb_cpu(pcb);
+    
+}
+
+
+
+void enviar_proceso_a_exit(t_PCB* pcb){
+        execute_to_null();
+        cancelar_quantum_si_corresponde(pcb);
+        agregar_a_cola_exit(pcb);
+        sem_post(&SEM_CPU); 
+} 

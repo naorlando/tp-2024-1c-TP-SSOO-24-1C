@@ -40,7 +40,7 @@ void atender_solicitud_stdin(int fd) {
 
         char *input = readline("Ingrese un texto: ");
 
-        escribir_memoria(io_stdin->direccion_fisica, input, io_stdin->tamanio);
+        //escribir_memoria(io_stdin->direccion_fisica, input, io_stdin->tamanio);
         free(input);
 
         log_info(logger_entradasalida, "Operacion READ finalizada");

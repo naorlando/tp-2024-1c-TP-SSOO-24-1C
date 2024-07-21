@@ -70,6 +70,9 @@ void mostrar_elementos_de_cola(t_queue *COLA, char *nombre_cola);
 t_list* listar_pids_de_queue(t_queue *queue);
 
 
+void execute_to_null();
+
+
 
 
 #endif //UTILS_QUEUE_

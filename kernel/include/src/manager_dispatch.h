@@ -20,7 +20,6 @@ void procesar_ios_genericas();
 void procesar_pcb_exit();
 void cancelar_hilo_quantum(uint32_t);
 void procesar_interrupcion_quantum();
-void execute_to_null();
 void cancelar_quantum_si_corresponde(t_PCB *pcb_exit);
 
 // Función para manejar la operación WAIT

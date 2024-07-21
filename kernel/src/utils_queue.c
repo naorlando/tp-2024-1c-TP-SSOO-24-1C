@@ -172,3 +172,9 @@ t_list* listar_pids_de_queue(t_queue *queue) {
 
     return pid_list;
 }
+
+void execute_to_null() {
+    pthread_mutex_lock(&MUTEX_EXECUTE);
+    EXECUTE = NULL;
+    pthread_mutex_unlock(&MUTEX_EXECUTE);
+}
