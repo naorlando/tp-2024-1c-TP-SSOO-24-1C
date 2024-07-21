@@ -1,21 +1,9 @@
 #include "memoria_server.h"
 
-
-
 void requests_cpu()
 {
     bool esperar = true;
-    // TODO SACAR ESTO APARTE
-    // t_package *packageHandshake = package_create(NULL_HEADER, sizeof(uint32_t));
-    // package_recv(packageHandshake, fd_cpu);
-    // if (packageHandshake->msg_header != MSG_CPU_MEMORIA_INIT)
-    // {
-    //     log_error(logger_memoria, "SE DEBE RECIBIR EL HANDSHAKE DE CPU ANTES QUE CUALQUIER MSJ");
-    //     exit(EXIT_FAILURE);
-    // }
-    // send_msg_memoria_cpu_init(memoria_config->TAM_PAGINA, fd_cpu);
-    // package_destroy(packageHandshake);
-    // ---------------------------
+
     while (esperar)
     {
         int cod_operacion = recibir_operacion(fd_cpu);
@@ -115,11 +103,11 @@ void levantar_servidor()
 void esperar_clientes()
 {
     // Espera conexion de la CPU
-    log_info(logger_memoria, "esperando a que se conecte CPU");
+    log_info(logger_memoria, "Esperando a que se conecte CPU");
     fd_cpu = esperar_cliente(logger_memoria, CLIENTE_CPU, fd_server);
 
     // Espera conexion del Kernel
-    log_info(logger_memoria, "esperando a que se conecte KERNEL");
+    log_info(logger_memoria, "Esperando a que se conecte KERNEL");
     fd_kernel = esperar_cliente(logger_memoria, CLIENTE_KERNEL, fd_server);
 }
 
@@ -166,7 +154,7 @@ void *esperar_conexiones_IO(void *arg)
 
         if (cliente_io != -1)
         {
-            t_IO_connection* io_connection = recibir_io_connection(cliente_io, logger_memoria, MSG_IO_KERNEL);
+            t_IO_connection* io_connection = recibir_io_connection(cliente_io, logger_memoria, MSG_IO_MEMORIA);
 
             if (io_connection != NULL) {
                 agregar_IO_connection(io_connection, ios_conectadas, &MUTEX_DICTIONARY_IOS);
