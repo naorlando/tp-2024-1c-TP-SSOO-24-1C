@@ -30,6 +30,7 @@ void cerrar_cliente();
 void _cerrar_puertos();
 void _cerrar_conexiones();
 
-void enviar_io_interface();
+void enviar_io_interface_kernel();
+void enviar_io_interface_memoria();
 
 #endif
