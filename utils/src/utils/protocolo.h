@@ -50,7 +50,7 @@ typedef enum
     MSG_MEMORIA_KERNEL, // SE LLAMA PERO NO SE USA!
     MSG_KERNEL_CREATE_PROCESS, // KERNEL -> MEMORIA (Se solicita crear la imagen de un proceso) 
     // KERNEL <-> IO
-    MSG_IO_KERNEL, // REVISAR
+    MSG_IO_KERNEL, // IO -> KERNEL (La IO establece una conexion con KERNEL)
     MSG_KERNEL_IO, // REVISAR
     MSG_KERNEL_IO_GENERICA, // KERNEL -> IO (Se solicita interactuar con una IO_GENERICA)
     MSG_KERNEL_IO_STDIN, // KERNEL -> IO (Se solicita interactuar con una IO_STDIN)
@@ -76,6 +76,7 @@ typedef enum
     MSG_INSTRUCTION_MEMORIA,
     MSG_NEXT_INSTRUCTION_CPU,
     //IO <-> MEMORIA
+    MSG_IO_MEMORIA, // IO -> MEMORIA (La IO establece una conexion con MEMORIA)
     MSG_MEMORIA_IO_STDIN,
     MSG_MEMORIA_IO_STDOUT,
     MSG_MEMORIA_IO_DIALFS,
@@ -318,7 +319,7 @@ uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
 //      El parámetro nombre_interfaz debe ser una cadena válida y no debe ser NULL.
 //      El parámetro tipo debe ser unna cadena válida y no debe ser NULL.
 // Post: La estructura t_IO_interface se serializa y se envía a través del socket especificado.
-void send_IO_interface(int, char*, char*);
+void send_IO_interface(int, char*, char*, t_msg_header);
 
 // Recibe una estructura t_IO_interface desde un socket especificado.
 // Pre: El parámetro fd debe ser un descriptor de archivo de socket válido y abierto.
