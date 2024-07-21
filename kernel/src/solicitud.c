@@ -74,19 +74,19 @@ bool procesar_solicitud(t_solicitud* solicitud_a_procesar)
             break;
         case SOLICITUD_GENERICA:
             t_solicitud_io_generica* solicitud_gen = (t_solicitud_io_generica*)get_contenido(solicitud_a_procesar);
-            io_connection = get_IO_connection(obtener_nombre_solicitud_generica(solicitud_gen));
+            io_connection = get_IO_connection(obtener_nombre_solicitud_generica(solicitud_gen), io_connections, &MUTEX_DICTIONARY);
 
             proceso = solicitud_gen;
             break;
         case SOLICITUD_STDIN:
             t_solicitud_io_stdin* solicitud_stdin = (t_solicitud_io_stdin*)get_contenido(solicitud_a_procesar);
-            io_connection = get_IO_connection(obtener_nombre_solicitud_stdin(solicitud_stdin));
+            io_connection = get_IO_connection(obtener_nombre_solicitud_stdin(solicitud_stdin), io_connections, &MUTEX_DICTIONARY);
 
             proceso = solicitud_stdin;
             break;
         case SOLICITUD_STDOUT:
             t_solicitud_io_stdout* solicitud_stdout = (t_solicitud_io_stdout*)get_contenido(solicitud_a_procesar);
-            io_connection = get_IO_connection(obtener_nombre_solicitud_stdout(solicitud_stdout));
+            io_connection = get_IO_connection(obtener_nombre_solicitud_stdout(solicitud_stdout), io_connections, &MUTEX_DICTIONARY);
 
             proceso = solicitud_stdout;
             break;

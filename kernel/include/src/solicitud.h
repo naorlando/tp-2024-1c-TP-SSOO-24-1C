@@ -7,6 +7,7 @@
 #include "utils/solicitudes_io.h"
 #include "utils/estructuras.h"
 #include "manager_ios.h"
+#include "utils/gestion_conexiones_io.h"
 
 typedef enum
 {   

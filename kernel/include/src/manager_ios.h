@@ -16,12 +16,6 @@ int procesar_solicitud_stdin(int, t_solicitud_io_stdin*);
 int procesar_solicitud_stdout(int, t_solicitud_io_stdout*);
 void procesar_solicitud_dialfs();
 void procesar_respuesta_io(int, char*);
-void* obtener_siguiente_proceso(t_IO_connection*);
-
-t_IO_connection* get_IO_connection(char*);
-void agregar_IO_connection(t_IO_connection*);
-t_IO_connection* nuevo_IO_cliente_conectado(int);
-t_IO_connection* recibir_io_connection(int);
 
 void proceso_solicita_io(void*);
 
