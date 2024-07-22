@@ -38,7 +38,8 @@ typedef struct {
 } hilo_args;
 
 void planificador_corto_plazo();
-void blocked();
+// TODO: Eliminar luego de probar la nueva implementacion de manager_ios
+//void blocked();
 t_planificador _obtener_planificador (char * str);
 void planificador_FIFO();
 void planificador_RR();

@@ -135,23 +135,24 @@ t_planificador _obtener_planificador(char *str)
     return -1;
 }
 
-void blocked()
-{
+// TODO: Eliminar luego de probar la nueva implementacion de manager_ios
+// void blocked()
+// {
 
-    while(1) {
-        sem_wait(&SEM_BLOCKED);
+//     while(1) {
+//         sem_wait(&SEM_BLOCKED);
         
-        t_solicitud* solicitud = get_next_solicitud();
+//         t_solicitud* solicitud = get_next_solicitud();
 
-        sem_wait(&SEM_SOLICITUDES);
+//         sem_wait(&SEM_SOLICITUDES);
 
-        if(!procesar_solicitud(solicitud)) {
-            // la io no esta conectada desde el principio
-            agregar_a_cola_exit(obtener_pcb_solicitud(solicitud));
-        }
+//         if(!procesar_solicitud(solicitud)) {
+//             // la io no esta conectada desde el principio
+//             agregar_a_cola_exit(obtener_pcb_solicitud(solicitud));
+//         }
         
-    }
-}
+//     }
+// }
 
 void pcb_execute( t_PCB* pcb)
 {

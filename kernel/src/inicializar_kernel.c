@@ -160,14 +160,15 @@ void inicializar_planificadores()
         exit(EXIT_FAILURE);
     }
 
-    pthread_t THREAD_BLOCKED;
-    if (!pthread_create(&THREAD_BLOCKED, NULL, (void *) blocked, NULL))
-        pthread_detach(THREAD_BLOCKED);
-    else
-    {
-        log_error(logger_kernel, "ERROR CRITICO INICIANDO EL ESTADO BLOCKED. ABORTANDO.");
-        exit(EXIT_FAILURE);
-    }
+    // TODO: Eliminar luego de probar la nueva implementacion de manager_ios
+    // pthread_t THREAD_BLOCKED;
+    // if (!pthread_create(&THREAD_BLOCKED, NULL, (void *) blocked, NULL))
+    //     pthread_detach(THREAD_BLOCKED);
+    // else
+    // {
+    //     log_error(logger_kernel, "ERROR CRITICO INICIANDO EL ESTADO BLOCKED. ABORTANDO.");
+    //     exit(EXIT_FAILURE);
+    // }
 }
 
 
