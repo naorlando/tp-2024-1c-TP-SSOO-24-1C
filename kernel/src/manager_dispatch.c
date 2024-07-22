@@ -25,14 +25,8 @@ void procesar_ios_genericas()
     //set_solicitud(SOLICITUD_GENERICA, solicitud_gen);
     // add_new_solicitud(SOLICITUD_GENERICA, solicitud_gen);
     // sem_post(&SEM_BLOCKED);
+    proceso_solicita_io(0, solicitud_gen);
     sem_post(&SEM_CPU);
-    
-    //1. Validar que la IO GENERICA este conectada
-    //2. 
-    //  a) Si esta conectada, encolar el PCB a la cola de bloqueo correspondiente (Sigue en 3 el flujo)
-    //  b) Si no esta conectada, pasar a EXIT el PCB. (Termina el flujo aca)
-    //3. Enviar el struct t_io_generica a la IO GENERICA si esta libre
-    //4. Bloquear el envio de otra solicitud de IO GENERICA, hasta que la IO responda luego de su procesamiento
 }
 
 void procesar_pcb_exit()
@@ -198,7 +192,22 @@ void logica_pcb_retorno_vrr(t_PCB *pcb) {
 }
 
 //TODO terminar de implementar
-void procesar_ios_stdin(){}
+void procesar_ios_stdin()
+{
+    t_solicitud_io_stdin* solicitud_stdin = recv_solicitud_io_stdin_cpu();
+
+    t_PCB* pcb_io_stdin = obtener_pcb_solicitud_stdin(solicitud_stdin);
+
+    log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_stdin->pid);
+    
+    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {
+        cancelar_hilo_quantum(pcb_io_stdin->pid);
+    }
+
+    proceso_solicita_io(0, solicitud_stdin);
+    sem_post(&SEM_CPU);
+}
+
 //TODO terminar de implementar
 void procesar_ios_stdout(){}
 //TODO terminar de implementar
