@@ -122,3 +122,10 @@ t_manejo_recurso*  recv_wait_or_signal_request()
     buffer_destroy(buffer);
     return manejo_recurso_recibido;
 }
+
+t_solicitud_io_stdin* recv_solicitud_io_stdin_cpu()
+{
+    t_solicitud_io_stdin* io_stdin = recv_solicitud_io_stdin(fd_cpu_dispatch);
+
+    return io_stdin;
+}

@@ -21,4 +21,5 @@ t_PCB* recv_pcb_interrupt();
 void send_interruption_cpu(t_interruption*);
 t_solicitud_io_generica* recv_solicitud_io_generica_cpu();
 t_manejo_recurso*  recv_wait_or_signal_request();
+t_solicitud_io_stdin* recv_solicitud_io_stdin_cpu();
 #endif
