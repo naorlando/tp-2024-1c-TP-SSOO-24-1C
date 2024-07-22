@@ -65,7 +65,43 @@ void procesar_respuesta_io(int fd, char* nombre_interfaz)
     delete_response(response);
 }
 
-void proceso_solicita_io(void* solicitud)
+void proceso_solicita_io(int tipo_io, void* solicitud)
 {
-    
+    t_IO_connection* io_connection;
+    bool agrego = false; // flag para saber si agregó la solicitud en la cola de bloqueados correspondiente
+    t_PCB* pcb_solicita_io;
+
+    switch(tipo_io)
+    {
+        case GENERICA:
+            t_solicitud_io_generica* solicitud_gen = (t_solicitud_io_generica*)solicitud;
+            io_connection = get_IO_connection(obtener_nombre_solicitud_generica(solicitud_gen), io_connections, &MUTEX_DICTIONARY);
+            pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "GENERICA");
+            break;
+        case STDIN:
+            t_solicitud_io_stdin* solicitud_stdin = (t_solicitud_io_stdin*)solicitud;
+            io_connection = get_IO_connection(obtener_nombre_solicitud_stdin(solicitud_stdin), io_connections, &MUTEX_DICTIONARY);
+            pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "STDIN");
+            break;
+        case STDOUT:
+            t_solicitud_io_stdout* solicitud_stdout = (t_solicitud_io_stdout*)solicitud;
+            io_connection = get_IO_connection(obtener_nombre_solicitud_stdout(solicitud_stdout), io_connections, &MUTEX_DICTIONARY);
+            pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "STDOUT");
+            break;
+        case DIALFS:
+            // TODO: descomentar despues de realizar el merge de la rama de JORGE!!
+            // t_solicitud_io_dialfs* solicitud_dialfs = (t_solicitud_io_dialfs*)solicitud;
+            // io_connection = get_IO_connection(obtener_nombre_solicitud_dialfs(solicitud_dialfs), io_connections, &MUTEX_DICTIONARY);
+            // pcb = obtener_pcb_de_solicitud(solicitud, "DIALFS");
+            break;
+        default:
+            //caso de error
+            break;
+    }
+
+    if(io_connection != NULL)
+        agrego= agregar_proceso_bloqueado(io_connection, solicitud);
+
+    if(!agrego)
+        agregar_a_cola_exit(pcb_solicita_io);
 }

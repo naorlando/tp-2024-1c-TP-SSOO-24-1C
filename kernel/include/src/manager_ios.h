@@ -7,6 +7,8 @@
 #include "protocolo_kernel.h"
 #include "utils/estructuras.h"
 #include "utils/solicitudes_io.h"
+#include "utils/gestion_conexiones_io.h"
+#include "utils_queue.h"
 
 typedef int (*procesar_solicitud_func)(int, void*);
 procesar_solicitud_func obtener_procesador_solicitud(int);
@@ -17,6 +19,6 @@ int procesar_solicitud_stdout(int, t_solicitud_io_stdout*);
 void procesar_solicitud_dialfs();
 void procesar_respuesta_io(int, char*);
 
-void proceso_solicita_io(void*);
+void proceso_solicita_io(int, void*);
 
 #endif //MANAGER_IOS_H_
