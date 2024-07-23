@@ -138,9 +138,11 @@ int recv_msg_cpu_memoria_data_write(t_buffer *buffer, uint32_t *pid, uint32_t *p
 // MEMORIA -> CPU :: MSG_MEMORIA_CPU_FRAME
 int send_msg_memoria_cpu(int fd, uint32_t frame)
 {
+    
     t_package *package = package_create(MSG_MEMORIA_CPU_FRAME, sizeof(u_int32_t));
 
     serialize_uint32_t(package->buffer, 1, frame);
+    usleep(obtener_retardo_respuesta(memoria_config) * 1000);
     package_send(package, fd);
 
     package_destroy(package);

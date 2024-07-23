@@ -215,7 +215,7 @@ void copiar_cadena(uint32_t origen, uint32_t destino, int tamano)
     uint32_t cant_paginas_origen = traductor_cantidad_paginas(origen, tamano);
     uint32_t cant_paginas_destino = traductor_cantidad_paginas(destino, tamano);
 
-    void *memory_value;
+    void *memory_value = malloc (tamano);
     if (read_from_memory(pcb_execute->pid, origen, &memory_value, cant_paginas_origen, tamano))
     {
 
