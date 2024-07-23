@@ -5,14 +5,13 @@
 #include "protocolo_kernel.h"
 #include "commons/string.h"
 #include "utils/sockets.h"
-//#include "utils/estructuras.h"
-//#include "utils/buffer.h"
 #include <commons/log.h>
 #include "kernel_config.h"
 #include <pthread.h>
-//#include "datos_hilos.h"
 #include "manager_dispatch.h"
 #include "manager_ios.h"
+#include "utils/io_interface.h"
+#include "utils/gestion_conexiones_io.h"
 
 void levantar_servidor();
 void inicializar_sockets();

@@ -40,7 +40,7 @@ void atender_solicitud_stdin(int fd) {
 
         char *input = readline("Ingrese un texto: ");
 
-        escribir_memoria(io_stdin->direccion_fisica, input, io_stdin->tamanio);
+        //escribir_memoria(io_stdin->direccion_fisica, input, io_stdin->tamanio);
         free(input);
 
         log_info(logger_entradasalida, "Operacion READ finalizada");
@@ -193,5 +193,10 @@ void send_confirmacion_io(int fd, t_msg_header header, t_response* response) {
 
 void send_IO_interface_kernel() 
 {
-    send_IO_interface(fd_kernel, nombre_interfaz, obtener_tipo_interfaz(entradasalida_config));
+    send_IO_interface(fd_kernel, nombre_interfaz, obtener_tipo_interfaz(entradasalida_config), MSG_IO_KERNEL);
+}
+
+void send_IO_interface_memoria()
+{
+    send_IO_interface(fd_memoria, nombre_interfaz, obtener_tipo_interfaz(entradasalida_config), MSG_IO_MEMORIA);
 }

@@ -41,7 +41,7 @@ void atender_kernel_IO(void* io_connection)
                 break;
             }
 
-            void* solicitud = obtener_siguiente_proceso(cliente_io);
+            void* solicitud = obtener_proceso_bloqueado(cliente_io);
             
             procesar_solicitud_func procesar_func = obtener_procesador_solicitud(obtener_tipo_conexion(cliente_io));
             char* tipo_interfaz = tipo_interfaz_to_string(obtener_tipo_conexion(cliente_io));
@@ -90,8 +90,8 @@ void atender_kernel_IO(void* io_connection)
             t_PCB* pcb = obtener_pcb_de_solicitud(solicitud, tipo_interfaz);
             if (pcb != NULL) {
                 sem_wait(&SEM_PLANIFICACION_READY_INICIADA);
-                agregar_de_blocked_a_ready(pcb);
                 destruir_solicitud_io(solicitud, tipo_interfaz);
+                agregar_de_blocked_a_ready(pcb);
             } else {
                 log_warning(logger_kernel, "No se pudo obtener el PCB de la solicitud");
             }
@@ -320,10 +320,10 @@ void* esperar_conexiones_IO(void* arg)
         int cliente_io = esperar_cliente(logger_kernel, CLIENTE_ENTRADASALIDA, server_fd);
         
         if (cliente_io != -1) {
-            t_IO_connection* io_connection = recibir_io_connection(cliente_io);
+            t_IO_connection* io_connection = recibir_io_connection(cliente_io, logger_kernel, MSG_IO_KERNEL);
 
             if (io_connection != NULL) {
-                agregar_IO_connection(io_connection);
+                agregar_IO_connection(io_connection, io_connections, &MUTEX_DICTIONARY);
                 
                 pthread_t hilo_io;
                 if (pthread_create(&hilo_io, NULL, (void*)atender_kernel_IO, io_connection) != 0) {

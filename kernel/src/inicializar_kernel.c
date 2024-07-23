@@ -159,17 +159,7 @@ void inicializar_planificadores()
         log_error(logger_kernel, "ERROR CRITICO INICIANDO EL PLANIFICADOR DE CORTO PLAZO. ABORTANDO.");
         exit(EXIT_FAILURE);
     }
-
-    pthread_t THREAD_BLOCKED;
-    if (!pthread_create(&THREAD_BLOCKED, NULL, (void *) blocked, NULL))
-        pthread_detach(THREAD_BLOCKED);
-    else
-    {
-        log_error(logger_kernel, "ERROR CRITICO INICIANDO EL ESTADO BLOCKED. ABORTANDO.");
-        exit(EXIT_FAILURE);
-    }
 }
-
 
 void initialize_lists()
 {
@@ -203,6 +193,4 @@ void inicializar_recursos() {
 
     string_array_destroy(nombres_recursos);
     //string_array_destroy(instancias_recursos);
-
-
 }

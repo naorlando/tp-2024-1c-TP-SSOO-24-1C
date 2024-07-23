@@ -9,6 +9,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 
+
 // Definición del enum tipo_interfaz_t
 typedef enum {
     GENERICA,
@@ -76,6 +77,9 @@ char* obtener_nombre_IO_interface(t_IO_interface*);
 // Post: Se retorna el tipo de la interfaz de E/S.
 tipo_interfaz_t obtener_tipo_IO_interface(t_IO_interface*);
 
+// Obtiene el tamaño de una estructura t_IO_interface.
+// Pre: El puntero a t_IO_interface debe ser válido y no NULL.
+// Post: Retorna el tamaño de la estructura t_IO_interface en bytes.
 uint32_t obtener_size_IO_interface(t_IO_interface*);
 
 //===============================================
@@ -115,14 +119,29 @@ int obtener_file_descriptor(t_IO_connection* conexion);
 // Post: Se retorna el puntero a la cola de procesos bloqueados de la conexión de E/S.
 t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion);
 
+// Obtiene el semáforo de la cola de procesos bloqueados de una conexión.
+// Pre: El puntero a t_IO_connection debe ser válido y no NULL.
+// Post: Retorna un puntero al semáforo de la cola de procesos bloqueados, o NULL si la conexión es NULL.
 sem_t* obtener_semaforo_cola_bloqueados(t_IO_connection* conexion);
 
+// Obtiene el mutex de la cola de procesos bloqueados de una conexión.
+// Pre: El puntero a t_IO_connection debe ser válido y no NULL.
+// Post: Retorna un puntero al mutex de la cola de procesos bloqueados, o NULL si la conexión es NULL.
 pthread_mutex_t* obtener_mutex_cola_bloqueados(t_IO_connection* conexion);
 
+// Obtiene un proceso bloqueado de la cola de procesos bloqueados de una conexión.
+// Pre: El puntero a t_IO_connection debe ser válido y no NULL.
+// Post: Retorna un puntero al proceso bloqueado extraído de la cola, o NULL si la cola está vacía o la conexión es NULL.
 void* obtener_proceso_bloqueado(t_IO_connection* conexion);
 
+// Agrega un proceso bloqueado a la cola de procesos bloqueados de una conexión.
+// Pre: El puntero a t_IO_connection y el puntero al proceso deben ser válidos y no NULL.
+// Post: Retorna true si el proceso fue agregado exitosamente, false en caso contrario.
 bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso);
 
+// Verifica si una conexión tiene procesos bloqueados en su cola.
+// Pre: El puntero a t_IO_connection debe ser válido y no NULL.
+// Post: Retorna true si la cola de procesos bloqueados está vacía, false en caso contrario.
 bool tiene_procesos_bloqueados(t_IO_connection* cliente_io);
 
 #endif // IO_INTERFACE_H

@@ -1,50 +1,5 @@
 #include "manager_ios.h"
 
-
-t_IO_connection* nuevo_IO_cliente_conectado(int cliente_io)
-{
-    t_IO_interface* io_interface = recv_IO_interface(cliente_io);
-
-    if (io_interface == NULL) {
-        log_error(logger_kernel, "Error al recibir la interfaz de E/S del cliente.");
-        liberar_conexion(cliente_io);
-        return NULL;
-    }
-
-    // Crear la estructura t_IO_connection
-    t_IO_connection* io_connection = crear_IO_connection(obtener_nombre_IO_interface(io_interface), obtener_tipo_IO_interface(io_interface), cliente_io);
-    if (io_connection == NULL) {
-        log_error(logger_kernel, "Error al crear la conexión de E/S.");
-        liberar_conexion(cliente_io);
-        return NULL;
-    }
-
-    // Libero la io_interface
-    liberar_IO_interface(io_interface);
-
-    return io_connection;
-}
-
-void agregar_IO_connection(t_IO_connection* io_connection)
-{
-    pthread_mutex_lock(&MUTEX_DICTIONARY);
-    char* nombre_interfaz = obtener_nombre_conexion(io_connection);
-
-    if (!dictionary_has_key(io_connections, nombre_interfaz)) {
-        dictionary_put(io_connections, nombre_interfaz, io_connection);
-    }
-    
-    pthread_mutex_unlock(&MUTEX_DICTIONARY);
-}
-
-t_IO_connection* get_IO_connection(char* nombre_interfaz) 
-{
-    pthread_mutex_lock(&MUTEX_DICTIONARY);
-    t_IO_connection* io_connection = dictionary_get(io_connections, nombre_interfaz);
-    pthread_mutex_unlock(&MUTEX_DICTIONARY);
-    return io_connection;
-}
-
 procesar_solicitud_func obtener_procesador_solicitud(int tipo_conexion) 
 {
     switch(tipo_conexion) {
@@ -59,11 +14,6 @@ procesar_solicitud_func obtener_procesador_solicitud(int tipo_conexion)
         default:
             return NULL;
     }
-}
-
-void* obtener_siguiente_proceso(t_IO_connection* cliente_io)
-{
-    return obtener_proceso_bloqueado(cliente_io);
 }
 
 int procesar_solicitud_IO(int fd, void* solicitud, procesar_solicitud_func procesar_func) 
@@ -115,20 +65,43 @@ void procesar_respuesta_io(int fd, char* nombre_interfaz)
     delete_response(response);
 }
 
-t_IO_connection* recibir_io_connection(int cliente_io) 
+void proceso_solicita_io(int tipo_io, void* solicitud)
 {
-    int cod_op = recibir_operacion(cliente_io);
+    t_IO_connection* io_connection;
+    bool agrego = false; // flag para saber si agregó la solicitud en la cola de bloqueados correspondiente
+    t_PCB* pcb_solicita_io;
 
-    if(cod_op == MSG_IO_KERNEL) {
-        return nuevo_IO_cliente_conectado(cliente_io);
-    } else {
-        log_error(logger_kernel, "Error al recibir un cliente IO. Operación incorrecta: %d", cod_op);
-        liberar_conexion(cliente_io);
+    switch(tipo_io)
+    {
+        case GENERICA:
+            t_solicitud_io_generica* solicitud_gen = (t_solicitud_io_generica*)solicitud;
+            io_connection = get_IO_connection(obtener_nombre_solicitud_generica(solicitud_gen), io_connections, &MUTEX_DICTIONARY);
+            pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "GENERICA");
+            break;
+        case STDIN:
+            t_solicitud_io_stdin* solicitud_stdin = (t_solicitud_io_stdin*)solicitud;
+            io_connection = get_IO_connection(obtener_nombre_solicitud_stdin(solicitud_stdin), io_connections, &MUTEX_DICTIONARY);
+            pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "STDIN");
+            break;
+        case STDOUT:
+            t_solicitud_io_stdout* solicitud_stdout = (t_solicitud_io_stdout*)solicitud;
+            io_connection = get_IO_connection(obtener_nombre_solicitud_stdout(solicitud_stdout), io_connections, &MUTEX_DICTIONARY);
+            pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "STDOUT");
+            break;
+        case DIALFS:
+            // TODO: descomentar despues de realizar el merge de la rama de JORGE!!
+            // t_solicitud_io_dialfs* solicitud_dialfs = (t_solicitud_io_dialfs*)solicitud;
+            // io_connection = get_IO_connection(obtener_nombre_solicitud_dialfs(solicitud_dialfs), io_connections, &MUTEX_DICTIONARY);
+            // pcb = obtener_pcb_de_solicitud(solicitud, "DIALFS");
+            break;
+        default:
+            //caso de error
+            break;
     }
-    return NULL;
-}
 
-void proceso_solicita_io(void* solicitud)
-{
-    
+    if(io_connection != NULL)
+        agrego= agregar_proceso_bloqueado(io_connection, solicitud);
+
+    if(!agrego)
+        agregar_a_cola_exit(pcb_solicita_io);
 }

@@ -33,4 +33,6 @@ void enviar_datos_leidos(int fd, void* buffer, uint32_t tamanio);
 // FUNCIONES comunes
 void send_IO_interface_kernel();
 
+void send_IO_interface_memoria();
+
 #endif

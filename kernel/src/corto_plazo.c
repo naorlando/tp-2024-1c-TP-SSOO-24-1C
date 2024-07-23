@@ -135,24 +135,6 @@ t_planificador _obtener_planificador(char *str)
     return -1;
 }
 
-void blocked()
-{
-
-    while(1) {
-        sem_wait(&SEM_BLOCKED);
-        
-        t_solicitud* solicitud = get_next_solicitud();
-
-        sem_wait(&SEM_SOLICITUDES);
-
-        if(!procesar_solicitud(solicitud)) {
-            // la io no esta conectada desde el principio
-            agregar_a_cola_exit(obtener_pcb_solicitud(solicitud));
-        }
-        
-    }
-}
-
 void pcb_execute( t_PCB* pcb)
 {
     log_info(logger_kernel, "Se prepara para ejecutar el PCB con PID: <%d>", pcb->pid);

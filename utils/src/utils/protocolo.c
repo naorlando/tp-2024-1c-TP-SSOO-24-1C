@@ -428,14 +428,14 @@ t_solicitud_io_stdout *recv_solicitud_io_stdout(int fd)
     return solicitud;
 }
 
-void send_IO_interface(int fd, char *nombre_interfaz, char *tipo)
+void send_IO_interface(int fd, char *nombre_interfaz, char *tipo, t_msg_header header)
 {
     tipo_interfaz_t tipo_interfaz = string_to_tipo_interfaz(tipo);
 
     t_IO_interface *interface = crear_IO_interface(nombre_interfaz, tipo_interfaz);
 
     // Creo el paquete que se va a enviar
-    t_package *package = package_create(MSG_IO_KERNEL, obtener_size_IO_interface(interface));
+    t_package *package = package_create(header, obtener_size_IO_interface(interface));
 
     // Serializo en el buffer el t_solicitud_io_generica
     serializar_IO_interface(get_buffer(package), interface);
