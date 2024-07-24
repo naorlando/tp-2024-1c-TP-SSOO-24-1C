@@ -40,6 +40,7 @@ typedef struct {
 typedef struct {
     uint32_t pid;          // Identificador del proceso
     t_list *paginas;      // Lista de entradas de la tabla de páginas
+    uint32_t size;
 } t_pid_table;
 
 // Estructura para manejar el espacio de memoria
@@ -57,7 +58,7 @@ extern bool is_structure_created;
 void create_page_tables_structure();
 
 // Función para crear un proceso con una cantidad específica de páginas
-void create_process(uint32_t pid, uint32_t num_paginas);
+void create_process(uint32_t pid, uint32_t num_paginas, uint32_t);
 
 // Función para obtener los datos de una página dada un PID y un número de página
 t_entrada_tabla_de_paginas *get_page_data(uint32_t pid, uint32_t page_number);
@@ -66,7 +67,7 @@ t_entrada_tabla_de_paginas *get_page_data(uint32_t pid, uint32_t page_number);
 bool get_page_frame(uint32_t pid, uint32_t page_number, uint32_t *frame_response);
 
 // Función para agregar una página a la memoria
-void agregar_pagina_a_memoria(uint32_t pid, uint32_t page_number);
+void agregar_pagina_a_memoria(t_entrada_tabla_de_paginas *);
 
 // Función para finalizar un proceso dado su PID
 void finalizar_proceso(uint32_t pid);

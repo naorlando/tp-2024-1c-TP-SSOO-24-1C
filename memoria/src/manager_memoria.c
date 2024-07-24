@@ -1,6 +1,6 @@
 #include "manager_memoria.h"
 
-void retornar_siguiente_instruccion() 
+void retornar_siguiente_instruccion()
 {
     t_next_instruction *next = recv_next_instruction_cpu();
 
@@ -59,7 +59,9 @@ int process_message_cpu_handshake()
     {
         log_error(logger_memoria, "SE DEBE RECIBIR EL HANDSHAKE DE CPU ANTES QUE CUALQUIER MSJ");
         exit(EXIT_FAILURE);
-    } else{
+    }
+    else
+    {
         handshake_cpu = true;
         send_msg_memoria_cpu_init(memoria_config->TAM_PAGINA, fd_cpu);
     }
@@ -77,6 +79,7 @@ int process_message_cpu_page()
     uint32_t page_number = 0;
     recv_msg_cpu_memoria_page(buffer, &pid, &page_number);
     t_entrada_tabla_de_paginas *pagina = get_page_data(pid, page_number);
+
     send_msg_memoria_cpu(fd_cpu, pagina->frame);
     return 0;
 }
@@ -86,18 +89,15 @@ int process_message_data_read(int file_descriptor)
 {
     t_buffer *buffer = recive_full_buffer(file_descriptor);
     uint32_t pid = 0;
-    uint32_t page_number = 0;
     uint32_t frame = 0;
     uint32_t offset = 0;
     uint32_t size_value = 0;
 
     recv_msg_memoria_data_read(buffer, &pid, &frame, &offset, &size_value);
-
+    log_info(logger_memoria, "PID: <%d> - Accion: <LEER> - Direccion fisica: <%d>” - Tamaño <%d>", pid, frame, size_value);
     void *value = read_data(frame, offset, size_value);
 
     send_msg_memoria_generic_data_read(value, size_value, file_descriptor);
-
-    log_info(logger_memoria, "PID: %u - Accion: LEER <%u> BYTES - Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u", pid, size_value, page_number, frame, offset);
     buffer_destroy(buffer);
     free(value);
     return 0;
@@ -116,10 +116,9 @@ int process_message_data_write(int file_descriptor)
 
     void *value = malloc(value_size);
     buffer_read_data(buffer, value, value_size);
+    usleep(obtener_retardo_respuesta(memoria_config) * 1000);
+    log_info(logger_memoria, "PID: <%d> - Accion: <ESCRIBIR> - Direccion fisica: <%d>” - Tamaño <%d>", pid, frame, value_size);
     write_data(frame, offset, value, value_size);
-
-    log_info(logger_memoria, "PID: %u - Accion: ESCRIBIR <%u> BYTES- Direccion fisica: ( Marco: %u | Desplazamiento: %u",
-             pid, value_size, frame, offset);
     buffer_destroy(buffer);
     free(value);
     return 0;
@@ -140,4 +139,15 @@ int process_message_cpu_resize(int file_descriptor)
              pid, new_size);
     buffer_destroy(buffer);
     return 0;
+}
+
+void finaliizar_proceso_manager()
+{
+    t_buffer *buffer = recive_full_buffer(fd_kernel);
+    uint32_t pid = -1;
+    recv_msg_kernel_memoria_end_process(buffer, &pid);
+    usleep(obtener_retardo_respuesta(memoria_config) * 1000);
+    finalizar_proceso(pid);
+
+    buffer_destroy(buffer);
 }

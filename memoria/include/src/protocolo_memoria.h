@@ -44,4 +44,8 @@ int send_msg_cpu_memoria_resize(uint8_t resize_response,int fd);
 
 int recv_msg_cpu_memoria_handshake(t_buffer *buffer, uint32_t *handshake);
 
+
+//END PROCESS
+void recv_msg_kernel_memoria_end_process(t_buffer *buffer, uint32_t *pid);
+
 #endif /*PROTOCOLO_MEMORIA_H_*/

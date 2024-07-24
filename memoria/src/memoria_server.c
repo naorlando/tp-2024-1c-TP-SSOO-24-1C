@@ -74,6 +74,9 @@ void requests_kernel()
         case MSG_KERNEL_CREATE_PROCESS:
             crear_imagen_proceso();
             break;
+        case MSG_KERNEL_END_PROCESS:
+            finaliizar_proceso_manager();
+            break;    
         case -1:
             log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
             esperar = false; // Cortamos la espera de solicitudes

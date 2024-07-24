@@ -49,6 +49,7 @@ typedef enum
     MSG_KERNEL_MEMORIA, // SE LLAMA PERO NO SE USA!
     MSG_MEMORIA_KERNEL, // SE LLAMA PERO NO SE USA!
     MSG_KERNEL_CREATE_PROCESS, // KERNEL -> MEMORIA (Se solicita crear la imagen de un proceso) 
+    MSG_KERNEL_END_PROCESS, // MARCA LOS MARCOS LIBRES DEL BITARRAY
     // KERNEL <-> IO
     MSG_IO_KERNEL, // IO -> KERNEL (La IO establece una conexion con KERNEL)
     MSG_KERNEL_IO, // REVISAR

@@ -1,13 +1,5 @@
 #include "tabla_paginas.h"
 
-// extern memory_t * espacio_memoria ;
-
-// t_dictionary *diccionario_tablas_de_paginas_por_proceso;
-// pthread_mutex_t MUTEX_DICCIONARIO_TABLAS_PAGINAS;
-
-// pthread_mutex_t MUTEX_BIT_ARRAY_MEMORY;
-// bool is_structure_created = false;
-
 uint8_t resize(uint32_t pid, uint32_t new_size)
 {
     uint32_t new_page_count = calculate_page_count(new_size);
@@ -21,13 +13,7 @@ uint8_t resize(uint32_t pid, uint32_t new_size)
             log_error(logger_memoria, "No hay suficientes marcos disponibles para crear el proceso PID: %d", pid);
             return 0;
         }
-        create_process(pid, new_page_count);
-
-        // Asignar marcos a las nuevas páginas
-        for (uint32_t i = 0; i < new_page_count; i++)
-        {
-            agregar_pagina_a_memoria(pid, i);
-        }
+        create_process(pid, new_page_count, new_size);
         return 1;
     }
 
@@ -37,7 +23,8 @@ uint8_t resize(uint32_t pid, uint32_t new_size)
     pthread_mutex_unlock(&MUTEX_DICCIONARIO_TABLAS_PAGINAS);
 
     uint32_t old_page_count = list_size(pid_table->paginas);
-
+    uint32_t old_size = pid_table->size;
+    
     if (new_page_count > old_page_count)
     {
         // Verificar si hay suficientes frames disponibles antes de aumentar el tamaño
@@ -52,11 +39,12 @@ uint8_t resize(uint32_t pid, uint32_t new_size)
         for (uint32_t i = old_page_count; i < new_page_count; i++)
         {
             t_entrada_tabla_de_paginas *pagina = _create_default_page();
+            agregar_pagina_a_memoria(pagina);
             list_add(pid_table->paginas, pagina);
 
             // Asignar un marco libre a la página
-            agregar_pagina_a_memoria(pid, i);
         }
+        log_info(logger_memoria, "AMPLIACION -- PID: <%d> - Tamaño Actual: <%d> - Tamaño a Ampliar: <%d>", pid, old_size, new_size); //LOG MINIMO
     }
     else if (new_page_count < old_page_count)
     {
@@ -77,9 +65,9 @@ uint8_t resize(uint32_t pid, uint32_t new_size)
         {
             list_remove(pid_table->paginas, list_size(pid_table->paginas) - 1);
         }
+        log_info(logger_memoria, "REDUCCIÓN -- PID: <%d> - Tamaño Actual: <%d> - Tamaño a Ampliar: <%d>", pid, old_size, new_size); //LOG MINIMO
     }
 
-    log_info(logger_memoria, "PID: %d - Tamaño cambiado a %d páginas", pid, new_page_count);
     return 1;
 }
 
@@ -99,7 +87,7 @@ void create_page_tables_structure()
 }
 
 // Función para crear un proceso con una cantidad específica de páginas
-void create_process(uint32_t pid, uint32_t num_paginas)
+void create_process(uint32_t pid, uint32_t num_paginas, uint32_t size)
 {
     if (!is_structure_created)
     {
@@ -116,11 +104,13 @@ void create_process(uint32_t pid, uint32_t num_paginas)
     pthread_mutex_lock(&MUTEX_DICCIONARIO_TABLAS_PAGINAS);
     t_pid_table *pid_table = malloc(sizeof(t_pid_table));
     pid_table->pid = pid;
+    pid_table->size = size;
     pid_table->paginas = list_create();
 
     for (uint32_t i = 0; i < num_paginas; i++)
     {
         t_entrada_tabla_de_paginas *pagina = _create_default_page();
+        agregar_pagina_a_memoria(pagina);
         list_add(pid_table->paginas, pagina);
     }
 
@@ -131,6 +121,7 @@ void create_process(uint32_t pid, uint32_t num_paginas)
 // Función para obtener los datos de una página dada un PID y un número de página
 t_entrada_tabla_de_paginas *get_page_data(uint32_t pid, uint32_t page_number)
 {
+    t_entrada_tabla_de_paginas *response = NULL;
     pthread_mutex_lock(&MUTEX_DICCIONARIO_TABLAS_PAGINAS);
     t_pid_table *pid_table = _find_pid(pid, diccionario_tablas_de_paginas_por_proceso);
     pthread_mutex_unlock(&MUTEX_DICCIONARIO_TABLAS_PAGINAS);
@@ -141,7 +132,10 @@ t_entrada_tabla_de_paginas *get_page_data(uint32_t pid, uint32_t page_number)
         exit(EXIT_FAILURE);
     }
 
-    return list_get(pid_table->paginas, page_number);
+    response = list_get(pid_table->paginas, page_number);
+    log_info(logger_memoria, "Acceso a Tabla de Páginas -- PID: <%d> - Pagina: <%d> - Marco: <%d>", pid, page_number, response->frame);
+
+    return response;
 }
 
 // Función para obtener el marco de una página dada un PID y un número de página
@@ -160,9 +154,8 @@ bool get_page_frame(uint32_t pid, uint32_t page_number, uint32_t *frame_response
 }
 
 // Función para agregar una página a la memoria
-void agregar_pagina_a_memoria(uint32_t pid, uint32_t page_number)
+void agregar_pagina_a_memoria(t_entrada_tabla_de_paginas *pagina_a_agregar)
 {
-    t_entrada_tabla_de_paginas *pagina_a_agregar = get_page_data(pid, page_number);
     int32_t frame_disponible = _frame_disponible();
 
     if (frame_disponible != -1)
@@ -171,11 +164,7 @@ void agregar_pagina_a_memoria(uint32_t pid, uint32_t page_number)
         _set_bitarray_value_memory(frame_disponible, true);
 
         pagina_a_agregar->presencia = true;
-        // pagina_a_agregar->uso = true;
-        // pagina_a_agregar->modificado = false;
         pagina_a_agregar->frame = frame_disponible;
-
-        log_info(logger_memoria, "PID: %d - Página: %d - Marco: %d agregado a memoria", pid, page_number, frame_disponible);
     }
     else
     {
@@ -187,7 +176,7 @@ void agregar_pagina_a_memoria(uint32_t pid, uint32_t page_number)
 void finalizar_proceso(uint32_t pid)
 {
     pthread_mutex_lock(&MUTEX_DICCIONARIO_TABLAS_PAGINAS);
-    t_pid_table *proceso_obtenido = dictionary_remove(diccionario_tablas_de_paginas_por_proceso, (char *)&pid);
+    t_pid_table *proceso_obtenido = dictionary_remove(diccionario_tablas_de_paginas_por_proceso, uint32_to_string(pid));
     pthread_mutex_unlock(&MUTEX_DICCIONARIO_TABLAS_PAGINAS);
 
     if (proceso_obtenido == NULL)
@@ -210,7 +199,7 @@ void finalizar_proceso(uint32_t pid)
     list_destroy(proceso_obtenido->paginas);
     free(proceso_obtenido);
 
-    log_info(logger_memoria, "Proceso con PID: %d finalizado y memoria liberada", pid);
+    log_info(logger_memoria, "Destruccion de Tabla de Paginas - PID: <%d> - Tamaño: <%d>", pid, cant_paginas_proceso);
 }
 
 // Función interna para encontrar una tabla de páginas por PID

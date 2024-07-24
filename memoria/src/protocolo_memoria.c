@@ -116,7 +116,7 @@ int recv_msg_cpu_memoria_page(t_buffer *buffer, uint32_t *pid, uint32_t *page)
 
 // --   READ DATA    --
 
-// GENERICO -> MEMORIA 
+// GENERICO -> MEMORIA
 int recv_msg_memoria_data_read(t_buffer *buffer, uint32_t *pid, uint32_t *frame, uint32_t *offset, uint32_t *size_value)
 {
 
@@ -155,7 +155,7 @@ int send_msg_memoria_generic_data_read(void *value, uint32_t size_value, int fd)
 {
     t_package *package = package_create(MSG_MEMORIA_GENERIC_DATA_READ, size_value);
     buffer_add_data(package->buffer, value, size_value);
-
+    usleep(obtener_retardo_respuesta(memoria_config) * 1000);
     package_send(package, fd);
 
     package_destroy(package);
@@ -176,8 +176,8 @@ int send_msg_cpu_memoria_resize(uint8_t resize_response, int fd)
     t_package *package = package_create(MSG_MEMORIA_CPU_RESIZE, sizeof(uint8_t));
 
     buffer_add_uint8(package->buffer, resize_response);
-
-    package_send(package,fd);
+    usleep(obtener_retardo_respuesta(memoria_config) * 1000);
+    package_send(package, fd);
 
     package_destroy(package);
 
@@ -189,4 +189,12 @@ int recv_msg_cpu_memoria_handshake(t_buffer *buffer, uint32_t *handshake)
     deserialize_uint32_t(buffer, 1, handshake);
 
     return EXIT_SUCCESS;
+}
+
+void recv_msg_kernel_memoria_end_process(t_buffer *buffer, uint32_t *pid)
+{
+
+    deserialize_uint32_t(buffer, 1, pid);
+
+ 
 }

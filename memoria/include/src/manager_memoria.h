@@ -26,5 +26,6 @@ int process_message_cpu_handshake();
 
 void crear_imagen_proceso();
 
+void finaliizar_proceso_manager();
 
 #endif //MANAGER_MEMORIA_H_
