@@ -18,7 +18,7 @@ int process_message_cpu_page();
 
 int process_message_data_read(int file_descriptor);
 
-int process_message_data_write();
+int process_message_data_write(int file_descriptor);
 
 int process_message_cpu_resize(int file_descriptor);
 

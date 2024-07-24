@@ -104,9 +104,9 @@ int process_message_data_read(int file_descriptor)
 }
 
 // MSG_CPU_MEMORIA_DATA_WRITE
-int process_message_data_write()
+int process_message_data_write(int file_descriptor)
 {
-    t_buffer *buffer = recive_full_buffer(fd_cpu);
+    t_buffer *buffer = recive_full_buffer(file_descriptor);
     uint32_t pid = 0;
     uint32_t frame = 0;
     uint32_t offset = 0;

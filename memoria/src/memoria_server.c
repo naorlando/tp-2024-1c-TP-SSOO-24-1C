@@ -32,7 +32,7 @@ void requests_cpu()
             break;
 
         case MSG_GENERIC_MEMORIA_DATA_WRITE:
-            process_message_data_write();
+            process_message_data_write(fd_cpu);
             break;
 
         case MSG_CPU_MEMORIA_RESIZE:
@@ -154,9 +154,10 @@ void *esperar_conexiones_IO(void *arg)
 
         if (cliente_io != -1)
         {
-            t_IO_connection* io_connection = recibir_io_connection(cliente_io, logger_memoria, MSG_IO_MEMORIA);
+            t_IO_connection *io_connection = recibir_io_connection(cliente_io, logger_memoria, MSG_IO_MEMORIA);
 
-            if (io_connection != NULL) {
+            if (io_connection != NULL)
+            {
                 agregar_IO_connection(io_connection, ios_conectadas, &MUTEX_DICTIONARY_IOS);
 
                 pthread_t hilo_entradasalida;
@@ -165,7 +166,7 @@ void *esperar_conexiones_IO(void *arg)
                     log_error(logger_memoria, "Error al crear el hilo para atender el cliente de IO. ABORTANDO");
                     exit(EXIT_FAILURE);
                 }
-                char* nombre_interfaz = obtener_nombre_conexion(io_connection);
+                char *nombre_interfaz = obtener_nombre_conexion(io_connection);
                 log_info(logger_memoria, "Nueva conexión de I/O establecida: %s de tipo %s", nombre_interfaz, tipo_interfaz_to_string(obtener_tipo_conexion(io_connection)));
                 pthread_detach(hilo_entradasalida);
             }
@@ -178,9 +179,9 @@ void *esperar_conexiones_IO(void *arg)
     return NULL;
 }
 
-void atender_memoria_IO(void* io_connection)
+void atender_memoria_IO(void *io_connection)
 {
-    t_IO_connection* cliente_io = (t_IO_connection*)io_connection;
+    t_IO_connection *cliente_io = (t_IO_connection *)io_connection;
     bool control_key = 1;
 
     while (control_key)
@@ -189,17 +190,25 @@ void atender_memoria_IO(void* io_connection)
 
         switch (cod_op)
         {
-            case EXAMPLE:
-                recv_example_msg_entradasalida();
-                // esperar = false; //Cortamos la espera de solicitudes
-                break;
-            case -1:
-                log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
-                control_key = false; // Cortamos la espera de solicitudes
-                break;
-            default:
-                log_warning(logger_memoria, "WARNING: El modulo de memoria ha recibido una solicitud con una operacion desconocida");
-                break;
+        case EXAMPLE:
+            recv_example_msg_entradasalida();
+            // esperar = false; //Cortamos la espera de solicitudes
+            break;
+
+        case MSG_GENERIC_MEMORIA_DATA_READ:
+            process_message_data_read(obtener_file_descriptor(cliente_io));
+            break;
+
+        case MSG_GENERIC_MEMORIA_DATA_WRITE:
+            process_message_data_write(obtener_file_descriptor(cliente_io));
+            break;
+        case -1:
+            log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");
+            control_key = false; // Cortamos la espera de solicitudes
+            break;
+        default:
+            log_warning(logger_memoria, "WARNING: El modulo de memoria ha recibido una solicitud con una operacion desconocida");
+            break;
         }
     }
 }
