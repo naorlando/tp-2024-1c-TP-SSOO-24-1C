@@ -41,7 +41,6 @@ extern pthread_mutex_t MUTEX_EXIT;
 extern pthread_mutex_t MUTEX_NEW;
 extern pthread_mutex_t MUTEX_EXECUTE;
 extern pthread_mutex_t MUTEX_DICTIONARY;
-extern pthread_mutex_t MUTEX_SOLICITUD;
 extern pthread_mutex_t MUTEX_RECURSOS;
 extern pthread_mutex_t MUTEX_AUX_READY;
 extern pthread_mutex_t MUTEX_COLA_RETORNO_PCB;
@@ -87,7 +86,6 @@ extern t_queue* COLA_NEW;
 extern t_queue* COLA_RETORNO_PCB;
 extern t_PCB* EXECUTE; //una variable para que el kernel conozca el pcb que este ejecutando:
 extern t_list* LISTA_COLAS_DISPOSITIVOS; 
-extern t_queue* SOLICITUDES;
 
 
 //ESTADO PLANIFICADOR

@@ -22,7 +22,7 @@ t_PCB* recv_pcb_kernel();
 // Pre: La variable global pcb_execute debe ser un puntero válido a t_PCB y no debe ser NULL.
 //      El descriptor de archivo fd_kernel_dispatch debe ser válido y estar abierto.
 // Post: El PCB contenido en pcb_execute se envía al kernel.
-void send_pcb_kernel();
+void send_pcb_kernel(int);
 
 // Envia un t_PCB al Kernel por una interrupción.
 // Pre: La variable global pcb_execute debe ser un puntero válido a t_PCB y no debe ser NULL.

@@ -18,7 +18,7 @@ t_PCB* recv_pcb_cpu()
     t_PCB* pcb = recv_pcb(fd_cpu_dispatch);
     // detenemos.
     // asignamos nuevo quantum al pcb.
-    log_info(logger_kernel, "Se recibio un PCB del CPU_DISPATCH, PID <%d>", pcb->pid);
+    log_info(logger_kernel, "Se recibio un PCB a traves del CPU_DISPATCH, PID <%d>", pcb->pid);
 
     return pcb;
 }

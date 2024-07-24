@@ -28,6 +28,7 @@ extern bool llego_a_exit;
 extern bool solicitud_io;
 extern bool solicitud_recurso;
 extern bool cambio_pc;
+extern bool out_of_memory;
 
 
 // Variables globales
