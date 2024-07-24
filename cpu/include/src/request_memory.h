@@ -8,6 +8,7 @@
 #include "variables_globales.h"
 #include "utils/instruccion.h"
 #include "utils/estructuras.h"
+#include "utils/protocolo.h"
 #include "utils/io_frames_lib.h"
 #include "protocolo_cpu.h"
 #include "cpu_interrupt.h"

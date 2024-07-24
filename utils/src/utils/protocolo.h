@@ -63,13 +63,12 @@ typedef enum
     //CPU <-> MEMORIA
 	MSG_MEMORIA_CPU_INIT,
 	MSG_CPU_MEMORIA_PAGE,
-	MSG_MEMORIA_CPU_DATA_READ,
     MSG_MEMORIA_CPU_DATA_WRITE,
     MSG_MEMORIA_CPU_FRAME,
     MSG_MEMORIA_CPU_RESIZE,
 	MSG_CPU_MEMORIA_RESIZE,
-	MSG_CPU_MEMORIA_DATA_WRITE,
-    MSG_CPU_MEMORIA_DATA_READ,
+
+    
 	MSG_CPU_MEMORIA_INIT,
     MSG_MEMORIA_CPU,
     MSG_CPU_MEMORIA,
@@ -83,6 +82,11 @@ typedef enum
     MSG_IO_STDIN_MEMORIA,
     MSG_IO_STDOUT_MEMORIA,
     MSG_IO_DIALFS_MEMORIA,
+
+    //GENERIC MEMORIA
+    MSG_MEMORIA_GENERIC_DATA_READ,
+    MSG_GENERIC_MEMORIA_DATA_READ,
+    MSG_GENERIC_MEMORIA_DATA_WRITE,
     // HEADER_EXAMPLE
     EXAMPLE,
     //Empty package
@@ -560,5 +564,11 @@ t_manejo_recurso* deserialize_manejo_recurso(t_buffer* buffer);
 void serializar_io_frames(t_buffer* buffer, t_io_frames* io_frames);
 t_io_frames* deserializar_io_frames(t_buffer* buffer);
 
+// --   WRITE DATA MEMORIA   --
+int send_msg_memoria_data_write(uint32_t pid, uint32_t frame, uint32_t offset, void *value, uint32_t size_valor, int fd);
+// --   READ DATA MEMORIA   --
+int send_msg_memoria_data_read(uint32_t pid, uint32_t frame, uint32_t offset, uint32_t size_value, int fd);
+// --   READ RESPONSE DATA MEMORIA   --
+int recv_msg_memoria_data(t_buffer *buffer, void *value, uint32_t value_size);
 
 #endif

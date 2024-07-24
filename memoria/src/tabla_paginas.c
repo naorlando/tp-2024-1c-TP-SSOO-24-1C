@@ -171,8 +171,8 @@ void agregar_pagina_a_memoria(uint32_t pid, uint32_t page_number)
         _set_bitarray_value_memory(frame_disponible, true);
 
         pagina_a_agregar->presencia = true;
-        pagina_a_agregar->uso = true;
-        pagina_a_agregar->modificado = false;
+        // pagina_a_agregar->uso = true;
+        // pagina_a_agregar->modificado = false;
         pagina_a_agregar->frame = frame_disponible;
 
         log_info(logger_memoria, "PID: %d - Página: %d - Marco: %d agregado a memoria", pid, page_number, frame_disponible);
@@ -258,9 +258,9 @@ t_entrada_tabla_de_paginas *_create_default_page()
         exit(EXIT_FAILURE); // Opcional: puedes manejar esto de otra manera si prefieres no terminar el programa
     }
     pagina->frame = UINT32_MAX; // Valor por defecto para indicar que aún no se ha asignado un frame
-    pagina->modificado = false;
+
     pagina->presencia = false;
-    pagina->uso = true;
+
     return pagina;
 }
 

@@ -1071,3 +1071,41 @@ t_io_frames* deserializar_io_frames(t_buffer* buffer) {
     return io_frames;
 }
 
+// --   WRITE DATA MEMORIA   --
+int send_msg_memoria_data_write(uint32_t pid, uint32_t frame, uint32_t offset, void *value, uint32_t size_valor, int fd)
+{
+
+    t_package *package = package_create(MSG_GENERIC_MEMORIA_DATA_WRITE, (sizeof(uint32_t) * 4) + size_valor);
+
+    serialize_uint32_t(package->buffer, 4, pid, frame, offset, size_valor);
+    buffer_add_data(package->buffer, value, size_valor);
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return EXIT_SUCCESS;
+}
+
+// --   READ DATA MEMORIA   --
+int send_msg_memoria_data_read(uint32_t pid, uint32_t frame, uint32_t offset, uint32_t size_value, int fd)
+{
+
+    t_package *package = package_create(MSG_GENERIC_MEMORIA_DATA_READ, sizeof(uint32_t) * 4);
+
+    serialize_uint32_t(package->buffer, 4, pid, frame, offset, size_value);
+
+    package_send(package, fd);
+
+    package_destroy(package);
+
+    return EXIT_SUCCESS;
+}
+
+// --   READ RESPONSE DATA MEMORIA   --
+int recv_msg_memoria_data(t_buffer *buffer, void *value, uint32_t value_size)
+{
+
+    buffer_read_data(buffer, value, value_size);
+
+    return EXIT_SUCCESS;
+}

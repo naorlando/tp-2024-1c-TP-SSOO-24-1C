@@ -116,8 +116,8 @@ int recv_msg_cpu_memoria_page(t_buffer *buffer, uint32_t *pid, uint32_t *page)
 
 // --   READ DATA    --
 
-// CPU -> MEMORIA :: MSG_CPU_MEMORIA_DATA_READ
-int recv_msg_cpu_memoria_data_read(t_buffer *buffer, uint32_t *pid, uint32_t *frame, uint32_t *offset, uint32_t *size_value)
+// GENERICO -> MEMORIA 
+int recv_msg_memoria_data_read(t_buffer *buffer, uint32_t *pid, uint32_t *frame, uint32_t *offset, uint32_t *size_value)
 {
 
     deserialize_uint32_t(buffer, 4, pid, frame, offset, size_value);
@@ -127,10 +127,10 @@ int recv_msg_cpu_memoria_data_read(t_buffer *buffer, uint32_t *pid, uint32_t *fr
 
 // --   WRITE DATA    --
 
-// CPU -> MEMORIA :: MSG_MEMORIA_CPU_DATA_WRITE
-int recv_msg_cpu_memoria_data_write(t_buffer *buffer, uint32_t *pid, uint32_t *page, uint32_t *frame, uint32_t *offset, uint32_t *size_value) {
-    deserialize_uint32_t(buffer, 5, pid, page, frame, offset, size_value);
-  
+// GENERICO -> MEMORIA ::
+int recv_msg_memoria_data_write(t_buffer *buffer, uint32_t *pid, uint32_t *frame, uint32_t *offset, uint32_t *size_value)
+{
+    deserialize_uint32_t(buffer, 4, pid, frame, offset, size_value);
 
     return EXIT_SUCCESS;
 }
@@ -138,7 +138,7 @@ int recv_msg_cpu_memoria_data_write(t_buffer *buffer, uint32_t *pid, uint32_t *p
 // MEMORIA -> CPU :: MSG_MEMORIA_CPU_FRAME
 int send_msg_memoria_cpu(int fd, uint32_t frame)
 {
-    
+
     t_package *package = package_create(MSG_MEMORIA_CPU_FRAME, sizeof(u_int32_t));
 
     serialize_uint32_t(package->buffer, 1, frame);
@@ -151,11 +151,10 @@ int send_msg_memoria_cpu(int fd, uint32_t frame)
 }
 
 // MEMORIA -> CPU :: MSG_MEMORIA_CPU_DATA_READ
-int send_msg_memoria_cpu_data_read(void *value, uint32_t size_value, int fd)
+int send_msg_memoria_generic_data_read(void *value, uint32_t size_value, int fd)
 {
-
-    t_package *package = package_create(MSG_MEMORIA_CPU_DATA_READ, size_value);
-    buffer_add_data(package->buffer,value,size_value);
+    t_package *package = package_create(MSG_MEMORIA_GENERIC_DATA_READ, size_value);
+    buffer_add_data(package->buffer, value, size_value);
 
     package_send(package, fd);
 
@@ -178,7 +177,7 @@ int send_msg_cpu_memoria_resize(uint8_t resize_response, int fd)
 
     buffer_add_uint8(package->buffer, resize_response);
 
-    package_send(package, fd);
+    package_send(package,fd);
 
     package_destroy(package);
 

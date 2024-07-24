@@ -204,7 +204,7 @@ void procesar_ios_stdin()
         cancelar_hilo_quantum(pcb_io_stdin->pid);
     }
 
-    proceso_solicita_io(0, solicitud_stdin);
+    proceso_solicita_io(1, solicitud_stdin);
     sem_post(&SEM_CPU);
 }
 

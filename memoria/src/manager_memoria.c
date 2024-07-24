@@ -82,21 +82,20 @@ int process_message_cpu_page()
 }
 
 // MSG_CPU_MEMORIA_DATA_READ
-int process_message_cpu_data_read()
+int process_message_data_read(int file_descriptor)
 {
-    t_buffer *buffer = recive_full_buffer(fd_cpu);
+    t_buffer *buffer = recive_full_buffer(file_descriptor);
     uint32_t pid = 0;
     uint32_t page_number = 0;
     uint32_t frame = 0;
     uint32_t offset = 0;
     uint32_t size_value = 0;
 
-    recv_msg_cpu_memoria_data_read(buffer, &pid, &frame, &offset, &size_value);
-    // t_entrada_tabla_de_paginas *pagina = get_page_data(pid, page_number);
-    // pagina->uso = 1;
+    recv_msg_memoria_data_read(buffer, &pid, &frame, &offset, &size_value);
+
     void *value = read_data(frame, offset, size_value);
 
-    send_msg_memoria_cpu_data_read(value, size_value, fd_cpu);
+    send_msg_memoria_generic_data_read(value, size_value, file_descriptor);
 
     log_info(logger_memoria, "PID: %u - Accion: LEER <%u> BYTES - Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u", pid, size_value, page_number, frame, offset);
     buffer_destroy(buffer);
@@ -105,41 +104,37 @@ int process_message_cpu_data_read()
 }
 
 // MSG_CPU_MEMORIA_DATA_WRITE
-int process_message_cpu_data_write()
+int process_message_data_write()
 {
     t_buffer *buffer = recive_full_buffer(fd_cpu);
     uint32_t pid = 0;
-    uint32_t page_number = 0;
     uint32_t frame = 0;
     uint32_t offset = 0;
     uint32_t value_size = 0;
 
-    recv_msg_cpu_memoria_data_write(buffer, &pid, &page_number, &frame, &offset, &value_size);
+    recv_msg_memoria_data_write(buffer, &pid, &frame, &offset, &value_size);
 
     void *value = malloc(value_size);
     buffer_read_data(buffer, value, value_size);
-    t_entrada_tabla_de_paginas *pagina = get_page_data(pid, page_number);
-    pagina->uso = 1;
-    pagina->modificado = 1;
     write_data(frame, offset, value, value_size);
 
-    log_info(logger_memoria, "PID: %u - Accion: ESCRIBIR <%u> BYTES- Direccion fisica: (Page: %u | Marco: %u | Desplazamiento: %u",
-             pid, value_size, page_number, frame, offset);
+    log_info(logger_memoria, "PID: %u - Accion: ESCRIBIR <%u> BYTES- Direccion fisica: ( Marco: %u | Desplazamiento: %u",
+             pid, value_size, frame, offset);
     buffer_destroy(buffer);
     free(value);
     return 0;
 }
 
 // RESIZE
-int process_message_cpu_resize()
+int process_message_cpu_resize(int file_descriptor)
 {
-    t_buffer *buffer = recive_full_buffer(fd_cpu);
+    t_buffer *buffer = recive_full_buffer(file_descriptor);
     uint32_t pid = 0;
     uint32_t new_size;
 
     recv_msg_cpu_memoria_resize(buffer, &pid, &new_size);
     uint8_t resize_response = resize(pid, new_size);
-    send_msg_cpu_memoria_resize(resize_response, fd_cpu);
+    send_msg_cpu_memoria_resize(resize_response, file_descriptor);
 
     log_info(logger_memoria, "PID: %u - Accion: RESIZE - Nuevo tamaño (<%u>)",
              pid, new_size);

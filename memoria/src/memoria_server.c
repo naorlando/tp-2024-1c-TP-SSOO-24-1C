@@ -27,16 +27,16 @@ void requests_cpu()
             process_message_cpu_page();
             break;
 
-        case MSG_CPU_MEMORIA_DATA_READ:
-            process_message_cpu_data_read();
+        case MSG_GENERIC_MEMORIA_DATA_READ:
+            process_message_data_read(fd_cpu);
             break;
 
-        case MSG_CPU_MEMORIA_DATA_WRITE:
-            process_message_cpu_data_write();
+        case MSG_GENERIC_MEMORIA_DATA_WRITE:
+            process_message_data_write();
             break;
 
         case MSG_CPU_MEMORIA_RESIZE:
-            process_message_cpu_resize();
+            process_message_cpu_resize(fd_cpu);
             break;
         case -1:
             log_error(logger_memoria, "ERROR: Ha surgido un problema inesperado, se desconecto el modulo de memoria.");

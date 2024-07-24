@@ -16,11 +16,11 @@ void retornar_siguiente_instruccion();
 
 int process_message_cpu_page();
 
-int process_message_cpu_data_read();
+int process_message_data_read(int file_descriptor);
 
-int process_message_cpu_data_write();
+int process_message_data_write();
 
-int process_message_cpu_resize();
+int process_message_cpu_resize(int file_descriptor);
 
 int process_message_cpu_handshake();
 

@@ -34,8 +34,6 @@
 typedef struct {
     uint32_t frame;        // Número de marco en la memoria física
     bool presencia;       // Indica si la página está en memoria
-    bool modificado;      // Indica si la página ha sido modificada
-    bool uso;             // Indica si la página ha sido utilizada recientemente
 } t_entrada_tabla_de_paginas;
 
 // Estructura para la tabla de páginas de un proceso
