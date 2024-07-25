@@ -179,56 +179,58 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
 // TODO: REVISAR MACHEO DE INT, debuggear.
 //#############################################################################################################
 // Función para obtener el puntero a un registro basado en su nombre:
-uint32_t* _obtener_registro(t_cpu_registers *registros, const char *nombre) {
+uint32_t  _obtener_registro(t_cpu_registers *registros, const char *nombre) {
+
+ 
     //pc:
     if (strcmp(nombre, "PC") == 0) {
-        return (uint32_t*)&registros->pc;
+        return (uint32_t ) registros->pc;
     }
     if (strcmp(nombre, "AX") == 0) {
         //log_info(logger_cpu, "AX = %u", (uint32_t)registros->ax);
-        return (uint32_t*)&registros->ax;
+        return (uint32_t ) registros->ax;
         // uint32_t valor = (uint32_t)registros->ax; 
-        // return &valor;
+        // return  valor;
     }
     if (strcmp(nombre, "BX") == 0) {
         //log_info(logger_cpu, "BX = %u", (uint32_t)registros->bx);
-        return (uint32_t*)&registros->bx;
-        // uint32_t valor = (uint32_t)registros->bx; 
-        // return &valor;
-    }
+        return (uint32_t ) registros->bx;
+    //     uint32_t valor = (uint32_t)registros->bx; 
+    //     return  valor;
+     }
     if (strcmp(nombre, "CX") == 0) {
         log_info(logger_cpu, "CX = %u", (uint32_t)registros->cx);
-        return (uint32_t*)&registros->cx;
+        return (uint32_t ) registros->cx;
     }
     if (strcmp(nombre, "DX") == 0) {
         log_info(logger_cpu, "DX = %u", (uint32_t)registros->dx);
-        return (uint32_t*)&registros->dx;
+        return (uint32_t ) registros->dx;
     }
     if (strcmp(nombre, "EAX") == 0) {
         log_info(logger_cpu, "EAX = %u", registros->eax);
-        return &registros->eax;
+        return  registros->eax;
     }
     if (strcmp(nombre, "EBX") == 0) {
         log_info(logger_cpu, "EBX = %u", registros->ebx);
-        return &registros->ebx;
+        return  registros->ebx;
     }
     if (strcmp(nombre, "ECX") == 0) {
         log_info(logger_cpu, "ECX = %u", registros->ecx);
-        return &registros->ecx;
+        return  registros->ecx;
     }
     if (strcmp(nombre, "EDX") == 0) {
         log_info(logger_cpu, "EDX = %u", registros->edx);
-        return &registros->edx;
+        return  registros->edx;
     }
     if (strcmp(nombre, "SI") == 0) {
         log_info(logger_cpu, "SI = %u", registros->si);
-        return &registros->si;
+        return  registros->si;
     }
     if (strcmp(nombre, "DI") == 0) {
         log_info(logger_cpu, "DI = %u", registros->di);
-        return &registros->di;
+        return  registros->di;
     }
-    return NULL;
+    return EXIT_FAILURE;
 }
 
 void _establecer_registro(t_cpu_registers *registros, char *nombre, uint32_t valor) {
@@ -252,8 +254,8 @@ void _establecer_registro(t_cpu_registers *registros, char *nombre, uint32_t val
 uint32_t _obtener_valor_registro(t_cpu_registers *registros, char *nombre)
 {
     remove_newline(nombre);
-    uint32_t *reg = _obtener_registro(registros, nombre);
-    return reg ? *reg : 0;
+    uint32_t reg = _obtener_registro(registros, nombre);
+    return reg ? reg : 0;
 }
 
 void informar_kernel_error(const char *mensaje)
