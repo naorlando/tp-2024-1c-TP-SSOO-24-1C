@@ -73,9 +73,9 @@ void send_get_next_instruction_memoria(uint32_t pid, uint32_t program_counter)
     send_get_next_instruction(fd_memoria, pid, program_counter);
 }
 
-void send_pcb_kernel()
+void send_pcb_kernel(int header)
 {
-    send_pcb(MSG_PCB_KERNEL_EXIT, fd_kernel_dispatch, pcb_execute);
+    send_pcb(header, fd_kernel_dispatch, pcb_execute);
 }
 
 void send_solicitud_io_generica_kernel(t_PCB *pcb, t_instruction *instruccion)
@@ -115,6 +115,9 @@ void send_pcb_kernel_interruption(t_name_interruption tipo_de_interrupcion)
         send_pcb(MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, fd_kernel_dispatch, pcb_execute);
         break;
 
+    case EXIT_INTERRUPT:
+        send_pcb(MSG_PCB_KERNEL_INTERRUPTION_FINISH_PROCESS, fd_kernel_dispatch, pcb_execute);
+        break;
     // TODO : mandarle el RECURSO.
     //  camino de la interrupcion a la negativa, ya sea  que no haya recursos disponibles, o el signal termino bien.
     //  case RECURSO_INTERRUPT:

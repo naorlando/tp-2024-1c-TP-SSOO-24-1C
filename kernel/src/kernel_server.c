@@ -34,67 +34,64 @@ void atender_kernel_IO(void* io_connection)
     {
         sem_wait(obtener_semaforo_cola_bloqueados(cliente_io));
 
-        while (true)
+        // Si la cola de bloqueados está vacía, romper el bucle
+        if (tiene_procesos_bloqueados(cliente_io)) {
+            break;
+        }
+
+        void* solicitud = obtener_proceso_bloqueado(cliente_io);
+        
+        procesar_solicitud_func procesar_func = obtener_procesador_solicitud(obtener_tipo_conexion(cliente_io));
+        char* tipo_interfaz = tipo_interfaz_to_string(obtener_tipo_conexion(cliente_io));
+
+        if (procesar_func != NULL) {
+            int enviado = procesar_solicitud_IO(obtener_file_descriptor(cliente_io), solicitud, procesar_func);
+        
+            //La IO esta desconectada, se pasa a EXIT el PCB y se procesa el siguiente que este en la cola
+            if(enviado == -1) {
+                agregar_a_cola_exit(obtener_pcb_de_solicitud(solicitud, tipo_interfaz));
+                log_info(logger_kernel, "La IO %s no esta conectada, se manda a EXIT el Proceso", tipo_interfaz);
+                continue;
+            }
+        } else {
+            log_warning(logger_kernel, "Tipo de IO desconocida. No quieras meter la pata");
+        }
+
+        int cod_op = recibir_operacion(obtener_file_descriptor(cliente_io));
+
+        switch (cod_op)
         {
-            // Si la cola de bloqueados está vacía, romper el bucle interno
-            if (tiene_procesos_bloqueados(cliente_io)) {
+            case EXAMPLE:
+                // Se procesa el request
+                recv_example_msg_entradasalida(obtener_file_descriptor(cliente_io));
                 break;
-            }
+            case MSG_IO_KERNEL_GENERICA:
+            case MSG_IO_KERNEL_STDIN:
+            case MSG_IO_KERNEL_STDOUT:
+                log_info(logger_kernel, "Se recibio un mensaje de IO %s", tipo_interfaz);
+                procesar_respuesta_io(obtener_file_descriptor(cliente_io), obtener_nombre_conexion(cliente_io));
+                break;
+            case MSG_IO_KERNEL_DIALFS: 
 
-            void* solicitud = obtener_proceso_bloqueado(cliente_io);
-            
-            procesar_solicitud_func procesar_func = obtener_procesador_solicitud(obtener_tipo_conexion(cliente_io));
-            char* tipo_interfaz = tipo_interfaz_to_string(obtener_tipo_conexion(cliente_io));
-    
-            if (procesar_func != NULL) {
-                int enviado = procesar_solicitud_IO(obtener_file_descriptor(cliente_io), solicitud, procesar_func);
-            
-                //La IO esta desconectada, se pasa a EXIT el PCB y se procesa el siguiente que este en la cola
-                if(enviado == -1) {
-                    agregar_a_cola_exit(obtener_pcb_de_solicitud(solicitud, tipo_interfaz));
-                    log_info(logger_kernel, "La IO %s no esta conectada, se manda a EXIT el Proceso", tipo_interfaz);
-                    continue;
-                }
-            } else {
-                log_warning(logger_kernel, "Tipo de IO desconocida. No quieras meter la pata");
-            }
+                log_info(logger_kernel, "Se recibio un mensaje de IO DIALFS");
+                break;
+            case -1:
+                log_error(logger_kernel, "la IO se desconecto. Terminando servidor");
+                control_key = 0;
+                break;
+            default:
+                log_warning(logger_kernel, "Operacion desconocida en IO. No quieras meter la pata");
+                break;
+        }
 
-            int cod_op = recibir_operacion(obtener_file_descriptor(cliente_io));
-
-            switch (cod_op)
-            {
-                case EXAMPLE:
-                    // Se procesa el request
-                    recv_example_msg_entradasalida(obtener_file_descriptor(cliente_io));
-                    break;
-                case MSG_IO_KERNEL_GENERICA:
-                case MSG_IO_KERNEL_STDIN:
-                case MSG_IO_KERNEL_STDOUT:
-                    log_info(logger_kernel, "Se recibio un mensaje de IO %s", tipo_interfaz);
-                    procesar_respuesta_io(obtener_file_descriptor(cliente_io), obtener_nombre_conexion(cliente_io));
-                    break;
-                case MSG_IO_KERNEL_DIALFS: 
-
-                    log_info(logger_kernel, "Se recibio un mensaje de IO DIALFS");
-                    break;
-                case -1:
-                    log_error(logger_kernel, "la IO se desconecto. Terminando servidor");
-                    control_key = 0;
-                    break;
-                default:
-                    log_warning(logger_kernel, "Operacion desconocida en IO. No quieras meter la pata");
-                    break;
-            }
-
-            // Obtener el PCB de la solicitud y moverlo a ready
-            t_PCB* pcb = obtener_pcb_de_solicitud(solicitud, tipo_interfaz);
-            if (pcb != NULL) {
-                sem_wait(&SEM_PLANIFICACION_READY_INICIADA);
-                destruir_solicitud_io(solicitud, tipo_interfaz);
-                agregar_de_blocked_a_ready(pcb);
-            } else {
-                log_warning(logger_kernel, "No se pudo obtener el PCB de la solicitud");
-            }
+        // Obtener el PCB de la solicitud y moverlo a ready
+        t_PCB* pcb = obtener_pcb_de_solicitud(solicitud, tipo_interfaz);
+        if (pcb != NULL) {
+            sem_wait(&SEM_PLANIFICACION_READY_INICIADA);
+            destruir_solicitud_io(solicitud, tipo_interfaz);
+            agregar_de_blocked_a_ready(pcb);
+        } else {
+            log_warning(logger_kernel, "No se pudo obtener el PCB de la solicitud");
         }
     }
 }
@@ -159,10 +156,16 @@ void atender_kernel_cpu_dispatch()
                 
                 // sem_post(&SEM_CPU);
                 // log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
-
-                procesar_pcb_exit();
+            
+                procesar_pcb_exit(SUCCESS); // cargo el motivo por el cual se manda a exit
 
                 break;
+
+            case MSG_PCB_KERNEL_INTERRUPTION_FINISH_PROCESS:
+
+                procesar_pcb_exit(INTERRUPTED_BY_USER); // cargo el motivo por el cual se manda a exit
+                break;
+
             case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
 
             // hay que:
@@ -218,7 +221,7 @@ void atender_kernel_cpu_dispatch()
                 procesar_ios_stdout();
                 break;
             case MSG_CPU_OUT_OF_MEMORY:
-                procesar_out_memory();
+                procesar_pcb_exit(OUT_OF_MEMORY);
                 break;        
             case -1:
                 log_error(logger_kernel, "CPU DISPATCH se desconecto. Terminando servidor");

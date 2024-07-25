@@ -22,4 +22,5 @@ void send_interruption_cpu(t_interruption*);
 t_solicitud_io_generica* recv_solicitud_io_generica_cpu();
 t_manejo_recurso*  recv_wait_or_signal_request();
 t_solicitud_io_stdin* recv_solicitud_io_stdin_cpu();
+void send_msg_kernel_memoria_end_process(uint32_t);
 #endif

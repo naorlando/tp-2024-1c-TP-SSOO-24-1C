@@ -7,6 +7,7 @@ void cronometro_iniciar(void) {
     if (cronometro == NULL) {
         cronometro = temporal_create();
     } else {
+        cronometro->elapsed_ms = 0;
         temporal_resume(cronometro);
     }
 }

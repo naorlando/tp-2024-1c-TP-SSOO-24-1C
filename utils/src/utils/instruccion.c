@@ -142,6 +142,7 @@ uint32_t obtener_instruction_size(t_instruction* instruccion)
     return size;
 }
 
+//TODO: ELIMINAR --> NO SE USA!
 // Libera la memoria asignada para una instrucción.
 void instruccion_destroy(t_instruction *instruccion) {
     if (instruccion) {

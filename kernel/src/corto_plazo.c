@@ -51,7 +51,14 @@ void planificador_VRR()
         t_PCB *pcb = NULL;
 
         // Jerarquizamos las colas de READY
-        if (!queue_is_empty(COLA_AUX_READY)) {
+        // if (!queue_is_empty(COLA_AUX_READY)) {
+        //     pcb = get_next_pcb_aux_ready_to_exec();
+        // } else {
+        //     pcb = get_next_pcb_ready_to_exec();
+        //     pcb->quantum = obtener_quantum(kernel_config);
+        // }
+
+        if (!list_is_empty(COLA_AUX_READY)) {
             pcb = get_next_pcb_aux_ready_to_exec();
         } else {
             pcb = get_next_pcb_ready_to_exec();
@@ -119,6 +126,16 @@ void enviar_interrupcion_a_cpu(uint32_t pid)
     send_interruption_cpu(interrupcion);
 
     destroy_interruption(interrupcion);
+}
+
+void actualizar_quantum(t_PCB* pcb)
+{
+    cronometro_detener(); 
+    if (cronometro_obtener_tiempo() < pcb->quantum) {
+            pcb->quantum -= cronometro_obtener_tiempo();
+    } else {
+            pcb->quantum = obtener_quantum(kernel_config);
+    }
 }
 
 // -----------------------------------------------------------------------------------------------

@@ -33,7 +33,6 @@ pthread_mutex_t MUTEX_EXIT;
 pthread_mutex_t MUTEX_NEW;
 pthread_mutex_t MUTEX_EXECUTE;
 pthread_mutex_t MUTEX_DICTIONARY;
-pthread_mutex_t MUTEX_SOLICITUD;
 pthread_mutex_t MUTEX_RECURSOS;
 pthread_mutex_t MUTEX_COLA_RETORNO_PCB;
 pthread_mutex_t MUTEX_AUX_READY;
@@ -43,7 +42,6 @@ sem_t SEM_BLOCKED;
 sem_t SEM_EXIT;
 sem_t SEM_NEW;
 sem_t SEM_MULTIPROGRAMACION;
-sem_t SEM_SOLICITUDES;
 sem_t SEM_CPU; 
 sem_t SEM_PCB_RETURNS;
 sem_t SEM_AUX_READY;
@@ -52,14 +50,18 @@ sem_t SEM_PLANIFICACION_READY_INICIADA;
 sem_t SEM_PLANIFICACION_EXEC_INICIADA;
 sem_t SEM_PLANIFICACION_BLOCKED_INICIADA;
 
-t_queue *COLA_READY;
-t_queue *COLA_AUX_READY;
-t_queue *COLA_EXIT;
-t_queue *COLA_NEW;
-t_queue *COLA_RETORNO_PCB;
+// t_queue *COLA_READY;
+// t_queue *COLA_AUX_READY;
+// t_queue *COLA_EXIT;
+// t_queue *COLA_NEW;
+// t_queue *COLA_RETORNO_PCB;
+t_list *COLA_READY;
+t_list *COLA_AUX_READY;
+t_list *COLA_EXIT;
+t_list *COLA_NEW;
+t_list *COLA_RETORNO_PCB;
 t_PCB *EXECUTE;
 t_list *LISTA_COLAS_DISPOSITIVOS;
-t_queue *SOLICITUDES;
 
 void init()
 {
@@ -77,15 +79,15 @@ void init()
 
 void _iniciar_logger()
 {
-    logger_kernel = log_create("kernel.log", "KERNEL_LOG", 1, LOG_LEVEL_INFO);
+    logger_kernel = log_create("kernel.log", "KERNEL_LOG", 0, LOG_LEVEL_INFO);
 
     if (logger_kernel == NULL)
     {
         perror("No se pudo crear el archivo log para el modulo de kernel");
-        // exit(EXIT_FAILURE);
+        // exit(EXIT_FAILURE);make cle
     }
 
-    logger_kernel_debug = log_create("kernel.log", "KERNEL_LOG", 1, LOG_LEVEL_TRACE);
+    logger_kernel_debug = log_create("kernel_debug.log", "KERNEL_LOG", 0, LOG_LEVEL_TRACE);
 
     if (logger_kernel_debug == NULL)
     {
@@ -163,12 +165,15 @@ void inicializar_planificadores()
 
 void initialize_lists()
 {
-    COLA_READY = queue_create();
-    COLA_AUX_READY = queue_create();
-    COLA_EXIT = queue_create();
-    COLA_NEW = queue_create();
+    // COLA_READY = queue_create();
+    // COLA_AUX_READY = queue_create();
+    // COLA_EXIT = queue_create();
+    // COLA_NEW = queue_create();
+    COLA_READY = list_create();
+    COLA_AUX_READY = list_create();
+    COLA_EXIT = list_create();
+    COLA_NEW = list_create();
     LISTA_COLAS_DISPOSITIVOS = list_create();
-    SOLICITUDES = queue_create();
 }
 
 void inicializar_dictionarios()
@@ -188,6 +193,7 @@ void inicializar_recursos() {
         recurso->nombre = strdup(nombres_recursos[i]);
         recurso->instancias = instancias_recursos[i];
         recurso->cola_bloqueados = queue_create();
+        recurso->mutex_cola_bloqueados = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
         dictionary_put(recursos_dictionary, recurso->nombre, recurso);
     }
 

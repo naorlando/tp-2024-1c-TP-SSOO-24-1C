@@ -56,6 +56,8 @@ typedef struct {
     char *nombre;
     int instancias;
     t_queue *cola_bloqueados;
+    // mutex para la cola de bloqueados
+    pthread_mutex_t mutex_cola_bloqueados;
 } t_recurso;
 
 typedef struct {
@@ -63,6 +65,14 @@ typedef struct {
     char *nombre_recurso;
 } t_manejo_recurso;
 
+// Enum para logs obligatorios de motivo de exit
+typedef enum {
+    SUCCESS,
+    INVALID_RESOURCE,
+    INVALID_INTERFACE,
+    OUT_OF_MEMORY,
+    INTERRUPTED_BY_USER
+} t_motivo_exit;
 
 t_PCB* pcb_create(uint32_t pid,  uint32_t quantum);
 void pcb_destroy(t_PCB* pcb);
@@ -95,5 +105,10 @@ uint32_t get_size_new_process(t_new_process*);
 t_manejo_recurso *manejo_recurso_create(t_PCB *pcb, char *nombre_recurso);
 void manejo_recurso_destroy(t_manejo_recurso *manejo_recurso);
 u_int32_t get_manejo_recurso_size(t_manejo_recurso *manejo_recurso);
+
+// obtengo el string del tipo de motivo por el cual un pcb se mando a exit
+// pre: el motivo fue seteado previamente
+// post: se retorna el string del motivo
+char* obtener_motivo_exit(t_motivo_exit motivo);
 
 #endif

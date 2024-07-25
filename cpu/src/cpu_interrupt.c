@@ -10,13 +10,15 @@ void recibir_interrupcion()
     // variable global: tipo_de_interrupcion
     // hay condicion de carrera ya que pueden entrar una interrupcion de IO y una de QUANTUM al mismo tiempo, 
     // queriendo modificar la misma variable.
+
+
     if(pcb_execute->pid == get_pid_interruption(interruption)){
         pthread_mutex_lock(&MUTEX_INTERRUPT);
         interrupcion_pendiente = true;
         tipo_de_interrupcion = get_name(interruption);
         pthread_mutex_unlock(&MUTEX_INTERRUPT);
 
-        //SOlo para seguir el flujo
+        //Solo para seguir el flujo
         log_info(logger_cpu, "Se debe desalojar el PCB de pid <%d>", get_pid_interruption(interruption));
     }
 

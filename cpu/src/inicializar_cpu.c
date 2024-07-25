@@ -22,6 +22,7 @@ bool llego_a_exit = false;
 bool solicitud_io = false; 
 bool solicitud_recurso = false;
 bool cambio_pc = false;
+bool out_of_memory = false;
 
 sem_t SEM_INTERRUPT;
 sem_t SEM_SOCKET_KERNEL_DISPATCH;

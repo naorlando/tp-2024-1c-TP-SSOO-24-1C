@@ -17,10 +17,14 @@
 #include "manager_ios.h"
 
 void procesar_ios_genericas();
-void procesar_pcb_exit();
+
+// procesa un pcb para finalizarlo
+// pre: motivo y pcb
+// post: finaliza el pcb
+void procesar_pcb_exit(t_motivo_exit motivo);
+
 void cancelar_hilo_quantum(uint32_t);
 void procesar_interrupcion_quantum();
-void execute_to_null();
 void cancelar_quantum_si_corresponde(t_PCB *pcb_exit);
 
 // Función para manejar la operación WAIT
@@ -37,7 +41,5 @@ void logica_pcb_retorno_vrr(t_PCB *pcb);
 void procesar_ios_stdin();
 
 void procesar_ios_stdout();
-
-void procesar_out_memory();
 
 #endif //MANAGER_DISPATCH_
