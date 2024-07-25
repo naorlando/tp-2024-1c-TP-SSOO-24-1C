@@ -22,9 +22,6 @@ void procesar_ios_genericas()
         cancelar_hilo_quantum(pcb_io_gen->pid);
     }
 
-    //set_solicitud(SOLICITUD_GENERICA, solicitud_gen);
-    // add_new_solicitud(SOLICITUD_GENERICA, solicitud_gen);
-    // sem_post(&SEM_BLOCKED);
     proceso_solicita_io(0, solicitud_gen);
     sem_post(&SEM_CPU);
 }
@@ -51,8 +48,11 @@ void procesar_pcb_exit(t_motivo_exit motivo)
     
     sem_post(&SEM_CPU);
 
-    log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
-    log_info(logger_kernel, "La cola de Exit tiene %d elementos", queue_size(COLA_EXIT));
+    //log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+    //log_info(logger_kernel, "La cola de Exit tiene %d elementos", queue_size(COLA_EXIT));
+
+    log_info(logger_kernel, "La cola de Ready tiene %d elementos", list_size(COLA_READY));
+    log_info(logger_kernel, "La cola de Exit tiene %d elementos", list_size(COLA_EXIT));
 }
 
 void procesar_interrupcion_quantum()
@@ -74,7 +74,8 @@ void procesar_interrupcion_quantum()
 
 
     log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
-    log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+    //log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+    log_info(logger_kernel, "La cola de Ready tiene %d elementos", list_size(COLA_READY));
     sem_post(&SEM_CPU);
 }
 
@@ -214,7 +215,8 @@ void cancelar_quantum_si_corresponde(t_PCB *pcb_exit) {
 
 void logica_pcb_retorno_vrr(t_PCB *pcb) {
     pthread_mutex_lock(&MUTEX_COLA_RETORNO_PCB);
-        queue_push(COLA_RETORNO_PCB, pcb);
+        //queue_push(COLA_RETORNO_PCB, pcb);
+        list_add(COLA_RETORNO_PCB, pcb);
     pthread_mutex_unlock(&MUTEX_COLA_RETORNO_PCB);
     sem_post(&SEM_PCB_RETURNS);  // Signal que el PCB ha retornado
 }

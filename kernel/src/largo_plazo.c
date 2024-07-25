@@ -40,13 +40,15 @@ void send_new_to_ready()
         // }
 
         log_info(logger_kernel, "Se paso el PCB <%d> de NEW -> READY ",pcb->pid);
-        log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
+        //log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
+        log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", list_size(COLA_NEW));
 
         // encolar en ready
         agregar_de_new_a_ready(pcb);
 
         sem_post(&SEM_PLANIFICACION_NEW_READY_INICIADA);
-        log_info(logger_kernel, "Cola READY tiene un total de %d elementos", queue_size(COLA_READY));
+        //log_info(logger_kernel, "Cola READY tiene un total de %d elementos", queue_size(COLA_READY));
+        log_info(logger_kernel, "Cola READY tiene un total de %d elementos", list_size(COLA_READY));
     }
 }
 

@@ -50,11 +50,16 @@ sem_t SEM_PLANIFICACION_READY_INICIADA;
 sem_t SEM_PLANIFICACION_EXEC_INICIADA;
 sem_t SEM_PLANIFICACION_BLOCKED_INICIADA;
 
-t_queue *COLA_READY;
-t_queue *COLA_AUX_READY;
-t_queue *COLA_EXIT;
-t_queue *COLA_NEW;
-t_queue *COLA_RETORNO_PCB;
+// t_queue *COLA_READY;
+// t_queue *COLA_AUX_READY;
+// t_queue *COLA_EXIT;
+// t_queue *COLA_NEW;
+// t_queue *COLA_RETORNO_PCB;
+t_list *COLA_READY;
+t_list *COLA_AUX_READY;
+t_list *COLA_EXIT;
+t_list *COLA_NEW;
+t_list *COLA_RETORNO_PCB;
 t_PCB *EXECUTE;
 t_list *LISTA_COLAS_DISPOSITIVOS;
 
@@ -160,10 +165,14 @@ void inicializar_planificadores()
 
 void initialize_lists()
 {
-    COLA_READY = queue_create();
-    COLA_AUX_READY = queue_create();
-    COLA_EXIT = queue_create();
-    COLA_NEW = queue_create();
+    // COLA_READY = queue_create();
+    // COLA_AUX_READY = queue_create();
+    // COLA_EXIT = queue_create();
+    // COLA_NEW = queue_create();
+    COLA_READY = list_create();
+    COLA_AUX_READY = list_create();
+    COLA_EXIT = list_create();
+    COLA_NEW = list_create();
     LISTA_COLAS_DISPOSITIVOS = list_create();
 }
 
