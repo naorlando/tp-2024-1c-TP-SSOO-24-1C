@@ -94,7 +94,7 @@ int process_message_data_read(int file_descriptor)
     uint32_t size_value = 0;
 
     recv_msg_memoria_data_read(buffer, &pid, &frame, &offset, &size_value);
-    log_info(logger_memoria, "PID: <%d> - Accion: <LEER> - Direccion fisica: <%d>” - Tamaño <%d>", pid, frame, size_value);
+    log_info(logger_memoria, "PID: <%d> - Accion: <LEER> - Direccion fisica: <%d> - Tamaño <%d>", pid, frame, size_value);
     void *value = read_data(frame, offset, size_value);
 
     send_msg_memoria_generic_data_read(value, size_value, file_descriptor);
@@ -117,7 +117,7 @@ int process_message_data_write(int file_descriptor)
     void *value = malloc(value_size);
     buffer_read_data(buffer, value, value_size);
     usleep(obtener_retardo_respuesta(memoria_config) * 1000);
-    log_info(logger_memoria, "PID: <%d> - Accion: <ESCRIBIR> - Direccion fisica: <%d>” - Tamaño <%d>", pid, frame, value_size);
+    log_info(logger_memoria, "PID: <%d> - Accion: <ESCRIBIR> - Direccion fisica: <%d> - Tamaño <%d>", pid, frame, value_size);
     write_data(frame, offset, value, value_size);
     buffer_destroy(buffer);
     free(value);
