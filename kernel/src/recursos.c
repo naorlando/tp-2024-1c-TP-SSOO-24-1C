@@ -62,7 +62,9 @@ void bloquear_proceso(t_recurso *recurso, t_PCB *pcb)
 {
     // semaforo: de DETENER_PLANIFICACION.
     pthread_mutex_lock(&recurso->mutex_cola_bloqueados);
-        queue_push(recurso->cola_bloqueados, pcb);
+        //queue_push(recurso->cola_bloqueados, pcb);
+        pcb->state = BLOCKED;
+        list_add(recurso->cola_bloqueados, pcb);
     pthread_mutex_unlock(&recurso->mutex_cola_bloqueados);
     log_info(logger_kernel, "Proceso %d bloqueado por recurso %s", pcb->pid, recurso->nombre);
 }
@@ -70,7 +72,8 @@ void bloquear_proceso(t_recurso *recurso, t_PCB *pcb)
 t_PCB* desbloquear_proceso(t_recurso *recurso) 
 {
     pthread_mutex_lock(&recurso->mutex_cola_bloqueados);
-        t_PCB* pcb = queue_pop(recurso->cola_bloqueados);
+        //t_PCB* pcb = queue_pop(recurso->cola_bloqueados);
+        t_PCB* pcb = list_remove(recurso->cola_bloqueados, 0);
     pthread_mutex_unlock(&recurso->mutex_cola_bloqueados);
 
     log_info(logger_kernel, "Proceso %d bloqueado por recurso %s", pcb->pid, recurso->nombre);
@@ -133,7 +136,7 @@ void liberar_recursos_de_proceso(u_int32_t pid) {
             incrementar_recurso(recurso);
             log_info(logger_kernel, "Se libera recurso %s (SIN PREVIAMENTE SER LIBERADO) del PID = %d", nombre_recurso, pid);
             remover_recurso_de_proceso(nombre_recurso, pid);
-            if (!queue_is_empty(recurso->cola_bloqueados)) {
+            if (!list_is_empty(recurso->cola_bloqueados)) {
                 t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
                 log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
                 handle_wait(pcb_desbloqueado, nombre_recurso, true);
@@ -188,7 +191,7 @@ void remover_proceso_de_colas_bloqueados(uint32_t pid) {
         }
 
         pthread_mutex_lock(&recurso->mutex_cola_bloqueados); // Asegúrate de tener un mutex para cada cola de bloqueados
-        t_PCB *pcb_removido = (t_PCB *)list_remove_by_condition(recurso->cola_bloqueados->elements, pid_match);
+        t_PCB *pcb_removido = (t_PCB *)list_remove_by_condition(recurso->cola_bloqueados, pid_match);
         pthread_mutex_unlock(&recurso->mutex_cola_bloqueados);
 
         if (pcb_removido != NULL) {
@@ -224,9 +227,11 @@ void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal) {
             send_pcb_cpu(pcb);
         } else {
             agregar_de_blocked_a_ready(pcb);
+            update_pcb(pcb);
         }
     } else {
         enviar_proceso_a_cola_bloqueados(recurso, pcb);
+        execute_to_null();
         log_info(logger_kernel, "Recurso %s no tenía instancias disponibles. Proceso %d bloqueado", nombre_recurso, pcb->pid);
         sem_post(&SEM_CPU);    
     }
@@ -237,9 +242,9 @@ void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal) {
 void enviar_proceso_a_cola_bloqueados(t_recurso* recurso,t_PCB* pcb)
 {
     bloquear_proceso(recurso, pcb);
-    execute_to_null();
     cancelar_quantum_si_corresponde(pcb);
     actualizar_quantum(pcb);
+    update_pcb(pcb);
 }
 
 void handle_signal(t_PCB *pcb, char *nombre_recurso) {
@@ -264,7 +269,7 @@ void handle_signal(t_PCB *pcb, char *nombre_recurso) {
 
 
     t_PCB *pcb_desbloqueado = NULL;
-    bool desbloquear = !queue_is_empty(recurso->cola_bloqueados);
+    bool desbloquear = !list_is_empty(recurso->cola_bloqueados);
     if (desbloquear) {
         pcb_desbloqueado = desbloquear_proceso(recurso);
         log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);

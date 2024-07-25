@@ -19,6 +19,8 @@ void create_pcb_table()
 
 t_PCB *get_pcb(uint32_t pid)
 {
+    pthread_mutex_lock(&MUTEX_DICTIONARY);
+    
     if (_is_empty_table())
         return NULL;
 
@@ -28,6 +30,8 @@ t_PCB *get_pcb(uint32_t pid)
         return NULL;
 
     t_PCB *pcb = (t_PCB *)dictionary_get(table_pcb, key);
+
+    pthread_mutex_unlock(&MUTEX_DICTIONARY);
 
     return (pcb != NULL) ? pcb : NULL;
 }
@@ -83,10 +87,12 @@ bool _is_empty_table()
 
 void update_pcb(t_PCB *pcb)
 {
+    pthread_mutex_lock(&MUTEX_DICTIONARY);
     // actualizar el pcb en la tabla de pcb:
     // actualizar el pcb que ingresa en la tabla de pcbs macheando por pid:
     // Elimino el PCB de la tabla de pcbs que gestiona el Kernel
     delete_pcb(pcb->pid);
     // Agrego el PCB pero con su contexto nuevo
     add_pcb(pcb);
+    pthread_mutex_unlock(&MUTEX_DICTIONARY);
 }

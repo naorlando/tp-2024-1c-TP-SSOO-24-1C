@@ -72,7 +72,8 @@ t_list* listar_pids_de_queue(t_list *queue);
 
 void execute_to_null();
 
-
+// limpia el pcb de todas las listas de estado posibles, NEW, READY, BLOCKED.
+void eliminar_de_listas_de_estado(t_PCB* pcb);
 
 
 #endif //UTILS_QUEUE_

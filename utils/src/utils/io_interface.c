@@ -169,7 +169,6 @@ bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso) {
     t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(conexion);
 
     if(cola_bloqueados_io == NULL) return false;
-
     pthread_mutex_lock(mutex_blocked);
     queue_push(cola_bloqueados_io, proceso);
     pthread_mutex_unlock(mutex_blocked);

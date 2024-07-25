@@ -20,8 +20,6 @@ void _atender_instruccion(void*);
 void f_iniciar_proceso(char*);
 void f_ejecutar_script(const char*);
 
-void enviar_pcb_cpu();
-
 int asignar_pid();
 
 // ----------------------------------------------

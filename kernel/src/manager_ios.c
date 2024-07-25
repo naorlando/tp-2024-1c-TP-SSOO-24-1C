@@ -101,6 +101,7 @@ void proceso_solicita_io(int tipo_io, void* solicitud)
 
     if(io_connection != NULL) {
         pcb_solicita_io->state = BLOCKED;
+        update_pcb(pcb_solicita_io);
         agrego= agregar_proceso_bloqueado(io_connection, solicitud);
     }
     

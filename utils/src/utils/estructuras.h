@@ -55,7 +55,7 @@ typedef struct
 typedef struct {
     char *nombre;
     int instancias;
-    t_queue *cola_bloqueados;
+    t_list *cola_bloqueados;
     // mutex para la cola de bloqueados
     pthread_mutex_t mutex_cola_bloqueados;
 } t_recurso;

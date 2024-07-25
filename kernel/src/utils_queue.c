@@ -16,11 +16,9 @@ void agregar_de_execute_a_ready(t_PCB* pcb)
 }
 
 void agregar_a_cola_ready_VRR(t_PCB* pcb){
-    if (cronometro_obtener_tiempo() < pcb->quantum) {
-            pcb->quantum -= cronometro_obtener_tiempo() ;
+    if (obtener_quantum(kernel_config) > pcb->quantum) {
             agregar_a_cola_aux_ready(pcb);
     } else {
-            pcb->quantum = obtener_quantum(kernel_config);
             agregar_a_cola_ready(pcb);
     }
 }

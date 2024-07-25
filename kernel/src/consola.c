@@ -136,7 +136,9 @@ void f_iniciar_proceso(char *path)
     t_PCB *pcb = pcb_create(pid, obtener_quantum(kernel_config));
 
     // Cargo el pcb a la tabla de pcbs
-    add_pcb(pcb);
+    pthread_mutex_lock(&MUTEX_DICTIONARY);
+        add_pcb(pcb);
+    pthread_mutex_unlock(&MUTEX_DICTIONARY);
 
     log_info(logger_kernel, "Se serializa el nuevo proceso para enviar a memoria la creacion de la imagen del proceso");
 
@@ -145,13 +147,6 @@ void f_iniciar_proceso(char *path)
 
     // Agregar PCB a la cola de NEW
     process_to_new(pcb);
-}
-
-void enviar_pcb_cpu()
-{
-    t_PCB *pcb = get_pcb(1);
-    // envio el pcb a cpu 
-    send_pcb_cpu(pcb);
 }
 
 // Ejecutar un script con comandos de consola
@@ -245,7 +240,10 @@ void listar_pids_por_estado(t_state state) {
         }
     }
 
-    dictionary_iterator(table_pcb, closure);  // Iterar sobre el diccionario
+    // mutex:
+    pthread_mutex_lock(&MUTEX_DICTIONARY);
+        dictionary_iterator(table_pcb, closure);  // Iterar sobre el diccionario
+    pthread_mutex_unlock(&MUTEX_DICTIONARY);
 
     printf("[");
     for (int i = 0; i < list_size(pids); i++) {
@@ -273,7 +271,6 @@ void f_finalizar_proceso(u_int32_t pid){
         return;
     }
     // ##############################################################
-    // TODO: falta hacer la siguiente logica:
     // En caso de que el proceso se encuentre ejecutando en CPU, 
     // se deberá enviar una señal de interrupción a través de la conexión de interrupt con el mismo y 
     // aguardar a que éste retorne el Contexto de Ejecución antes de iniciar la liberación de recursos.
@@ -282,18 +279,15 @@ void f_finalizar_proceso(u_int32_t pid){
         t_interruption* interrupcion_exit = create_interruption(EXIT_INTERRUPT, pid);
         send_interruption_cpu(interrupcion_exit);
         destroy_interruption(interrupcion_exit);
-
-
-        // ####### esto ya lo hace manager_dispatch.c #######
-        // // esperar a que retorne el contexto de ejecucion...
-        // pcb = recv_pcb_cpu();
-        // // actualizar el pcb en la tabla de pcb:
-        // update_pcb(pcb);
-
+        // el resto de la logica se ve cuando llega el PCB a kernel_server con motivo de desalojo INTERRUPTED_BY_USER
         return;
     }
 
     // ##############################################################
+
+    // si se encuentra en las distintas listas, eliminarlo de la lista:
+    // eliminar_de_listas_de_estado(pcb);
+
 
     // elimina el PCB para siempre (ver en largo_plazo.c, ACA SE LIBERAN LOS RECURSOS PARA SALIR DEL DEADLOCK)
     agregar_a_cola_exit(pcb);

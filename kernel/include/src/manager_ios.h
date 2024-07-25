@@ -9,6 +9,7 @@
 #include "utils/solicitudes_io.h"
 #include "utils/gestion_conexiones_io.h"
 #include "utils_queue.h"
+#include "table_pcb.h"
 
 typedef int (*procesar_solicitud_func)(int, void*);
 procesar_solicitud_func obtener_procesador_solicitud(int);

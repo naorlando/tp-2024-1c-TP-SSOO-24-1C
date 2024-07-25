@@ -15,12 +15,9 @@ void procesar_ios_genericas()
     t_solicitud_io_generica* solicitud_gen = recv_solicitud_io_generica_cpu();
 
     t_PCB* pcb_io_gen = obtener_pcb_solicitud_generica(solicitud_gen);
-
+    cancelar_quantum_si_corresponde(pcb_io_gen);
+    actualizar_quantum(pcb_io_gen);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_gen->pid);
-    
-    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {
-        cancelar_hilo_quantum(pcb_io_gen->pid);
-    }
 
     proceso_solicita_io(0, solicitud_gen);
     sem_post(&SEM_CPU);
@@ -206,7 +203,6 @@ void handle_signal_request() {
 //     pthread_mutex_unlock(&MUTEX_RECURSOS);
 // }
 
-
 void cancelar_quantum_si_corresponde(t_PCB *pcb_exit) {
     if (strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {
         cancelar_hilo_quantum(pcb_exit->pid);
@@ -227,12 +223,9 @@ void procesar_ios_stdin()
     t_solicitud_io_stdin* solicitud_stdin = recv_solicitud_io_stdin_cpu();
 
     t_PCB* pcb_io_stdin = obtener_pcb_solicitud_stdin(solicitud_stdin);
-
+    cancelar_quantum_si_corresponde(pcb_io_stdin);
+    actualizar_quantum(pcb_io_stdin);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_stdin->pid);
-    
-    if(strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {
-        cancelar_hilo_quantum(pcb_io_stdin->pid);
-    }
 
     proceso_solicita_io(1, solicitud_stdin);
     sem_post(&SEM_CPU);
