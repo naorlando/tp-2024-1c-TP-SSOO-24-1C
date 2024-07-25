@@ -74,7 +74,7 @@ void init()
 
 void _iniciar_logger()
 {
-    logger_kernel = log_create("kernel.log", "KERNEL_LOG", 1, LOG_LEVEL_INFO);
+    logger_kernel = log_create("kernel.log", "KERNEL_LOG", 0, LOG_LEVEL_INFO);
 
     if (logger_kernel == NULL)
     {

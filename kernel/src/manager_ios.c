@@ -99,9 +99,11 @@ void proceso_solicita_io(int tipo_io, void* solicitud)
             break;
     }
 
-    if(io_connection != NULL)
+    if(io_connection != NULL) {
+        pcb_solicita_io->state = BLOCKED;
         agrego= agregar_proceso_bloqueado(io_connection, solicitud);
-
+    }
+    
     if(!agrego)
         agregar_a_cola_exit(pcb_solicita_io);
 }
