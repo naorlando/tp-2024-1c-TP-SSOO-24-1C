@@ -79,10 +79,10 @@ void _iniciar_logger()
     if (logger_kernel == NULL)
     {
         perror("No se pudo crear el archivo log para el modulo de kernel");
-        // exit(EXIT_FAILURE);
+        // exit(EXIT_FAILURE);make cle
     }
 
-    logger_kernel_debug = log_create("kernel.log", "KERNEL_LOG", 1, LOG_LEVEL_TRACE);
+    logger_kernel_debug = log_create("kernel_debug.log", "KERNEL_LOG", 0, LOG_LEVEL_TRACE);
 
     if (logger_kernel_debug == NULL)
     {
