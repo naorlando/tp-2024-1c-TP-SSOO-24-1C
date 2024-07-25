@@ -36,7 +36,7 @@ void atender_kernel_IO(void* io_connection)
 
         // Si la cola de bloqueados está vacía, romper el bucle
         if (tiene_procesos_bloqueados(cliente_io)) {
-            break;
+            continue;
         }
 
         void* solicitud = obtener_proceso_bloqueado(cliente_io);
