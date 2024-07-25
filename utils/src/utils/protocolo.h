@@ -38,7 +38,10 @@ typedef enum
     MSG_PCB_IO_KERNEL, // SE LLAMA PERO NO SE USA!
     MSG_PCB_KERNEL_EXIT, // CPU -> KERNEL (El PCB llego a la instruccion EXIT) 
     MSG_PCB_KERNEL_INTERRUPTION_QUANTUM, // CPU -> KERNEL (Devuelvo pcb al kernel con interrupcion por fin de quantum)
-    MSG_QUANTUM, // KERNEL -> CPU (Interrupcion por fin de quantum)
+    MSG_PCB_KERNEL_INTERRUPTION_FINISH_PROCESS, // CPU -> KERNEL (Devuelvo pcb al kernel con interrupcion por finalizacion de proceso)
+    MSG_QUANTUM, // KERNEL -> CPU (INTERRUPT: Interrupcion por fin de quantum)
+    MSG_KERNEL_CPU_EXIT, // KERNEL -> CPU (INTERRUPT: Se envia mensaje indicando que el proceso llego a EXIT)
+    // MSG_KERNEL_CPU_RECURSO, // KERNEL -> CPU (INTERRUPT: Se envia mensaje indicando que el proceso llego a RECURSO)
     MSG_CPU_KERNEL_WAIT, // CPU -> KERNEL (se envia mensaje indicando un WAIT recurso)
     MSG_CPU_KERNEL_SIGNAL, // CPU -> KERNEL (se envia mensaje indicando un SIGNAL recurso)
     MSG_CPU_IO_GEN_SLEEP, // CPU -> KERNEL (Se solicita interactuar con IO GENENRICA) 

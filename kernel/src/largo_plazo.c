@@ -33,7 +33,11 @@ void send_new_to_ready()
         sem_wait(&SEM_PLANIFICACION_NEW_READY_INICIADA);
         
         // descolar pcb de NEW
+
         t_PCB *pcb = siguiente_pcb_cola_new();
+        // if(pcb->state == FINISHED){
+        //     continue;
+        // }
 
         log_info(logger_kernel, "Se paso el PCB <%d> de NEW -> READY ",pcb->pid);
         log_info(logger_kernel, "Cola NEW tiene un total de %d elementos", queue_size(COLA_NEW));
@@ -53,7 +57,7 @@ void end_process()
         sem_wait(&SEM_EXIT);
         t_PCB *pcb_exit;  
 
-        log_info(logger_kernel, "empieza a terminar el proceso");
+        // log_info(logger_kernel, "empieza a terminar el proceso");
         // tomar pcb de exit
         pcb_exit = get_next_pcb_exit();
         sem_post(&SEM_MULTIPROGRAMACION);

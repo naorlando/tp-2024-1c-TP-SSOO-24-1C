@@ -45,6 +45,7 @@ void planificador_RR();
 void planificador_VRR();
 void interrupcion_quantum(uint32_t pid,uint32_t quantum);
 void* funcion_hilo_quantum(void*);
+void actualizar_quantum(t_PCB* pcb);
 
 // envia una interrupcion a la cpu
 void enviar_interrupcion_a_cpu(uint32_t); 

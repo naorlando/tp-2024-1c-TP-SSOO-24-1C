@@ -198,11 +198,11 @@ void inicializar_recursos() {
         recurso->nombre = strdup(nombres_recursos[i]);
         recurso->instancias = instancias_recursos[i];
         recurso->cola_bloqueados = queue_create();
+        recurso->mutex_cola_bloqueados = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
         dictionary_put(recursos_dictionary, recurso->nombre, recurso);
     }
 
     string_array_destroy(nombres_recursos);
     //string_array_destroy(instancias_recursos);
-
 
 }

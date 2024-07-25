@@ -141,3 +141,21 @@ u_int32_t get_manejo_recurso_size(t_manejo_recurso *manejo_recurso)
 {
     return sizeof(u_int32_t) + strlen(manejo_recurso->nombre_recurso) + 1 + get_pcb_size(manejo_recurso->pcb);
 }
+
+char* obtener_motivo_exit(t_motivo_exit motivo){    
+    switch(motivo)
+    {
+        case SUCCESS:
+            return "SUCCESS";
+        case INVALID_RESOURCE:
+            return "INVALID_RESOURCE";
+        case INVALID_INTERFACE:
+            return "INVALID_INTERFACE";
+        case OUT_OF_MEMORY:
+            return "OUT_OF_MEMORY";
+        case INTERRUPTED_BY_USER:
+            return "INTERRUPTED_BY_USER";
+        default:
+            return "UNKNOWN";
+    }
+}

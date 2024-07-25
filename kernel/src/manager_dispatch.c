@@ -35,22 +35,22 @@ void procesar_ios_genericas()
     //4. Bloquear el envio de otra solicitud de IO GENERICA, hasta que la IO responda luego de su procesamiento
 }
 
-void procesar_pcb_exit()
-{
-    //TODO: ARMAR UNA FUNCION QUE SE ENCARGUE DE LA GESTION DE LIBERAR EL PCB QUE LLEGO A EXIT
-    // YA QUE PUEDE TENER RECURSOS ASIGNADOS Y MEMORIA
-    t_PCB* pcb_exit= recv_pcb_cpu(); // DATO: aca dentro se crea otro malloc de pcb(se usa pcb_create())..
 
+void procesar_pcb_exit(t_motivo_exit motivo)
+{
+    t_PCB* pcb_exit= recv_pcb_cpu(); // DATO: aca dentro se crea otro malloc de pcb(se usa pcb_create())..
     execute_to_null();
     cancelar_quantum_si_corresponde(pcb_exit);
 
-    log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
+    //log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
 
     // Actualizo el estado del pcb en la cola correspondiente:
     agregar_a_cola_exit(pcb_exit);
     
+    // LOG OBLIGATORIO:
+    log_info(logger_kernel, "Finaliza el proceso <%d> - Motivo: %s", pcb_exit->pid, obtener_motivo_exit(motivo));
+
     cronometro_reiniciar(); // funciona en caso de VRR
-    
     // actualizar el pcb en la tabla de pcb:
     update_pcb(pcb_exit);
     log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_exit->pid);

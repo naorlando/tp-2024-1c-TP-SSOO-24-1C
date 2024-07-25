@@ -209,8 +209,14 @@ t_message_example *recv_example(int fd)
 
 int send_interruption(t_interruption *interruption, int fd)
 {
-    t_package *package = package_create(MSG_QUANTUM, get_interruption_size(interruption));
-
+    t_package *package;
+    if(interruption->name == QUANTUM_INTERRUPT){
+        package = package_create(MSG_QUANTUM, get_interruption_size(interruption));
+    }
+    else if(interruption->name == EXIT_INTERRUPT){
+        package = package_create(MSG_KERNEL_CPU_EXIT, get_interruption_size(interruption));
+    }
+    
     serialize_interruption(get_buffer(package), interruption);
 
     package_send(package, fd);

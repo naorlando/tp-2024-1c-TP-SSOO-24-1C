@@ -17,7 +17,12 @@
 #include "cronometro.h"
 
 void procesar_ios_genericas();
-void procesar_pcb_exit();
+
+// procesa un pcb para finalizarlo
+// pre: motivo y pcb
+// post: finaliza el pcb
+void procesar_pcb_exit(t_motivo_exit motivo);
+
 void cancelar_hilo_quantum(uint32_t);
 void procesar_interrupcion_quantum();
 void cancelar_quantum_si_corresponde(t_PCB *pcb_exit);
