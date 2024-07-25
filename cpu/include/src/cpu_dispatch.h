@@ -39,7 +39,7 @@ void solicitar_IO(t_instruction*);
 // Obtiene el registro correspondiente a un nombre dado.
 // Pre: Los registros deben ser válidos y no NULL.
 // Post: Retorna un puntero al registro correspondiente al nombre dado.
-uint32_t* _obtener_registro(t_cpu_registers *, const char *);
+uint32_t _obtener_registro(t_cpu_registers *, const char *);
 
 // Establece el valor de un registro dado un nombre.
 // Pre: Los registros deben ser válidos y no NULL.
