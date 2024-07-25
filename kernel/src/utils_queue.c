@@ -17,8 +17,12 @@ void agregar_de_execute_a_ready(t_PCB* pcb)
 
 void agregar_a_cola_ready_VRR(t_PCB* pcb){
     if (obtener_quantum(kernel_config) > pcb->quantum) {
+        log_warning(logger_kernel, "El tiempo del cronometro es: <%d>", cronometro_obtener_tiempo());
+        log_warning(logger_kernel, " PID: <%d> a la COLA AUXILIAR DE READY!!!. QUANTUM: %d ",pcb->pid, pcb->quantum);
             agregar_a_cola_aux_ready(pcb);
     } else {
+        log_warning(logger_kernel, "El tiempo del cronometro es: <%d>", cronometro_obtener_tiempo());
+        log_warning(logger_kernel, " PID: <%d> a la COLA READY NORMAL!!!. QUANTUM: %d ",pcb->pid ,pcb->quantum);
             agregar_a_cola_ready(pcb);
     }
 }
