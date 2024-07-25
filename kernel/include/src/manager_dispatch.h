@@ -42,6 +42,4 @@ void procesar_ios_stdin();
 
 void procesar_ios_stdout();
 
-void procesar_out_memory();
-
 #endif //MANAGER_DISPATCH_

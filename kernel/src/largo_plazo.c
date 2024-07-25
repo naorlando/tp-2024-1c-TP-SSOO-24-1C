@@ -65,7 +65,8 @@ void end_process()
         // chequeo de recursos no liberados:
         free_resource(pcb_exit);
         // -------------------------------------------------------------------
-
+        // Eliminamos bloque de memoria asignada
+        send_msg_kernel_memoria_end_process(pcb_exit->pid);
         // liberar memoria de pcb: TODO: chequear donde liberar PCBs
         // pcb_destroy(pcb_exit);
     }

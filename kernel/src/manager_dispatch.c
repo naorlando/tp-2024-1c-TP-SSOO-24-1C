@@ -239,12 +239,4 @@ void procesar_ios_stdin()
 //TODO terminar de implementar
 void procesar_ios_stdout(){}
 
-//TODO terminar de implementar
-void procesar_out_memory()
-{
-    t_PCB* pcb_out_of_memory = recv_pcb_cpu();
-    log_info(logger_kernel, "OUT OF MEMORY PARA EL PID <%d>", pcb_out_of_memory->pid);
-
-    agregar_a_cola_exit(pcb_out_of_memory);
-}
 

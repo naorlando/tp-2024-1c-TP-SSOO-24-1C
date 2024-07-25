@@ -128,3 +128,14 @@ t_solicitud_io_stdin* recv_solicitud_io_stdin_cpu()
 
     return io_stdin;
 }
+
+void send_msg_kernel_memoria_end_process(uint32_t pid)
+{
+    t_package *package = package_create(MSG_KERNEL_END_PROCESS, sizeof(uint32_t));
+
+    buffer_add_uint32(package->buffer, pid);
+
+    package_send(package, fd_kernel_memoria);
+
+    package_destroy(package);
+}

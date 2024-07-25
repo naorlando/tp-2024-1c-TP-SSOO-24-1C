@@ -221,7 +221,7 @@ void atender_kernel_cpu_dispatch()
                 procesar_ios_stdout();
                 break;
             case MSG_CPU_OUT_OF_MEMORY:
-                procesar_out_memory();
+                procesar_pcb_exit(OUT_OF_MEMORY);
                 break;        
             case -1:
                 log_error(logger_kernel, "CPU DISPATCH se desconecto. Terminando servidor");
