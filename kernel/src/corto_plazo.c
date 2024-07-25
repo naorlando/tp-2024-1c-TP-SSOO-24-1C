@@ -133,8 +133,16 @@ void actualizar_quantum(t_PCB* pcb)
     cronometro_detener(); 
     if (cronometro_obtener_tiempo() < pcb->quantum) {
             pcb->quantum -= cronometro_obtener_tiempo();
+            log_warning(logger_kernel, "Se actualizo el quantum del PCB de PID: <%d> a <%d>", pcb->pid, pcb->quantum);
+            // timepo de cronometro:
+            log_warning(logger_kernel, "El tiempo del cronometro es: <%d>", cronometro_obtener_tiempo());
     } else {
+            log_warning(logger_kernel, "QUANTUM ANTES   -> PID: <%d> a <%d>", pcb->pid, pcb->quantum);
+            // timepo de cronometro:
+            log_warning(logger_kernel, "El tiempo del cronometro es: <%d>", cronometro_obtener_tiempo());
             pcb->quantum = obtener_quantum(kernel_config);
+            log_warning(logger_kernel, "QUANTUM DESPUES -> PID: <%d> a <%d>", pcb->pid, pcb->quantum);
+
     }
 }
 

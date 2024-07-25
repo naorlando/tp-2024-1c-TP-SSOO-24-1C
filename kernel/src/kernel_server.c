@@ -90,6 +90,7 @@ void atender_kernel_IO(void* io_connection)
             sem_wait(&SEM_PLANIFICACION_READY_INICIADA);
             destruir_solicitud_io(solicitud, tipo_interfaz);
             agregar_de_blocked_a_ready(pcb);
+            sem_post(&SEM_PLANIFICACION_READY_INICIADA);
         } else {
             log_warning(logger_kernel, "No se pudo obtener el PCB de la solicitud");
         }
