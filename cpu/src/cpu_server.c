@@ -72,6 +72,12 @@ void atender_cpu_kernel_interrupt()
                 recibir_interrupcion();
                 log_info(logger_cpu, "Se recibio un mensaje de interrupcion por QUANTUM del kernel");
                 break;
+            
+            case MSG_KERNEL_CPU_EXIT:
+                recibir_interrupcion();
+                log_info(logger_cpu, "Se recibio un mensaje de interrupcion por EXIT del kernel");
+                break;
+
             case -1:
                 log_error(logger_cpu, "El KERNEL se desconecto. Terminando servidor");
                 control_key = 0;

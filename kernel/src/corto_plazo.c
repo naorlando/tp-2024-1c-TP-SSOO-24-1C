@@ -121,6 +121,16 @@ void enviar_interrupcion_a_cpu(uint32_t pid)
     destroy_interruption(interrupcion);
 }
 
+void actualizar_quantum(t_PCB* pcb)
+{
+    cronometro_detener(); 
+    if (cronometro_obtener_tiempo() < pcb->quantum) {
+            pcb->quantum -= cronometro_obtener_tiempo();
+    } else {
+            pcb->quantum = obtener_quantum(kernel_config);
+    }
+}
+
 // -----------------------------------------------------------------------------------------------
 //      GENERALES:
 // -----------------------------------------------------------------------------------------------

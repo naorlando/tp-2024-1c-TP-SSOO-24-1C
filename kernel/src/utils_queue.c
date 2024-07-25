@@ -58,14 +58,16 @@ t_PCB* siguiente_pcb_cola_new()
 t_PCB *get_next_pcb_ready_to_exec()
 {
     sem_wait(&SEM_CPU);
-    sem_wait(&SEM_READY); // Espera a que haya un PCB en la cola de READY
     t_PCB *pcb_a_tomar;
-
+ 
     //log_info(logger_kernel, "Se va a tomar el siguiente PCB de la cola de READY");
-
+    
+    do{
+    sem_wait(&SEM_READY); // Espera a que haya un PCB en la cola de READ
     pthread_mutex_lock(&MUTEX_READY);
         pcb_a_tomar = queue_pop(COLA_READY);
     pthread_mutex_unlock(&MUTEX_READY);
+    } while(pcb_a_tomar->state == FINISHED);
 
     return pcb_a_tomar;
 }
@@ -76,11 +78,12 @@ t_PCB *get_next_pcb_aux_ready_to_exec(){
     t_PCB *pcb_a_tomar;
 
     //log_info(logger_kernel, "Se va a tomar el siguiente PCB de la cola de READY");
-
+    do{
     pthread_mutex_lock(&MUTEX_AUX_READY);
         pcb_a_tomar = queue_pop(COLA_AUX_READY);
     pthread_mutex_unlock(&MUTEX_AUX_READY);
-
+    } while(pcb_a_tomar->state == FINISHED);
+     
     return pcb_a_tomar;
 }
 
@@ -115,8 +118,8 @@ void agregar_de_blocked_a_ready(t_PCB* pcb)
         agregar_a_cola_ready(pcb);
     }
     else if(strcmp(algoritmo_plani, "VRR") == 0){
-        //TODO: Se debe agregar a la cola auxiliar?
-        
+        // TODO: testear
+        agregar_a_cola_ready_VRR(pcb);
     }
 }
 
@@ -171,4 +174,10 @@ t_list* listar_pids_de_queue(t_queue *queue) {
     }
 
     return pid_list;
+}
+
+void execute_to_null() {
+    pthread_mutex_lock(&MUTEX_EXECUTE);
+    EXECUTE = NULL;
+    pthread_mutex_unlock(&MUTEX_EXECUTE);
 }

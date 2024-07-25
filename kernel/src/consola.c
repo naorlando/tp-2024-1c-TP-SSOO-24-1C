@@ -268,6 +268,10 @@ void f_finalizar_proceso(u_int32_t pid){
         log_error(logger_kernel, "No se encontro el proceso con PID: %d", pid);
         return;
     }
+    if(pcb->state == FINISHED){
+        log_warning(logger_kernel, "El proceso con PID: %d ya se encuentra finalizado", pid);
+        return;
+    }
     // ##############################################################
     // TODO: falta hacer la siguiente logica:
     // En caso de que el proceso se encuentre ejecutando en CPU, 
@@ -275,18 +279,28 @@ void f_finalizar_proceso(u_int32_t pid){
     // aguardar a que éste retorne el Contexto de Ejecución antes de iniciar la liberación de recursos.
     if(EXECUTE != NULL && EXECUTE->pid == pid){
         // enviar señal de interrupcion a CPU
-        // esperar a que retorne el contexto de ejecucion...
+        t_interruption* interrupcion_exit = create_interruption(EXIT_INTERRUPT, pid);
+        send_interruption_cpu(interrupcion_exit);
+        destroy_interruption(interrupcion_exit);
+
+
+        // ####### esto ya lo hace manager_dispatch.c #######
+        // // esperar a que retorne el contexto de ejecucion...
+        // pcb = recv_pcb_cpu();
+        // // actualizar el pcb en la tabla de pcb:
+        // update_pcb(pcb);
+
+        return;
     }
 
     // ##############################################################
 
     // elimina el PCB para siempre (ver en largo_plazo.c, ACA SE LIBERAN LOS RECURSOS PARA SALIR DEL DEADLOCK)
     agregar_a_cola_exit(pcb);
+    log_info(logger_kernel, "Finaliza el proceso <%d> - Motivo: %s", pcb->pid, obtener_motivo_exit(INTERRUPTED_BY_USER));
 
-    if(pid == EXECUTE->pid) cronometro_reiniciar(); // funciona en caso de VRR
-    // Eliminar de la tabla de PCBs
-    // TODO: verificar si se genera un doble free (del diccionario... ).
-    delete_pcb(pid);
+    // Eliminar de la tabla de PCBs --> DEPRECADO POR DECISION DE MANTENER UN HISTORIAL DE PCBS MANDADOS A EXIT
+    // delete_pcb(pid);
 }
 
 void f_iniciar_planificacion(){

@@ -156,10 +156,16 @@ void atender_kernel_cpu_dispatch()
                 
                 // sem_post(&SEM_CPU);
                 // log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
-
-                procesar_pcb_exit();
+            
+                procesar_pcb_exit(SUCCESS); // cargo el motivo por el cual se manda a exit
 
                 break;
+
+            case MSG_PCB_KERNEL_INTERRUPTION_FINISH_PROCESS:
+
+                procesar_pcb_exit(INTERRUPTED_BY_USER); // cargo el motivo por el cual se manda a exit
+                break;
+
             case MSG_PCB_KERNEL_INTERRUPTION_QUANTUM:
 
             // hay que:
