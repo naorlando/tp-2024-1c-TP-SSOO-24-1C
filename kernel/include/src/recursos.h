@@ -48,7 +48,7 @@ bool recurso_match(void* recurso_ptr);
 void print_dictionary();
 bool remover_recurso_de_proceso(char *nombre_recurso, uint32_t pid);
 
-// Liberar los recursos que un proceso tiene asignados si corresponde
+// Liberar recursos asociados al proceso y procesos de la cola de bloqueados:
 // pre: un PCB!=NULL por liberar
 // post: se liberan los recursos que el proceso tiene asignados
 void liberar_recursos_de_proceso(u_int32_t pid);
@@ -70,6 +70,9 @@ void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal);
 
 void handle_signal(t_PCB *pcb, char *nombre_recurso);
 
-void remover_proceso_de_todas_las_colas_de_bloqueados(char* nombre_recurso, t_recurso* recurso, void* pid_ptr);
+//void remover_proceso_de_todas_las_colas_de_bloqueados(char* nombre_recurso, t_recurso* recurso, void* pid_ptr);
+
+void remover_proceso_de_colas_bloqueados(uint32_t pid);
+// void remover_proceso_de_colas_bloqueados_de_recurso(t_recurso* recurso, uint32_t pid);
 
 #endif // RESOURCES_H_

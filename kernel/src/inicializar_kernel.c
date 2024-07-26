@@ -189,7 +189,7 @@ void inicializar_dictionarios()
 void inicializar_recursos() {
 
     char **nombres_recursos = obtener_recursos(kernel_config);
-    u_int32_t *instancias_recursos = obtener_instancias_recursos(kernel_config);
+    uint32_t *instancias_recursos = obtener_instancias_recursos(kernel_config);
 
     for (int i = 0; nombres_recursos[i] != NULL; i++) {
         t_recurso *recurso = malloc(sizeof(t_recurso));

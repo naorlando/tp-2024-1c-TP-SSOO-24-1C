@@ -286,7 +286,7 @@ void f_finalizar_proceso(u_int32_t pid){
     // ##############################################################
 
     // si se encuentra en las distintas listas, eliminarlo de la lista:
-    // eliminar_de_listas_de_estado(pcb);
+    eliminar_de_listas_de_estado(pcb);
 
 
     // elimina el PCB para siempre (ver en largo_plazo.c, ACA SE LIBERAN LOS RECURSOS PARA SALIR DEL DEADLOCK)
@@ -296,6 +296,73 @@ void f_finalizar_proceso(u_int32_t pid){
     // Eliminar de la tabla de PCBs --> DEPRECADO POR DECISION DE MANTENER UN HISTORIAL DE PCBS MANDADOS A EXIT
     // delete_pcb(pid);
 }
+
+void eliminar_de_listas_de_estado(t_PCB* pcb)
+{
+    switch (pcb->state)
+    {
+    case NEW:
+        eliminar_de_new(pcb);
+        break;
+    case READY:
+        eliminar_de_ready(pcb);
+        break;
+    case BLOCKED:
+        eliminar_de_blocked_io(pcb);
+        // el liberar recursos asignados lo hacemos en Largo plazo.
+        break;
+    default:
+        break;
+    }
+}
+
+void eliminar_de_new(t_PCB* pcb)
+{
+    // Eliminar de la cola de NEW
+    pthread_mutex_lock(&MUTEX_NEW);
+        list_remove_element(COLA_NEW, (void*)pcb);
+    pthread_mutex_unlock(&MUTEX_NEW);
+}
+
+void eliminar_de_ready(t_PCB* pcb)
+{
+    // Eliminar de la cola de READY
+    pthread_mutex_lock(&MUTEX_READY);
+    bool exito = list_remove_element(COLA_READY, (void*)pcb);
+    pthread_mutex_unlock(&MUTEX_READY);
+    
+}  
+
+void eliminar_de_blocked_io(t_PCB* pcb) 
+{
+    // Eliminar de la cola de BLOCKED de cada io:
+
+    void closure(char* key, void* element) {
+        t_IO_connection* io = (t_IO_connection*) element;
+        void* solicitud_removida = NULL;
+        bool pid_match(void *solicitud) {
+            char* tipo_interfaz = tipo_interfaz_to_string(io->tipo_interfaz);
+            t_PCB* pcb_actual = obtener_pcb_de_solicitud(solicitud,tipo_interfaz);
+            uint32_t pid_actual = pcb_actual->pid;
+            return pid_actual == pcb->pid;
+        }
+
+        if (io->cola_procesos_bloqueados != NULL && !list_is_empty(io->cola_procesos_bloqueados)) {
+            pthread_mutex_lock(&io->mutex_cola_bloqueados);
+               solicitud_removida = list_remove_by_condition(io->cola_procesos_bloqueados, pid_match);
+            pthread_mutex_unlock(&io->mutex_cola_bloqueados);
+        }
+
+        if (solicitud_removida != NULL) {
+            char* tipo_io = tipo_interfaz_to_string(io->tipo_interfaz);
+            t_PCB* pcb_removido = obtener_pcb_de_solicitud(solicitud_removida,tipo_io);
+            log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados de la io %s", pcb_removido->pid, io->nombre_interfaz);
+        }
+    }
+
+    dictionary_iterator(io_connections, closure);
+}
+
 
 void f_iniciar_planificacion(){
     if(!planificador_status)

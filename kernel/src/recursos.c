@@ -96,13 +96,16 @@ void free_resource(t_PCB *pcb)
 {
     log_info(logger_kernel, "Liberando recursos del proceso %d", pcb->pid);
 
-    // Liberar recursos asociados al proceso
+    // Liberar recursos asociados al proceso y procesos de la cola de bloqueados:
+   
     liberar_recursos_de_proceso(pcb->pid);
 
-    // Esta logica se usa para cunado se manda un pcb a exit y se quiere sacar completamenteel pid del diccionario: recursos_asignados_por_pid
-    // Verificar si el proceso está en el diccionario antes de eliminarlo: 
+    remover_proceso_de_colas_bloqueados(pcb->pid); // iterador
+
+    // Esta logica se usa para cuando se manda un pcb a exit y se quiere sacar  
+    // completamente el pid del diccionario: recursos_asignados_por_pid
     char* pid_str = uint32_to_string(pcb->pid);
-    if (dictionary_has_key(recursos_asignados_por_pid, pid_str)) {
+    if (dictionary_has_key(recursos_asignados_por_pid, pid_str)) { // Verificar si el proceso está en el diccionario antes de eliminarlo: 
         dictionary_remove_and_destroy(recursos_asignados_por_pid, pid_str, (void *)list_destroy);
         log_info(logger_kernel, "Proceso %d eliminado del diccionario de recursos asignados.", pcb->pid);
     }
@@ -119,23 +122,42 @@ void liberar_recursos_de_proceso(u_int32_t pid) {
         return;
     }
 
-    // Verificar si el proceso tiene recursos asignados
     char* pid_str = uint32_to_string(pid);
     t_list *recursos = dictionary_get(recursos_asignados_por_pid, pid_str);
+
+    // Verificar si el proceso tiene recursos asignados
     if (recursos == NULL) {
         log_info(logger_kernel, "El proceso %d no tiene recursos asignados, se puede eliminar tranquilamente.", pid);
         free(pid_str);
         return;
     }
 
-    // Si tiene recursos, liberar los recursos no previamente liberados
+    // Si tiene recursos, liberar los recursos no previamente liberados:
+    // se hacen los signal correspondientes 
     while (!list_is_empty(recursos)) {
+        // pasos:
+        // primero removemos del recursos_asignados_por_pid
+        // segundo, a partir de esto obtenemos el nombre_recurso, que es la key del diccionario de recursos
+        // buscamos en el diccionario de recursos el recurso y liberamos el proceso de la cola del recurso
+        // ----------------------------------------------------------------------------------------------
         char *nombre_recurso = (char *)list_remove(recursos, 0);
-        t_recurso *recurso = get_recurso(nombre_recurso);
+        // ----------------------------------------------------------------------------------------------
+
+        // se obtiene el recurso del diccionario de recursos ( key = nombre_recurso, value= t_recurso* ):
+        t_recurso *recurso = get_recurso(nombre_recurso); 
         if (recurso != NULL) {
             incrementar_recurso(recurso);
             log_info(logger_kernel, "Se libera recurso %s (SIN PREVIAMENTE SER LIBERADO) del PID = %d", nombre_recurso, pid);
-            remover_recurso_de_proceso(nombre_recurso, pid);
+            
+            
+            //remover_recurso_de_proceso(nombre_recurso, pid); // se elimina la relacion proceso->recurso del diccionario: recursos_asignados_por_pid
+            
+
+            // ----------------------------------------------------------------------------------------------
+            // eliminar PCB a finalizar de la recurso->cola_bloqueados:
+            // remover_proceso_de_colas_bloqueados_de_recurso(recurso,pid);
+            // ----------------------------------------------------------------------------------------------
+
             if (!list_is_empty(recurso->cola_bloqueados)) {
                 t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
                 log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
@@ -144,7 +166,7 @@ void liberar_recursos_de_proceso(u_int32_t pid) {
         }
     }
 
-    list_destroy(recursos);  // Destruir la lista de recursos
+    //list_destroy(recursos); 
     free(pid_str);
 }
 
@@ -162,7 +184,7 @@ bool remover_recurso_de_proceso(char *nombre_recurso, uint32_t pid)
         //     dictionary_remove_and_destroy(recursos_asignados_por_pid, pid_str, (void *) list_destroy);
         // }
         free(pid_str);  // Liberar la memoria asignada para pid_str
-        print_dictionary();
+        //print_dictionary();
         return true;
     } else {
         log_error(logger_kernel, "No se encontró el proceso %d en la lista de recursos asignados.", pid);
@@ -174,11 +196,11 @@ bool remover_recurso_de_proceso(char *nombre_recurso, uint32_t pid)
 void print_dictionary() {
     void print_item(char* key, void* value) {
         t_list* recursos = (t_list*)value;
-        printf("PID: %s -> Recursos: ", key);
+        log_info(logger_kernel,"PID: %s -> Recursos: ", key);
         for (int i = 0; i < list_size(recursos); i++) {
-            printf("%s ", (char*)list_get(recursos, i));
+            log_info(logger_kernel,"%s ", (char*)list_get(recursos, i));
         }
-        printf("\n");
+        // printf("\n");
     }
     dictionary_iterator(recursos_asignados_por_pid, print_item);
 }
@@ -196,12 +218,27 @@ void remover_proceso_de_colas_bloqueados(uint32_t pid) {
 
         if (pcb_removido != NULL) {
             log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
-        } else {
-            log_info(logger_kernel, "Proceso %d no se encontró en la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
-        }
+        } 
     }
     dictionary_iterator(recursos_dictionary, remover_proceso);
 }
+
+// void remover_proceso_de_colas_bloqueados_de_recurso(t_recurso* recurso, uint32_t pid)
+// {
+//     bool pid_match(void *pcb_ptr) {
+//         return ((t_PCB *)pcb_ptr)->pid == pid;
+//     }
+
+//     pthread_mutex_lock(&recurso->mutex_cola_bloqueados);
+//         t_PCB *pcb_removido = (t_PCB *)list_remove_by_condition(recurso->cola_bloqueados, pid_match);
+//     pthread_mutex_unlock(&recurso->mutex_cola_bloqueados);
+//     // ES ACA!, el list remove devuelve un pcb vacio(0x0) = nulo, el pid llega bien, 
+//     if (pcb_removido != NULL) {
+//         log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
+//     } else {
+//         log_warning(logger_kernel, "Proceso %d no se encontró en la cola de bloqueados del recurso %s", pid, recurso->nombre);
+//     }
+// }
 
 void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal) {
 
@@ -231,7 +268,7 @@ void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal) {
             send_pcb_cpu(pcb);
         } else {
             agregar_de_blocked_a_ready(pcb);
-            update_pcb(pcb);
+            //update_pcb(pcb);
         }
     } else {
         enviar_proceso_a_cola_bloqueados(recurso, pcb);
