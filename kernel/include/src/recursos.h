@@ -72,7 +72,7 @@ void handle_signal(t_PCB *pcb, char *nombre_recurso);
 
 //void remover_proceso_de_todas_las_colas_de_bloqueados(char* nombre_recurso, t_recurso* recurso, void* pid_ptr);
 
-
-void remover_proceso_de_colas_bloqueados_de_recurso(t_recurso* recurso, uint32_t pid);
+void remover_proceso_de_colas_bloqueados(uint32_t pid);
+// void remover_proceso_de_colas_bloqueados_de_recurso(t_recurso* recurso, uint32_t pid);
 
 #endif // RESOURCES_H_
