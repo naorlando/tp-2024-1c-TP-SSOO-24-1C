@@ -53,8 +53,15 @@ int read_from_memory(uint32_t pid, uint32_t logical_address, void *memory_value,
             }
         }
 
-        // Calcular bytes que se pueden leer en el frame actual
-        uint32_t bytes_disponibles = (page_size - dir_logica->desplazamiento_pagina) + 1;
+        uint32_t bytes_disponibles = 0;
+        if (dir_logica->desplazamiento_pagina == 0)
+        {
+            bytes_disponibles = page_size - (dir_logica->desplazamiento_pagina);
+        }
+        else
+        {
+            bytes_disponibles = (page_size - dir_logica->desplazamiento_pagina) + 1;
+        }
         uint32_t bytes_a_leer = (remaining_bytes < bytes_disponibles) ? remaining_bytes : bytes_disponibles;
 
         // Leer los bytes desde la memoria
@@ -116,8 +123,15 @@ int write_into_memory(uint32_t pid, uint32_t logical_address, void *write_value,
             }
         }
 
-        // Calcular bytes que se pueden escribir en el frame actual
-        uint32_t bytes_disponibles = (page_size - dir_logica->desplazamiento_pagina) + 1;
+        uint32_t bytes_disponibles = 0;
+        if (dir_logica->desplazamiento_pagina == 0)
+        {
+            bytes_disponibles = page_size - (dir_logica->desplazamiento_pagina);
+        }
+        else
+        {
+            bytes_disponibles = (page_size - dir_logica->desplazamiento_pagina) + 1;
+        }
         uint32_t bytes_a_escribir = (remaining_bytes < bytes_disponibles) ? remaining_bytes : bytes_disponibles;
 
         void *valor_asignable = malloc(bytes_a_escribir);
@@ -214,10 +228,12 @@ void copiar_cadena(uint32_t origen, uint32_t destino, int tamano)
     uint32_t cant_paginas_origen = traductor_cantidad_paginas(origen, tamano);
     uint32_t cant_paginas_destino = traductor_cantidad_paginas(destino, tamano);
 
-    void *memory_value = malloc(tamano);
-    if (read_from_memory(pcb_execute->pid, origen, &memory_value, cant_paginas_origen, tamano))
-    {
+    char *memory_value = malloc(tamano + 1);
 
+    if (read_from_memory(pcb_execute->pid, origen, memory_value, cant_paginas_origen, tamano))
+    {
+        memory_value[tamano] = '\0';
+        log_info(logger_cpu, "LA CADENA RECUPERADA %s", memory_value);
         if (!write_into_memory(pcb_execute->pid, destino, memory_value, cant_paginas_destino, tamano))
         {
             log_error(logger_cpu, "Error COPY_STRING en pegar la información");
@@ -229,7 +245,7 @@ void copiar_cadena(uint32_t origen, uint32_t destino, int tamano)
     }
 }
 
-t_io_frames *exec_io_frames(uint32_t pid, uint32_t direccion_logica, uint32_t tamano)
+t_io_frames *exec_io_frames(uint32_t pid, uint32_t direccion_logica, uint32_t tamano, bool lectura)
 {
 
     t_datos_dir_logica *dir_logica = crear_dir_logica(direccion_logica);
@@ -261,8 +277,16 @@ t_io_frames *exec_io_frames(uint32_t pid, uint32_t direccion_logica, uint32_t ta
                 return NULL; // Error
             }
         }
+        uint32_t bytes_disponibles = 0;
 
-        uint32_t bytes_disponibles = page_size - dir_logica->desplazamiento_pagina + 1;
+        if (dir_logica->desplazamiento_pagina == 0 || lectura)
+        {
+            bytes_disponibles = page_size - (dir_logica->desplazamiento_pagina);
+        }
+        else
+        {
+            bytes_disponibles = (page_size - dir_logica->desplazamiento_pagina) + 1;
+        }
         uint32_t bytes_a_escribir = (remaining_bytes < bytes_disponibles) ? remaining_bytes : bytes_disponibles;
 
         t_frame_data *frame_data = create_frame_data(frame, bytes_a_escribir, dir_logica->desplazamiento_pagina);

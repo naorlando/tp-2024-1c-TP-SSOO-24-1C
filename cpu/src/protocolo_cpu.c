@@ -100,7 +100,7 @@ void send_solicitud_io_stdin_kernel(t_PCB *pcb, t_instruction *instruccion)
     uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
     uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
 
-    t_io_frames* io_frames_stdin = exec_io_frames(pcb->pid,direccion_logica,tamano);
+    t_io_frames* io_frames_stdin = exec_io_frames(pcb->pid,direccion_logica,tamano,false);
 
     t_io_stdin* io_stdin = crear_io_stdin(io_frames_stdin);
    
@@ -181,7 +181,7 @@ void send_solicitud_io_stdout_kernel(t_PCB *pcb, t_instruction *instruccion)
     uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
     uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
 
-    t_io_frames* io_frames_stdout = exec_io_frames(pcb->pid,direccion_logica,tamano);
+    t_io_frames* io_frames_stdout = exec_io_frames(pcb->pid,direccion_logica,tamano,true);
 
     t_io_stdout* io_stdout = crear_io_stdout(io_frames_stdout);
    

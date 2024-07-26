@@ -64,12 +64,12 @@ void procesar_interrupcion_quantum()
 
     // cronometro_detener(); // funciona en caso de VRR
  
-    // 2-actualizar el estado del pcb en la cola correspondiente:
     actualizar_quantum(pcb_interrupt);
-    agregar_de_execute_a_ready(pcb_interrupt);
-
     // 3-actualizar el pcb en la tabla de pcb:
     update_pcb(pcb_interrupt);
+    // 2-actualizar el estado del pcb en la cola correspondiente:
+    agregar_de_execute_a_ready(pcb_interrupt);
+
     log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_interrupt->pid);
 
 
