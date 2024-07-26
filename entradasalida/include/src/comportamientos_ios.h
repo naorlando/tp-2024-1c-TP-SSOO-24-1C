@@ -16,5 +16,6 @@
 bool ejecutar_unidades_de_trabajo(t_io_generica *);
 char *leer_entrada_limitada(uint32_t);
 void escribir_memoria(t_io_frames *, char *);
+char *leer_memoria(t_io_frames *);
 
 #endif /* COMPORTAMIENTOS_IOS_H_ */

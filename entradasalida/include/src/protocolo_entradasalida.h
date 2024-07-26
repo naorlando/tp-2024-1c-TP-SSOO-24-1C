@@ -14,15 +14,10 @@ void atender_solicitud_stdin(int);
 void atender_solicitud_stdout(int);
 
 
-char* leer_memoria(uint32_t, uint32_t);
-
 void send_confirmacion_io(int, t_msg_header, t_response*);
 
 // FUNCIONES de atención de instrucciones
 void atender_instruccion_dialfs(int fd);
-
-// FUNCION auxiliar de interfaz STDOUT
-char* leer_memoria(uint32_t direccion_fisica, uint32_t tamanio);
 
 // FUNCION auxiliar de interfaz DIALFS
 void enviar_datos_leidos(int fd, void* buffer, uint32_t tamanio);
