@@ -212,6 +212,10 @@ void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal) {
     if (recurso == NULL) {
         log_error(logger_kernel, "Recurso %s no encontrado. Proceso %d enviado a EXIT.", nombre_recurso, pcb->pid);
         enviar_proceso_a_exit(pcb);
+
+        //LOG OBLIGATORIO:
+        log_info(logger_kernel, "Finaliza el proceso <%d> - Motivo: %s", pcb_exit->pid, obtener_motivo_exit(INVALID_RESOURCE));
+        
         return;
     }
 
@@ -243,6 +247,10 @@ void enviar_proceso_a_cola_bloqueados(t_recurso* recurso,t_PCB* pcb)
 {
     sem_wait(&SEM_PLANIFICACION_BLOCKED_INICIADA);
     bloquear_proceso(recurso, pcb);
+
+    // LOG OBLIGATORIO:
+    log_info(logger_kernel,"PID: <%d> - Bloqueado por: <%s>" pcb->pid, recurso->nombre);
+
     cancelar_quantum_si_corresponde(pcb);
     actualizar_quantum(pcb);
     update_pcb(pcb);
@@ -257,12 +265,18 @@ void handle_signal(t_PCB *pcb, char *nombre_recurso) {
     if (recurso == NULL) {
         log_error(logger_kernel, "Recurso %s no encontrado. Proceso %d enviado a EXIT.", nombre_recurso, pcb->pid);
         enviar_proceso_a_exit(pcb);
+
+        //LOG OBLIGATORIO:
+        log_info(logger_kernel, "Finaliza el proceso <%d> - Motivo: %s", pcb_exit->pid, obtener_motivo_exit(INVALID_RESOURCE));
         return;
     }
 
     if (!remover_recurso_de_proceso(nombre_recurso, pcb->pid)) {
         log_error(logger_kernel, "Proceso %d no tiene asignado el recurso %s. Enviado a EXIT.", pcb->pid, nombre_recurso);
         enviar_proceso_a_exit(pcb);
+
+        //LOG OBLIGATORIO:
+        log_info(logger_kernel, "Finaliza el proceso <%d> - Motivo: %s", pcb_exit->pid, obtener_motivo_exit(INVALID_RESOURCE));
         return;
     }
 

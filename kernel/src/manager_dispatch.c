@@ -58,7 +58,9 @@ void procesar_interrupcion_quantum()
     // 1-recibir pcb:
     t_PCB* pcb_interrupt = recv_pcb_interrupt();
 
-    log_info(logger_kernel, "Se recibio un PCB por interrupcion de QUANTUM a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
+    // LOG OBLIGATORIO:
+    // PID: <PID> - Desalojado por fin de Quantum
+    log_info(logger_kernel, "PID: <%d> - Desalojado por fin de Quantum", pcb_interrupt->pid);
 
     // cronometro_detener(); // funciona en caso de VRR
  
