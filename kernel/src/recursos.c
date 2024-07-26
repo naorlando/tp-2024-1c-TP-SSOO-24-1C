@@ -96,13 +96,13 @@ void free_resource(t_PCB *pcb)
 {
     log_info(logger_kernel, "Liberando recursos del proceso %d", pcb->pid);
 
-    // Liberar recursos asociados al proceso
+    // Liberar recursos asociados al proceso y procesos de la cola de bloqueados:
     liberar_recursos_de_proceso(pcb->pid);
 
-    // Esta logica se usa para cunado se manda un pcb a exit y se quiere sacar completamente el pid del diccionario: recursos_asignados_por_pid
-    // Verificar si el proceso está en el diccionario antes de eliminarlo: 
+    // Esta logica se usa para cuando se manda un pcb a exit y se quiere sacar  
+    // completamente el pid del diccionario: recursos_asignados_por_pid
     char* pid_str = uint32_to_string(pcb->pid);
-    if (dictionary_has_key(recursos_asignados_por_pid, pid_str)) {
+    if (dictionary_has_key(recursos_asignados_por_pid, pid_str)) { // Verificar si el proceso está en el diccionario antes de eliminarlo: 
         dictionary_remove_and_destroy(recursos_asignados_por_pid, pid_str, (void *)list_destroy);
         log_info(logger_kernel, "Proceso %d eliminado del diccionario de recursos asignados.", pcb->pid);
     }
@@ -119,23 +119,33 @@ void liberar_recursos_de_proceso(u_int32_t pid) {
         return;
     }
 
-    // Verificar si el proceso tiene recursos asignados
     char* pid_str = uint32_to_string(pid);
     t_list *recursos = dictionary_get(recursos_asignados_por_pid, pid_str);
+
+    // Verificar si el proceso tiene recursos asignados
     if (recursos == NULL) {
         log_info(logger_kernel, "El proceso %d no tiene recursos asignados, se puede eliminar tranquilamente.", pid);
         free(pid_str);
         return;
     }
 
-    // Si tiene recursos, liberar los recursos no previamente liberados
+    // Si tiene recursos, liberar los recursos no previamente liberados:
+    // se hacen los signal correspondientes 
     while (!list_is_empty(recursos)) {
         char *nombre_recurso = (char *)list_remove(recursos, 0);
-        t_recurso *recurso = get_recurso(nombre_recurso);
+        // se obtiene el recurso del diccionario de recursos ( key = nombre_recurso, value= t_recurso* ):
+        t_recurso *recurso = get_recurso(nombre_recurso); 
         if (recurso != NULL) {
             incrementar_recurso(recurso);
             log_info(logger_kernel, "Se libera recurso %s (SIN PREVIAMENTE SER LIBERADO) del PID = %d", nombre_recurso, pid);
-            remover_recurso_de_proceso(nombre_recurso, pid);
+            remover_recurso_de_proceso(nombre_recurso, pid); // se elimina la relacion proceso->recurso del diccionario: recursos_asignados_por_pid
+            
+
+            // ----------------------------------------------------------------------------------------------
+            // eliminar PCB a finalizar de la recurso->cola_bloqueados:
+            remover_proceso_de_colas_bloqueados_de_recurso(recurso,pid);
+            // ----------------------------------------------------------------------------------------------
+
             if (!list_is_empty(recurso->cola_bloqueados)) {
                 t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
                 log_info(logger_kernel, "Proceso %d desbloqueado por SIGNAL de recurso %s", pcb_desbloqueado->pid, nombre_recurso);
@@ -183,24 +193,41 @@ void print_dictionary() {
     dictionary_iterator(recursos_asignados_por_pid, print_item);
 }
 
-void remover_proceso_de_colas_bloqueados(uint32_t pid) {
-    void remover_proceso(char *key, void *value) {
-        t_recurso *recurso = (t_recurso *)value;
-        bool pid_match(void *pcb_ptr) {
-            return ((t_PCB *)pcb_ptr)->pid == pid;
-        }
+// void remover_proceso_de_colas_bloqueados(uint32_t pid) {
+//     void remover_proceso(char *key, void *value) {
+//         t_recurso *recurso = (t_recurso *)value;
+//         bool pid_match(void *pcb_ptr) {
+//             return ((t_PCB *)pcb_ptr)->pid == pid;
+//         }
 
-        pthread_mutex_lock(&recurso->mutex_cola_bloqueados); // Asegúrate de tener un mutex para cada cola de bloqueados
-        t_PCB *pcb_removido = (t_PCB *)list_remove_by_condition(recurso->cola_bloqueados, pid_match);
-        pthread_mutex_unlock(&recurso->mutex_cola_bloqueados);
+//         pthread_mutex_lock(&recurso->mutex_cola_bloqueados); // Asegúrate de tener un mutex para cada cola de bloqueados
+//         t_PCB *pcb_removido = (t_PCB *)list_remove_by_condition(recurso->cola_bloqueados, pid_match);
+//         pthread_mutex_unlock(&recurso->mutex_cola_bloqueados);
 
-        if (pcb_removido != NULL) {
-            log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
-        } else {
-            log_info(logger_kernel, "Proceso %d no se encontró en la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
-        }
+//         if (pcb_removido != NULL) {
+//             log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
+//         } else {
+//             log_info(logger_kernel, "Proceso %d no se encontró en la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
+//         }
+//     }
+//     dictionary_iterator(recursos_dictionary, remover_proceso);
+// }
+
+void remover_proceso_de_colas_bloqueados_de_recurso(t_recurso* recurso, uint32_t pid)
+{
+    bool pid_match(void *pcb_ptr) {
+        return ((t_PCB *)pcb_ptr)->pid == pid;
     }
-    dictionary_iterator(recursos_dictionary, remover_proceso);
+
+    pthread_mutex_lock(&recurso->mutex_cola_bloqueados);
+        t_PCB *pcb_removido = (t_PCB *)list_remove_by_condition(recurso->cola_bloqueados, pid_match);
+    pthread_mutex_unlock(&recurso->mutex_cola_bloqueados);
+
+    if (pcb_removido != NULL) {
+        log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
+    } else {
+        log_warning(logger_kernel, "Proceso %d no se encontró en la cola de bloqueados del recurso %s", pcb_removido->pid, recurso->nombre);
+    }
 }
 
 void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal) {
