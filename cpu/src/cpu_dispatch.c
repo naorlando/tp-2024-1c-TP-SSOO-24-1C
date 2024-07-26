@@ -115,24 +115,24 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
         }
         case WAIT:
         {
-            log_info(logger_cpu, "EJECUTANDO WAIT\n");
             // variable con nombre de recurso
             char *nombre_recurso = (char *)list_get(instruccion->params, 0);
             // logica de WAIT de un recurso:
             // mandar mensaje a kernel para que haga cositas con el recurso
             handle_wait_or_signal(pcb_execute, nombre_recurso, WAIT);
+            log_info(logger_cpu, "PID: <%d> - Ejecutando: <WAIT> - <%s>\n", pcb_execute->pid, nombre_recurso);
             // activo flag:
             solicitud_recurso = true;
             break;
         }
         case SIGNAL:
         {
-            log_info(logger_cpu, "EJECUTANDO SIGNAL\n");
             // variable con nombre de recurso
             char *nombre_recurso = (char *)list_get(instruccion->params, 0);
             // logica de SIGNAL de un recurso:
             // mandar mensaje a kernel para que haga cositas con el recurso
             handle_wait_or_signal(pcb_execute, nombre_recurso, SIGNAL);
+            log_info(logger_cpu, "PID: <%d> - Ejecutando: <SIGNAL> - <%s>\n", pcb_execute->pid, nombre_recurso);
             // activo flag:
             solicitud_recurso = true;
             break;
