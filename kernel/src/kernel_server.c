@@ -87,6 +87,10 @@ void atender_kernel_IO(void* io_connection)
         // Obtener el PCB de la solicitud y moverlo a ready
         t_PCB* pcb = obtener_pcb_de_solicitud(solicitud, tipo_interfaz);
         if (pcb != NULL) {
+            if(pcb->state == FINISHED) {
+                log_info(logger_kernel, "El PCB de PID <%d> que llego de IO ya había terminado su ejecucion", pcb->pid);
+                continue;
+            }
             destruir_solicitud_io(solicitud, tipo_interfaz);
             agregar_de_blocked_a_ready(pcb);
         } else {

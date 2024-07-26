@@ -333,33 +333,30 @@ void eliminar_de_ready(t_PCB* pcb)
     
 }  
 
-void eliminar_de_blocked_io(t_PCB* pcb)
+void eliminar_de_blocked_io(t_PCB* pcb) 
 {
     // Eliminar de la cola de BLOCKED de cada io:
-    //t_list* nombres_de_ios = dictionary_keys(io_connections);
-    
-    // ##############################################################
-    // TODO: pensar estrategia para cuando la io ya pida desencolar el PCB y lo este ejecutando ya.
-    // ##############################################################
 
     void closure(char* key, void* element) {
         t_IO_connection* io = (t_IO_connection*) element;
-        t_PCB *pcb_removido;
-        //bool pcb_encontrado = false;
-        // pcb match: (condition)
+        t_PCB *pcb_removido = NULL;
         bool pid_match(void *pcb_ptr) {
             return ((t_PCB *)pcb_ptr)->pid == pcb->pid;
         }
+
         if (io->cola_procesos_bloqueados != NULL && !list_is_empty(io->cola_procesos_bloqueados)) {
             pthread_mutex_lock(&io->mutex_cola_bloqueados);
+            // Verificar si el proceso está en la cola de bloqueados
+            if (list_any_satisfy(io->cola_procesos_bloqueados, pid_match)) {
                 pcb_removido = (t_PCB *)list_remove_by_condition(io->cola_procesos_bloqueados, pid_match);
-                // hacer lo mismo pero con: bool list_remove_element(t_list* self, void* element);
-                //pcb_encontrado = list_remove_element(io->cola_procesos_bloqueados, (void*)pcb);
+            }
             pthread_mutex_unlock(&io->mutex_cola_bloqueados);
         }
 
         if (pcb_removido != NULL) {
             log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados de la io %s", pcb_removido->pid, io->nombre_interfaz);
+        } else {
+            log_warning(logger_kernel, "Proceso %d no encontrado en la cola de bloqueados de la io %s", pcb->pid, io->nombre_interfaz);
         }
     }
 
