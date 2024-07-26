@@ -391,7 +391,7 @@ void solicitar_IO(t_instruction *instruccion)
             send_solicitud_io_stdin_kernel(pcb_execute,instruccion);
             break;
         case IO_STDOUT_WRITE:
-
+            send_solicitud_io_stdout_kernel(pcb_execute,instruccion);
             break;
         case IO_FS_CREATE:
 

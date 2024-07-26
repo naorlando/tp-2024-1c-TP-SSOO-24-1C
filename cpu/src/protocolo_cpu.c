@@ -170,3 +170,20 @@ int send_msg_cpu_memoria_resize(uint32_t pid, uint32_t new_size, int fd)
 
     return EXIT_SUCCESS;
 }
+
+void send_solicitud_io_stdout_kernel(t_PCB *pcb, t_instruction *instruccion)
+{
+    t_list *parametros = obtener_parametros(instruccion);
+    char *interface = (char *)list_get(parametros, 0);
+    char *reg_direccion = (char *)list_get(parametros, 1);
+    char *reg_tamano = (char *)list_get(parametros, 2);
+
+    uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+    uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
+
+    t_io_frames* io_frames_stdout = exec_io_frames(pcb->pid,direccion_logica,tamano);
+
+    t_io_stdout* io_stdout = crear_io_stdout(io_frames_stdout);
+   
+    send_solicitud_io_stdout(fd_kernel_dispatch, pcb, interface, io_stdout);
+}

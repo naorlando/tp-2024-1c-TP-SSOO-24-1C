@@ -407,7 +407,7 @@ void send_solicitud_io_stdout(int fd, t_PCB *pcb, char *nombre_interfaz, t_io_st
     t_solicitud_io_stdout *solicitud = crear_solicitud_io_stdout(pcb, nombre_interfaz, io_stdout);
 
     // Creo el paquete que se va a enviar
-    t_package *package = package_create(MSG_CPU_IO_GEN_SLEEP, obtener_tamanio_solicitud_stdout(solicitud));
+    t_package *package = package_create(MSG_CPU_IO_STDOUT_WRITE, obtener_tamanio_solicitud_stdout(solicitud));
 
     // Serializo en el buffer el t_solicitud_io_generica
     serializar_solicitud_io_stdout(get_buffer(package), solicitud);

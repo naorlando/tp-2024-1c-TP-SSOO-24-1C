@@ -79,7 +79,7 @@ void atender_solicitud_stdout(int fd)
         log_info(logger_entradasalida, "PID: <%d> - Operacion: <WRITE>", obtener_pid_stdout(io_stdout));
 
         char *valor = leer_memoria(io_stdout->frames_data);
-        printf("%.*s", get_tamano_total_io_frames(io_stdout->frames_data), valor);
+         log_info(logger_entradasalida, "TAMAÑO LEIDO : <%d> - CADENA : <%s>", get_tamano_total_io_frames(io_stdout->frames_data), valor);
 
         free(valor);
 

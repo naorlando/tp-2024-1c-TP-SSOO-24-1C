@@ -139,3 +139,10 @@ void send_msg_kernel_memoria_end_process(uint32_t pid)
 
     package_destroy(package);
 }
+
+t_solicitud_io_stdout* recv_solicitud_io_stdout_cpu()
+{
+    t_solicitud_io_stdout* io_stdout = recv_solicitud_io_stdout(fd_cpu_dispatch);
+
+    return io_stdout;
+}

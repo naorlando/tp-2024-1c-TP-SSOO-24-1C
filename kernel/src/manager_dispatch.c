@@ -226,13 +226,24 @@ void procesar_ios_stdin()
     t_PCB* pcb_io_stdin = obtener_pcb_solicitud_stdin(solicitud_stdin);
     cancelar_quantum_si_corresponde(pcb_io_stdin);
     actualizar_quantum(pcb_io_stdin);
-    log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_stdin->pid);
+    log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO STDIN para el PCB de PID <%d>", pcb_io_stdin->pid);
 
     proceso_solicita_io(1, solicitud_stdin);
     sem_post(&SEM_CPU);
 }
 
 //TODO terminar de implementar
-void procesar_ios_stdout(){}
+void procesar_ios_stdout(){
+    t_solicitud_io_stdout* solicitud_stdout = recv_solicitud_io_stdout_cpu();
+
+    t_PCB* pcb_io_stdout = obtener_pcb_solicitud_stdout(solicitud_stdout);
+    cancelar_quantum_si_corresponde(pcb_io_stdout);
+    actualizar_quantum(pcb_io_stdout);
+    log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO STDOUT para el PCB de PID <%d>", pcb_io_stdout->pid);
+
+    proceso_solicita_io(2, solicitud_stdout);
+    sem_post(&SEM_CPU);
+
+}
 
 
