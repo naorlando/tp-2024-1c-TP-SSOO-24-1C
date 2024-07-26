@@ -339,24 +339,24 @@ void eliminar_de_blocked_io(t_PCB* pcb)
 
     void closure(char* key, void* element) {
         t_IO_connection* io = (t_IO_connection*) element;
-        t_PCB *pcb_removido = NULL;
-        bool pid_match(void *pcb_ptr) {
-            return ((t_PCB *)pcb_ptr)->pid == pcb->pid;
+        void* solicitud_removida = NULL;
+        bool pid_match(void *solicitud) {
+            char* tipo_interfaz = tipo_interfaz_to_string(io->tipo_interfaz);
+            t_PCB* pcb_actual = obtener_pcb_de_solicitud(solicitud,tipo_interfaz);
+            uint32_t pid_actual = pcb_actual->pid;
+            return pid_actual == pcb->pid;
         }
 
         if (io->cola_procesos_bloqueados != NULL && !list_is_empty(io->cola_procesos_bloqueados)) {
             pthread_mutex_lock(&io->mutex_cola_bloqueados);
-            // Verificar si el proceso está en la cola de bloqueados
-            if (list_any_satisfy(io->cola_procesos_bloqueados, pid_match)) {
-                pcb_removido = (t_PCB *)list_remove_by_condition(io->cola_procesos_bloqueados, pid_match);
-            }
+               solicitud_removida = list_remove_by_condition(io->cola_procesos_bloqueados, pid_match);
             pthread_mutex_unlock(&io->mutex_cola_bloqueados);
         }
 
-        if (pcb_removido != NULL) {
+        if (solicitud_removida != NULL) {
+            char* tipo_io = tipo_interfaz_to_string(io->tipo_interfaz);
+            t_PCB* pcb_removido = obtener_pcb_de_solicitud(solicitud_removida,tipo_io);
             log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados de la io %s", pcb_removido->pid, io->nombre_interfaz);
-        } else {
-            log_warning(logger_kernel, "Proceso %d no encontrado en la cola de bloqueados de la io %s", pcb->pid, io->nombre_interfaz);
         }
     }
 
