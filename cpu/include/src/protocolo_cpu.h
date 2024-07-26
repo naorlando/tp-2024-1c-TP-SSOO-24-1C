@@ -53,6 +53,8 @@ void send_solicitud_io_generica_kernel(t_PCB*, t_instruction*);
 
 void send_solicitud_io_stdin_kernel(t_PCB *pcb, t_instruction *instruccion);
 
+void send_solicitud_io_stdout_kernel(t_PCB *pcb, t_instruction *instruccion);
+
 
 // --   PAGE & FRAME    --
 int recv_msg_memoria_cpu_frame(t_buffer* buffer, uint32_t * frame);

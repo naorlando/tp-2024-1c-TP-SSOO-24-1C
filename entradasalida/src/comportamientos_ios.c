@@ -25,7 +25,8 @@ char *leer_entrada_limitada(uint32_t tamanio_limite)
             free(input);
         }
 
-        input = readline("Ingrese un texto: ");
+        log_info(logger_entradasalida, "Longitud maxima : %d", tamanio_limite);
+        input = readline("Ingrese un texto : ");
         if (input == NULL)
         {
             log_error(logger_entradasalida, "Error al leer la entrada\n");
@@ -33,13 +34,13 @@ char *leer_entrada_limitada(uint32_t tamanio_limite)
         }
 
         len = strlen(input);
-        if (len > tamanio_limite - 1)
+        if (len > tamanio_limite)
         {
             log_error(logger_entradasalida, "La entrada excede el tamaño máximo permitido (%u caracteres). Inténtelo de nuevo.\n", tamanio_limite - 1);
         }
-    } while (len > tamanio_limite - 1);
+    } while (len > tamanio_limite);
 
-    input[tamanio_limite - 1] = '\0';
+
 
     return input;
 }
@@ -74,7 +75,7 @@ void escribir_memoria(t_io_frames *io_frames, char *entrada)
 char *leer_memoria(t_io_frames *io_frames)
 {
     uint32_t tamanio_total = get_tamano_total_io_frames(io_frames);
-    char *salida = malloc(tamanio_total);
+    char *salida = malloc(tamanio_total+1);
     t_list *frames = io_frames->frames_data;
     uint32_t size_lista = list_size(frames);
     size_t offset = 0;
@@ -105,6 +106,6 @@ char *leer_memoria(t_io_frames *io_frames)
         buffer_destroy(buffer);
         free(read_value);
     }
-
+    salida[tamanio_total] = '\0';
     return salida;
 }
