@@ -92,7 +92,7 @@ t_IO_connection* crear_IO_connection(const char* nombre, tipo_interfaz_t tipo, i
     }
     nueva_conexion->tipo_interfaz = tipo;
     nueva_conexion->file_descriptor = fd;
-    nueva_conexion->cola_procesos_bloqueados = queue_create();
+    nueva_conexion->cola_procesos_bloqueados = list_create();
     sem_init(&(nueva_conexion->sem_cola_bloqueados), 0, 0);
     pthread_mutex_init(&(nueva_conexion->mutex_cola_bloqueados), NULL);
 
@@ -128,7 +128,7 @@ int obtener_file_descriptor(t_IO_connection* conexion) {
     return -1;  // Valor por defecto en caso de error
 }
 
-t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion) {
+t_list* obtener_cola_procesos_bloqueados(t_IO_connection* conexion) {
     if (conexion) {
         return conexion->cola_procesos_bloqueados;
     }
@@ -136,14 +136,14 @@ t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion) {
 }
 
 void* obtener_proceso_bloqueado(t_IO_connection* conexion) {
-    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(conexion);
+    t_list* cola_bloqueados_io = obtener_cola_procesos_bloqueados(conexion);
 
     if(cola_bloqueados_io == NULL) return NULL;
 
     pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(conexion);
 
     pthread_mutex_lock(mutex_blocked);
-    void* proceso_bloqueado = queue_pop(cola_bloqueados_io);
+    void* proceso_bloqueado = list_remove(cola_bloqueados_io, 0);
     pthread_mutex_unlock(mutex_blocked);
 
     return proceso_bloqueado;
@@ -166,11 +166,11 @@ pthread_mutex_t* obtener_mutex_cola_bloqueados(t_IO_connection* conexion) {
 bool agregar_proceso_bloqueado(t_IO_connection* conexion, void* proceso) {
     pthread_mutex_t* mutex_blocked = obtener_mutex_cola_bloqueados(conexion);
 
-    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(conexion);
+    t_list* cola_bloqueados_io = obtener_cola_procesos_bloqueados(conexion);
 
     if(cola_bloqueados_io == NULL) return false;
     pthread_mutex_lock(mutex_blocked);
-    queue_push(cola_bloqueados_io, proceso);
+    list_add(cola_bloqueados_io, proceso);
     pthread_mutex_unlock(mutex_blocked);
 
     sem_post(obtener_semaforo_cola_bloqueados(conexion));
@@ -184,8 +184,8 @@ bool tiene_procesos_bloqueados(t_IO_connection* cliente_io)
     bool is_empty;
 
     pthread_mutex_lock(mutex_blocked);
-    t_queue* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
-    is_empty = queue_is_empty(cola_bloqueados_io);
+    t_list* cola_bloqueados_io = obtener_cola_procesos_bloqueados(cliente_io);
+    is_empty = list_is_empty(cola_bloqueados_io);
     pthread_mutex_unlock(mutex_blocked);
 
     return is_empty;

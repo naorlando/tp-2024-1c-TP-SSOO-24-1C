@@ -29,7 +29,7 @@ typedef struct {
     char* nombre_interfaz;
     tipo_interfaz_t tipo_interfaz;
     int file_descriptor;
-    t_queue* cola_procesos_bloqueados;
+    t_list* cola_procesos_bloqueados;
     sem_t sem_cola_bloqueados;
     pthread_mutex_t mutex_cola_bloqueados;
 } t_IO_connection;
@@ -117,7 +117,7 @@ int obtener_file_descriptor(t_IO_connection* conexion);
 // Función para obtener la cola de procesos bloqueados de una conexión de E/S
 // Pre: El puntero conexión debe apuntar a una estructura de conexión de E/S válida y no debe ser NULL.
 // Post: Se retorna el puntero a la cola de procesos bloqueados de la conexión de E/S.
-t_queue* obtener_cola_procesos_bloqueados(t_IO_connection* conexion);
+t_list* obtener_cola_procesos_bloqueados(t_IO_connection* conexion);
 
 // Obtiene el semáforo de la cola de procesos bloqueados de una conexión.
 // Pre: El puntero a t_IO_connection debe ser válido y no NULL.
