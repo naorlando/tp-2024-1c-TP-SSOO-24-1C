@@ -63,6 +63,7 @@ void procesar_interrupcion_quantum()
     log_info(logger_kernel, "PID: <%d> - Desalojado por fin de Quantum", pcb_interrupt->pid);
 
     // cronometro_detener(); // funciona en caso de VRR
+    execute_to_null();
  
     actualizar_quantum(pcb_interrupt);
     // 3-actualizar el pcb en la tabla de pcb:

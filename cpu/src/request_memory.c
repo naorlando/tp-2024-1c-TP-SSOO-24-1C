@@ -228,12 +228,11 @@ void copiar_cadena(uint32_t origen, uint32_t destino, int tamano)
     uint32_t cant_paginas_origen = traductor_cantidad_paginas(origen, tamano);
     uint32_t cant_paginas_destino = traductor_cantidad_paginas(destino, tamano);
 
-    char *memory_value = malloc(tamano + 1);
+    void *memory_value = malloc(tamano);
 
     if (read_from_memory(pcb_execute->pid, origen, memory_value, cant_paginas_origen, tamano))
     {
-        memory_value[tamano] = '\0';
-        log_info(logger_cpu, "LA CADENA RECUPERADA %s", memory_value);
+
         if (!write_into_memory(pcb_execute->pid, destino, memory_value, cant_paginas_destino, tamano))
         {
             log_error(logger_cpu, "Error COPY_STRING en pegar la información");
