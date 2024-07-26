@@ -36,7 +36,7 @@ void atender_kernel_IO(void* io_connection)
 
         // Si la cola de bloqueados está vacía, romper el bucle
         if (tiene_procesos_bloqueados(cliente_io)) {
-            continue;
+            break;
         }
 
         void* solicitud = obtener_proceso_bloqueado(cliente_io);
@@ -87,10 +87,8 @@ void atender_kernel_IO(void* io_connection)
         // Obtener el PCB de la solicitud y moverlo a ready
         t_PCB* pcb = obtener_pcb_de_solicitud(solicitud, tipo_interfaz);
         if (pcb != NULL) {
-            sem_wait(&SEM_PLANIFICACION_READY_INICIADA);
             destruir_solicitud_io(solicitud, tipo_interfaz);
             agregar_de_blocked_a_ready(pcb);
-            sem_post(&SEM_PLANIFICACION_READY_INICIADA);
         } else {
             log_warning(logger_kernel, "No se pudo obtener el PCB de la solicitud");
         }

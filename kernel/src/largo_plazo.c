@@ -31,7 +31,13 @@ void send_new_to_ready()
             continue;
         }
         
+        // if(flag_de_orden_multiprogramacion){
+        // }
+            sem_wait(&SEM_ORDEN_CAMBIO_MULTIPROGRAMACION);
+            sem_post(&SEM_ORDEN_CAMBIO_MULTIPROGRAMACION);
+        
         sem_wait(&SEM_MULTIPROGRAMACION);
+        //SEM_MULTIPROGRAMACION->__align = grado_multiprogramacion;
         // Control de PLANIFICACION:
         sem_wait(&SEM_PLANIFICACION_NEW_READY_INICIADA);
         
@@ -67,6 +73,7 @@ void end_process()
         // tomar pcb de exit
         pcb_exit = get_next_pcb_exit();
         sem_post(&SEM_MULTIPROGRAMACION);
+        //SEM_MULTIPROGRAMACION->__align = grado_multiprogramacion;
         // -------------------------------------------------------------------
         // chequeo de recursos no liberados:
         free_resource(pcb_exit);

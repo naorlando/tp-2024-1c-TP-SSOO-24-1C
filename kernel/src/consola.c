@@ -106,7 +106,7 @@ void _atender_instruccion(void *args)
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {
-        // código correspondiente
+        f_cambiar_grado_multiprogramacion( (uint16_t) atoi(comando_consola[1]));
     }
     else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0)
     {
@@ -334,4 +334,83 @@ void f_detener_planificacion(){
         log_info(logger_kernel,"la planificacion ya se encuentra pausada");
     }
     
+}
+
+// void f_cambiar_grado_multiprogramacion(int numero)
+// {
+//     uint16_t grado_multiprogramacionV2 = grado_multiprogramacion;
+//     int diferencia = abs(grado_multiprogramacion - numero);
+
+//     if(numero < grado_multiprogramacion){
+//         grado_multiprogramacion =- numero;
+//     }else if(numero > grado_multiprogramacion){
+//         grado_multiprogramacion =+ numero;
+//     }else{
+//         log_info(logger_kernel,"El grado de multiprogramacion ya es %d", grado_multiprogramacion);
+//         return;
+//     }
+
+//     if (numero < grado_multiprogramacionV2){
+//         log_warning(logger_kernel, "El grado de multiprogramación ha sido cambiado a %d", numero);
+//         //decrementar_multiprogramacion(grado_multiprogramacion - numero);
+//         SEM_MULTIPROGRAMACION->__align =- diferencia;
+//     } else if (numero > grado_multiprogramacionV2){
+//         //incrementar_multiprogramacion(numero - grado_multiprogramacion);
+//         log_warning(logger_kernel, "El grado de multiprogramación ha sido cambiado a %d", numero);
+//         SEM_MULTIPROGRAMACION->__align =+ diferencia;
+//     } else {
+//         log_info(logger_kernel, "El grado de multiprogramación ya es %d", grado_multiprogramacion);
+//     }
+
+// }
+
+void f_cambiar_grado_multiprogramacion(uint16_t nuevo_grado) {
+    pthread_t thread;
+    t_multiprogramacion_args* args = malloc(sizeof(t_multiprogramacion_args));
+    args->nuevo_grado = nuevo_grado;
+    
+    pthread_create(&thread, NULL, cambiar_grado_multiprogramacion, args);
+    pthread_detach(thread);
+    // cambiar_grado_multiprogramacion(args);
+
+}
+
+void* cambiar_grado_multiprogramacion(void* args) 
+{   
+    
+    flag_de_orden_multiprogramacion = true;
+    sem_wait(&SEM_ORDEN_CAMBIO_MULTIPROGRAMACION);
+
+    t_multiprogramacion_args* multiprog_args = (t_multiprogramacion_args*)args;
+    uint16_t nuevo_grado = multiprog_args->nuevo_grado;
+    free(multiprog_args);
+
+    int diferencia = nuevo_grado - grado_multiprogramacion;
+    log_warning(logger_kernel, "El grado de multiprogramación ANTES:%d", grado_multiprogramacion);
+
+    if (diferencia > 0) {
+        for (int i = 0; i < diferencia; i++) {
+            sem_post(&SEM_MULTIPROGRAMACION);    
+            log_warning(logger_kernel, "Se incrementa el grado de multiprogramación");
+        }
+    } else if (diferencia < 0) {
+
+
+        for (int i = 0; i < abs(diferencia); i++) {
+            sem_wait(&SEM_MULTIPROGRAMACION);
+            log_warning(logger_kernel, "Se decrementa el grado de multiprogramación");
+        }
+    } else {
+        log_info(logger_kernel, "El grado de multiprogramación ya es %d", grado_multiprogramacion);
+    }
+
+    log_warning(logger_kernel, "El grado de multiprogramación DESPUES:%d", grado_multiprogramacion );
+    
+    //actualizamos la variable global:
+    grado_multiprogramacion = nuevo_grado;
+
+    sem_post(&SEM_ORDEN_CAMBIO_MULTIPROGRAMACION);
+    flag_de_orden_multiprogramacion = false;
+
+    return NULL;
 }
