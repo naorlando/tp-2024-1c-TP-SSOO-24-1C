@@ -89,6 +89,7 @@ void atender_kernel_IO(void* io_connection)
         if (pcb != NULL) {
             if(pcb->state == FINISHED) {
                 log_info(logger_kernel, "El PCB de PID <%d> que llego de IO ya había terminado su ejecucion", pcb->pid);
+                destruir_solicitud_io(solicitud, tipo_interfaz);
                 continue;
             }
             destruir_solicitud_io(solicitud, tipo_interfaz);
