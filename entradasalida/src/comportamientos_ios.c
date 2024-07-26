@@ -39,7 +39,7 @@ char *leer_entrada_limitada(uint32_t tamanio_limite)
         }
     } while (len > tamanio_limite - 1);
 
-    input[tamanio_limite -1] = "\0";
+    input[tamanio_limite -1] = '\0';
 
     return input;
 }
@@ -68,4 +68,13 @@ void escribir_memoria(t_io_frames *io_frames, char *entrada)
         free(write_value);
     }
     
+}
+
+// Función auxiliar que lee la memoria de la dirección física y devuelve el valor leído
+char *leer_memoria(t_io_frames *io_frames)
+{
+
+    
+
+    return "";
 }

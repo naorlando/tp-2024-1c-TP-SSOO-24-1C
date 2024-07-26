@@ -210,13 +210,15 @@ t_message_example *recv_example(int fd)
 int send_interruption(t_interruption *interruption, int fd)
 {
     t_package *package;
-    if(interruption->name == QUANTUM_INTERRUPT){
+    if (interruption->name == QUANTUM_INTERRUPT)
+    {
         package = package_create(MSG_QUANTUM, get_interruption_size(interruption));
     }
-    else if(interruption->name == EXIT_INTERRUPT){
+    else if (interruption->name == EXIT_INTERRUPT)
+    {
         package = package_create(MSG_KERNEL_CPU_EXIT, get_interruption_size(interruption));
     }
-    
+
     serialize_interruption(get_buffer(package), interruption);
 
     package_send(package, fd);
@@ -595,8 +597,6 @@ t_response *recv_response(int fd)
     return response;
 }
 
-
-
 /*########################################## SERIALIZE AND DESERIALIZE FUNCTIONS ##########################################*/
 // serializado generico TP0
 void *serializar_paquete(t_package *paquete, int bytes)
@@ -853,7 +853,7 @@ void serialize_uint32_t(t_buffer *buffer, int args_qty, ...)
 void deserialize_uint32_t(t_buffer *buffer, int args_qty, ...)
 {
 
-    //void *stream = buffer->stream;
+    // void *stream = buffer->stream;
 
     va_list valist;
     va_start(valist, args_qty); // Inicializa valist con la cantidad de argumentos recibidos
@@ -865,7 +865,6 @@ void deserialize_uint32_t(t_buffer *buffer, int args_qty, ...)
 
         ptr_value = va_arg(valist, uint32_t *);
         *ptr_value = buffer_read_uint32(buffer);
-      
     }
 
     va_end(valist); // Libera memoria reservada para valist
@@ -952,7 +951,6 @@ void serializar_io_stdin(t_buffer *buffer, t_io_stdin *io_stdin)
     serializar_io_frames(buffer, io_stdin->frames_data);
 }
 
-
 t_io_stdin *deserializar_io_stdin(t_buffer *buffer)
 {
     return crear_io_stdin(deserializar_io_frames(buffer));
@@ -979,17 +977,12 @@ t_solicitud_io_stdout *deserializar_solicitud_io_stdout(t_buffer *buffer)
 
 void serializar_io_stdout(t_buffer *buffer, t_io_stdout *io_stdout)
 {
-    buffer_add_uint32(buffer, io_stdout->direccion_fisica);
-    buffer_add_uint32(buffer, io_stdout->tamanio);
-    buffer_add_uint32(buffer, io_stdout->pid);
+    serializar_io_frames(buffer, io_stdout->frames_data);
 }
 
 t_io_stdout *deserializar_io_stdout(t_buffer *buffer)
 {
-    uint32_t direccion_fisica = buffer_read_uint32(buffer);
-    uint32_t tamanio = buffer_read_uint32(buffer);
-    uint32_t pid = buffer_read_uint32(buffer);
-    return crear_io_stdout(direccion_fisica, tamanio, pid);
+    return crear_io_stdout(deserializar_io_frames(buffer));
 }
 
 void serializar_IO_interface(t_buffer *buffer, t_IO_interface *interface)
@@ -1043,33 +1036,37 @@ t_manejo_recurso *deserialize_manejo_recurso(t_buffer *buffer)
     return manejo_recurso_create(pcb, nombre_recurso);
 }
 
-void serializar_io_frames(t_buffer* buffer, t_io_frames* io_frames) {
+void serializar_io_frames(t_buffer *buffer, t_io_frames *io_frames)
+{
     buffer_add_uint32(buffer, io_frames->pid);
     buffer_add_uint32(buffer, io_frames->tamano_total);
     uint32_t size_list = list_size(io_frames->frames_data);
     buffer_add_uint32(buffer, size_list);
-    
-    for (int i = 0; i < size_list; i++) {
-        t_frame_data* frame_data = get_frame_data(io_frames, i);
+
+    for (int i = 0; i < size_list; i++)
+    {
+        t_frame_data *frame_data = get_frame_data(io_frames, i);
         buffer_add_uint32(buffer, frame_data->frame);
         buffer_add_uint32(buffer, frame_data->tamano);
         buffer_add_uint32(buffer, frame_data->desplazamiento);
     }
 }
 
-t_io_frames* deserializar_io_frames(t_buffer* buffer) {
+t_io_frames *deserializar_io_frames(t_buffer *buffer)
+{
     uint32_t pid = buffer_read_uint32(buffer);
     uint32_t tamano_total = buffer_read_uint32(buffer);
     uint32_t size_list = buffer_read_uint32(buffer);
-    
-    t_io_frames* io_frames = create_io_frames(pid, tamano_total);
+
+    t_io_frames *io_frames = create_io_frames(pid, tamano_total);
     int pos = 0;
 
-    while (pos < size_list) {
+    while (pos < size_list)
+    {
         uint32_t frame = buffer_read_uint32(buffer);
         uint32_t tamano = buffer_read_uint32(buffer);
         uint32_t desplazamiento = buffer_read_uint32(buffer);
-        t_frame_data* frame_data = create_frame_data(frame, tamano, desplazamiento);
+        t_frame_data *frame_data = create_frame_data(frame, tamano, desplazamiento);
         add_frame_data(io_frames, frame_data);
         pos++;
     }

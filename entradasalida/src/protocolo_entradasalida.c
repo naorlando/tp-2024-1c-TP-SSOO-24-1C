@@ -43,11 +43,11 @@ void atender_solicitud_stdin(int fd)
     {
 
         uint32_t tamanio_io_stdin = get_tamano_total_io_frames(io_stdin->frames_data);
-        
+
         log_info(logger_entradasalida, "PID: <%d> - Operacion: <READ>", obtener_pid_stdin(io_stdin));
 
         char *input = leer_entrada_limitada(tamanio_io_stdin);
-        escribir_memoria(io_stdin->frames_data,input);
+        escribir_memoria(io_stdin->frames_data, input);
         free(input);
 
         log_info(logger_entradasalida, "Operacion READ finalizada");
@@ -64,7 +64,6 @@ void atender_solicitud_stdin(int fd)
     }
 }
 
-
 //======================================================
 //          FUNCIONES DE ENTRADA/SALIDA STDOUT
 //======================================================
@@ -79,8 +78,8 @@ void atender_solicitud_stdout(int fd)
     {
         log_info(logger_entradasalida, "PID: <%d> - Operacion: <WRITE>", obtener_pid_stdout(io_stdout));
 
-        char *valor = leer_memoria(io_stdout->direccion_fisica, io_stdout->tamanio);
-        printf("%.*s", io_stdout->tamanio, valor);
+        char *valor = leer_memoria(io_stdout->frames_data);
+        printf("%.*s", get_tamano_total_io_frames(io_stdout->frames_data), valor);
 
         free(valor);
 
@@ -96,25 +95,6 @@ void atender_solicitud_stdout(int fd)
     {
         log_error(logger_entradasalida, "Error al recibir IO STDOUT");
     }
-}
-
-// Función auxiliar que lee la memoria de la dirección física y devuelve el valor leído
-char *leer_memoria(uint32_t direccion_fisica, uint32_t tamanio)
-{
-    /*t_package *package = package_create(MSG_READ_MEMORY, sizeof(t_buffer));
-    t_buffer *buffer = get_buffer(package);
-    buffer_add_uint32(buffer, direccion_fisica);
-    buffer_add_uint32(buffer, tamanio);
-    package_send(package, fd_memoria);
-    package_destroy(package);
-
-    t_package *response = package_create(NULL_HEADER, 0);
-    package_recv(response, fd_memoria);
-    char *valor = strdup(extract_string_buffer(get_buffer(response)));
-    package_destroy(response);
-    return valor;*/
-
-    return "";
 }
 
 //======================================================

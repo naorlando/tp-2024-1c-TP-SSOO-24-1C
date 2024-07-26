@@ -28,9 +28,7 @@ typedef struct
 // INTERFAZ STDOUT
 typedef struct
 {
-    uint32_t direccion_fisica;
-    uint32_t tamanio;
-    uint32_t pid;
+     t_io_frames *frames_data;
 } t_io_stdout;
 
 // SOLICITUD GENERICA
@@ -168,7 +166,7 @@ t_solicitud_io_stdout *crear_solicitud_io_stdout(t_PCB *pcb, char *nombre_interf
 // Función para crear una E/S STDOUT.
 // Pre: La dirección física, el tamaño y el pid deben ser válidos.
 // Post: Retorna un puntero a una estructura t_io_stdout creada.
-t_io_stdout *crear_io_stdout(uint32_t direccion_fisica, uint32_t tamanio, uint32_t pid);
+t_io_stdout *crear_io_stdout(t_io_frames*);
 
 // Función para destruir una solicitud de E/S STDOUT.
 // Pre: La solicitud debe ser válida y no NULL.
@@ -179,6 +177,8 @@ void destruir_solicitud_io_stdout(t_solicitud_io_stdout *solicitud);
 // Pre: La E/S STDOUT debe ser válida y no NULL.
 // Post: La memoria asociada a la E/S STDOUT se libera.
 void destruir_io_stdout(t_io_stdout *io_stdout);
+
+t_frame_data *obtener_frame_stdout(t_io_stdout *io_stdout, int index);
 
 // Crea una nueva estructura t_response con los valores especificados.
 // Pre: Ninguna.
@@ -209,11 +209,6 @@ uint32_t obtener_tiempo_sleep(t_io_generica *io_generica);
 // Pre: El puntero io_generica debe apuntar a una estructura io_generica válida y no debe ser NULL.
 // Post: Retorna un valor de tipo uint32_t que contiene el PID asociado.
 uint32_t obtener_pid_generica(t_io_generica *io_generica);
-
-// Obtiene la dirección física del stdin de una estructura t_io_stdin.
-// Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
-// Post: Retorna la dirección física del stdin como un valor uint32_t.
-uint32_t obtener_direccion_fisica_stdin(t_io_stdin *io_stdin);
 
 // Obtiene el tamaño del stdin de una estructura t_io_stdin.
 // Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
