@@ -1,4 +1,5 @@
 #include "dialfs.h"
+#include "variables_globales.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
