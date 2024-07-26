@@ -70,28 +70,33 @@ void proceso_solicita_io(int tipo_io, void* solicitud)
     t_IO_connection* io_connection;
     bool agrego = false; // flag para saber si agregó la solicitud en la cola de bloqueados correspondiente
     t_PCB* pcb_solicita_io;
+    char* nombre_interfaz;
 
     switch(tipo_io)
     {
         case GENERICA:
             t_solicitud_io_generica* solicitud_gen = (t_solicitud_io_generica*)solicitud;
-            io_connection = get_IO_connection(obtener_nombre_solicitud_generica(solicitud_gen), io_connections, &MUTEX_DICTIONARY);
+            nombre_interfaz = obtener_nombre_solicitud_generica(solicitud_gen);
+            io_connection = get_IO_connection(nombre_interfaz, io_connections, &MUTEX_DICTIONARY);
             pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "GENERICA");
             break;
         case STDIN:
             t_solicitud_io_stdin* solicitud_stdin = (t_solicitud_io_stdin*)solicitud;
-            io_connection = get_IO_connection(obtener_nombre_solicitud_stdin(solicitud_stdin), io_connections, &MUTEX_DICTIONARY);
+            nombre_interfaz = obtener_nombre_solicitud_stdin(solicitud_stdin);
+            io_connection = get_IO_connection(nombre_interfaz, io_connections, &MUTEX_DICTIONARY);
             pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "STDIN");
             break;
         case STDOUT:
             t_solicitud_io_stdout* solicitud_stdout = (t_solicitud_io_stdout*)solicitud;
-            io_connection = get_IO_connection(obtener_nombre_solicitud_stdout(solicitud_stdout), io_connections, &MUTEX_DICTIONARY);
+            nombre_interfaz = obtener_nombre_solicitud_stdout(solicitud_stdout);
+            io_connection = get_IO_connection(nombre_interfaz, io_connections, &MUTEX_DICTIONARY);
             pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "STDOUT");
             break;
         case DIALFS:
             // TODO: descomentar despues de realizar el merge de la rama de JORGE!!
             // t_solicitud_io_dialfs* solicitud_dialfs = (t_solicitud_io_dialfs*)solicitud;
-            // io_connection = get_IO_connection(obtener_nombre_solicitud_dialfs(solicitud_dialfs), io_connections, &MUTEX_DICTIONARY);
+            // nombre_interfaz = obtener_nombre_solicitud_dialfs(solicitud_dialfs);
+            // io_connection = get_IO_connection(nombre_interfaz, io_connections, &MUTEX_DICTIONARY);
             // pcb = obtener_pcb_de_solicitud(solicitud, "DIALFS");
             break;
         default:
@@ -107,6 +112,10 @@ void proceso_solicita_io(int tipo_io, void* solicitud)
         sem_post(&SEM_PLANIFICACION_BLOCKED_INICIADA);
     }
     
-    if(!agrego)
+    if(!agrego) {
         agregar_a_cola_exit(pcb_solicita_io);
+        log_info(logger_kernel, "Finaliza el proceso <%d> - Motivo: %s", pcb_solicita_io->pid, obtener_motivo_exit(INVALID_INTERFACE));
+    }else {
+        log_info(logger_kernel, "PID: <%d> - Bloqueado por: <%s>", pcb_solicita_io->pid, nombre_interfaz);
+    }
 }
