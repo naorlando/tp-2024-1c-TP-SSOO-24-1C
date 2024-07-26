@@ -158,6 +158,31 @@ void ejecutar_instruccion(t_instruction *instruccion, t_cpu_registers *cpu_regis
             solicitud_io = true;
             break;
         }
+        case IO_FS_CREATE:
+        {
+
+            break;
+        }
+        case IO_FS_DELETE:
+        {
+
+            break;
+        }
+        case IO_FS_TRUNCATE:
+        {
+
+            break;
+        }
+        case IO_FS_WRITE:
+        {
+
+            break;
+        }
+        case IO_FS_READ:
+        {
+
+            break;
+        }
         case EXIT:
         { 
             log_info(logger_cpu, "PID: <%d> - Ejecutando: <EXIT>\n", pcb_execute->pid);
