@@ -13,7 +13,7 @@
 extern t_log *logger_entradasalida;
 extern t_log *logger_entradasalida_debug;
 extern char* nombre_interfaz;
-extern t_dialfs* DIALFS; // Sistema de archivos DialFS
+extern t_dialfs* dialfs; // Sistema de archivos DialFS
 
 //FD
 extern int fd_memoria;

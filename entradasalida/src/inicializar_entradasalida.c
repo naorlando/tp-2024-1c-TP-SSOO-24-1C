@@ -77,7 +77,7 @@ void _imprimir_config() {
 }
 
 void _inicializar_dialfs() {
-    if (strcmp(obtener_tipo_interfaz(entradasalida_config), "DIALFS") != 0) {
+    if (strcmp(obtener_tipo_interfaz(entradasalida_config), "dialfs") != 0) {
         return;
     }
     // Obtengo los datos necesarios para crear el sistema de archivos DialFS desde archivo de configuración
@@ -87,8 +87,8 @@ void _inicializar_dialfs() {
     uint32_t retraso_compactacion = obtener_retraso_compactacion(entradasalida_config);
     
     // Creo el sistema de archivos DialFS con los datos obtenidos
-    DIALFS = crear_dialfs(path_base_dialfs, block_size, block_count, retraso_compactacion);
-    if (DIALFS == NULL) {
+    dialfs = crear_dialfs(path_base_dialfs, block_size, block_count, retraso_compactacion);
+    if (dialfs == NULL) {
         log_error(logger_entradasalida, "Error al crear el sistema de archivos DialFS.");
         exit(EXIT_FAILURE);
     }
