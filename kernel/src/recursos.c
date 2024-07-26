@@ -241,10 +241,12 @@ void handle_wait(t_PCB *pcb, char *nombre_recurso, bool from_signal) {
 
 void enviar_proceso_a_cola_bloqueados(t_recurso* recurso,t_PCB* pcb)
 {
+    sem_wait(&SEM_PLANIFICACION_BLOCKED_INICIADA);
     bloquear_proceso(recurso, pcb);
     cancelar_quantum_si_corresponde(pcb);
     actualizar_quantum(pcb);
     update_pcb(pcb);
+    sem_post(&SEM_PLANIFICACION_BLOCKED_INICIADA);
 }
 
 void handle_signal(t_PCB *pcb, char *nombre_recurso) {

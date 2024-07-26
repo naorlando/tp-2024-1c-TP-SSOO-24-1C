@@ -33,6 +33,8 @@ extern bool interrupcion_enviada;
 extern t_dictionary* io_connections;
 extern t_dictionary* recursos_dictionary;
 extern t_dictionary* recursos_asignados_por_pid;
+extern uint16_t grado_multiprogramacion;
+extern bool flag_de_orden_multiprogramacion;
 
 //MUTEXS
 extern pthread_mutex_t MUTEX_READY;
@@ -59,6 +61,7 @@ extern sem_t SEM_PLANIFICACION_NEW_READY_INICIADA;
 extern sem_t SEM_PLANIFICACION_READY_INICIADA;
 extern sem_t SEM_PLANIFICACION_EXEC_INICIADA;
 extern sem_t SEM_PLANIFICACION_BLOCKED_INICIADA;
+extern sem_t SEM_ORDEN_CAMBIO_MULTIPROGRAMACION;
 
 //CONFIG
 extern t_config* config_kernel;

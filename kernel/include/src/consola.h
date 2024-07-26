@@ -1,6 +1,7 @@
 #ifndef CONSOLA_H_
 #define CONSOLA_H_
 
+#include <stdlib.h>
 #include <variables_globales.h>
 #include "utils/estructuras.h"
 #include "utils/protocolo.h"
@@ -10,6 +11,9 @@
 #include "largo_plazo.h"
 #include "syncro.h"
 
+typedef struct {
+    uint16_t nuevo_grado;
+} t_multiprogramacion_args;
 
 
 void iniciar_consola_interactiva();
@@ -49,6 +53,12 @@ void f_iniciar_planificacion();
 // pre: -
 // post: desactiva los semaforos de planificacion
 void f_detener_planificacion();
+
+// ----------------------------------------------
+//      CAMBIAR_GRADO_MULTIPROGRAMACION:
+// ----------------------------------------------
+void f_cambiar_grado_multiprogramacion(uint16_t nuevo_grado);
+void* cambiar_grado_multiprogramacion(void* args);
 
 
 #endif //CONSOLA_H_

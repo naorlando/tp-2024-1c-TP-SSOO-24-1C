@@ -23,6 +23,8 @@ bool planificador_status = true;
 t_dictionary* io_connections;
 t_dictionary *recursos_dictionary;
 t_dictionary *recursos_asignados_por_pid;
+uint16_t grado_multiprogramacion = 0;
+bool flag_de_orden_multiprogramacion = false;
 
 
 //pthread_mutex_t mutex_recursos;
@@ -49,6 +51,7 @@ sem_t SEM_PLANIFICACION_NEW_READY_INICIADA;
 sem_t SEM_PLANIFICACION_READY_INICIADA;
 sem_t SEM_PLANIFICACION_EXEC_INICIADA;
 sem_t SEM_PLANIFICACION_BLOCKED_INICIADA;
+sem_t SEM_ORDEN_CAMBIO_MULTIPROGRAMACION;
 
 // t_queue *COLA_READY;
 // t_queue *COLA_AUX_READY;

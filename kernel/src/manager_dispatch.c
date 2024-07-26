@@ -60,9 +60,10 @@ void procesar_interrupcion_quantum()
 
     log_info(logger_kernel, "Se recibio un PCB por interrupcion de QUANTUM a traves del CPU_DISPATCH, PID: <%d>", pcb_interrupt->pid);
 
-    cronometro_detener(); // funciona en caso de VRR
-
+    // cronometro_detener(); // funciona en caso de VRR
+ 
     // 2-actualizar el estado del pcb en la cola correspondiente:
+    actualizar_quantum(pcb_interrupt);
     agregar_de_execute_a_ready(pcb_interrupt);
 
     // 3-actualizar el pcb en la tabla de pcb:

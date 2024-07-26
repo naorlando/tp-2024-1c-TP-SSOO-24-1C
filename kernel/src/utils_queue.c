@@ -17,8 +17,12 @@ void agregar_de_execute_a_ready(t_PCB* pcb)
 
 void agregar_a_cola_ready_VRR(t_PCB* pcb){
     if (obtener_quantum(kernel_config) > pcb->quantum) {
+        log_warning(logger_kernel, "El tiempo del cronometro es: <%d>", cronometro_obtener_tiempo());
+        log_warning(logger_kernel, " PID: <%d> a la COLA AUXILIAR DE READY!!!. QUANTUM: %d ",pcb->pid, pcb->quantum);
             agregar_a_cola_aux_ready(pcb);
     } else {
+        log_warning(logger_kernel, "El tiempo del cronometro es: <%d>", cronometro_obtener_tiempo());
+        log_warning(logger_kernel, " PID: <%d> a la COLA READY NORMAL!!!. QUANTUM: %d ",pcb->pid ,pcb->quantum);
             agregar_a_cola_ready(pcb);
     }
 }
@@ -34,6 +38,7 @@ void agregar_a_cola_ready(t_PCB* pcb)
     // LOG obligatorio:
     // Ingreso a Ready: "Cola Ready / Ready Prioridad: [<LISTA DE PIDS>]"
     mostrar_elementos_de_cola(COLA_READY, "Ready");
+    log_warning(logger_kernel, "###################### grado de multiprogramacion: %d#####################", grado_multiprogramacion);
 
     sem_post(&SEM_READY);
 }
@@ -119,6 +124,7 @@ void agregar_de_new_a_ready(t_PCB* pcb)
 
 void agregar_de_blocked_a_ready(t_PCB* pcb)
 {
+    sem_wait(&SEM_PLANIFICACION_READY_INICIADA);
     char* algoritmo_plani = obtener_algoritmo_planificacion(kernel_config);
 
     if(strcmp(algoritmo_plani, "FIFO") == 0){
@@ -131,6 +137,7 @@ void agregar_de_blocked_a_ready(t_PCB* pcb)
         // TODO: testear
         agregar_a_cola_ready_VRR(pcb);
     }
+    sem_post(&SEM_PLANIFICACION_READY_INICIADA);
 }
 
 void agregar_a_cola_exit(t_PCB* pcb)

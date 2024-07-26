@@ -6,6 +6,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <variables_globales.h>
+#include "kernel_config.h"
 
 
 void initialize_semaphores();
