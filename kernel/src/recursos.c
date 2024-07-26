@@ -99,7 +99,7 @@ void free_resource(t_PCB *pcb)
     // Liberar recursos asociados al proceso
     liberar_recursos_de_proceso(pcb->pid);
 
-    // Esta logica se usa para cunado se manda un pcb a exit y se quiere sacar completamenteel pid del diccionario: recursos_asignados_por_pid
+    // Esta logica se usa para cunado se manda un pcb a exit y se quiere sacar completamente el pid del diccionario: recursos_asignados_por_pid
     // Verificar si el proceso está en el diccionario antes de eliminarlo: 
     char* pid_str = uint32_to_string(pcb->pid);
     if (dictionary_has_key(recursos_asignados_por_pid, pid_str)) {

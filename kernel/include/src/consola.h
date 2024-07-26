@@ -40,6 +40,10 @@ void listar_pids_por_estado(t_state state);
 //      FINALIZAR_PROCESO:
 // ----------------------------------------------
 void f_finalizar_proceso(u_int32_t pid);
+void eliminar_de_listas_de_estado(t_PCB* pcb);
+void eliminar_de_new(t_PCB* pcb);
+void eliminar_de_ready(t_PCB* pcb);
+void eliminar_de_blocked_io(t_PCB* pcb);
 
 // ----------------------------------------------
 //      INICIAR_PLANIFICACION:

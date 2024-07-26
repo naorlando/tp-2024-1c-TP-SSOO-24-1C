@@ -286,7 +286,7 @@ void f_finalizar_proceso(u_int32_t pid){
     // ##############################################################
 
     // si se encuentra en las distintas listas, eliminarlo de la lista:
-    // eliminar_de_listas_de_estado(pcb);
+    eliminar_de_listas_de_estado(pcb);
 
 
     // elimina el PCB para siempre (ver en largo_plazo.c, ACA SE LIBERAN LOS RECURSOS PARA SALIR DEL DEADLOCK)
@@ -296,6 +296,76 @@ void f_finalizar_proceso(u_int32_t pid){
     // Eliminar de la tabla de PCBs --> DEPRECADO POR DECISION DE MANTENER UN HISTORIAL DE PCBS MANDADOS A EXIT
     // delete_pcb(pid);
 }
+
+void eliminar_de_listas_de_estado(t_PCB* pcb)
+{
+    switch (pcb->state)
+    {
+    case NEW:
+        eliminar_de_new(pcb);
+        break;
+    case READY:
+        eliminar_de_ready(pcb);
+        break;
+    case BLOCKED:
+        eliminar_de_blocked_io(pcb);
+        // el liberar recursos asignados lo hacemos en Largo plazo.
+        break;
+    default:
+        break;
+    }
+}
+
+void eliminar_de_new(t_PCB* pcb)
+{
+    // Eliminar de la cola de NEW
+    pthread_mutex_lock(&MUTEX_NEW);
+        list_remove_element(COLA_NEW, (void*)pcb);
+    pthread_mutex_unlock(&MUTEX_NEW);
+}
+
+void eliminar_de_ready(t_PCB* pcb)
+{
+    // Eliminar de la cola de READY
+    pthread_mutex_lock(&MUTEX_READY);
+    bool exito = list_remove_element(COLA_READY, (void*)pcb);
+    pthread_mutex_unlock(&MUTEX_READY);
+    
+}  
+
+void eliminar_de_blocked_io(t_PCB* pcb)
+{
+    // Eliminar de la cola de BLOCKED de cada io:
+    //t_list* nombres_de_ios = dictionary_keys(io_connections);
+    
+    // ##############################################################
+    // TODO: pensar estrategia para cuando la io ya pida desencolar el PCB y lo este ejecutando ya.
+    // ##############################################################
+
+    void closure(char* key, void* element) {
+        t_IO_connection* io = (t_IO_connection*) element;
+        t_PCB *pcb_removido;
+        //bool pcb_encontrado = false;
+        // pcb match: (condition)
+        bool pid_match(void *pcb_ptr) {
+            return ((t_PCB *)pcb_ptr)->pid == pcb->pid;
+        }
+        if (io->cola_procesos_bloqueados != NULL && !list_is_empty(io->cola_procesos_bloqueados)) {
+            pthread_mutex_lock(&io->mutex_cola_bloqueados);
+                pcb_removido = (t_PCB *)list_remove_by_condition(io->cola_procesos_bloqueados, pid_match);
+                // hacer lo mismo pero con: bool list_remove_element(t_list* self, void* element);
+                //pcb_encontrado = list_remove_element(io->cola_procesos_bloqueados, (void*)pcb);
+            pthread_mutex_unlock(&io->mutex_cola_bloqueados);
+        }
+
+        if (pcb_removido != NULL) {
+            log_info(logger_kernel, "Proceso %d removido de la cola de bloqueados de la io %s", pcb_removido->pid, io->nombre_interfaz);
+        }
+    }
+
+    dictionary_iterator(io_connections, closure);
+}
+
 
 void f_iniciar_planificacion(){
     if(!planificador_status)
