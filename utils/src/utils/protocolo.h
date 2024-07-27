@@ -47,7 +47,8 @@ typedef enum
     MSG_CPU_IO_GEN_SLEEP, // CPU -> KERNEL (Se solicita interactuar con IO GENENRICA) 
     MSG_CPU_IO_STDIN_READ, // CPU -> KERNEL (Se solicita interactuar con IO STDIN) 
     MSG_CPU_IO_STDOUT_WRITE, // CPU -> KERNEL (Se solicita interactuar con IO STDOUT)
-    MSG_CPU_OUT_OF_MEMORY, //CPU -> KERNEL (Fallo instruccion resize, eliminar PCB) 
+    MSG_CPU_OUT_OF_MEMORY, //CPU -> KERNEL (Fallo instruccion resize, eliminar PCB)
+    MSG_CPU_IO_DIALFS,  //CPU -> KERNEL (Se solicita interactuar con IO DIALFS)
     // KERNEL <-> MEMORIA
     MSG_KERNEL_MEMORIA, // SE LLAMA PERO NO SE USA!
     MSG_MEMORIA_KERNEL, // SE LLAMA PERO NO SE USA!
@@ -558,12 +559,12 @@ t_solicitud_io_dialfs* deserializar_solicitud_io_dialfs(t_buffer* buffer);
 // Función para serializar una E/S DIALFS.
 // Pre: El buffer y la E/S DIALFS deben ser válidos y no NULL.
 // Post: La E/S DIALFS se serializa en el buffer.
-void serializar_io_dialfs(t_buffer* buffer, t_io_dialfs* io_dialfs);
+void serializar_t_io_dialfs(t_buffer* buffer, t_io_dialfs* io_dialfs);
 
 // Función para deserializar una E/S DIALFS.
 // Pre: El buffer debe ser válido y no NULL.
 // Post: Retorna un puntero a una estructura t_io_dialfs deserializada.
-t_io_dialfs* deserializar_io_dialfs(t_buffer* buffer);
+t_io_dialfs *deserializar_t_io_dialfs(t_buffer *buffer); 
 
 /*********** SERIALIZE AND DESERIALIZE 'T_IO_INTERFACE' ***********/
 // Serializar una estructura t_IO_interface en un buffer
@@ -601,5 +602,16 @@ int send_msg_memoria_data_write(uint32_t pid, uint32_t frame, uint32_t offset, v
 int send_msg_memoria_data_read(uint32_t pid, uint32_t frame, uint32_t offset, uint32_t size_value, int fd);
 // --   READ RESPONSE DATA MEMORIA   --
 int recv_msg_memoria_data(t_buffer *buffer, void *value, uint32_t value_size);
+
+
+void serializar_t_io_dialfs(t_buffer *buffer, t_io_dialfs *dialfs); 
+void serialize_t_io_dialfs_cd(t_buffer *buffer, t_io_dialfs_cd *cd); 
+void serialize_t_io_dialfs_truncate(t_buffer *buffer, t_io_dialfs_truncate *truncate);
+void serialize_t_io_dialfs_rw(t_buffer *buffer, t_io_dialfs_rw *rw);
+t_io_dialfs_cd* deserialize_t_io_dialfs_cd(t_buffer *buffer) ;
+t_io_dialfs_truncate* deserialize_t_io_dialfs_truncate(t_buffer *buffer) ;
+t_io_dialfs_rw* deserialize_t_io_dialfs_rw(t_buffer *buffer) ;
+t_io_dialfs* deserialize_t_io_dialfs(t_buffer *buffer); 
+
 
 #endif

@@ -16,7 +16,7 @@ int recv_example_msg_kernel();
 // Recibe un t_PCB desde el Kernel.
 // Pre: El descriptor de archivo fd_kernel_dispatch debe ser válido y estar abierto.
 // Post: Retorna un puntero a t_PCB que contiene el PCB recibido.
-t_PCB* recv_pcb_kernel();
+t_PCB *recv_pcb_kernel();
 
 // Envía un t_PCB al Kernel.
 // Pre: La variable global pcb_execute debe ser un puntero válido a t_PCB y no debe ser NULL.
@@ -40,25 +40,34 @@ void send_get_next_instruction_memoria(uint32_t, uint32_t);
 // Recibe una instrucción desde la memoria.
 // Pre: El descriptor de archivo fd_memoria debe ser válido y estar abierto.
 // Post: Retorna un puntero a t_instruction que contiene la instrucción recibida.
-t_instruction* recv_instruction_memoria();
+t_instruction *recv_instruction_memoria();
 
 int send_msg_cpu_memoria_init(int fd);
 
-int recv_msg_memoria_cpu_init(uint32_t* );
+int recv_msg_memoria_cpu_init(uint32_t *);
 
-void send_solicitud_io_generica_kernel(t_PCB*, t_instruction*);
+void send_solicitud_io_generica_kernel(t_PCB *, t_instruction *);
 
 void send_solicitud_io_stdin_kernel(t_PCB *pcb, t_instruction *instruccion);
 
 void send_solicitud_io_stdout_kernel(t_PCB *pcb, t_instruction *instruccion);
 
+void send_solicitud_io_fs_create(t_PCB *pcb, t_instruction *instruccion);
+
+void send_solicitud_io_fs_delete(t_PCB *pcb, t_instruction *instruccion);
+
+void send_solicitud_io_fs_truncate(t_PCB *pcb, t_instruction *instruccion);
+
+void send_solicitud_io_fs_write(t_PCB *pcb, t_instruction *instruccion);
+
+void send_solicitud_io_fs_read(t_PCB *pcb, t_instruction *instruccion);
 
 // --   PAGE & FRAME    --
-int recv_msg_memoria_cpu_frame(t_buffer* buffer, uint32_t * frame);
+int recv_msg_memoria_cpu_frame(t_buffer *buffer, uint32_t *frame);
 // CPU -> MEMORIA :: MSG_CPU_MEMORIA_PAGE
 int send_msg_cpu_memoria_page(uint32_t pid, uint32_t page, int fd);
 // -- RESIZE --
 // CPU -> MEMORIA ::  MSG_CPU_MEMORIA_RESIZE
-int send_msg_cpu_memoria_resize(uint32_t pid, uint32_t new_size, int fd) ;
+int send_msg_cpu_memoria_resize(uint32_t pid, uint32_t new_size, int fd);
 
 #endif

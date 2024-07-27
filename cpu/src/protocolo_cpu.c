@@ -100,10 +100,10 @@ void send_solicitud_io_stdin_kernel(t_PCB *pcb, t_instruction *instruccion)
     uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
     uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
 
-    t_io_frames* io_frames_stdin = exec_io_frames(pcb->pid,direccion_logica,tamano,false);
+    t_io_frames *io_frames_stdin = exec_io_frames(pcb->pid, direccion_logica, tamano, false);
 
-    t_io_stdin* io_stdin = crear_io_stdin(io_frames_stdin);
-   
+    t_io_stdin *io_stdin = crear_io_stdin(io_frames_stdin);
+
     send_solicitud_io_stdin(fd_kernel_dispatch, pcb, interface, io_stdin);
 }
 
@@ -131,7 +131,6 @@ void send_pcb_kernel_interruption(t_name_interruption tipo_de_interrupcion)
         break;
     }
 }
-
 
 // CPU -> MEMORIA :: MSG_CPU_MEMORIA_PAGE
 int send_msg_cpu_memoria_page(uint32_t pid, uint32_t page, int fd)
@@ -181,9 +180,97 @@ void send_solicitud_io_stdout_kernel(t_PCB *pcb, t_instruction *instruccion)
     uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
     uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
 
-    t_io_frames* io_frames_stdout = exec_io_frames(pcb->pid,direccion_logica,tamano,true);
+    t_io_frames *io_frames_stdout = exec_io_frames(pcb->pid, direccion_logica, tamano, true);
 
-    t_io_stdout* io_stdout = crear_io_stdout(io_frames_stdout);
-   
+    t_io_stdout *io_stdout = crear_io_stdout(io_frames_stdout);
+
     send_solicitud_io_stdout(fd_kernel_dispatch, pcb, interface, io_stdout);
+}
+
+void send_solicitud_io_fs_create(t_PCB *pcb, t_instruction *instruccion)
+{
+
+    t_list *parametros = obtener_parametros(instruccion);
+    char *interface = (char *)list_get(parametros, 0);
+    char *nombre_archivo = (char *)list_get(parametros, 1);
+
+    t_io_dialfs_cd *dialfs_cd = crear_io_dialfs_cd(interface, nombre_archivo);
+
+    t_io_dialfs *dialfs = crear_io_dialfs(pcb->pid, IO_FS_CREATE, dialfs_cd);
+
+    send_solicitud_io_dialfs(fd_kernel_dispatch, pcb, interface, dialfs);
+}
+
+void send_solicitud_io_fs_delete(t_PCB *pcb, t_instruction *instruccion)
+{
+    t_list *parametros = obtener_parametros(instruccion);
+    char *interface = (char *)list_get(parametros, 0);
+    char *nombre_archivo = (char *)list_get(parametros, 1);
+
+    t_io_dialfs_cd *dialfs_cd = crear_io_dialfs_cd(interface, nombre_archivo);
+
+    t_io_dialfs *dialfs = crear_io_dialfs(pcb->pid, IO_FS_DELETE, dialfs_cd);
+
+    send_solicitud_io_dialfs(fd_kernel_dispatch, pcb, interface, dialfs);
+}
+
+void send_solicitud_io_fs_truncate(t_PCB *pcb, t_instruction *instruccion)
+{
+    t_list *parametros = obtener_parametros(instruccion);
+    char *interface = (char *)list_get(parametros, 0);
+    char *nombre_archivo = (char *)list_get(parametros, 1);
+    char *reg_tamano = (char *)list_get(parametros, 2);
+    uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
+
+    t_io_dialfs_truncate *dialfs_truncate = crear_io_dialfs_truncate(interface, nombre_archivo, tamano);
+
+    t_io_dialfs *dialfs = crear_io_dialfs(pcb->pid, IO_FS_TRUNCATE, dialfs_truncate);
+
+    send_solicitud_io_dialfs(fd_kernel_dispatch, pcb, interface, dialfs);
+}
+
+void send_solicitud_io_fs_write(t_PCB *pcb, t_instruction *instruccion)
+{
+
+    t_list *parametros = obtener_parametros(instruccion);
+    char *interface = (char *)list_get(parametros, 0);
+    char *nombre_archivo = (char *)list_get(parametros, 1);
+    char *reg_direccion = (char *)list_get(parametros, 2);
+    char *reg_tamano = (char *)list_get(parametros, 3);
+    char * reg_puntero =  (char *)list_get(parametros, 4);
+
+    uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+    uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
+      uint32_t puntero = _obtener_valor_registro(cpu_registers, reg_puntero);
+
+    t_io_frames *io_frames_dialfs = exec_io_frames(pcb->pid, direccion_logica, tamano, true);
+
+    t_io_dialfs_rw * dialfs_rw = crear_io_dialfs_rw(interface, nombre_archivo, tamano,io_frames_dialfs,puntero);
+
+    t_io_dialfs *dialfs = crear_io_dialfs(pcb->pid, IO_FS_WRITE, dialfs_rw);
+
+    send_solicitud_io_dialfs(fd_kernel_dispatch, pcb, interface, dialfs);
+}
+
+void send_solicitud_io_fs_read(t_PCB *pcb, t_instruction *instruccion)
+{
+
+    t_list *parametros = obtener_parametros(instruccion);
+    char *interface = (char *)list_get(parametros, 0);
+    char *nombre_archivo = (char *)list_get(parametros, 1);
+    char *reg_direccion = (char *)list_get(parametros, 2);
+    char *reg_tamano = (char *)list_get(parametros, 3);
+    char * reg_puntero =  (char *)list_get(parametros, 4);
+
+    uint32_t direccion_logica = _obtener_valor_registro(cpu_registers, reg_direccion);
+    uint32_t tamano = _obtener_valor_registro(cpu_registers, reg_tamano);
+      uint32_t puntero = _obtener_valor_registro(cpu_registers, reg_puntero);
+
+    t_io_frames *io_frames_dialfs = exec_io_frames(pcb->pid, direccion_logica, tamano, false);
+
+    t_io_dialfs_rw * dialfs_rw = crear_io_dialfs_rw(interface, nombre_archivo, tamano,io_frames_dialfs,puntero);
+
+    t_io_dialfs *dialfs = crear_io_dialfs(pcb->pid, IO_FS_READ, dialfs_rw);
+
+    send_solicitud_io_dialfs(fd_kernel_dispatch, pcb, interface, dialfs);
 }

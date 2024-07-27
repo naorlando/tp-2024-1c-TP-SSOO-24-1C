@@ -25,4 +25,5 @@ t_manejo_recurso*  recv_wait_or_signal_request();
 t_solicitud_io_stdin* recv_solicitud_io_stdin_cpu();
 void send_msg_kernel_memoria_end_process(uint32_t);
 t_solicitud_io_stdout* recv_solicitud_io_stdout_cpu();
+t_solicitud_io_dialfs* recv_solicitud_io_dialfs_cpu();
 #endif

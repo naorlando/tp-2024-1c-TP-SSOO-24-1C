@@ -436,30 +436,31 @@ t_solicitud_io_stdout *recv_solicitud_io_stdout(int fd)
     return solicitud;
 }
 
-int send_io_dialfs(int fd, t_io_dialfs* io_dialfs)
+int send_io_dialfs(int fd, t_io_dialfs *io_dialfs)
 {
     // Creo el paquete que se va a enviar
-    t_package* package = package_create(MSG_KERNEL_IO_DIALFS, obtener_tamanio_io_dialfs(io_dialfs));
+    t_package *package = package_create(MSG_KERNEL_IO_DIALFS, obtener_tamanio_io_dialfs(io_dialfs));
 
     // Serializo en el buffer el t_io_dialfs
-    serializar_io_dialfs(get_buffer(package), io_dialfs);
+    serializar_t_io_dialfs(get_buffer(package), io_dialfs);
 
     // Envio el paquete
     int bytes_enviados = package_send(package, fd);
 
-    //Elimino el paquete usado
+    // Elimino el paquete usado
     package_destroy(package);
 
     return bytes_enviados;
 }
 
-t_io_dialfs* recv_io_dialfs(int fd)
+t_io_dialfs *recv_io_dialfs(int fd)
 {
-    t_buffer* buffer = recive_full_buffer(fd);
+    t_buffer *buffer = recive_full_buffer(fd);
 
-    if(buffer == NULL) return NULL;
+    if (buffer == NULL)
+        return NULL;
 
-    t_io_dialfs* io_dialfs = deserializar_io_dialfs(buffer);
+    t_io_dialfs *io_dialfs = deserialize_t_io_dialfs(buffer);
 
     buffer_destroy(buffer);
 
@@ -1044,7 +1045,6 @@ t_response *deserializar_response(t_buffer *buffer)
 {
     uint32_t pid_response = buffer_read_uint32(buffer);
     bool process = buffer_read_bool(buffer);
-
     t_response *response = create_response(process, pid_response);
 
     return response;
@@ -1143,42 +1143,202 @@ int recv_msg_memoria_data(t_buffer *buffer, void *value, uint32_t value_size)
     return EXIT_SUCCESS;
 }
 
-void serializar_solicitud_io_dialfs(t_buffer* buffer, t_solicitud_io_dialfs* solicitud) {
+void serializar_solicitud_io_dialfs(t_buffer *buffer, t_solicitud_io_dialfs *solicitud)
+{
     serialize_pcb(buffer, solicitud->pcb);
     buffer_add_string(buffer, solicitud->nombre_interfaz);
-    serializar_io_dialfs(buffer, solicitud->io_dialfs);
+    serializar_t_io_dialfs(buffer, solicitud->io_dialfs);
 }
 
-t_solicitud_io_dialfs* deserializar_solicitud_io_dialfs(t_buffer* buffer) {
-    t_PCB* pcb = deserialize_pcb(buffer);
+t_solicitud_io_dialfs *deserializar_solicitud_io_dialfs(t_buffer *buffer)
+{
+    t_PCB *pcb = deserialize_pcb(buffer);
     uint32_t length_string = buffer_read_uint32(buffer);
-    char* nombre_interfaz = buffer_read_string(buffer, length_string);
-    t_io_dialfs* io_dialfs = deserializar_io_dialfs(buffer);
+    char *nombre_interfaz = buffer_read_string(buffer, length_string);
+    t_io_dialfs *io_dialfs = deserializar_t_io_dialfs(buffer);
     return crear_solicitud_io_dialfs(pcb, nombre_interfaz, io_dialfs);
 }
 
-void serializar_io_dialfs(t_buffer* buffer, t_io_dialfs* io_dialfs) {
-    buffer_add_string(buffer, io_dialfs->nombre_interfaz);
-    buffer_add_string(buffer, io_dialfs->nombre_archivo);
-    buffer_add_uint32(buffer, io_dialfs->pid);
-    buffer_add_uint32(buffer, io_dialfs->operacion);
-    buffer_add_uint32(buffer, io_dialfs->tamanio);
-    buffer_add_uint32(buffer, io_dialfs->direccion_logica);
-    buffer_add_uint32(buffer, io_dialfs->puntero_archivo);
+void serializar_t_io_dialfs(t_buffer *buffer, t_io_dialfs *dialfs)
+{
+    buffer_add_uint32(buffer, dialfs->pid);
+    buffer_add_uint32(buffer, dialfs->operacion);
+
+    switch (dialfs->operacion)
+    {
+    case IO_FS_CREATE:
+    case IO_FS_DELETE:
+        serialize_t_io_dialfs_cd(buffer, (t_io_dialfs_cd *)dialfs->dialfs_generic);
+        break;
+    case IO_FS_TRUNCATE:
+        serialize_t_io_dialfs_truncate(buffer, (t_io_dialfs_truncate *)dialfs->dialfs_generic);
+        break;
+    case IO_FS_WRITE:
+    case IO_FS_READ:
+        serialize_t_io_dialfs_rw(buffer, (t_io_dialfs_rw *)dialfs->dialfs_generic);
+        break;
+    default:
+        break;
+    }
 }
 
-t_io_dialfs* deserializar_io_dialfs(t_buffer* buffer) {
-    uint32_t length_nombre_interfaz = buffer_read_uint32(buffer);
-    char* nombre_interfaz = buffer_read_string(buffer, length_nombre_interfaz);
-    
-    uint32_t length_nombre_archivo = buffer_read_uint32(buffer);
-    char* nombre_archivo = buffer_read_string(buffer, length_nombre_archivo);
-    
-    uint32_t pid = buffer_read_uint32(buffer);
-    t_name_instruction operacion = buffer_read_uint32(buffer);
-    uint32_t tamanio = buffer_read_uint32(buffer);
-    uint32_t direccion_logica = buffer_read_uint32(buffer);
-    uint32_t puntero_archivo = buffer_read_uint32(buffer);
-    
-    return crear_io_dialfs(nombre_interfaz, nombre_archivo, pid, operacion, tamanio, direccion_logica, puntero_archivo);
+t_io_dialfs *deserializar_t_io_dialfs(t_buffer *buffer) {
+    t_io_dialfs *dialfs = malloc(sizeof(t_io_dialfs));
+    dialfs->pid = buffer_read_uint32(buffer);
+    dialfs->operacion = buffer_read_uint32(buffer);
+
+
+    switch (dialfs->operacion) {
+        case IO_FS_CREATE:
+        case IO_FS_DELETE:
+            dialfs->dialfs_generic = deserialize_t_io_dialfs_cd(buffer);
+            break;
+        case IO_FS_TRUNCATE:
+            dialfs->dialfs_generic = deserialize_t_io_dialfs_truncate(buffer);
+            break;
+        case IO_FS_WRITE:
+        case IO_FS_READ:
+            dialfs->dialfs_generic = deserialize_t_io_dialfs_rw(buffer);
+            break;
+        default:
+            break;
+    }
+
+    return dialfs;
+}
+
+
+
+void serialize_t_io_dialfs_cd(t_buffer *buffer, t_io_dialfs_cd *cd)
+{
+    buffer_add_string(buffer, cd->nombre_interfaz);
+    buffer_add_string(buffer, cd->nombre_archivo);
+}
+
+void serialize_t_io_dialfs_truncate(t_buffer *buffer, t_io_dialfs_truncate *truncate)
+{
+    buffer_add_string(buffer, truncate->nombre_interfaz);
+    buffer_add_string(buffer, truncate->nombre_archivo);
+    buffer_add_uint32(buffer, truncate->tamanio);
+}
+
+void serialize_t_io_dialfs_rw(t_buffer *buffer, t_io_dialfs_rw *rw)
+{
+    buffer_add_string(buffer, rw->nombre_interfaz);
+    buffer_add_string(buffer, rw->nombre_archivo);
+    buffer_add_uint32(buffer, rw->tamanio);
+    // Supongo que ya tienes funciones para serializar t_io_frames
+    serializar_io_frames(buffer, rw->frames_data);
+    buffer_add_uint32(buffer, rw->puntero_archivo);
+}
+
+void serialize_t_io_dialfs(t_buffer *buffer, t_io_dialfs *dialfs)
+{
+    buffer_add_uint32(buffer, dialfs->pid);
+    buffer_add_uint32(buffer, dialfs->operacion);
+
+    switch (dialfs->operacion)
+    {
+    case IO_FS_CREATE:
+    case IO_FS_DELETE:
+        serialize_t_io_dialfs_cd(buffer, (t_io_dialfs_cd *)dialfs->dialfs_generic);
+        break;
+    case IO_FS_TRUNCATE:
+        serialize_t_io_dialfs_truncate(buffer, (t_io_dialfs_truncate *)dialfs->dialfs_generic);
+        break;
+    case IO_FS_WRITE:
+    case IO_FS_READ:
+        serialize_t_io_dialfs_rw(buffer, (t_io_dialfs_rw *)dialfs->dialfs_generic);
+        break;
+    default:
+        // Manejar caso por defecto
+        break;
+    }
+}
+
+t_io_dialfs_cd *deserialize_t_io_dialfs_cd(t_buffer *buffer)
+{
+    t_io_dialfs_cd *cd = malloc(sizeof(t_io_dialfs_cd));
+    uint32_t tamanio_nombre_interfaz = buffer_read_uint32(buffer);
+    cd->nombre_interfaz = buffer_read_string(buffer, tamanio_nombre_interfaz);
+    uint32_t tamanio_nombre_archivo = buffer_read_uint32(buffer);
+    cd->nombre_archivo = buffer_read_string(buffer, tamanio_nombre_archivo);
+    return cd;
+}
+
+t_io_dialfs_truncate *deserialize_t_io_dialfs_truncate(t_buffer *buffer)
+{
+    t_io_dialfs_truncate *truncate = malloc(sizeof(t_io_dialfs_truncate));
+    uint32_t tamanio_nombre_interfaz = buffer_read_uint32(buffer);
+    truncate->nombre_interfaz = buffer_read_string(buffer, tamanio_nombre_interfaz);
+    uint32_t tamanio_nombre_archivo = buffer_read_uint32(buffer);
+    truncate->nombre_archivo = buffer_read_string(buffer, tamanio_nombre_archivo);
+    truncate->tamanio = buffer_read_uint32(buffer);
+    return truncate;
+}
+
+t_io_dialfs_rw *deserialize_t_io_dialfs_rw(t_buffer *buffer)
+{
+    t_io_dialfs_rw *rw = malloc(sizeof(t_io_dialfs_rw));
+    uint32_t tamanio_nombre_interfaz = buffer_read_uint32(buffer);
+    rw->nombre_interfaz = buffer_read_string(buffer,tamanio_nombre_interfaz);
+    uint32_t tamanio_nombre_archivo = buffer_read_uint32(buffer);
+    rw->nombre_archivo = buffer_read_string(buffer,tamanio_nombre_archivo);
+    rw->tamanio = buffer_read_uint32(buffer);
+    // Supongo que ya tienes funciones para deserializar t_io_frames
+    rw->frames_data = deserializar_io_frames(buffer);
+    rw->puntero_archivo = buffer_read_uint32(buffer);
+    return rw;
+}
+
+t_io_dialfs *deserialize_t_io_dialfs(t_buffer *buffer)
+{
+    t_io_dialfs *dialfs = malloc(sizeof(t_io_dialfs));
+    dialfs->pid = buffer_read_uint32(buffer);
+    dialfs->operacion = buffer_read_uint32(buffer);
+
+    switch (dialfs->operacion)
+    {
+    case IO_FS_CREATE:
+    case IO_FS_DELETE:
+        dialfs->dialfs_generic = deserialize_t_io_dialfs_cd(buffer);
+        break;
+    case IO_FS_TRUNCATE:
+        dialfs->dialfs_generic = deserialize_t_io_dialfs_truncate(buffer);
+        break;
+    case IO_FS_WRITE:
+    case IO_FS_READ:
+        dialfs->dialfs_generic = deserialize_t_io_dialfs_rw(buffer);
+        break;
+    default:
+        // Manejar caso por defecto
+        break;
+    }
+
+    return dialfs;
+}
+void send_solicitud_io_dialfs(int fd, t_PCB *pcb, char *nombre_interfaz, t_io_dialfs *io_dialfs) {
+    t_solicitud_io_dialfs *solicitud = malloc(sizeof(t_solicitud_io_dialfs));
+    solicitud->pcb = pcb;
+    solicitud->nombre_interfaz = nombre_interfaz;
+    solicitud->io_dialfs = io_dialfs;
+
+    t_package *package = package_create(MSG_CPU_IO_DIALFS, obtener_tamanio_solicitud_io_dialfs(solicitud));
+    serializar_solicitud_io_dialfs(get_buffer(package), solicitud);
+    package_send(package, fd);
+
+    free(solicitud);
+    package_destroy(package);
+}
+
+t_solicitud_io_dialfs *recv_solicitud_io_dialfs(int fd) {
+    t_buffer *buffer = recive_full_buffer(fd);
+
+    if (buffer == NULL)
+        return NULL;
+
+    t_solicitud_io_dialfs *solicitud = deserializar_solicitud_io_dialfs(buffer);
+    buffer_destroy(buffer);
+
+    return solicitud;
 }

@@ -97,10 +97,10 @@ void proceso_solicita_io(int tipo_io, void* solicitud)
             break;
         case DIALFS:
             // TODO: descomentar despues de realizar el merge de la rama de JORGE!!
-            // t_solicitud_io_dialfs* solicitud_dialfs = (t_solicitud_io_dialfs*)solicitud;
-            // nombre_interfaz = obtener_nombre_solicitud_dialfs(solicitud_dialfs);
-            // io_connection = get_IO_connection(nombre_interfaz, io_connections, &MUTEX_DICTIONARY);
-            // pcb = obtener_pcb_de_solicitud(solicitud, "DIALFS");
+            t_solicitud_io_dialfs* solicitud_dialfs = (t_solicitud_io_dialfs*)solicitud;
+            nombre_interfaz = obtener_nombre_solicitud_dialfs(solicitud_dialfs);
+            io_connection = get_IO_connection(nombre_interfaz, io_connections, &MUTEX_DICTIONARY);
+            pcb_solicita_io = obtener_pcb_de_solicitud(solicitud, "DIALFS");
             break;
         default:
             //caso de error

@@ -107,37 +107,37 @@ void atender_solicitud_dialfs(int fd)
         bool operacion_exitosa = false;
 
         switch(io_dialfs->operacion) {
-            case IO_FS_CREATE:
-                operacion_exitosa = crear_archivo_dialfs(io_dialfs->nombre_archivo);
-                log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
-                break;
-            case IO_FS_DELETE:
-                operacion_exitosa = eliminar_archivo_dialfs(io_dialfs->nombre_archivo);
-                log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
-                break;
-            case IO_FS_TRUNCATE:
-                operacion_exitosa = truncar_archivo_dialfs(io_dialfs->nombre_archivo, io_dialfs->tamanio);
-                log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio);
-                break;
-            case IO_FS_WRITE:
-                // Los datos a escribir están en memoria en la dirección lógica dada
-                // TODO: Se necesitaría una función para obtener los datos de la memoria usando la dirección lógica
-                // void* datos = obtener_datos_de_memoria(io_dialfs->direccion_logica, io_dialfs->tamanio);
-                // operacion_exitosa = escribir_archivo_dialfs(io_dialfs->nombre_archivo, datos, io_dialfs->tamanio, io_dialfs->puntero_archivo);
-                // free(datos);
-                log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->puntero_archivo);
-                break;
-            case IO_FS_READ:
-                void* buffer = malloc(io_dialfs->tamanio);
-                operacion_exitosa = leer_archivo_dialfs(io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->puntero_archivo);
-                if (operacion_exitosa) {
-                    // Escribo los datos leídos en la memoria en la dirección lógica dada
-                    //escribir_datos_en_memoria(io_dialfs->direccion_logica, buffer, io_dialfs->tamanio);
-                    //enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
-                }
-                free(buffer);
-                log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->puntero_archivo);
-                break;
+            // case IO_FS_CREATE:
+            //     operacion_exitosa = crear_archivo_dialfs(io_dialfs->nombre_archivo);
+            //     log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
+            //     break;
+            // case IO_FS_DELETE:
+            //     operacion_exitosa = eliminar_archivo_dialfs(io_dialfs->nombre_archivo);
+            //     log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
+            //     break;
+            // case IO_FS_TRUNCATE:
+            //     operacion_exitosa = truncar_archivo_dialfs(io_dialfs->nombre_archivo, io_dialfs->tamanio);
+            //     log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio);
+            //     break;
+            // case IO_FS_WRITE:
+            //     // Los datos a escribir están en memoria en la dirección lógica dada
+            //     // TODO: Se necesitaría una función para obtener los datos de la memoria usando la dirección lógica
+            //     // void* datos = obtener_datos_de_memoria(io_dialfs->direccion_logica, io_dialfs->tamanio);
+            //     // operacion_exitosa = escribir_archivo_dialfs(io_dialfs->nombre_archivo, datos, io_dialfs->tamanio, io_dialfs->puntero_archivo);
+            //     // free(datos);
+            //     log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->puntero_archivo);
+            //     break;
+            // case IO_FS_READ:
+            //     void* buffer = malloc(io_dialfs->tamanio);
+            //     operacion_exitosa = leer_archivo_dialfs(io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->puntero_archivo);
+            //     if (operacion_exitosa) {
+            //         // Escribo los datos leídos en la memoria en la dirección lógica dada
+            //         //escribir_datos_en_memoria(io_dialfs->direccion_logica, buffer, io_dialfs->tamanio);
+            //         //enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
+            //     }
+            //     free(buffer);
+            //     log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->puntero_archivo);
+            //     break;
             default:
                 log_error(logger_entradasalida, "Operación DialFS no reconocida");
                 break;

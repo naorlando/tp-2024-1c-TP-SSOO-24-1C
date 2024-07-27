@@ -42,4 +42,6 @@ void procesar_ios_stdin();
 
 void procesar_ios_stdout();
 
+void procesar_ios_dialfs();
+
 #endif //MANAGER_DISPATCH_

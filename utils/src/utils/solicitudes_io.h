@@ -71,15 +71,36 @@ Esta estructura ajusta a lo que el enunciado requiere para las solicitudes del K
  *IO_FS_WRITE: Usa nombre_interfaz, nombre_archivo, direccion_logica, tamanio, puntero_archivo, pid.
  *IO_FS_READ: Usa nombre_interfaz, nombre_archivo, direccion_logica, tamanio, puntero_archivo, pid.
 */
-typedef struct {
-    char* nombre_interfaz;      // Nombre de la interfaz DialFS
-    char* nombre_archivo;       // Nombre del archivo a operar
-    uint32_t pid;               // PID del proceso que realiza la operación
+typedef struct
+{
+    void * dialfs_generic;
+    uint32_t pid;                 // PID del proceso que realiza la operación
     t_name_instruction operacion; // Tipo de operación a realizar
-    uint32_t tamanio;           // Tamaño para operaciones de lectura/escritura/truncado
-    uint32_t direccion_logica;  // Dirección lógica para operaciones de lectura/escritura
-    uint32_t puntero_archivo;   // Puntero del archivo para operaciones de lectura/escritura
+      // Tamaño para operaciones de lectura/escritura/truncado
 } t_io_dialfs;
+
+typedef struct
+{
+    char *nombre_interfaz; // Nombre de la interfaz DialFS
+    char *nombre_archivo;  // Nombre del archivo a operar
+                           // Puntero del archivo para operaciones de lectura/escritura
+} t_io_dialfs_cd;
+
+typedef struct
+{
+    char *nombre_interfaz; // Nombre de la interfaz DialFS
+    char *nombre_archivo;  // Nombre del archivo a operar
+    uint32_t tamanio;      // Tamaño para operaciones de lectura/escritura/truncado
+} t_io_dialfs_truncate;
+
+typedef struct
+{
+    char *nombre_interfaz; // Nombre de la interfaz DialFS
+    char *nombre_archivo;  // Nombre del archivo a operar
+    uint32_t tamanio;      // Tamaño para operaciones de lectura/escritura/truncado
+    t_io_frames *frames_data;
+    uint32_t puntero_archivo; // Puntero del archivo para operaciones de lectura/escritura
+} t_io_dialfs_rw;
 
 // SOLICITUD DIALFS
 typedef struct
@@ -140,7 +161,7 @@ t_solicitud_io_stdin *crear_solicitud_io_stdin(t_PCB *pcb, char *nombre_interfaz
 // Función para crear una E/S STDIN.
 // Pre: La dirección física, el tamaño y el pid deben ser válidos.
 // Post: Retorna un puntero a una estructura t_io_stdin creada.
-t_io_stdin *crear_io_stdin(t_io_frames*);
+t_io_stdin *crear_io_stdin(t_io_frames *);
 
 // Función para destruir una solicitud de E/S STDIN.
 // Pre: La solicitud debe ser válida y no NULL.
@@ -155,7 +176,7 @@ void destruir_io_stdin(t_io_stdin *io_stdin);
 // Obtiene la dirección física del stdin de una estructura t_io_stdin.
 // Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
 // Post: Retorna la dirección física del stdin como un valor uint32_t.
- t_frame_data* obtener_frame_stdin(t_io_stdin *io_stdin, int index);
+t_frame_data *obtener_frame_stdin(t_io_stdin *io_stdin, int index);
 
 // Obtiene el tamaño de una interfaz de I/O stdin.
 // Pre: El puntero io_stdin debe apuntar a una estructura t_io_stdin válida y no debe ser NULL.
@@ -174,7 +195,7 @@ t_solicitud_io_stdout *crear_solicitud_io_stdout(t_PCB *pcb, char *nombre_interf
 // Función para crear una E/S STDOUT.
 // Pre: La dirección física, el tamaño y el pid deben ser válidos.
 // Post: Retorna un puntero a una estructura t_io_stdout creada.
-t_io_stdout *crear_io_stdout(t_io_frames*);
+t_io_stdout *crear_io_stdout(t_io_frames *);
 
 // Función para destruir una solicitud de E/S STDOUT.
 // Pre: La solicitud debe ser válida y no NULL.
@@ -322,12 +343,11 @@ uint32_t obtener_tamanio_io_stdout(t_io_stdout *io_stdout);
 //   - direccion_logica: Dirección lógica para operaciones de lectura/escritura.
 //   - puntero_archivo: Puntero del archivo para operaciones de lectura/escritura.
 // Retorna: Puntero a la nueva estructura t_io_dialfs o NULL si falla la asignación.
-t_io_dialfs* crear_io_dialfs(char* nombre_interfaz, char* nombre_archivo, uint32_t pid, t_name_instruction operacion, uint32_t tamanio, uint32_t direccion_logica, uint32_t puntero_archivo);
-
+t_io_dialfs* crear_io_dialfs(uint32_t pid, t_name_instruction operacion, void * generic); 
 // Libera la memoria de una estructura de E/S DialFS.
 // Parámetro:
 //   - io_dialfs: Puntero a la estructura a liberar.
-void destruir_io_dialfs(t_io_dialfs* io_dialfs);
+void destruir_io_dialfs(t_io_dialfs *io_dialfs);
 
 // Crea una nueva solicitud de E/S DialFS.
 // Parámetros:
@@ -335,42 +355,42 @@ void destruir_io_dialfs(t_io_dialfs* io_dialfs);
 //   - nombre_interfaz: Nombre de la interfaz de E/S.
 //   - io_dialfs: Puntero a la estructura de E/S DialFS.
 // Retorna: Puntero a la nueva estructura t_solicitud_io_dialfs o NULL si falla la asignación.
-t_solicitud_io_dialfs* crear_solicitud_io_dialfs(t_PCB* pcb, char* nombre_interfaz, t_io_dialfs* io_dialfs);
+t_solicitud_io_dialfs *crear_solicitud_io_dialfs(t_PCB *pcb, char *nombre_interfaz, t_io_dialfs *io_dialfs);
 
 // Libera la memoria de una solicitud de E/S DialFS.
 // Parámetro:
 //   - solicitud: Puntero a la solicitud a liberar.
-void destruir_solicitud_io_dialfs(t_solicitud_io_dialfs* solicitud);
+void destruir_solicitud_io_dialfs(t_solicitud_io_dialfs *solicitud);
 
 // Calcula el tamaño en bytes de una estructura de E/S DialFS.
 // Parámetro:
 //   - io_dialfs: Puntero a la estructura de E/S DialFS.
 // Retorna: Tamaño en bytes de la estructura.
-uint32_t obtener_tamanio_io_dialfs(t_io_dialfs* io_dialfs);
+uint32_t obtener_tamanio_io_dialfs(t_io_dialfs *io_dialfs);
 
 // Calcula el tamaño en bytes de una solicitud de E/S DialFS.
 // Parámetro:
 //   - solicitud: Puntero a la solicitud de E/S DialFS.
 // Retorna: Tamaño en bytes de la solicitud.
-uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
+uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
 
 // Obtiene el PCB asociado a una solicitud de E/S DialFS.
 // Parámetro:
 //   - solicitud: Puntero a la solicitud de E/S DialFS.
 // Retorna: Puntero al PCB.
-t_PCB* obtener_pcb_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
+t_PCB *obtener_pcb_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
 
 // Obtiene el nombre de la interfaz de una solicitud de E/S DialFS.
 // Parámetro:
 //   - solicitud: Puntero a la solicitud de E/S DialFS.
 // Retorna: Nombre de la interfaz.
-char* obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
+char *obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
 
 // Obtiene la estructura de E/S DialFS de una solicitud.
 // Parámetro:
 //   - solicitud: Puntero a la solicitud de E/S DialFS.
 // Retorna: Puntero a la estructura de E/S DialFS.
-t_io_dialfs* obtener_io_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
+t_io_dialfs *obtener_io_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
 
 //===============================================
 // FUNCIONES DE RESPONSE
@@ -381,30 +401,30 @@ t_io_dialfs* obtener_io_solicitud_dialfs(t_solicitud_io_dialfs* solicitud);
 //   - process: Indica si el proceso fue exitoso.
 //   - pid: Identificador del proceso.
 // Retorna: Puntero a la nueva estructura t_response o NULL si falla la asignación.
-t_response* create_response(bool process, uint32_t pid);
+t_response *create_response(bool process, uint32_t pid);
 
 // Libera la memoria de una estructura de respuesta.
 // Parámetro:
 //   - response: Puntero a la estructura a liberar.
-void delete_response(t_response* response);
+void delete_response(t_response *response);
 
 // Obtiene el estado del proceso de una respuesta.
 // Parámetro:
 //   - response: Puntero a la estructura de respuesta.
 // Retorna: true si el proceso fue exitoso, false en caso contrario.
-bool get_process_response(t_response* response);
+bool get_process_response(t_response *response);
 
 // Obtiene el PID asociado a una respuesta.
 // Parámetro:
 //   - response: Puntero a la estructura de respuesta.
 // Retorna: PID del proceso.
-uint32_t get_pid_response(t_response* response);
+uint32_t get_pid_response(t_response *response);
 
 // Calcula el tamaño en bytes de una estructura de respuesta.
 // Parámetro:
 //   - response: Puntero a la estructura de respuesta.
 // Retorna: Tamaño en bytes de la estructura.
-uint32_t get_size_response(t_response* response);
+uint32_t get_size_response(t_response *response);
 
 //===============================================
 // FUNCIONES AUXILIARES
@@ -429,5 +449,19 @@ void destruir_solicitud_io(void *, char *);
  * @return Nombre de la operación.
  * @note Esta función es utilizada para mostrar información en los logs.
  */
-char* get_operation_name(t_name_instruction operacion);
+char *get_operation_name(t_name_instruction operacion);
+
+t_io_dialfs_cd* crear_io_dialfs_cd(char *nombre_interfaz, char *nombre_archivo);
+t_io_dialfs_truncate* crear_io_dialfs_truncate(char *nombre_interfaz, char *nombre_archivo, uint32_t tamanio);
+t_io_dialfs_rw* crear_io_dialfs_rw(char *nombre_interfaz, char *nombre_archivo, uint32_t tamanio, t_io_frames *frames_data, uint32_t puntero_archivo);
+void destruir_io_dialfs_cd(t_io_dialfs_cd* cd);
+void destruir_io_dialfs_truncate(t_io_dialfs_truncate* truncate);
+void destruir_io_dialfs_rw(t_io_dialfs_rw* rw);
+
+t_PCB *obtener_pcb_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
+char *obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
+
+t_io_dialfs *obtener_io_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
+uint32_t obtener_tamanio_solicitud_io_dialfs(t_solicitud_io_dialfs *solicitud);
+
 #endif

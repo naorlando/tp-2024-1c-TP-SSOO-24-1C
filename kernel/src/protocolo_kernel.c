@@ -162,3 +162,10 @@ t_solicitud_io_stdout* recv_solicitud_io_stdout_cpu()
 
     return io_stdout;
 }
+
+t_solicitud_io_dialfs* recv_solicitud_io_dialfs_cpu()
+{
+    t_solicitud_io_dialfs* solicitud_dialfs = recv_solicitud_io_dialfs(fd_cpu_dispatch);
+
+    return solicitud_dialfs;
+}

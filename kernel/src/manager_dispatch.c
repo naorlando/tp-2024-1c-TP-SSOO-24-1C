@@ -1,8 +1,9 @@
 #include "manager_dispatch.h"
 
-void cancelar_hilo_quantum(uint32_t pid) 
+void cancelar_hilo_quantum(uint32_t pid)
 {
-    if (get_pid_datos_hilo(datos_hilo_quantum) == pid && !interrupcion_enviada) {
+    if (get_pid_datos_hilo(datos_hilo_quantum) == pid && !interrupcion_enviada)
+    {
         pthread_cancel(get_hilo(datos_hilo_quantum));
         log_info(logger_kernel, "Se cancela el hilo de quantum para desalojar el PCB de PID: <%d>", pid);
     }
@@ -12,9 +13,9 @@ void cancelar_hilo_quantum(uint32_t pid)
 
 void procesar_ios_genericas()
 {
-    t_solicitud_io_generica* solicitud_gen = recv_solicitud_io_generica_cpu();
+    t_solicitud_io_generica *solicitud_gen = recv_solicitud_io_generica_cpu();
 
-    t_PCB* pcb_io_gen = obtener_pcb_solicitud_generica(solicitud_gen);
+    t_PCB *pcb_io_gen = obtener_pcb_solicitud_generica(solicitud_gen);
     cancelar_quantum_si_corresponde(pcb_io_gen);
     actualizar_quantum(pcb_io_gen);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_gen->pid);
@@ -23,18 +24,17 @@ void procesar_ios_genericas()
     sem_post(&SEM_CPU);
 }
 
-
 void procesar_pcb_exit(t_motivo_exit motivo)
 {
-    t_PCB* pcb_exit= recv_pcb_cpu(); // DATO: aca dentro se crea otro malloc de pcb(se usa pcb_create())..
+    t_PCB *pcb_exit = recv_pcb_cpu(); // DATO: aca dentro se crea otro malloc de pcb(se usa pcb_create())..
     execute_to_null();
     cancelar_quantum_si_corresponde(pcb_exit);
 
-    //log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
+    // log_info(logger_kernel, "Llego a EXIT el PCB de PID <%d>", pcb_exit->pid);
 
     // Actualizo el estado del pcb en la cola correspondiente:
     agregar_a_cola_exit(pcb_exit);
-    
+
     // LOG OBLIGATORIO:
     log_info(logger_kernel, "Finaliza el proceso <%d> - Motivo: %s", pcb_exit->pid, obtener_motivo_exit(motivo));
 
@@ -42,11 +42,11 @@ void procesar_pcb_exit(t_motivo_exit motivo)
     // actualizar el pcb en la tabla de pcb:
     update_pcb(pcb_exit);
     log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_exit->pid);
-    
+
     sem_post(&SEM_CPU);
 
-    //log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
-    //log_info(logger_kernel, "La cola de Exit tiene %d elementos", queue_size(COLA_EXIT));
+    // log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+    // log_info(logger_kernel, "La cola de Exit tiene %d elementos", queue_size(COLA_EXIT));
 
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", list_size(COLA_READY));
     log_info(logger_kernel, "La cola de Exit tiene %d elementos", list_size(COLA_EXIT));
@@ -54,9 +54,9 @@ void procesar_pcb_exit(t_motivo_exit motivo)
 
 void procesar_interrupcion_quantum()
 {
-    //TODO: agregar PCB donde este:
-    // 1-recibir pcb:
-    t_PCB* pcb_interrupt = recv_pcb_interrupt();
+    // TODO: agregar PCB donde este:
+    //  1-recibir pcb:
+    t_PCB *pcb_interrupt = recv_pcb_interrupt();
 
     // LOG OBLIGATORIO:
     // PID: <PID> - Desalojado por fin de Quantum
@@ -64,7 +64,7 @@ void procesar_interrupcion_quantum()
 
     // cronometro_detener(); // funciona en caso de VRR
     execute_to_null();
- 
+
     actualizar_quantum(pcb_interrupt);
     // 3-actualizar el pcb en la tabla de pcb:
     update_pcb(pcb_interrupt);
@@ -73,15 +73,15 @@ void procesar_interrupcion_quantum()
 
     log_info(logger_kernel, "Se actualizo el PCB de PID: <%d> en la table_pcb", pcb_interrupt->pid);
 
-
     log_info(logger_kernel, "Se actualizo el estado del PCB de PID: <%d> en la cola READY", pcb_interrupt->pid);
-    //log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
+    // log_info(logger_kernel, "La cola de Ready tiene %d elementos", queue_size(COLA_READY));
     log_info(logger_kernel, "La cola de Ready tiene %d elementos", list_size(COLA_READY));
     sem_post(&SEM_CPU);
 }
 
-void handle_wait_request() {
-    //recibo el paquete con el recurso a manejar    
+void handle_wait_request()
+{
+    // recibo el paquete con el recurso a manejar
 
     t_manejo_recurso *manejo_recurso_recv = recv_wait_or_signal_request();
 
@@ -93,11 +93,11 @@ void handle_wait_request() {
     log_info(logger_kernel, "CX: %u", pcb->cpu_registers->cx);
     log_info(logger_kernel, "Nombre de recurso: %s", nombre_recurso);
 
-    handle_wait(pcb, nombre_recurso,false);
-
+    handle_wait(pcb, nombre_recurso, false);
 }
 
-void handle_signal_request() {
+void handle_signal_request()
+{
 
     t_manejo_recurso *manejo_recurso_recv = recv_wait_or_signal_request();
     t_PCB *pcb = manejo_recurso_recv->pcb;
@@ -109,7 +109,6 @@ void handle_signal_request() {
     log_info(logger_kernel, "Nombre de recurso: %s", nombre_recurso);
 
     handle_signal(pcb, nombre_recurso);
-
 }
 
 // // manejar instruccion WAIT
@@ -132,8 +131,8 @@ void handle_signal_request() {
 //         execute_to_null();
 //         cancelar_quantum_si_corresponde(pcb);
 //         agregar_a_cola_exit(pcb);
-//         sem_post(&SEM_CPU);    
-//         return; 
+//         sem_post(&SEM_CPU);
+//         return;
 //     }
 
 //     if (recurso->instancias > 0) {
@@ -146,12 +145,11 @@ void handle_signal_request() {
 //     } else {
 //         bloquear_proceso(recurso, pcb);
 //         log_info(logger_kernel, "Recurso %s no tenía instancias disponibles. Proceso %d bloqueado", nombre_recurso, pcb->pid);
-//         sem_post(&SEM_CPU);    
+//         sem_post(&SEM_CPU);
 //     }
 
 //     pthread_mutex_unlock(&MUTEX_RECURSOS);
 // }
-
 
 // manejar instruccion SIGNAL
 // void handle_signal_request()
@@ -174,7 +172,7 @@ void handle_signal_request() {
 //         execute_to_null();
 //         cancelar_quantum_si_corresponde(pcb);
 //         agregar_a_cola_exit(pcb);
-//         sem_post(&SEM_CPU);    
+//         sem_post(&SEM_CPU);
 //         return;
 //     }
 
@@ -185,15 +183,13 @@ void handle_signal_request() {
 //         execute_to_null();
 //         cancelar_quantum_si_corresponde(pcb);
 //         agregar_a_cola_exit(pcb);
-//         sem_post(&SEM_CPU);    
+//         sem_post(&SEM_CPU);
 //         return;
 //     }
-//     // si el proceso esta en la lista de procesos asignados,se ELEMININA EL PID en la funcion remove_asignado_a_recurso() e 
+//     // si el proceso esta en la lista de procesos asignados,se ELEMININA EL PID en la funcion remove_asignado_a_recurso() e
 //     // incremento las instancias del recurso...
 //     incrementar_recurso(recurso); // recurso->instancias++;
 //     log_info(logger_kernel, "Recurso %s incrementado. Instancias actuales: %d", nombre_recurso, recurso->instancias);
-
- 
 
 //     if (!queue_is_empty(recurso->cola_bloqueados)) {
 //         t_PCB *pcb_desbloqueado = desbloquear_proceso(recurso);
@@ -207,26 +203,29 @@ void handle_signal_request() {
 //     pthread_mutex_unlock(&MUTEX_RECURSOS);
 // }
 
-void cancelar_quantum_si_corresponde(t_PCB *pcb_exit) {
-    if (strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0) {
+void cancelar_quantum_si_corresponde(t_PCB *pcb_exit)
+{
+    if (strcmp(obtener_algoritmo_planificacion(kernel_config), "FIFO") != 0)
+    {
         cancelar_hilo_quantum(pcb_exit->pid);
     }
 }
 
-void logica_pcb_retorno_vrr(t_PCB *pcb) {
+void logica_pcb_retorno_vrr(t_PCB *pcb)
+{
     pthread_mutex_lock(&MUTEX_COLA_RETORNO_PCB);
-        //queue_push(COLA_RETORNO_PCB, pcb);
-        list_add(COLA_RETORNO_PCB, pcb);
+    // queue_push(COLA_RETORNO_PCB, pcb);
+    list_add(COLA_RETORNO_PCB, pcb);
     pthread_mutex_unlock(&MUTEX_COLA_RETORNO_PCB);
-    sem_post(&SEM_PCB_RETURNS);  // Signal que el PCB ha retornado
+    sem_post(&SEM_PCB_RETURNS); // Signal que el PCB ha retornado
 }
 
-//TODO terminar de implementar
+// TODO terminar de implementar
 void procesar_ios_stdin()
 {
-    t_solicitud_io_stdin* solicitud_stdin = recv_solicitud_io_stdin_cpu();
+    t_solicitud_io_stdin *solicitud_stdin = recv_solicitud_io_stdin_cpu();
 
-    t_PCB* pcb_io_stdin = obtener_pcb_solicitud_stdin(solicitud_stdin);
+    t_PCB *pcb_io_stdin = obtener_pcb_solicitud_stdin(solicitud_stdin);
     cancelar_quantum_si_corresponde(pcb_io_stdin);
     actualizar_quantum(pcb_io_stdin);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO STDIN para el PCB de PID <%d>", pcb_io_stdin->pid);
@@ -235,18 +234,28 @@ void procesar_ios_stdin()
     sem_post(&SEM_CPU);
 }
 
-//TODO terminar de implementar
-void procesar_ios_stdout(){
-    t_solicitud_io_stdout* solicitud_stdout = recv_solicitud_io_stdout_cpu();
+// TODO terminar de implementar
+void procesar_ios_stdout()
+{
+    t_solicitud_io_stdout *solicitud_stdout = recv_solicitud_io_stdout_cpu();
 
-    t_PCB* pcb_io_stdout = obtener_pcb_solicitud_stdout(solicitud_stdout);
+    t_PCB *pcb_io_stdout = obtener_pcb_solicitud_stdout(solicitud_stdout);
     cancelar_quantum_si_corresponde(pcb_io_stdout);
     actualizar_quantum(pcb_io_stdout);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO STDOUT para el PCB de PID <%d>", pcb_io_stdout->pid);
 
     proceso_solicita_io(2, solicitud_stdout);
     sem_post(&SEM_CPU);
-
 }
 
+void procesar_ios_dialfs()
+{
+    t_solicitud_io_dialfs *solicitud_dialfs = recv_solicitud_io_dialfs_cpu();
+    t_PCB *pcb_io_dialfs = obtener_pcb_solicitud_dialfs(solicitud_dialfs);
+    cancelar_quantum_si_corresponde(pcb_io_dialfs);
+    actualizar_quantum(pcb_io_dialfs);
+    log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO DIALGS para el PCB de PID <%d>", pcb_io_dialfs->pid);
 
+    proceso_solicita_io(3, solicitud_dialfs);
+    sem_post(&SEM_CPU);
+}
