@@ -13,12 +13,18 @@
 #include <string.h>
 #include <unistd.h> // Librería para usleep
 #include <sys/stat.h> // Librería para manejo de archivos
+#include "utils/utils.h"
+#include "bitmap.h"
+#include "bloques.h"
+#include "metadata.h"
 
 // Estructura para almacenar los datos de un archivo en el sistema DialFS.
 typedef struct {
     char* nombre;
     uint32_t bloque_inicial;
     uint32_t tamanio;
+    char* path_metadata;
+    char* path_archivo;
 } t_archivo_dialfs;
 
 // Estructura para almacenar los datos del sistema de archivos DialFS.
@@ -26,9 +32,11 @@ typedef struct {
     char* path_base;
     uint32_t block_size;
     uint32_t block_count;
-    uint32_t retraso_compactacion;
-    t_bitarray* bitmap;
+    uint32_t retraso_compactacion; 
     t_list* archivos;
+    char* path_bitmap;
+    char* path_bloques;
+
 } t_dialfs;
 
 //===============================================
@@ -207,7 +215,7 @@ void mover_bloques(t_dialfs* fs, uint32_t origen, uint32_t destino, uint32_t can
  * @param fs Puntero a la instancia de t_dialfs.
  * @param archivo Puntero al t_archivo_dialfs cuyos metadatos se guardarán.
  */
-void guardar_metadata_archivo(t_dialfs* fs, t_archivo_dialfs* archivo);
+t_config*  guardar_metadata_archivo(t_dialfs* fs, t_archivo_dialfs* archivo);
 
 /**
  * Carga los metadatos de un archivo en el sistema DialFS.
@@ -229,5 +237,10 @@ int comparar_bloques_iniciales(t_archivo_dialfs* a, t_archivo_dialfs* b);
  * @param archivo Puntero al t_archivo_dialfs a destruir.
  */
 void destruir_archivo_dialfs(t_archivo_dialfs* archivo);
+
+char* get_path_bitmap(t_dialfs* fs);
+char* get_path_bloques(t_dialfs* fs);
+char* get_path_base(t_dialfs* fs);
+char* get_path_metadata(t_archivo_dialfs* archivo);
 
 #endif // DIALFS_H
