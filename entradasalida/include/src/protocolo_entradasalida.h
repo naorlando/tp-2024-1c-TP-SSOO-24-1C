@@ -81,14 +81,6 @@ void send_IO_interface_memoria();
 //======================================================
 
 /**
- * Obtiene el nombre de una operación de entrada/salida.
- * @param operacion Operación de entrada/salida.
- * @return Nombre de la operación.
- * @note Esta función es utilizada para mostrar información en los logs.
- */
-char* get_operation_name(t_name_instruction operacion);
-
-/**
  * Envia los datos leidos al kernel
  * @param fd Descriptor de archivo para la comunicación.
  * @param buffer Buffer con los datos leidos.

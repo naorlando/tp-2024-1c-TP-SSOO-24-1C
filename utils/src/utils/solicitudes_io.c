@@ -416,3 +416,8 @@ char* obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
 t_io_dialfs* obtener_io_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
     return solicitud->io_dialfs;
 }
+
+char* get_operation_name(t_name_instruction operacion) 
+{
+    return "";
+}

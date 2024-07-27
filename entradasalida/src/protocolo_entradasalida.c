@@ -175,8 +175,3 @@ void send_IO_interface_memoria()
 {
     send_IO_interface(fd_memoria, nombre_interfaz, obtener_tipo_interfaz(entradasalida_config), MSG_IO_MEMORIA);
 }
-
-char* get_operation_name(t_name_instruction operacion) 
-{
-    return "";
-}

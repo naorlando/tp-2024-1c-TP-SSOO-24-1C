@@ -422,4 +422,12 @@ t_PCB *obtener_pcb_de_solicitud(void *, char *);
 //      El puntero tipo_interfaz debe apuntar a una cadena de caracteres válida que representa el tipo de interfaz y no debe ser NULL.
 // Post: La estructura de solicitud IO se destruye utilizando la función de destrucción correspondiente.
 void destruir_solicitud_io(void *, char *);
+
+/**
+ * Obtiene el nombre de una operación de entrada/salida.
+ * @param operacion Operación de entrada/salida.
+ * @return Nombre de la operación.
+ * @note Esta función es utilizada para mostrar información en los logs.
+ */
+char* get_operation_name(t_name_instruction operacion);
 #endif
