@@ -487,7 +487,21 @@ uint32_t obtener_tamanio_solicitud_io_dialfs(t_solicitud_io_dialfs *solicitud)
 
 char *get_operation_name(t_name_instruction operacion)
 {
-    return "";
+    switch (operacion)
+    {
+        case IO_FS_CREATE:
+            return "CREATE";
+        case IO_FS_DELETE:
+            return "DELETE";
+        case IO_FS_TRUNCATE:
+            return "TRUNCATE";
+        case IO_FS_WRITE:
+            return "WRITE";
+        case IO_FS_READ:
+            return "READ";
+        default:
+            return "UNKNOWN";
+    }
 }
 
 t_io_dialfs_cd *crear_io_dialfs_cd(char *nombre_interfaz, char *nombre_archivo)
@@ -525,4 +539,24 @@ t_io_dialfs_rw *crear_io_dialfs_rw(char *nombre_interfaz, char *nombre_archivo, 
     rw->frames_data = frames_data;
     rw->puntero_archivo = puntero_archivo;
     return rw;
+}
+
+
+void* get_dialfs_generic(t_io_dialfs *io_dialfs)
+{
+    if (io_dialfs == NULL) return NULL;
+
+    switch (io_dialfs->operacion)
+    {
+        case IO_FS_CREATE:
+        case IO_FS_DELETE:
+            return (t_io_dialfs_cd*) io_dialfs->dialfs_generic;
+        case IO_FS_TRUNCATE:
+            return (t_io_dialfs_truncate*) io_dialfs->dialfs_generic;
+        case IO_FS_WRITE:
+        case IO_FS_READ:
+            return (t_io_dialfs_rw*) io_dialfs->dialfs_generic;
+        default:
+            return NULL;
+    }
 }

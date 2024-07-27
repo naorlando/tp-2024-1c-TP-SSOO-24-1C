@@ -73,12 +73,9 @@ void atender_kernel_IO(void *io_connection)
         case MSG_IO_KERNEL_GENERICA:
         case MSG_IO_KERNEL_STDIN:
         case MSG_IO_KERNEL_STDOUT:
+        case MSG_IO_KERNEL_DIALFS:
             log_info(logger_kernel, "Se recibio un mensaje de IO %s", tipo_interfaz);
             procesar_respuesta_io(obtener_file_descriptor(cliente_io), obtener_nombre_conexion(cliente_io));
-            break;
-        case MSG_IO_KERNEL_DIALFS:
-
-            log_info(logger_kernel, "Se recibio un mensaje de IO DIALFS");
             break;
         case -1:
             log_error(logger_kernel, "la IO se desconecto. Terminando servidor");

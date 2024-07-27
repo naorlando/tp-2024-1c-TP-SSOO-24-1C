@@ -76,7 +76,6 @@ typedef struct
     void * dialfs_generic;
     uint32_t pid;                 // PID del proceso que realiza la operación
     t_name_instruction operacion; // Tipo de operación a realizar
-      // Tamaño para operaciones de lectura/escritura/truncado
 } t_io_dialfs;
 
 typedef struct
@@ -463,5 +462,7 @@ char *obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
 
 t_io_dialfs *obtener_io_solicitud_dialfs(t_solicitud_io_dialfs *solicitud);
 uint32_t obtener_tamanio_solicitud_io_dialfs(t_solicitud_io_dialfs *solicitud);
+
+void* get_dialfs_generic(t_io_dialfs *io_dialfs);
 
 #endif
