@@ -5,23 +5,23 @@
 // FUNCIONES DE MANEJO DE ARCHIVOS
 //===============================================
 
-bool crear_archivo(char* nombre) {
+bool crear_archivo_dialfs(char* nombre) {
     return crear_archivo(dialfs, nombre);
 }
 
-bool eliminar_archivo(char* nombre) {
+bool eliminar_archivo_dialfs(char* nombre) {
     return eliminar_archivo(dialfs, nombre);
 }
 
-bool truncar_archivo(char* nombre, uint32_t nuevo_tamanio) {
+bool truncar_archivo_dialfs(char* nombre, uint32_t nuevo_tamanio) {
     return truncar_archivo(dialfs, nombre, nuevo_tamanio);
 }
 
-bool escribir_archivo(char* nombre, void* datos, uint32_t tamanio, uint32_t offset) {
+bool escribir_archivo_dialfs(char* nombre, void* datos, uint32_t tamanio, uint32_t offset) {
     return escribir_archivo(dialfs, nombre, datos, tamanio, offset);
 }
 
-bool leer_archivo(char* nombre, void* buffer, uint32_t tamanio, uint32_t offset) {
+bool leer_archivo_dialfs(char* nombre, void* buffer, uint32_t tamanio, uint32_t offset) {
     return leer_archivo(dialfs, nombre, buffer, tamanio, offset);
 }
 
@@ -29,7 +29,7 @@ bool leer_archivo(char* nombre, void* buffer, uint32_t tamanio, uint32_t offset)
 // FUNCIONES DE MANTENIMIENTO
 //===============================================
 
-void compactar_fs() {
+void compactar_fs_dialfs() {
     compactar_fs(dialfs);
 }
 

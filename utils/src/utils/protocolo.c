@@ -946,16 +946,17 @@ t_solicitud_io_stdin* deserializar_solicitud_io_stdin(t_buffer* buffer) {
 }
 
 void serializar_io_stdin(t_buffer* buffer, t_io_stdin* io_stdin) {
-    buffer_add_uint32(buffer, io_stdin->direccion_fisica);
-    buffer_add_uint32(buffer, io_stdin->tamanio);
-    buffer_add_uint32(buffer, io_stdin->pid);
+    // buffer_add_uint32(buffer, io_stdin->direccion_fisica);
+    // buffer_add_uint32(buffer, io_stdin->tamanio);
+    // buffer_add_uint32(buffer, io_stdin->pid);
 }
 
 t_io_stdin* deserializar_io_stdin(t_buffer* buffer) {
-    uint32_t direccion_fisica = buffer_read_uint32(buffer);
-    uint32_t tamanio = buffer_read_uint32(buffer);
-    uint32_t pid = buffer_read_uint32(buffer);
-    return crear_io_stdin(direccion_fisica, tamanio, pid);
+    // uint32_t direccion_fisica = buffer_read_uint32(buffer);
+    // uint32_t tamanio = buffer_read_uint32(buffer);
+    // uint32_t pid = buffer_read_uint32(buffer);
+    // return crear_io_stdin(direccion_fisica, tamanio, pid);
+    return NULL;
 }
 
 // IO Stdout
@@ -978,16 +979,17 @@ t_solicitud_io_stdout* deserializar_solicitud_io_stdout(t_buffer* buffer) {
 }
 
 void serializar_io_stdout(t_buffer* buffer, t_io_stdout* io_stdout) {
-    buffer_add_uint32(buffer, io_stdout->direccion_fisica);
-    buffer_add_uint32(buffer, io_stdout->tamanio);
-    buffer_add_uint32(buffer, io_stdout->pid);
+    // buffer_add_uint32(buffer, io_stdout->direccion_fisica);
+    // buffer_add_uint32(buffer, io_stdout->tamanio);
+    // buffer_add_uint32(buffer, io_stdout->pid);
 }
 
 t_io_stdout* deserializar_io_stdout(t_buffer* buffer) {
-    uint32_t direccion_fisica = buffer_read_uint32(buffer);
-    uint32_t tamanio = buffer_read_uint32(buffer);
-    uint32_t pid = buffer_read_uint32(buffer);
-    return crear_io_stdout(direccion_fisica, tamanio, pid);
+    // uint32_t direccion_fisica = buffer_read_uint32(buffer);
+    // uint32_t tamanio = buffer_read_uint32(buffer);
+    // uint32_t pid = buffer_read_uint32(buffer);
+    // return crear_io_stdout(direccion_fisica, tamanio, pid);
+    return NULL;
 }
 
 // IO DialFS

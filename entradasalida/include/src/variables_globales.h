@@ -4,6 +4,7 @@
 #include <commons/log.h>
 #include <commons/config.h>
 #include "entradasalida_config.h"
+#include "dialfs.h"
 
 
 #define SERVER_MEMORIA "SERVER MEMORIA"

@@ -1,7 +1,7 @@
 #ifndef COMPORTAMIENTOS_DIALFS_H
 #define COMPORTAMIENTOS_DIALFS_H
 
-#include "DIALFS.h"
+#include "dialfs.h"
 #include "variables_globales.h"
 
 //===============================================
@@ -13,14 +13,14 @@
  * @param nombre Nombre del archivo a crear.
  * @return true si el archivo se creó exitosamente, false en caso contrario.
  */
-bool crear_archivo(char* nombre);
+bool crear_archivo_dialfs(char* nombre);
 
 /**
  * Elimina un archivo del sistema DialFS.
  * @param nombre Nombre del archivo a eliminar.
  * @return true si el archivo se eliminó exitosamente, false en caso contrario.
  */
-bool eliminar_archivo(char* nombre);
+bool eliminar_archivo_dialfs(char* nombre);
 
 /**
  * Modifica el tamaño de un archivo existente en DialFS.
@@ -28,7 +28,7 @@ bool eliminar_archivo(char* nombre);
  * @param nuevo_tamanio Nuevo tamaño del archivo en bytes.
  * @return true si el archivo se truncó exitosamente, false en caso contrario.
  */
-bool truncar_archivo(char* nombre, uint32_t nuevo_tamanio);
+bool truncar_archivo_dialfs(char* nombre, uint32_t nuevo_tamanio);
 
 /**
  * Escribe datos en un archivo existente en DialFS.
@@ -38,7 +38,7 @@ bool truncar_archivo(char* nombre, uint32_t nuevo_tamanio);
  * @param offset Posición en el archivo donde comenzar a escribir.
  * @return true si la escritura fue exitosa, false en caso contrario.
  */
-bool escribir_archivo(char* nombre, void* datos, uint32_t tamanio, uint32_t offset);
+bool escribir_archivo_dialfs(char* nombre, void* datos, uint32_t tamanio, uint32_t offset);
 
 /**
  * Lee datos de un archivo existente en DialFS.
@@ -48,7 +48,7 @@ bool escribir_archivo(char* nombre, void* datos, uint32_t tamanio, uint32_t offs
  * @param offset Posición en el archivo donde comenzar a leer.
  * @return true si la lectura fue exitosa, false en caso contrario.
  */
-bool leer_archivo(char* nombre, void* buffer, uint32_t tamanio, uint32_t offset);
+bool leer_archivo_dialfs(char* nombre, void* buffer, uint32_t tamanio, uint32_t offset);
 
 //===============================================
 // FUNCIONES DE MANTENIMIENTO
@@ -57,7 +57,7 @@ bool leer_archivo(char* nombre, void* buffer, uint32_t tamanio, uint32_t offset)
 /**
  * Realiza la compactación del sistema de archivos DialFS.
  */
-void compactar_fs();
+void compactar_fs_dialfs();
 
 //===============================================
 // FUNCIONES DE LECTURA Y ESCRITURA DE MEMORIA

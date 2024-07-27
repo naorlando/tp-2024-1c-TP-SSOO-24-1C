@@ -33,25 +33,25 @@ void atender_solicitud_stdin(int fd) {
     t_io_stdin *io_stdin = recv_io_stdin(fd);
 
     if (io_stdin != NULL) {
-        log_info(logger_entradasalida, "PID: <%d> - Interfaz: <%s> - Operacion: <READ>", 
-                 io_stdin->pid, io_stdin->nombre_interfaz);
+        // log_info(logger_entradasalida, "PID: <%d> - Interfaz: <%s> - Operacion: <READ>", 
+        //          io_stdin->pid, io_stdin->nombre_interfaz);
 
-        char *input = readline("Ingrese un texto: ");
+        // char *input = readline("Ingrese un texto: ");
 
-        int resultado = escribir_memoria_stdin(io_stdin->pid, 
-                                               io_stdin->direccion_logica, 
-                                               io_stdin->tamanio, 
-                                               input);
+        // int resultado = escribir_memoria_stdin(io_stdin->pid, 
+        //                                        io_stdin->direccion_logica, 
+        //                                        io_stdin->tamanio, 
+        //                                        input);
         
-        free(input);
+        // free(input);
 
-        log_info(logger_entradasalida, "Operacion READ finalizada");
+        // log_info(logger_entradasalida, "Operacion READ finalizada");
 
-        bool operacion_exitosa = (resultado == 0);
-        t_response* response = create_response(operacion_exitosa, io_stdin->pid);
-        send_confirmacion_io(fd, MSG_IO_KERNEL_STDIN, response);
+        // bool operacion_exitosa = (resultado == 0);
+        // t_response* response = create_response(operacion_exitosa, io_stdin->pid);
+        // send_confirmacion_io(fd, MSG_IO_KERNEL_STDIN, response);
 
-        destruir_io_stdin(io_stdin);
+        // destruir_io_stdin(io_stdin);
     } else {
         log_error(logger_entradasalida, "Error al recibir IO STDIN");
     }
@@ -65,28 +65,28 @@ void atender_solicitud_stdout(int fd) {
     t_io_stdout* io_stdout = recv_io_stdout(fd);
 
     if (io_stdout != NULL) {
-        log_info(logger_entradasalida, "PID: <%d> - Interfaz: <%s> - Operacion: <WRITE>", 
-                 io_stdout->pid, io_stdout->nombre_interfaz);
+        // log_info(logger_entradasalida, "PID: <%d> - Interfaz: <%s> - Operacion: <WRITE>", 
+        //          io_stdout->pid, io_stdout->nombre_interfaz);
 
-        char *valor = leer_memoria_stdout(io_stdout->pid, 
-                                          io_stdout->direccion_logica, 
-                                          io_stdout->tamanio);
+        // char *valor = leer_memoria_stdout(io_stdout->pid, 
+        //                                   io_stdout->direccion_logica, 
+        //                                   io_stdout->tamanio);
         
-        if (valor != NULL) {
-            printf("%.*s", io_stdout->tamanio, valor);
-            free(valor);
+        // if (valor != NULL) {
+        //     printf("%.*s", io_stdout->tamanio, valor);
+        //     free(valor);
 
-            t_response* response = create_response(true, io_stdout->pid);
-            send_confirmacion_io(fd, MSG_IO_KERNEL_STDOUT, response);
+        //     t_response* response = create_response(true, io_stdout->pid);
+        //     send_confirmacion_io(fd, MSG_IO_KERNEL_STDOUT, response);
 
-            log_info(logger_entradasalida, "Operacion WRITE finalizada");
-        } else {
-            log_error(logger_entradasalida, "Error al leer de memoria para IO STDOUT");
-            t_response* response = create_response(false, io_stdout->pid);
-            send_confirmacion_io(fd, MSG_IO_KERNEL_STDOUT, response);
-        }
+        //     log_info(logger_entradasalida, "Operacion WRITE finalizada");
+        // } else {
+        //     log_error(logger_entradasalida, "Error al leer de memoria para IO STDOUT");
+        //     t_response* response = create_response(false, io_stdout->pid);
+        //     send_confirmacion_io(fd, MSG_IO_KERNEL_STDOUT, response);
+        // }
 
-        destruir_io_stdout(io_stdout);
+        // destruir_io_stdout(io_stdout);
     } else {
         log_error(logger_entradasalida, "Error al recibir IO STDOUT");
     }
@@ -107,32 +107,32 @@ void atender_solicitud_dialfs(int fd)
         
         switch(io_dialfs->operacion) {
             case IO_FS_CREATE:
-                operacion_exitosa = crear_archivo(io_dialfs->nombre_archivo);
+                operacion_exitosa = crear_archivo_dialfs(io_dialfs->nombre_archivo);
                 log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
                 break;
             case IO_FS_DELETE:
-                operacion_exitosa = eliminar_archivo(io_dialfs->nombre_archivo);
+                operacion_exitosa = eliminar_archivo_dialfs(io_dialfs->nombre_archivo);
                 log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
                 break;
             case IO_FS_TRUNCATE:
-                operacion_exitosa = truncar_archivo(io_dialfs->nombre_archivo, io_dialfs->tamanio);
+                operacion_exitosa = truncar_archivo_dialfs(io_dialfs->nombre_archivo, io_dialfs->tamanio);
                 log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio);
                 break;
             case IO_FS_WRITE:
                 // Los datos a escribir están en memoria en la dirección lógica dada
                 // TODO: Se necesitaría una función para obtener los datos de la memoria usando la dirección lógica
-                void* datos = obtener_datos_de_memoria(io_dialfs->direccion_logica, io_dialfs->tamanio);
-                operacion_exitosa = escribir_archivo(io_dialfs->nombre_archivo, datos, io_dialfs->tamanio, io_dialfs->puntero_archivo);
-                free(datos);
+                // void* datos = obtener_datos_de_memoria(io_dialfs->direccion_logica, io_dialfs->tamanio);
+                // operacion_exitosa = escribir_archivo_dialfs(io_dialfs->nombre_archivo, datos, io_dialfs->tamanio, io_dialfs->puntero_archivo);
+                // free(datos);
                 log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->puntero_archivo);
                 break;
             case IO_FS_READ:
                 void* buffer = malloc(io_dialfs->tamanio);
-                operacion_exitosa = leer_archivo(io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->puntero_archivo);
+                operacion_exitosa = leer_archivo_dialfs(io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->puntero_archivo);
                 if (operacion_exitosa) {
                     // Escribo los datos leídos en la memoria en la dirección lógica dada
-                    escribir_datos_en_memoria(io_dialfs->direccion_logica, buffer, io_dialfs->tamanio);
-                    enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
+                    //escribir_datos_en_memoria(io_dialfs->direccion_logica, buffer, io_dialfs->tamanio);
+                    //enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
                 }
                 free(buffer);
                 log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->puntero_archivo);
@@ -166,4 +166,12 @@ void send_confirmacion_io(int fd, t_msg_header header, t_response* response) {
 void send_IO_interface_kernel() 
 {
     send_IO_interface(fd_kernel, nombre_interfaz, obtener_tipo_interfaz(entradasalida_config));
+}
+
+//======================================================
+//               FUNCIONES AUXILIARES
+//======================================================
+// TODO: TERMINAR DE IMPLEMENTAR
+const char* get_operation_name(t_name_instruction operacion) {
+    return "";
 }

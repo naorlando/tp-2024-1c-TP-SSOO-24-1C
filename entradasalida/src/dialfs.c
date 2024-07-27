@@ -1,11 +1,4 @@
 #include "dialfs.h"
-#include "variables_globales.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h> // Librería para usleep
-#include <sys/stat.h> // Librería para manejo de archivos
-
 
 //===============================================
 // FUNCIONES DE INICIALIZACIÓN Y DESTRUCCIÓN

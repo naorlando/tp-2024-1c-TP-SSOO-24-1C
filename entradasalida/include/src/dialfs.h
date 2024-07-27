@@ -8,10 +8,11 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <dirent.h>
-#include "utils/estructuras.h"
-#include "utils/buffer.h"
-#include "utils/protocolo.h"
-#include "variables_globales.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h> // Librería para usleep
+#include <sys/stat.h> // Librería para manejo de archivos
 
 // Estructura para almacenar los datos de un archivo en el sistema DialFS.
 typedef struct {

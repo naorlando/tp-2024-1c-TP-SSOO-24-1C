@@ -10,7 +10,7 @@ char* nombre_interfaz;
 t_config* config_entradasalida;
 t_IO_config* entradasalida_config;
 
-t_dialfs* DIALFS;
+t_dialfs* dialfs;
 
 char* kernel_port;
 char* memoria_port;
