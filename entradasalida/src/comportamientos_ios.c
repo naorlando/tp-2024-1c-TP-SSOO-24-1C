@@ -3,12 +3,12 @@
 bool ejecutar_unidades_de_trabajo(t_io_generica *io_generica)
 {
     uint32_t tiempo_sleep = obtener_tiempo_sleep(io_generica);
-
     int tiempo_espera = tiempo_sleep * obtener_tiempo_unidad_trabajo(entradasalida_config);
 
-    log_info(logger_entradasalida, "Esperando %d milisegundos", tiempo_espera);
+    log_info(logger_entradasalida, "PID: %d - Esperando %d milisegundos", 
+             obtener_pid_generica(io_generica), tiempo_espera);
 
-    sleep(tiempo_espera / 1000);
+    usleep(tiempo_espera * 1000);  // usleep usa microsegundos
 
     return true;
 }

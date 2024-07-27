@@ -7,12 +7,15 @@
 #include <commons/config.h>
 #include <commons/string.h>
 #include <variables_globales.h>
+#include <dialfs.h>
 
 void init(char*);
 
 void _iniciar_logger();
 void _iniciar_config(char*);
 void _imprimir_config();
+
+void _inicializar_dialfs();
 
 
 

@@ -1,5 +1,9 @@
 #include "solicitudes_io.h"
 
+#include "solicitudes_io.h"
+#include <stdlib.h>
+#include <string.h>
+
 //===============================================
 // FUNCIONES DE IO GENERICA
 //===============================================
@@ -37,7 +41,6 @@ t_solicitud_io_stdin *crear_solicitud_io_stdin(t_PCB *pcb, char *nombre_interfaz
     solicitud->pcb = pcb;
     solicitud->nombre_interfaz = strdup(nombre_interfaz);
     solicitud->io_stdin = io_stdin;
-
     return solicitud;
 }
 
@@ -62,7 +65,6 @@ t_solicitud_io_stdout *crear_solicitud_io_stdout(t_PCB *pcb, char *nombre_interf
     solicitud->pcb = pcb;
     solicitud->nombre_interfaz = strdup(nombre_interfaz);
     solicitud->io_stdout = io_stdout;
-
     return solicitud;
 }
 
@@ -350,18 +352,19 @@ t_solicitud_io_dialfs *crear_solicitud_io_dialfs(t_PCB *pcb, char *nombre_interf
     return solicitud;
 }
 
-t_io_dialfs *crear_io_dialfs(char *nombre_archivo, uint32_t tamanio, uint32_t offset, void *datos, t_name_instruction operacion)
-{
-    t_io_dialfs *io_dialfs = malloc(sizeof(t_io_dialfs));
-    if (io_dialfs == NULL)
-        return NULL;
+t_io_dialfs* crear_io_dialfs(char* nombre_interfaz, char* nombre_archivo, uint32_t pid, t_name_instruction operacion, uint32_t tamanio, uint32_t direccion_logica, uint32_t puntero_archivo) {
+    t_io_dialfs* io_dialfs = malloc(sizeof(t_io_dialfs));
+    if (io_dialfs == NULL) return NULL;
+    io_dialfs->nombre_interfaz = strdup(nombre_interfaz);
     io_dialfs->nombre_archivo = strdup(nombre_archivo);
-    io_dialfs->tamanio = tamanio;
-    io_dialfs->offset = offset;
-    io_dialfs->datos = datos;
+    io_dialfs->pid = pid;
     io_dialfs->operacion = operacion;
+    io_dialfs->tamanio = tamanio;
+    io_dialfs->direccion_logica = direccion_logica;
+    io_dialfs->puntero_archivo = puntero_archivo;
     return io_dialfs;
 }
+
 
 void destruir_solicitud_io_dialfs(t_solicitud_io_dialfs *solicitud)
 {
@@ -373,30 +376,43 @@ void destruir_solicitud_io_dialfs(t_solicitud_io_dialfs *solicitud)
     }
 }
 
-void destruir_io_dialfs(t_io_dialfs *io_dialfs)
-{
-    if (io_dialfs != NULL)
-    {
+void destruir_io_dialfs(t_io_dialfs* io_dialfs) {
+    if (io_dialfs != NULL) {
+        free(io_dialfs->nombre_interfaz);
         free(io_dialfs->nombre_archivo);
-        free(io_dialfs->datos);
         free(io_dialfs);
     }
 }
 
-uint32_t obtener_tamanio_io_dialfs(t_io_dialfs *io_dialfs)
-{
+
+uint32_t obtener_tamanio_io_dialfs(t_io_dialfs* io_dialfs) {
     uint32_t size = 0;
-
-    size += sizeof(uint32_t) + strlen(io_dialfs->nombre_archivo) + 1; // Nombre del archivo
-    size += sizeof(uint32_t);                                         // Tamaño
-    size += sizeof(uint32_t);                                         // Offset
-    size += sizeof(uint32_t);                                         // Operación
-
-    // Si es una operación de escritura, incluimos el tamaño de los datos
-    if (io_dialfs->operacion == IO_FS_WRITE)
-    {
-        size += io_dialfs->tamanio;
-    }
-
+    size += sizeof(uint32_t) + strlen(io_dialfs->nombre_interfaz) + 1;
+    size += sizeof(uint32_t) + strlen(io_dialfs->nombre_archivo) + 1;
+    size += sizeof(uint32_t);
+    size += sizeof(t_name_instruction);
+    size += sizeof(uint32_t);
+    size += sizeof(uint32_t);
+    size += sizeof(uint32_t);
     return size;
+}
+
+uint32_t obtener_tamanio_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
+    uint32_t size = 0;
+    size += get_pcb_size(solicitud->pcb);
+    size += sizeof(uint32_t) + strlen(solicitud->nombre_interfaz) + 1;
+    size += obtener_tamanio_io_dialfs(solicitud->io_dialfs);
+    return size;
+}
+
+t_PCB* obtener_pcb_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
+    return solicitud->pcb;
+}
+
+char* obtener_nombre_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
+    return solicitud->nombre_interfaz;
+}
+
+t_io_dialfs* obtener_io_solicitud_dialfs(t_solicitud_io_dialfs* solicitud) {
+    return solicitud->io_dialfs;
 }

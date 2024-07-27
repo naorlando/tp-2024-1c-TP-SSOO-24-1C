@@ -11,6 +11,7 @@
 #include <entradasalida_config.h>
 #include <pthread.h>
 
+
 void inicializar_sockets();
 // void crear_hilo_interfaz_generica();
 // void crear_hilo_interfaz_stdin();

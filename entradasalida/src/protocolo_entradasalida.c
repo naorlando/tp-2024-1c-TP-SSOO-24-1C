@@ -30,7 +30,7 @@ void atender_solicitud_generica(int fd)
 }
 
 //======================================================
-//          FUNCIONES DE ENTRADA/SALIDA STDIN
+//        FUNCIONES DE ENTRADA/SALIDA STDIN
 //======================================================
 
 // Función que atiende una solicitud de entrada/salida STDIN,
@@ -41,7 +41,6 @@ void atender_solicitud_stdin(int fd)
 
     if (io_stdin != NULL)
     {
-
         uint32_t tamanio_io_stdin = get_tamano_total_io_frames(io_stdin->frames_data);
 
         log_info(logger_entradasalida, "PID: <%d> - Operacion: <READ>", obtener_pid_stdin(io_stdin));
@@ -49,7 +48,6 @@ void atender_solicitud_stdin(int fd)
         char *input = leer_entrada_limitada(tamanio_io_stdin);
         escribir_memoria(io_stdin->frames_data, input);
         free(input);
-
         log_info(logger_entradasalida, "Operacion READ finalizada");
 
         // TODO: modificar la funcion para que no este harcodeado el 'true'
@@ -65,7 +63,7 @@ void atender_solicitud_stdin(int fd)
 }
 
 //======================================================
-//          FUNCIONES DE ENTRADA/SALIDA STDOUT
+//        FUNCIONES DE ENTRADA/SALIDA STDOUT
 //======================================================
 
 // Función que atiende una solicitud de entrada/salida STDOUT,
@@ -79,9 +77,7 @@ void atender_solicitud_stdout(int fd)
         log_info(logger_entradasalida, "PID: <%d> - Operacion: <WRITE>", obtener_pid_stdout(io_stdout));
 
         char *valor = leer_memoria(io_stdout->frames_data);
-         log_info(logger_entradasalida, "TAMAÑO LEIDO : <%d> - CADENA : <%s>", get_tamano_total_io_frames(io_stdout->frames_data), valor);
-
-        free(valor);
+        log_info(logger_entradasalida, "TAMAÑO LEIDO : <%d> - CADENA : <%s>", get_tamano_total_io_frames(io_stdout->frames_data), valor);
 
         // TODO: modificar la funcion para que no este harcodeado el 'true'
         t_response *response = create_response(true, obtener_pid_stdout(io_stdout));
@@ -98,73 +94,66 @@ void atender_solicitud_stdout(int fd)
 }
 
 //======================================================
-//          FUNCIONES DE ENTRADA/SALIDA DIALFS
+//        FUNCIONES DE ENTRADA/SALIDA DIALFS
 //======================================================
 
-void atender_instruccion_dialfs(int fd)
+void atender_solicitud_dialfs(int fd)
 {
-    /*t_io_dialfs* io_dialfs = deserializar_io_dialfs(recibir_buffer(&fd, sizeof(int)));
+    t_io_dialfs* io_dialfs = recv_io_dialfs(fd);
+    
     if (io_dialfs != NULL) {
+        log_info(logger_entradasalida, "PID: <%d> - Operacion: <%s>", io_dialfs->pid, get_operation_name(io_dialfs->operacion));
+        
         bool operacion_exitosa = false;
 
         switch(io_dialfs->operacion) {
             case IO_FS_CREATE:
-                operacion_exitosa = crear_archivo(dialfs, io_dialfs->nombre_archivo);
+                operacion_exitosa = crear_archivo_dialfs(io_dialfs->nombre_archivo);
                 log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
                 break;
             case IO_FS_DELETE:
-                operacion_exitosa = eliminar_archivo(dialfs, io_dialfs->nombre_archivo);
+                operacion_exitosa = eliminar_archivo_dialfs(io_dialfs->nombre_archivo);
                 log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, io_dialfs->nombre_archivo);
                 break;
             case IO_FS_TRUNCATE:
-                operacion_exitosa = truncar_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->tamanio);
+                operacion_exitosa = truncar_archivo_dialfs(io_dialfs->nombre_archivo, io_dialfs->tamanio);
                 log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio);
                 break;
             case IO_FS_WRITE:
-                operacion_exitosa = escribir_archivo(dialfs, io_dialfs->nombre_archivo, io_dialfs->datos, io_dialfs->tamanio, io_dialfs->offset);
-                log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->offset);
+                // Los datos a escribir están en memoria en la dirección lógica dada
+                // TODO: Se necesitaría una función para obtener los datos de la memoria usando la dirección lógica
+                // void* datos = obtener_datos_de_memoria(io_dialfs->direccion_logica, io_dialfs->tamanio);
+                // operacion_exitosa = escribir_archivo_dialfs(io_dialfs->nombre_archivo, datos, io_dialfs->tamanio, io_dialfs->puntero_archivo);
+                // free(datos);
+                log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->puntero_archivo);
                 break;
             case IO_FS_READ:
                 void* buffer = malloc(io_dialfs->tamanio);
-                operacion_exitosa = leer_archivo(dialfs, io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->offset);
+                operacion_exitosa = leer_archivo_dialfs(io_dialfs->nombre_archivo, buffer, io_dialfs->tamanio, io_dialfs->puntero_archivo);
                 if (operacion_exitosa) {
-                    enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
+                    // Escribo los datos leídos en la memoria en la dirección lógica dada
+                    //escribir_datos_en_memoria(io_dialfs->direccion_logica, buffer, io_dialfs->tamanio);
+                    //enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
                 }
                 free(buffer);
-                log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->offset);
+                log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, io_dialfs->nombre_archivo, io_dialfs->tamanio, io_dialfs->puntero_archivo);
                 break;
             default:
                 log_error(logger_entradasalida, "Operación DialFS no reconocida");
                 break;
         }
-
-        if (io_dialfs->operacion == IO_FS_READ && operacion_exitosa) {
-            // Ya se enviaron los datos leídos, no es necesario enviar confirmación adicional
-        } else {
-            enviar_confirmacion_io(fd, operacion_exitosa);
+        
+        if (io_dialfs->operacion != IO_FS_READ || !operacion_exitosa) {
+            t_response* response = create_response(operacion_exitosa, io_dialfs->pid);
+            send_confirmacion_io(fd, MSG_IO_KERNEL_DIALFS, response);
         }
 
         destruir_io_dialfs(io_dialfs);
     } else {
-        log_error(logger_entradasalida, "Error al recibir IO DialFS");
-        enviar_confirmacion_io(fd, false);
+        log_error(logger_entradasalida, "Error al recibir la solicitud IO DIALFS");
+        t_response* response = create_response(false, 0);
+        send_confirmacion_io(fd, MSG_IO_KERNEL_DIALFS, response);
     }
-
-    // Comprobamos si es necesario realizar una compactación
-    if (es_necesario_compactar(dialfs)) {
-        log_info(logger_entradasalida, "Inicio Compactación.");
-        compactar_fs(dialfs);
-        log_info(logger_entradasalida, "Fin Compactación.");
-    }*/
-}
-
-void enviar_datos_leidos(int fd, void *buffer, uint32_t tamanio)
-{
-    /*t_package* package = package_create(MSG_DIALFS_DATA, tamanio);
-    t_buffer* package_buffer = get_buffer(package);
-    buffer_add_data(package_buffer, buffer, tamanio);
-    package_send(package, fd);
-    package_destroy(package);*/
 }
 
 //======================================================
@@ -185,4 +174,9 @@ void send_IO_interface_kernel()
 void send_IO_interface_memoria()
 {
     send_IO_interface(fd_memoria, nombre_interfaz, obtener_tipo_interfaz(entradasalida_config), MSG_IO_MEMORIA);
+}
+
+char* get_operation_name(t_name_instruction operacion) 
+{
+    return "";
 }

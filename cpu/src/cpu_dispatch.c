@@ -385,7 +385,6 @@ bool manejar_interrupcion()
     {
         log_info(logger_cpu, "Interrupción de %s recibida, devolviendo PCB al Kernel", get_string_from_interruption(tipo_de_interrupcion));
         cargar_contexto_ejecucion_a_pcb(pcb_execute);
-
         log_info(logger_cpu, "PCB enviado al Kernel");
         send_pcb_kernel_interruption(tipo_de_interrupcion); // aca esta la logica de cual mensaje enviar al kernel segun cual sea el tipo de interrupccion
         sem_post(&SEM_INTERRUPT);

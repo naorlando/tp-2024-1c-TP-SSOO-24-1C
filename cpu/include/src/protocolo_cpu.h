@@ -46,9 +46,6 @@ int send_msg_cpu_memoria_init(int fd);
 
 int recv_msg_memoria_cpu_init(uint32_t* );
 
-void send_interface_kernel(/*t_interface**/);
-
-
 void send_solicitud_io_generica_kernel(t_PCB*, t_instruction*);
 
 void send_solicitud_io_stdin_kernel(t_PCB *pcb, t_instruction *instruccion);
