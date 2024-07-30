@@ -114,13 +114,13 @@ void atender_solicitud_dialfs(int fd)
                 log_info(logger_entradasalida, "PID: %d - Crear Archivo: %s", io_dialfs->pid, dialfs_cd->nombre_archivo);
                 break;
             }
-            // case IO_FS_DELETE:
-            // {
-            //     t_io_dialfs_cd* dialfs_cd = get_dialfs_generic(io_dialfs);
-            //     //operacion_exitosa = eliminar_archivo_dialfs(dialfs_cd->nombre_archivo);
-            //     log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, dialfs_cd->nombre_archivo);
-            //     break;
-            // }
+            case IO_FS_DELETE:
+            {
+                t_io_dialfs_cd* dialfs_cd = get_dialfs_generic(io_dialfs);
+                operacion_exitosa = eliminar_archivo_dialfs(dialfs_cd->nombre_archivo);
+                log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, dialfs_cd->nombre_archivo);
+                break;
+            }
             // case IO_FS_TRUNCATE:
             // {
             //     t_io_dialfs_truncate* dialfs_truncate = get_dialfs_generic(io_dialfs);

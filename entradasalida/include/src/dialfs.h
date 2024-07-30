@@ -242,5 +242,6 @@ char* get_path_bitmap(t_dialfs* fs);
 char* get_path_bloques(t_dialfs* fs);
 char* get_path_base(t_dialfs* fs);
 char* get_path_metadata(t_archivo_dialfs* archivo);
+char* get_path_archivo(t_archivo_dialfs* archivo);
 
 #endif // DIALFS_H

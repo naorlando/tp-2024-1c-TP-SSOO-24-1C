@@ -17,8 +17,8 @@ t_dialfs *crear_dialfs(char *path_base, uint32_t block_size, uint32_t block_coun
     fs->block_size = block_size;                     // Asignar tamaño de bloque
     fs->block_count = block_count;                   // Asignar cantidad de bloques
     fs->retraso_compactacion = retraso_compactacion; // Asignar retraso de compactación
-    fs -> path_bloques = string_from_format("%s/bloques.dat", path_base); 
-    fs -> path_bitmap = string_from_format("%s/bitmap.dat", path_base);
+    fs->path_bloques = string_from_format("%s/bloques.dat", path_base);
+    fs->path_bitmap = string_from_format("%s/bitmap.dat", path_base);
 
     if (!file_exists(get_path_bloques(fs)))
     {
@@ -27,9 +27,7 @@ t_dialfs *crear_dialfs(char *path_base, uint32_t block_size, uint32_t block_coun
 
     create_bitmap(get_path_bitmap(fs), block_count); // crea archivo bitmap
 
-
     fs->archivos = list_create(); // Crear lista de archivos
-
 
     return fs;
 }
@@ -51,17 +49,17 @@ bool crear_archivo(t_dialfs *fs, char *nombre)
 {
     t_archivo_dialfs *nuevo_archivo = malloc(sizeof(t_archivo_dialfs)); // Crear nuevo archivo
     nuevo_archivo->nombre = my_strdup(nombre);                          // Copiar nombre
-    
-    char* path_archivo = string_from_format("%s/", get_path_base(fs));
-    string_append(&path_archivo,nombre);
-    nuevo_archivo -> path_archivo = path_archivo;
 
-    char ** split_nombre= split(nombre, ".");
-    nuevo_archivo -> path_metadata = string_from_format("%s.metadata", split_nombre[0]);
-   
+    char *path_archivo = string_from_format("%s/", get_path_base(fs));
+    string_append(&path_archivo, nombre);
+    nuevo_archivo->path_archivo = path_archivo;
+
+    char **split_nombre = split(get_path_archivo(nuevo_archivo), ".");
+    nuevo_archivo->path_metadata = string_from_format("%s.metadata", split_nombre[0]);
+
     uint32_t bloque_libre = find_first_free_block(get_path_bitmap(fs)); // Buscar bloque libre
     nuevo_archivo->bloque_inicial = bloque_libre;
-   
+
     if (nuevo_archivo->bloque_inicial == (uint32_t)-1)
     {                                // Verificar si hay espacio
         free(nuevo_archivo->nombre); // Liberar memoria
@@ -70,14 +68,13 @@ bool crear_archivo(t_dialfs *fs, char *nombre)
     }
     nuevo_archivo->tamanio = 0; // Inicializar tamaño en 0
 
-    list_add(fs->archivos, nuevo_archivo);         // Agregar archivo a la lista de archivos del FS
-    
-    set_block_as_used(get_path_bitmap(fs),bloque_libre);
+    list_add(fs->archivos, nuevo_archivo); // Agregar archivo a la lista de archivos del FS
 
-    create_metadata(get_path_metadata(nuevo_archivo),bloque_libre);
+    set_block_as_used(get_path_bitmap(fs), bloque_libre);
 
+    create_metadata(get_path_metadata(nuevo_archivo), bloque_libre);
 
-   FILE *file = fopen(path_archivo, "wb"); //crear archivo con su nombre
+    FILE *file = fopen(path_archivo, "wb"); // crear archivo con su nombre
     if (file == NULL)
     {
         perror("No se pudo crear el archivo de metadata");
@@ -92,23 +89,25 @@ bool crear_archivo(t_dialfs *fs, char *nombre)
 
 bool eliminar_archivo(t_dialfs *fs, char *nombre)
 {
+    t_archivo_dialfs *archivo = NULL;
     for (int i = 0; i < list_size(fs->archivos); i++)
-    {                                                          // Recorrer lista de archivos
-        t_archivo_dialfs *archivo = list_get(fs->archivos, i); // Obtener archivo
+    {                                                              // Recorrer lista de archivos
+        t_archivo_dialfs *archivo_aux = list_get(fs->archivos, i); // Obtener archivo
         if (strcmp(archivo->nombre, nombre) == 0)
-        {                                                                                                           // Verificar si es el archivo buscado
-            liberar_bloques(fs, archivo->bloque_inicial, (archivo->tamanio + fs->block_size - 1) / fs->block_size); // Liberar bloques
-            list_remove_and_destroy_element(fs->archivos, i, free);                                                 // Eliminar archivo de la lista
-
-            char *metadata_path = string_from_format("%s/%s.metadata", fs->path_base, nombre); // Crear ruta de metadata
-            remove(metadata_path);                                                             // Eliminar archivo de metadata
-            free(metadata_path);                                                               // Liberar memoria
-
-//            guardar_estado_fs(fs);
-            return true;
+        {
+            t_archivo_dialfs *archivo = list_get(fs->archivos, i);
+            break;
+         
         }
     }
-    return false;
+    if (archivo == NULL)
+    {
+        return false;
+    }
+
+    uint32_t bloque_init = bloque_inicial(archivo->path_metadata);
+    uint32_t tamano = bloque_tamano_archivo(archivo->path_metadata);                                                     // Verificar si es el archivo buscado
+    return true;
 }
 
 bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio)
@@ -139,7 +138,7 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio)
 
     archivo->tamanio = nuevo_tamanio; // Actualizar tamaño
     // guardar_metadata_archivo(fs, archivo);
-   // guardar_estado_fs(fs);
+    // guardar_estado_fs(fs);
     return true;
 }
 
@@ -238,13 +237,13 @@ void compactar_fs(t_dialfs *fs)
     }
 
     for (uint32_t i = bloque_actual; i < fs->block_count; i++)
-    {                                      // Liberar bloques restantes
-       // bitarray_clean_bit(fs->bitmap, i); // Liberar bloque
+    { // Liberar bloques restantes
+      // bitarray_clean_bit(fs->bitmap, i); // Liberar bloque
     }
 
     usleep(fs->retraso_compactacion * 1000); // Convertir a microsegundos
 
-//    guardar_estado_fs(fs);
+    //    guardar_estado_fs(fs);
 }
 
 // void guardar_estado_fs(t_dialfs *fs)
@@ -285,7 +284,7 @@ void liberar_bloques(t_dialfs *fs, uint32_t bloque_inicial, uint32_t num_bloques
 {
     for (uint32_t i = 0; i < num_bloques; i++)
     {
-     //   bitarray_clean_bit(fs->bitmap, bloque_inicial + i);
+        //   bitarray_clean_bit(fs->bitmap, bloque_inicial + i);
     }
 }
 
@@ -336,7 +335,7 @@ bool ampliar_archivo(t_dialfs *fs, t_archivo_dialfs *archivo, uint32_t nuevo_tam
         // {
         //     return false;
         // }
-        //bitarray_set_bit(fs->bitmap, nuevo_bloque);
+        // bitarray_set_bit(fs->bitmap, nuevo_bloque);
     }
 
     return true;
@@ -366,8 +365,6 @@ void mover_bloques(t_dialfs *fs, uint32_t origen, uint32_t destino, uint32_t can
     fclose(file);
 }
 
-
-
 int comparar_bloques_iniciales(t_archivo_dialfs *a, t_archivo_dialfs *b)
 {
     return a->bloque_inicial - b->bloque_inicial;
@@ -382,32 +379,47 @@ void destruir_archivo_dialfs(t_archivo_dialfs *archivo)
     }
 }
 
-
-char* get_path_bitmap(t_dialfs* fs) {
-    if (fs == NULL) {
+char *get_path_bitmap(t_dialfs *fs)
+{
+    if (fs == NULL)
+    {
         return NULL;
     }
     return fs->path_bitmap;
 }
 
 // Getter para path_bloques
-char* get_path_bloques(t_dialfs* fs) {
-    if (fs == NULL) {
+char *get_path_bloques(t_dialfs *fs)
+{
+    if (fs == NULL)
+    {
         return NULL;
     }
     return fs->path_bloques;
 }
 
-char* get_path_base(t_dialfs* fs) {
-    if (fs == NULL) {
+char *get_path_base(t_dialfs *fs)
+{
+    if (fs == NULL)
+    {
         return NULL;
     }
     return fs->path_base;
 }
 
-char* get_path_metadata(t_archivo_dialfs* archivo) {
-    if (archivo == NULL) {
+char *get_path_metadata(t_archivo_dialfs *archivo)
+{
+    if (archivo == NULL)
+    {
         return NULL;
     }
     return archivo->path_metadata;
+}
+char *get_path_archivo(t_archivo_dialfs *archivo)
+{
+    if (archivo == NULL)
+    {
+        return NULL;
+    }
+    return archivo->path_archivo;
 }
