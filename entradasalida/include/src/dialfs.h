@@ -21,10 +21,10 @@
 // Estructura para almacenar los datos de un archivo en el sistema DialFS.
 typedef struct {
     char* nombre;
-    uint32_t bloque_inicial;
-    uint32_t tamanio;
+    uint32_t bloque_inicial;// TODO: se debe eliminar
+    uint32_t tamanio;// TODO: se debe eliminar
     char* path_metadata;
-    char* path_archivo;
+    char* path_archivo; // TODO: se debe eliminar
 } t_archivo_dialfs;
 
 // Estructura para almacenar los datos del sistema de archivos DialFS.

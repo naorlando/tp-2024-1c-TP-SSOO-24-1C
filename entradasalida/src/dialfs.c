@@ -25,9 +25,14 @@ t_dialfs *crear_dialfs(char *path_base, uint32_t block_size, uint32_t block_coun
         crear_archivo_bloques(get_path_bloques(fs), block_size, block_count);
     }
 
+    // TODO: Validar si existe o no el archivo, caso de no existir se debe crear
     create_bitmap(get_path_bitmap(fs), block_count); // crea archivo bitmap
 
+    //TODO: Una vez creado la lista, se debe verificar si hay archivos metadata creada y en caso
+    //afirmativo, se debe quedar con el nombre del mismo
     fs->archivos = list_create(); // Crear lista de archivos
+
+    //TODO: Crear una funcion intermedia que levante datos de los archivos de metadata. 
 
     return fs;
 }
