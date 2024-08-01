@@ -144,3 +144,32 @@ uint32_t find_first_free_block(const char* path) {
 
     return first_free_block;
 }
+
+//Utilizar esta funcion en los casos en donde se deba 
+t_bitarray *load_bitmap(const char *path_bitmap, char* bitarray_memory) {
+    /// Abrir el archivo bitmap en modo de lectura binaria
+    FILE *file = fopen(path_bitmap, "rb");
+    if (file == NULL) {
+        perror("Failed to open bitmap file for reading");
+        return -1;
+    }
+
+    // Obtener el tamaño del archivo
+    fseek(file, 0, SEEK_END);
+    size_t bitmap_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // Leer el contenido del bitmap
+    bitarray_memory = malloc(bitmap_size);
+    if (bitarray_memory == NULL) {
+        perror("Failed to allocate memory for bitmap");
+        fclose(file);
+        return -1;
+    }
+    fread(bitarray_memory, sizeof(char), bitmap_size, file);
+
+    // Crear un bitarray con el bloque de memoria
+    t_bitarray *bitarray = bitarray_create_with_mode(bitarray_memory, bitmap_size, LSB_FIRST);
+
+    return bitarray;
+}

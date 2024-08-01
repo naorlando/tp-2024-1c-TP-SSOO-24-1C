@@ -1,7 +1,5 @@
 #include "archivos.h"
 
-
-
 t_archivo_dialfs* buscar_archivo(t_dialfs *fs, char *nombre_archivo) {
     bool archivo_match(void *archivo_ptr) {
         t_archivo_dialfs *archivo = (t_archivo_dialfs *)archivo_ptr;

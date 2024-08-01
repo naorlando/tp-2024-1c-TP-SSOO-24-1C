@@ -216,3 +216,58 @@ char *get_path_archivo(t_archivo_dialfs *archivo)
 }
 
 
+bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
+    t_archivo_dialfs *archivo = buscar_archivo(fs, nombre);
+    if (archivo == NULL) {
+        log_error(logger_entradasalida, "Archivo %s no encontrado en el sistema de archivos.", nombre);
+        return false;
+    }
+
+    uint32_t tamanio_actual = get_tamanio_archivo(fs, nombre);
+    if (tamanio_actual == (uint32_t)-1) {
+        return false;
+    }
+
+    if (nuevo_tamanio == tamanio_actual) {
+        log_info(logger_entradasalida, "El tamaño solicitado es igual al actual. No se requiere truncado.");
+        return true;
+    }
+
+    uint32_t bloque_inicial = get_bloque_inicial_archivo(fs, nombre);
+    if (bloque_inicial == (uint32_t)-1) {
+        return false;
+    }
+
+    uint32_t bloques_actuales = (tamanio_actual + fs->block_size - 1) / fs->block_size;
+    uint32_t nuevos_bloques = (nuevo_tamanio + fs->block_size - 1) / fs->block_size;
+
+    if (nuevos_bloques < bloques_actuales) {
+        // Si se están liberando bloques
+        for (uint32_t i = nuevos_bloques; i < bloques_actuales; i++) {
+            set_block_as_free(fs->path_bitmap, bloque_inicial + i);
+        }
+    } else if (nuevos_bloques > bloques_actuales) {
+        // Si se necesitan más bloques
+        for (uint32_t i = bloques_actuales; i < nuevos_bloques; i++) {
+            uint32_t nuevo_bloque = find_first_free_block(fs->path_bitmap);
+            if (nuevo_bloque == (uint32_t)-1) {
+                log_error(logger_entradasalida, "No hay bloques libres disponibles para expandir el archivo.");
+                return false;
+            }
+            set_block_as_used(fs->path_bitmap, nuevo_bloque);
+            // Asegúrate de manejar adecuadamente el puntero al siguiente bloque
+        }
+    }
+
+    // Actualizar el tamaño en la metadata del archivo
+    FILE *metadata_file = fopen(archivo->path_archivo, "r+");
+    if (metadata_file == NULL) {
+        perror("No se pudo abrir el archivo de metadata");
+        return false;
+    }
+
+    fprintf(metadata_file, "TAMANIO_ARCHIVO=%u\n", nuevo_tamanio);
+    fclose(metadata_file);
+
+    return true;
+}

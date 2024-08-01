@@ -121,13 +121,13 @@ void atender_solicitud_dialfs(int fd)
                 log_info(logger_entradasalida, "PID: %d - Eliminar Archivo: %s", io_dialfs->pid, dialfs_cd->nombre_archivo);
                 break;
             }
-            // case IO_FS_TRUNCATE:
-            // {
-            //     t_io_dialfs_truncate* dialfs_truncate = get_dialfs_generic(io_dialfs);
-            //     //operacion_exitosa = truncar_archivo_dialfs(dialfs_truncate->nombre_archivo, dialfs_truncate->tamanio);
-            //     log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, dialfs_truncate->nombre_archivo, dialfs_truncate->tamanio);
-            //     break;
-            // }
+            case IO_FS_TRUNCATE:
+            {
+                t_io_dialfs_truncate* dialfs_truncate = get_dialfs_generic(io_dialfs);
+                operacion_exitosa = truncar_archivo_dialfs(dialfs_truncate->nombre_archivo, dialfs_truncate->tamanio);
+                log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, dialfs_truncate->nombre_archivo, dialfs_truncate->tamanio);
+                break;
+            }
             // case IO_FS_WRITE:
             // {    // Los datos a escribir están en memoria en la dirección lógica dada
             //     // TODO: Se necesitaría una función para obtener los datos de la memoria usando la dirección lógica
