@@ -8,6 +8,7 @@
 #include <commons/string.h>
 #include <variables_globales.h>
 #include <dialfs.h>
+#include "comportamientos_dialfs.h"
 
 void init(char*);
 

@@ -48,3 +48,4 @@ uint32_t bloque_tamano_archivo(char *path){
     return config_get_int_value(metadata, "TAMANIO_ARCHIVO");
 
 }
+

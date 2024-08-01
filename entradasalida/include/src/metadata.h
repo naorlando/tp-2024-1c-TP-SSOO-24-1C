@@ -20,4 +20,5 @@ uint32_t bloque_inicial(char *path);
  
 uint32_t bloque_tamano_archivo(char *path);
 
+
 #endif

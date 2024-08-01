@@ -83,7 +83,7 @@ typedef struct
     char *nombre_interfaz; // Nombre de la interfaz DialFS
     char *nombre_archivo;  // Nombre del archivo a operar
                            // Puntero del archivo para operaciones de lectura/escritura
-} t_io_dialfs_dc;
+} t_io_dialfs_cd;
 
 typedef struct
 {

@@ -105,4 +105,5 @@ void _inicializar_dialfs()
         log_error(logger_entradasalida, "Error al crear el sistema de archivos DialFS.");
         exit(EXIT_FAILURE);
     }
+
 }
