@@ -2,7 +2,6 @@
 
 
 
-
 t_archivo_dialfs* buscar_archivo(t_dialfs *fs, char *nombre_archivo) {
     bool archivo_match(void *archivo_ptr) {
         t_archivo_dialfs *archivo = (t_archivo_dialfs *)archivo_ptr;
@@ -56,7 +55,6 @@ uint32_t get_tamanio_archivo(t_dialfs *fs, char *nombre_archivo) {
 
     return tamanio_archivo;
 }
-
 
 
 
@@ -128,4 +126,10 @@ void levantar_archivos_desde_metadata(t_dialfs* fs) {
     }
 
     list_destroy(archivos_metadata);
+}
+
+void free_archivo_dialfs(t_archivo_dialfs *archivo) {
+    free(archivo->nombre);
+    free(archivo->path_archivo);
+    free(archivo);
 }

@@ -7,6 +7,7 @@
 #include "comportamientos_ios.h"
 #include "utils/solicitudes_io.h" 
 #include "dialfs.h"
+#include "comportamientos_dialfs.h"
 
 
 //======================================================

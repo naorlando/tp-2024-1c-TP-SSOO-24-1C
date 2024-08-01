@@ -30,6 +30,7 @@ uint32_t get_tamanio_archivo(t_dialfs *fs, char *nombre_archivo);
 
 uint32_t get_bloque_inicial_archivo(t_dialfs *fs, char *nombre_archivo);
 
+void free_archivo_dialfs(t_archivo_dialfs *archivo);
 
 
 #endif // ARCHIVOS_H
