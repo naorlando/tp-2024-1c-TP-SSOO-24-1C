@@ -32,6 +32,28 @@ uint32_t get_bloque_inicial_archivo(t_dialfs *fs, char *nombre_archivo) {
     return bloque_inicial;
 }
 
+// uint32_t get_tamanio_archivo(t_dialfs *fs, char *nombre_archivo) {
+//     t_archivo_dialfs *archivo = buscar_archivo(fs, nombre_archivo);
+//     if (archivo == NULL) {
+//         log_error(logger_entradasalida, "Archivo %s no encontrado en el sistema de archivos.", nombre_archivo);
+//         return (uint32_t)-1;
+//     }
+
+//     // Abrir el archivo de metadata para leer
+//     FILE *metadata_file = fopen(archivo->path_archivo, "r");
+//     if (metadata_file == NULL) {
+//         perror("No se pudo abrir el archivo de metadata");
+//         return (uint32_t)-1;
+//     }
+
+//     // Leer el tamaño del archivo
+//     uint32_t tamanio_archivo;
+//     fscanf(metadata_file, "BLOQUE_INICIAL=%*u\nTAMANIO_ARCHIVO=%u\n", &tamanio_archivo);
+//     fclose(metadata_file);
+
+//     return tamanio_archivo;
+// }
+
 uint32_t get_tamanio_archivo(t_dialfs *fs, char *nombre_archivo) {
     t_archivo_dialfs *archivo = buscar_archivo(fs, nombre_archivo);
     if (archivo == NULL) {
@@ -39,21 +61,19 @@ uint32_t get_tamanio_archivo(t_dialfs *fs, char *nombre_archivo) {
         return (uint32_t)-1;
     }
 
-    // Abrir el archivo de metadata para leer
-    FILE *metadata_file = fopen(archivo->path_archivo, "r");
-    if (metadata_file == NULL) {
-        perror("No se pudo abrir el archivo de metadata");
+    // Crear la configuración desde el archivo de metadata
+    t_config *metadata_config = config_create(archivo->path_archivo);
+    if (metadata_config == NULL) {
+        log_error(logger_entradasalida, "No se pudo abrir el archivo de metadata %s", archivo->path_archivo);
         return (uint32_t)-1;
     }
 
-    // Leer el tamaño del archivo
-    uint32_t tamanio_archivo;
-    fscanf(metadata_file, "BLOQUE_INICIAL=%*u\nTAMANIO_ARCHIVO=%u\n", &tamanio_archivo);
-    fclose(metadata_file);
+    // Obtener el tamaño del archivo desde la configuración
+    uint32_t tamanio_archivo = config_get_int_value(metadata_config, "TAMANIO_ARCHIVO");
+    config_destroy(metadata_config);
 
     return tamanio_archivo;
 }
-
 
 
 t_list* listar_archivos_metadata_en_directorio(t_dialfs* fs) {

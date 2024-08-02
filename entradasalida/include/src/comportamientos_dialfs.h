@@ -44,7 +44,7 @@ bool eliminar_archivo_dialfs(char* nombre);
  * @param nuevo_tamanio Nuevo tamaño del archivo en bytes.
  * @return true si el archivo se truncó exitosamente, false en caso contrario.
  */
-// bool truncar_archivo_dialfs(char* nombre, uint32_t nuevo_tamanio);
+bool truncar_archivo_dialfs(char* nombre, uint32_t nuevo_tamanio);
 
 /**
  * Escribe datos en un archivo existente en DialFS.
@@ -302,6 +302,13 @@ char* get_path_base(t_dialfs* fs);
 // char* get_path_metadata(t_archivo_dialfs* archivo);
 char* get_path_archivo(t_archivo_dialfs* archivo);
 
-
+bool compactar(t_dialfs *fs, uint32_t bloque_inicial, uint32_t tamanio_actual);
+void copiar_bloque(t_dialfs *fs, uint32_t bloque_origen, uint32_t bloque_destino);
+bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio);
+void* contenido_archivo_truncar(t_dialfs *fs, uint32_t bloque_inicial, uint32_t tamanio_actual);
+uint32_t mover_bloques_archivo(t_dialfs* fs, uint32_t primer_bloque_arc_ant, uint32_t primer_bloque_arc_sig);
+bool copiar_bloques(t_dialfs *fs, uint32_t bloque_origen, uint32_t bloque_destino, uint32_t tamanio);
+void copiar_bloque_desde_buffer(t_dialfs *fs, void *buffer, uint32_t bloque_destino, uint32_t offset, size_t size);
+t_archivo_dialfs* obtener_archivo_por_bloque_inicial(t_dialfs *fs, uint32_t bloque_inicial);
 
 #endif // COMPORTAMIENTOS_DIALFS_H
