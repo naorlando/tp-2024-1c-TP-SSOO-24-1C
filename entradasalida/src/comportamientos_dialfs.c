@@ -232,7 +232,7 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
 
     uint32_t bloques_actuales = (tamanio_actual > 0) ? ((tamanio_actual + fs->block_size - 1) / fs->block_size) : 1; 
     uint32_t nuevos_bloques = (nuevo_tamanio + fs->block_size - 1) / fs->block_size;
-
+    //TODO CUANDO EL TRUNCATE ES MENOR AL BLQOEU ASIGNADO
     if (nuevos_bloques < bloques_actuales) { // Caso cuando se quiere achicar el archivo
         for (uint32_t i = nuevos_bloques; i < bloques_actuales; i++) {
             set_block_as_free(fs->path_bitmap, bloque_inicial + i);
@@ -317,11 +317,11 @@ bool compactar(t_dialfs *fs, t_archivo_dialfs *archivo, uint32_t bloque_inicial,
             return false;
         }
 
-        primer_bloque_arc_sig += cant_bloques_movidos + 1;
-        bloque_a_pegar += cant_bloques_movidos + 1;
+        primer_bloque_arc_sig += cant_bloques_movidos;
+        bloque_a_pegar += cant_bloques_movidos;
     }
 
-    bloque_a_pegar--;
+    //bloque_a_pegar--;
 
     uint32_t bloques_actuales = (tamanio_actual + fs->block_size - 1) / fs->block_size;
 
@@ -500,7 +500,7 @@ bool escribir_archivo_dialfs(t_dialfs* fs, char* nombre_archivo, void* buffer, u
         return false;
     }
 
-    FILE* bloques_file = fopen(fs->path_bloques, "rb");
+    FILE* bloques_file = fopen(fs->path_bloques, "rb+");
     if (bloques_file == NULL) {
         log_error(logger_entradasalida, "Error al abrir el archivo de bloques");
         return false;
@@ -510,5 +510,6 @@ bool escribir_archivo_dialfs(t_dialfs* fs, char* nombre_archivo, void* buffer, u
     fseek(bloques_file, (bloque_inicial * fs->block_size) + puntero_archivo, SEEK_SET);
     fwrite(buffer, tamanio, 1, bloques_file);
     
+    fclose(bloques_file);
     return true;
 }

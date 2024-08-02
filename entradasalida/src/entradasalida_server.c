@@ -78,30 +78,30 @@ void crear_hilos_conexiones()
 // FUNCIONES PARA ATENDER SOLICITUDES DE ENTRADA/SALIDA
 //====================================================
 
-void atender_solicitudes_io_memoria() {
-    bool esperar = true;
-    while (esperar) {
-        int cod_operacion = recibir_operacion(fd_memoria);
-        switch (cod_operacion) {
-            case MSG_MEMORIA_IO_STDIN:
-                //atender_solicitud_stdin(fd_memoria);
-                break;
-            case MSG_MEMORIA_IO_STDOUT:
-                //atender_solicitud_stdout(fd_memoria);
-                break;
-            case MSG_MEMORIA_IO_DIALFS:
-                //atender_solicitud_dialfs(fd_memoria);
-                break;
-            case -1:
-                log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el módulo de memoria.");
-                esperar = false;
-                break;
-            default:
-                log_warning(logger_entradasalida, "WARNING: El módulo de entrada/salida ha recibido una solicitud con una operación desconocida de memoria");
-                break;
-        }
-    }
-}
+// void atender_solicitudes_io_memoria() {
+//     bool esperar = true;
+//     while (esperar) {
+//         int cod_operacion = recibir_operacion(fd_memoria);
+//         switch (cod_operacion) {
+//             case MSG_MEMORIA_IO_STDIN:
+//                 //atender_solicitud_stdin(fd_memoria);
+//                 break;
+//             case MSG_MEMORIA_IO_STDOUT:
+//                 //atender_solicitud_stdout(fd_memoria);
+//                 break;
+//             case MSG_MEMORIA_IO_DIALFS:
+//                 //atender_solicitud_dialfs(fd_memoria);
+//                 break;
+//             case -1:
+//                 log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el módulo de memoria.");
+//                 esperar = false;
+//                 break;
+//             default:
+//                 log_warning(logger_entradasalida, "WARNING: El módulo de entrada/salida ha recibido una solicitud con una operación desconocida de memoria");
+//                 break;
+//         }
+//     }
+// }
 
 void atender_solicitudes_io_kernel() {
     bool esperar = true;

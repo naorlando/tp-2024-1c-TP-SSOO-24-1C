@@ -466,7 +466,7 @@ uint32_t obtener_tamanio_io_dialfs(t_io_dialfs *dialfs)
         size += sizeof(uint32_t) + strlen(((t_io_dialfs_rw *)dialfs->dialfs_generic)->nombre_interfaz) + 1;
         size += sizeof(uint32_t) + strlen(((t_io_dialfs_rw *)dialfs->dialfs_generic)->nombre_archivo) + 1;
         size += sizeof(uint32_t);
-        size += get_tamano_total_io_frames(((t_io_dialfs_rw *)dialfs->dialfs_generic)->frames_data);
+        size += get_bytes_io_frames(((t_io_dialfs_rw *)dialfs->dialfs_generic)->frames_data);
         size += sizeof(uint32_t);
         break;
     default:
