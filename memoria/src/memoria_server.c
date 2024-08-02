@@ -64,11 +64,6 @@ void requests_kernel()
             recv_example_msg_kernel();
             // esperar = false; //Cortamos la espera de solicitudes
             break;
-
-        // TODO:
-        /*
-            Agregar operaciones a las que dara servicio el modulo
-        */
         case MSG_KERNEL_MEMORIA:
 
         case MSG_KERNEL_CREATE_PROCESS:
@@ -177,6 +172,7 @@ void *esperar_conexiones_IO(void *arg)
         else
         {
             log_error(logger_memoria, "Error al esperar cliente de IO");
+            control_key = 0;
         }
     }
     return NULL;
@@ -233,6 +229,20 @@ void _cerrar_conexiones()
     liberar_conexion(fd_server);
     liberar_conexion(fd_cpu);
     liberar_conexion(fd_kernel);
-    // TODO: Implementar funcion para liberar las conexiones de todas las IOs
-    //  que se conectaron a la memoria
+    
+        void cerrar_conexion_io(char *key, void *value)
+    {
+        t_IO_connection *conexion = (t_IO_connection *)value;
+        liberar_conexion(obtener_file_descriptor(conexion));
+        liberar_IO_connection(conexion);
+    }
+
+    if (ios_conectadas != NULL)
+    {
+        dictionary_iterator(ios_conectadas, cerrar_conexion_io);
+        dictionary_destroy(ios_conectadas);
+        ios_conectadas = NULL;
+    }
+
+    log_info(logger_memoria, "Todas las conexiones han sido cerradas correctamente.");
 }

@@ -49,7 +49,6 @@ void inicializar_sockets() {
 void crear_hilos_conexiones() 
 {
     pthread_t hilo_kernel;
-    //pthread_t hilo_memoria;
 
     // Hilo para manejar mensajes del Kernel
     if (pthread_create(&hilo_kernel, NULL, (void *)atender_solicitudes_io_kernel, NULL) != 0)
@@ -58,50 +57,12 @@ void crear_hilos_conexiones()
         exit(EXIT_FAILURE);
     }
 
-    // Inicializar hilo para atender mensajes de Memoria si no es una interfaz genérica
-    // if (strcmp(obtener_tipo_interfaz(entradasalida_config), "GENERICA") != 0) {
-        
-    //     // Hilo para manejar mensajes de Memoria
-    //     if (pthread_create(&hilo_memoria, NULL, (void *)atender_solicitudes_io_memoria, NULL) != 0) 
-    //     {
-    //         log_error(logger_entradasalida, "Error al crear el hilo para atender a la MEMORIA. ABORTANDO");
-    //         exit(EXIT_FAILURE);
-    //     }
-
-    //     pthread_join(hilo_memoria, NULL);
-    // }
-
     pthread_join(hilo_kernel, NULL);
 }
 
 //====================================================
 // FUNCIONES PARA ATENDER SOLICITUDES DE ENTRADA/SALIDA
 //====================================================
-
-// void atender_solicitudes_io_memoria() {
-//     bool esperar = true;
-//     while (esperar) {
-//         int cod_operacion = recibir_operacion(fd_memoria);
-//         switch (cod_operacion) {
-//             case MSG_MEMORIA_IO_STDIN:
-//                 //atender_solicitud_stdin(fd_memoria);
-//                 break;
-//             case MSG_MEMORIA_IO_STDOUT:
-//                 //atender_solicitud_stdout(fd_memoria);
-//                 break;
-//             case MSG_MEMORIA_IO_DIALFS:
-//                 //atender_solicitud_dialfs(fd_memoria);
-//                 break;
-//             case -1:
-//                 log_error(logger_entradasalida, "ERROR: Ha surgido un problema inesperado, se desconectó el módulo de memoria.");
-//                 esperar = false;
-//                 break;
-//             default:
-//                 log_warning(logger_entradasalida, "WARNING: El módulo de entrada/salida ha recibido una solicitud con una operación desconocida de memoria");
-//                 break;
-//         }
-//     }
-// }
 
 void atender_solicitudes_io_kernel() {
     bool esperar = true;

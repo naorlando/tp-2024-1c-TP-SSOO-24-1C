@@ -20,9 +20,6 @@ void cerrar_servidor();
 void* esperar_conexiones_IO(void* arg);
 //void cancelar_hilo_quantum(uint32_t);
 
-// Funciones de manejo de conexiones memoria
-void atender_kernel_memoria();
-
 // Funciones de manejo de conexiones CPU
 void atender_kernel_cpu_dispatch();
 

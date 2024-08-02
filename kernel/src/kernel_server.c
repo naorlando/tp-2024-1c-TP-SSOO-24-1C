@@ -1,30 +1,5 @@
 #include "kernel_server.h"
 
-void atender_kernel_memoria()
-{
-    bool control_key = 1;
-    while (control_key)
-    {
-        int cod_op = recibir_operacion(fd_kernel_memoria);
-
-        switch (cod_op)
-        {
-        case MSG_MEMORIA_KERNEL:
-
-            log_info(logger_kernel, "Se recibio un mje del memoria");
-            break;
-
-        case -1:
-            log_error(logger_kernel, "la memoria se desconecto. Terminando servidor");
-            control_key = 0;
-            break;
-        default:
-            log_warning(logger_kernel, "Operacion desconocida en memoria. No quieras meter la pata");
-            break;
-        }
-    }
-}
-
 void atender_kernel_IO(void *io_connection)
 {
     t_IO_connection *cliente_io = (t_IO_connection *)io_connection;
@@ -297,20 +272,12 @@ void inicializar_sockets()
 void crear_hilos_conexiones()
 {
     pthread_t hilo_cpu_dispatch;
-    pthread_t hilo_memoria;
     pthread_t hilo_aceptar_io;
 
     // Hilo para manejar mensajes de CPU Dispatch
     if (pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_kernel_cpu_dispatch, NULL) != 0)
     {
         log_error(logger_kernel, "Error al crear el hilo para atender la CPU dispatch. ABORTANDO");
-        exit(EXIT_FAILURE);
-    }
-
-    // Hilo para manejar mensajes de Memoria
-    if (pthread_create(&hilo_memoria, NULL, (void *)atender_kernel_memoria, NULL) != 0)
-    {
-        log_error(logger_kernel, "Error al crear el hilo para atender la MEMORIA. ABORTANDO");
         exit(EXIT_FAILURE);
     }
 
@@ -322,7 +289,6 @@ void crear_hilos_conexiones()
     }
 
     pthread_detach(hilo_cpu_dispatch);
-    pthread_detach(hilo_memoria);
     pthread_detach(hilo_aceptar_io);
 }
 
@@ -357,6 +323,7 @@ void *esperar_conexiones_IO(void *arg)
         else
         {
             log_error(logger_kernel, "Error al esperar cliente de IO");
+            control_key= 0;
         }
     }
     return NULL;

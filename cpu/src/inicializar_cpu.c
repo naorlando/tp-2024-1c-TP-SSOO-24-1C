@@ -106,8 +106,6 @@ void _iniciar_config(){
 
 }
 
-
-
 void imprimir_config() {
     log_trace(logger_cpu_debug, "PUERTO DE ESCUCHA DE LA CPU: %d", obtener_puerto_escucha_dispatch(cpu_config));
 }
