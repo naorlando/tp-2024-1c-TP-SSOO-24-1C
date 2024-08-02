@@ -18,15 +18,15 @@ bool truncar_archivo_dialfs(char* nombre, uint32_t nuevo_tamanio) {
     //return true;
 }
 
-bool escribir_archivo_dialfs(char* nombre, void* datos, uint32_t tamanio, uint32_t offset) {
-    // return escribir_archivo(dialfs, nombre, datos, tamanio, offset);
-    return true;
-}
+// bool escribir_archivo_dialfs(char* nombre, void* datos, uint32_t tamanio, uint32_t offset) {
+//     // return escribir_archivo(dialfs, nombre, datos, tamanio, offset);
+//     return true;
+// }
 
-bool leer_archivo_dialfs(char* nombre, void* buffer, uint32_t tamanio, uint32_t offset) {
-    // return leer_archivo(dialfs, nombre, buffer, tamanio, offset);
-    return true;
-}
+// bool leer_archivo_dialfs(char* nombre, void* buffer, uint32_t tamanio, uint32_t offset) {
+//     // return leer_archivo(dialfs, nombre, buffer, tamanio, offset);
+//     return true;
+// }
 
 //===============================================
 // FUNCIONES DE MANTENIMIENTO
@@ -258,7 +258,7 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
             }
         } else {
             // Compactar los bloques para crear espacio contiguo
-            if (!compactar(fs,archivo, bloque_inicial, tamanio_actual)) {
+            if (!compactar(fs, archivo, bloque_inicial, tamanio_actual)) {
                 log_error(logger_entradasalida, "No se pudo compactar el archivo %s.", nombre);
                 return false;
             }
@@ -292,7 +292,7 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
     return true;
 }
 
-bool compactar(t_dialfs *fs,t_archivo_dialfs *archivo , uint32_t bloque_inicial, uint32_t tamanio_actual) {
+bool compactar(t_dialfs *fs, t_archivo_dialfs *archivo, uint32_t bloque_inicial, uint32_t tamanio_actual) {
 
     usleep(fs->retraso_compactacion * 1000);
     // Almaceno en un buffer el contenido del archivo a truncar
@@ -455,4 +455,60 @@ t_archivo_dialfs* obtener_archivo_por_bloque_inicial(t_dialfs *fs, uint32_t bloq
     if(archivo_encontrado == NULL) return NULL;
 
     return (t_archivo_dialfs*)archivo_encontrado;
+}
+
+bool leer_archivo_dialfs(t_dialfs* fs, char* nombre_archivo, void* buffer, uint32_t tamanio, uint32_t puntero_archivo) {
+    t_archivo_dialfs* archivo = buscar_archivo(fs, nombre_archivo);
+
+    if (archivo == NULL) {
+        log_error(logger_entradasalida, "Archivo %s no encontrado", nombre_archivo);
+        return false;
+    }
+
+    uint32_t tamanio_archivo = tamano_archivo(archivo->path_archivo);
+    if (puntero_archivo + tamanio > tamanio_archivo) {
+        log_error(logger_entradasalida, "Intento de lectura fuera de los límites del archivo %s", nombre_archivo);
+        return false;
+    }
+
+    FILE* bloques_file = fopen(fs->path_bloques, "rb");
+    if (bloques_file == NULL) {
+        log_error(logger_entradasalida, "Error al abrir el archivo de bloques");
+        return false;
+    }
+
+    uint32_t bloque_inicial = bloque_inicial_archivo(archivo->path_archivo);
+    fseek(bloques_file, (bloque_inicial * fs->block_size) + puntero_archivo, SEEK_SET);
+    fread(buffer, tamanio, 1, bloques_file);
+    fclose(bloques_file);
+
+    return true;
+}
+
+bool escribir_archivo_dialfs(t_dialfs* fs, char* nombre_archivo, void* buffer, uint32_t tamanio, uint32_t puntero_archivo)
+{
+    t_archivo_dialfs* archivo = buscar_archivo(fs, nombre_archivo);
+
+    if (archivo == NULL) {
+        log_error(logger_entradasalida, "Archivo %s no encontrado", nombre_archivo);
+        return false;
+    }
+
+    uint32_t tamanio_archivo = tamano_archivo(archivo->path_archivo);
+    if (puntero_archivo + tamanio > tamanio_archivo) {
+        log_error(logger_entradasalida, "Intento de escritura fuera de los límites del archivo %s", nombre_archivo);
+        return false;
+    }
+
+    FILE* bloques_file = fopen(fs->path_bloques, "rb");
+    if (bloques_file == NULL) {
+        log_error(logger_entradasalida, "Error al abrir el archivo de bloques");
+        return false;
+    }
+
+    uint32_t bloque_inicial = bloque_inicial_archivo(archivo->path_archivo);
+    fseek(bloques_file, (bloque_inicial * fs->block_size) + puntero_archivo, SEEK_SET);
+    fwrite(buffer, tamanio, 1, bloques_file);
+    
+    return true;
 }

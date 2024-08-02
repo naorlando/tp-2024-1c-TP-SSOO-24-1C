@@ -128,28 +128,37 @@ void atender_solicitud_dialfs(int fd)
                 log_info(logger_entradasalida, "PID: %d - Truncar Archivo: %s - Tamaño: %d", io_dialfs->pid, dialfs_truncate->nombre_archivo, dialfs_truncate->tamanio);
                 break;
             }
-            // case IO_FS_WRITE:
-            // {    // Los datos a escribir están en memoria en la dirección lógica dada
-            //     // TODO: Se necesitaría una función para obtener los datos de la memoria usando la dirección lógica
-            //     // void* datos = obtener_datos_de_memoria(io_dialfs->direccion_logica, io_dialfs->tamanio);
-            //     // operacion_exitosa = escribir_archivo_dialfs(io_dialfs->nombre_archivo, datos, io_dialfs->tamanio, io_dialfs->puntero_archivo);
-            //     // free(datos);
-            //     t_io_dialfs_rw* dialfs_rw = get_dialfs_generic(io_dialfs);
-            //     log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, dialfs_rw->nombre_archivo, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
-            //     break;
-            // }
+            case IO_FS_WRITE:
+            {
+                t_io_dialfs_rw* dialfs_rw = get_dialfs_generic(io_dialfs);
+                char* buffer = leer_memoria(dialfs_rw->frames_data);
+                
+                if(buffer != NULL) {
+                    operacion_exitosa = escribir_archivo_dialfs(dialfs, dialfs_rw->nombre_archivo, buffer, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
+                }
+                
+                if (operacion_exitosa) {
+                    log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, dialfs_rw->nombre_archivo, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
+                }else {
+                    log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - NO se pude realizar la operacion de escritura. ABORTANDO.", io_dialfs->pid, dialfs_rw->nombre_archivo);
+                }
+                break;
+            }
             case IO_FS_READ:
             {
                 t_io_dialfs_rw* dialfs_rw = get_dialfs_generic(io_dialfs);
-                //void* buffer = malloc(io_dialfs->tamanio);
-                //operacion_exitosa = leer_archivo_dialfs(dialfs_rw->nombre_archivo, buffer, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
+                void* buffer = malloc(dialfs_rw->tamanio);
+                operacion_exitosa = leer_archivo_dialfs(dialfs, dialfs_rw->nombre_archivo, buffer, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
                 if (operacion_exitosa) {
-                    // Escribo los datos leídos en la memoria en la dirección lógica dada
+                    //Escribo los datos leídos en la memoria en la dirección lógica dada
                     //escribir_datos_en_memoria(io_dialfs->direccion_logica, buffer, io_dialfs->tamanio);
                     //enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
+                    escribir_memoria(dialfs_rw->frames_data, (char *)buffer);
+                    free(buffer);
+                    log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, dialfs_rw->nombre_archivo, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
+                }else  {
+                    log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - NO se pude realizar la operacion de lectura. ABORTANDO.", io_dialfs->pid, dialfs_rw->nombre_archivo);
                 }
-                free(buffer);
-                log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, dialfs_rw->nombre_archivo, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
                 break;
             }
             default:
@@ -157,7 +166,7 @@ void atender_solicitud_dialfs(int fd)
                 break;
         }
         
-        if (io_dialfs->operacion != IO_FS_READ || operacion_exitosa) {
+        if (/*io_dialfs->operacion != IO_FS_READ ||*/ operacion_exitosa) {
             t_response* response = create_response(operacion_exitosa, io_dialfs->pid);
             send_confirmacion_io(fd, MSG_IO_KERNEL_DIALFS, response);
         }

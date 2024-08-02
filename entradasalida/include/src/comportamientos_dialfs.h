@@ -310,5 +310,7 @@ uint32_t mover_bloques_archivo(t_dialfs* fs, uint32_t primer_bloque_arc_ant, uin
 bool copiar_bloques(t_dialfs *fs, uint32_t bloque_origen, uint32_t bloque_destino, uint32_t tamanio);
 void copiar_bloque_desde_buffer(t_dialfs *fs, void *buffer, uint32_t bloque_destino, uint32_t offset, size_t size);
 t_archivo_dialfs* obtener_archivo_por_bloque_inicial(t_dialfs *fs, uint32_t bloque_inicial);
+bool leer_archivo_dialfs(t_dialfs* fs, char* nombre_archivo, void* buffer, uint32_t tamanio, uint32_t puntero_archivo);
+bool escribir_archivo_dialfs(t_dialfs* fs, char* nombre_archivo, void* buffer, uint32_t tamanio, uint32_t puntero_archivo);
 
 #endif // COMPORTAMIENTOS_DIALFS_H
