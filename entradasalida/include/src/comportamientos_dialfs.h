@@ -33,18 +33,20 @@ bool crear_archivo_dialfs(char* nombre);
 
 /**
  * Elimina un archivo del sistema DialFS.
+ * @param pid PID del proceso que solicita la operación, lo usamos para log obligatorio de compactación.
  * @param nombre Nombre del archivo a eliminar.
  * @return true si el archivo se eliminó exitosamente, false en caso contrario.
  */
-bool eliminar_archivo_dialfs(char* nombre);
+bool eliminar_archivo_dialfs(uint32_t pid, char* nombre);
 
 /**
  * Modifica el tamaño de un archivo existente en DialFS.
+ * @param pid PID del proceso que solicita la operación, lo usamos para log obligatorio de compactación.
  * @param nombre Nombre del archivo a modificar.
  * @param nuevo_tamanio Nuevo tamaño del archivo en bytes.
  * @return true si el archivo se truncó exitosamente, false en caso contrario.
  */
-bool truncar_archivo_dialfs(char* nombre, uint32_t nuevo_tamanio);
+bool truncar_archivo_dialfs(uint32_t pid, char* nombre, uint32_t nuevo_tamanio);
 
 /**
  * Escribe datos en un archivo existente en DialFS.
@@ -158,7 +160,7 @@ bool crear_archivo(t_dialfs* fs, char* nombre);
  * @param nombre Nombre del archivo a eliminar.
  * @return true si el archivo se eliminó exitosamente, false en caso contrario.
  */
-bool eliminar_archivo(t_dialfs* fs, char* nombre);
+bool eliminar_archivo( uint32_t pid, t_dialfs* fs, char* nombre);
 
 /**
  * Modifica el tamaño de un archivo existente en DialFS.
@@ -302,9 +304,9 @@ char* get_path_base(t_dialfs* fs);
 // char* get_path_metadata(t_archivo_dialfs* archivo);
 char* get_path_archivo(t_archivo_dialfs* archivo);
 
-bool compactar(t_dialfs *fs,t_archivo_dialfs *archivo , uint32_t bloque_inicial, uint32_t tamanio_actual);
+bool compactar(uint32_t pid, t_dialfs *fs,t_archivo_dialfs *archivo , uint32_t bloque_inicial, uint32_t tamanio_actual);
 void copiar_bloque(t_dialfs *fs, uint32_t bloque_origen, uint32_t bloque_destino);
-bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio);
+bool truncar_archivo( uint32_t pid, t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio);
 void* contenido_archivo_truncar(t_dialfs *fs, uint32_t bloque_inicial, uint32_t tamanio_actual);
 uint32_t mover_bloques_archivo(t_dialfs* fs, uint32_t primer_bloque_arc_ant, uint32_t primer_bloque_arc_sig);
 bool copiar_bloques(t_dialfs *fs, uint32_t bloque_origen, uint32_t bloque_destino, uint32_t tamanio);

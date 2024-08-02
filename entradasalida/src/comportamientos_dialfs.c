@@ -9,12 +9,12 @@ bool crear_archivo_dialfs(char* nombre) {
     return crear_archivo(dialfs, nombre);
 }
 
-bool eliminar_archivo_dialfs(char* nombre) {
-    return eliminar_archivo(dialfs, nombre);
+bool eliminar_archivo_dialfs(uint32_t pid, char* nombre) {
+    return eliminar_archivo(pid, dialfs, nombre);
 }
 
-bool truncar_archivo_dialfs(char* nombre, uint32_t nuevo_tamanio) {
-    return truncar_archivo(dialfs, nombre, nuevo_tamanio);
+bool truncar_archivo_dialfs(uint32_t pid, char* nombre, uint32_t nuevo_tamanio) {
+    return truncar_archivo(pid, dialfs, nombre, nuevo_tamanio);
     //return true;
 }
 
@@ -117,7 +117,7 @@ bool crear_archivo(t_dialfs *fs, char *nombre)
     return true;
 }
 
-bool eliminar_archivo(t_dialfs *fs, char *nombre) {
+bool eliminar_archivo(uint32_t pid,t_dialfs *fs, char *nombre) {
     t_archivo_dialfs *archivo = buscar_archivo(fs, nombre);
     if (archivo == NULL) {
         log_error(logger_entradasalida, "Archivo %s no encontrado en el sistema de archivos.", nombre);
@@ -150,14 +150,21 @@ bool eliminar_archivo(t_dialfs *fs, char *nombre) {
         return false;
     }
 
-
     // Remover el archivo de la lista de archivos
-    //list_remove_and_destroy_element(fs->archivos, archivo, (void *)free_archivo_dialfs);
+    bool match_archivo(void *archivo_ptr) {
+        return strcmp(((t_archivo_dialfs *)archivo_ptr)->nombre, nombre) == 0;
+    }
+    list_remove_and_destroy_by_condition(fs->archivos, match_archivo, (void *)free_archivo_dialfs);
 
-    //TODO: ELIMINAR EL ARCHIVO DE LA LISTA DE ARCHIVOS Y CHEQUEAR EL BITMAP
+    // Compactar el sistema de archivos después de eliminar el archivo
+    if (!compactar(pid,fs, NULL, bloque_inicial, tamanio_archivo)) {
+        log_error(logger_entradasalida, "Error al compactar el sistema de archivos después de eliminar %s.", nombre);
+        return false;
+    }
 
     return true;
 }
+
 
 
 void destruir_archivo_dialfs(t_archivo_dialfs *archivo)
@@ -208,7 +215,7 @@ char *get_path_archivo(t_archivo_dialfs *archivo)
 }
 
 
-bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
+bool truncar_archivo(uint32_t pid, t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
     t_archivo_dialfs *archivo = buscar_archivo(fs, nombre);
     if (archivo == NULL) {
         log_error(logger_entradasalida, "Archivo %s no encontrado en el sistema de archivos.", nombre);
@@ -237,6 +244,7 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
         for (uint32_t i = nuevos_bloques; i < bloques_actuales; i++) {
             set_block_as_free(fs->path_bitmap, bloque_inicial + i);
         }
+        write_metadata(archivo->path_archivo, bloque_inicial, nuevo_tamanio);
 
         //TODO: Se debe compactar en este caso
     } else if (nuevos_bloques > bloques_actuales) { // Caso cuando se quiere agrandar el archivo
@@ -256,9 +264,10 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
             for (uint32_t i = bloques_actuales; i < nuevos_bloques; i++) {
                 set_block_as_used(fs->path_bitmap, bloque_inicial + i);
             }
+            write_metadata(archivo->path_archivo, bloque_inicial, nuevo_tamanio);
         } else {
             // Compactar los bloques para crear espacio contiguo
-            if (!compactar(fs, archivo, bloque_inicial, tamanio_actual)) {
+            if (!compactar(pid, fs, archivo, bloque_inicial, tamanio_actual)) {
                 log_error(logger_entradasalida, "No se pudo compactar el archivo %s.", nombre);
                 return false;
             }
@@ -275,6 +284,10 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
             }
                          
         }
+    }else if (nuevo_tamanio < fs->block_size && tamanio_actual == 0){
+        log_info(logger_entradasalida,"El tamaño es menor a un bloque. No se requiere truncado.");
+        write_metadata(archivo->path_archivo, bloque_inicial, nuevo_tamanio);
+        return true;
     }
 
 
@@ -292,11 +305,19 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
     return true;
 }
 
-bool compactar(t_dialfs *fs, t_archivo_dialfs *archivo, uint32_t bloque_inicial, uint32_t tamanio_actual) {
+bool compactar( uint32_t pid, t_dialfs *fs, t_archivo_dialfs *archivo, uint32_t bloque_inicial, uint32_t tamanio_actual) {
+
+    // LOG OBLIGATORIO:
+    log_info(logger_entradasalida, "PID: %d - Inicio Compactacion.", pid);
+
 
     usleep(fs->retraso_compactacion * 1000);
     // Almaceno en un buffer el contenido del archivo a truncar
-    void* buffer = contenido_archivo_truncar(fs, bloque_inicial, tamanio_actual);
+    void* buffer = NULL;
+    if (archivo != NULL) {
+        // Almaceno en un buffer el contenido del archivo a truncar
+        buffer = contenido_archivo_truncar(fs, bloque_inicial, tamanio_actual);
+    }
     uint32_t primer_bloque_arc_sig = bloque_inicial + (tamanio_actual / fs->block_size) + 1;
 
     uint32_t primer_bloque_libre = find_first_free_block(fs->path_bitmap);
@@ -323,14 +344,16 @@ bool compactar(t_dialfs *fs, t_archivo_dialfs *archivo, uint32_t bloque_inicial,
 
     //bloque_a_pegar--;
 
-    uint32_t bloques_actuales = (tamanio_actual + fs->block_size - 1) / fs->block_size;
+    if (archivo != NULL) {
+        uint32_t bloques_actuales = (tamanio_actual + fs->block_size - 1) / fs->block_size;
+        copiar_bloque_desde_buffer(fs, buffer, bloque_a_pegar, bloques_actuales * fs->block_size, fs->block_size);
+        // ACTUALIZAR METADATA ARCHIVO A TRUNCAR
+        write_metadata(archivo->path_archivo, bloque_a_pegar, tamanio_actual);
+        free(buffer);
+    }
 
-    copiar_bloque_desde_buffer(fs, buffer, bloque_a_pegar, bloques_actuales * fs->block_size, fs->block_size);
-    
-    //ACTUALIZAR METADATA ARCHIVO A TRUNCAR
-    write_metadata(archivo->path_archivo, bloque_a_pegar, tamanio_actual);
-
-    free(buffer);
+    // LOG OBLIGATORIO:
+    log_info(logger_entradasalida, "PID: %d - Fin Compactacion.", pid);
 
     return true;
 }
