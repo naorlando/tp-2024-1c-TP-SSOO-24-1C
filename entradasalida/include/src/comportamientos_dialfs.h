@@ -302,7 +302,7 @@ char* get_path_base(t_dialfs* fs);
 // char* get_path_metadata(t_archivo_dialfs* archivo);
 char* get_path_archivo(t_archivo_dialfs* archivo);
 
-bool compactar(t_dialfs *fs, uint32_t bloque_inicial, uint32_t tamanio_actual);
+bool compactar(t_dialfs *fs,t_archivo_dialfs *archivo , uint32_t bloque_inicial, uint32_t tamanio_actual);
 void copiar_bloque(t_dialfs *fs, uint32_t bloque_origen, uint32_t bloque_destino);
 bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio);
 void* contenido_archivo_truncar(t_dialfs *fs, uint32_t bloque_inicial, uint32_t tamanio_actual);

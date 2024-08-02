@@ -230,7 +230,7 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
         return false;
     }
 
-    uint32_t bloques_actuales = (tamanio_actual + fs->block_size - 1) / fs->block_size;
+    uint32_t bloques_actuales = (tamanio_actual > 0) ? ((tamanio_actual + fs->block_size - 1) / fs->block_size) : 1; 
     uint32_t nuevos_bloques = (nuevo_tamanio + fs->block_size - 1) / fs->block_size;
 
     if (nuevos_bloques < bloques_actuales) { // Caso cuando se quiere achicar el archivo
@@ -240,7 +240,7 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
 
         //TODO: Se debe compactar en este caso
     } else if (nuevos_bloques > bloques_actuales) { // Caso cuando se quiere agrandar el archivo
-        uint32_t bloque_final = (bloques_actuales > 0) ? (bloque_inicial + bloques_actuales - 1) : bloque_inicial;
+        uint32_t bloque_final = bloque_inicial + bloques_actuales - 1;
         uint32_t siguiente_bloque = bloque_final + 1;
 
         // Verificar si los bloques después del archivo están libres
@@ -258,15 +258,22 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
             }
         } else {
             // Compactar los bloques para crear espacio contiguo
-            if (!compactar(fs, bloque_inicial, tamanio_actual)) {
+            if (!compactar(fs,archivo, bloque_inicial, tamanio_actual)) {
                 log_error(logger_entradasalida, "No se pudo compactar el archivo %s.", nombre);
                 return false;
             }
-            // for (uint32_t i = 0; i < nuevos_bloques; i++) {
-            //     set_block_as_used(fs->path_bitmap, bloque_inicial + i);
-            // }
+            uint32_t nuevo_bloque_inicial = bloque_inicial_archivo(archivo->path_archivo);
+            if (nuevo_bloque_inicial == (uint32_t)-1) {
+                return false;
+            } 
+            
+            write_metadata(archivo->path_archivo, nuevo_bloque_inicial, nuevo_tamanio);
 
-            //TODO: Se tiene que agrandar el archivo y actualizar su metadata
+
+            for (uint32_t i = bloques_actuales; i < nuevos_bloques; i++) {
+                set_block_as_used(fs->path_bitmap, nuevo_bloque_inicial + i);
+            }
+                         
         }
     }
 
@@ -285,7 +292,9 @@ bool truncar_archivo(t_dialfs *fs, char *nombre, uint32_t nuevo_tamanio) {
     return true;
 }
 
-bool compactar(t_dialfs *fs, uint32_t bloque_inicial, uint32_t tamanio_actual) {
+bool compactar(t_dialfs *fs,t_archivo_dialfs *archivo , uint32_t bloque_inicial, uint32_t tamanio_actual) {
+
+    usleep(fs->retraso_compactacion * 1000);
     // Almaceno en un buffer el contenido del archivo a truncar
     void* buffer = contenido_archivo_truncar(fs, bloque_inicial, tamanio_actual);
     uint32_t primer_bloque_arc_sig = bloque_inicial + (tamanio_actual / fs->block_size) + 1;
@@ -312,15 +321,14 @@ bool compactar(t_dialfs *fs, uint32_t bloque_inicial, uint32_t tamanio_actual) {
         bloque_a_pegar += cant_bloques_movidos + 1;
     }
 
-    // Mover el archivo a truncar al primer bloque libre
-    // for (uint32_t i = 0; i < nuevos_bloques; i++) {
-    //     copiar_bloque(fs, bloque_inicial + i, primer_bloque_libre + i);
-    //     set_block_as_free(fs->path_bitmap, bloque_inicial + i);
-    //     set_block_as_used(fs->path_bitmap, primer_bloque_libre + i);
-    // }
+    bloque_a_pegar--;
+
     uint32_t bloques_actuales = (tamanio_actual + fs->block_size - 1) / fs->block_size;
 
     copiar_bloque_desde_buffer(fs, buffer, bloque_a_pegar, bloques_actuales * fs->block_size, fs->block_size);
+    
+    //ACTUALIZAR METADATA ARCHIVO A TRUNCAR
+    write_metadata(archivo->path_archivo, bloque_a_pegar, tamanio_actual);
 
     free(buffer);
 
@@ -362,7 +370,8 @@ uint32_t mover_bloques_archivo(t_dialfs* fs, uint32_t primer_bloque_arc_ant, uin
     }
 
     uint32_t tamanio = tamano_archivo(archivo_actual->path_archivo);
-    uint32_t bloques_necesarios = (tamanio + fs->block_size - 1) / fs->block_size;
+
+    uint32_t bloques_necesarios = (tamanio > 0) ? ((tamanio + fs->block_size - 1) / fs->block_size) : 1;
 
     // Utilizar la función copiar_bloques
     if (!copiar_bloques(fs, primer_bloque_arc_sig, primer_bloque_arc_ant, tamanio)) {

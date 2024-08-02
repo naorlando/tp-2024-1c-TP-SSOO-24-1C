@@ -138,20 +138,20 @@ void atender_solicitud_dialfs(int fd)
             //     log_info(logger_entradasalida, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", io_dialfs->pid, dialfs_rw->nombre_archivo, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
             //     break;
             // }
-            // case IO_FS_READ:
-            // {
-            //     t_io_dialfs_rw* dialfs_rw = get_dialfs_generic(io_dialfs);
-            //     //void* buffer = malloc(io_dialfs->tamanio);
-            //     //operacion_exitosa = leer_archivo_dialfs(dialfs_rw->nombre_archivo, buffer, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
-            //     if (operacion_exitosa) {
-            //         // Escribo los datos leídos en la memoria en la dirección lógica dada
-            //         //escribir_datos_en_memoria(io_dialfs->direccion_logica, buffer, io_dialfs->tamanio);
-            //         //enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
-            //     }
-            //     //free(buffer);
-            //     log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, dialfs_rw->nombre_archivo, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
-            //     break;
-            // }
+            case IO_FS_READ:
+            {
+                t_io_dialfs_rw* dialfs_rw = get_dialfs_generic(io_dialfs);
+                //void* buffer = malloc(io_dialfs->tamanio);
+                //operacion_exitosa = leer_archivo_dialfs(dialfs_rw->nombre_archivo, buffer, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
+                if (operacion_exitosa) {
+                    // Escribo los datos leídos en la memoria en la dirección lógica dada
+                    //escribir_datos_en_memoria(io_dialfs->direccion_logica, buffer, io_dialfs->tamanio);
+                    //enviar_datos_leidos(fd, buffer, io_dialfs->tamanio);
+                }
+                free(buffer);
+                log_info(logger_entradasalida, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", io_dialfs->pid, dialfs_rw->nombre_archivo, dialfs_rw->tamanio, dialfs_rw->puntero_archivo);
+                break;
+            }
             default:
                 log_error(logger_entradasalida, "Operación DialFS no reconocida");
                 break;
