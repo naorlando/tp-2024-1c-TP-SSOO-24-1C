@@ -16,6 +16,7 @@ void procesar_ios_genericas()
     t_solicitud_io_generica *solicitud_gen = recv_solicitud_io_generica_cpu();
 
     t_PCB *pcb_io_gen = obtener_pcb_solicitud_generica(solicitud_gen);
+    execute_to_null();
     cancelar_quantum_si_corresponde(pcb_io_gen);
     actualizar_quantum(pcb_io_gen);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO GENERICA para el PCB de PID <%d>", pcb_io_gen->pid);
@@ -226,6 +227,7 @@ void procesar_ios_stdin()
     t_solicitud_io_stdin *solicitud_stdin = recv_solicitud_io_stdin_cpu();
 
     t_PCB *pcb_io_stdin = obtener_pcb_solicitud_stdin(solicitud_stdin);
+    execute_to_null();
     cancelar_quantum_si_corresponde(pcb_io_stdin);
     actualizar_quantum(pcb_io_stdin);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO STDIN para el PCB de PID <%d>", pcb_io_stdin->pid);
@@ -240,6 +242,7 @@ void procesar_ios_stdout()
     t_solicitud_io_stdout *solicitud_stdout = recv_solicitud_io_stdout_cpu();
 
     t_PCB *pcb_io_stdout = obtener_pcb_solicitud_stdout(solicitud_stdout);
+    execute_to_null();
     cancelar_quantum_si_corresponde(pcb_io_stdout);
     actualizar_quantum(pcb_io_stdout);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO STDOUT para el PCB de PID <%d>", pcb_io_stdout->pid);
@@ -252,6 +255,7 @@ void procesar_ios_dialfs()
 {
     t_solicitud_io_dialfs *solicitud_dialfs = recv_solicitud_io_dialfs_cpu();
     t_PCB *pcb_io_dialfs = obtener_pcb_solicitud_dialfs(solicitud_dialfs);
+    execute_to_null();
     cancelar_quantum_si_corresponde(pcb_io_dialfs);
     actualizar_quantum(pcb_io_dialfs);
     log_info(logger_kernel, "Se recibio una solicitud de CPU a una IO DIALGS para el PCB de PID <%d>", pcb_io_dialfs->pid);

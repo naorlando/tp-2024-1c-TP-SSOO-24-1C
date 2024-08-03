@@ -117,6 +117,7 @@ void proceso_solicita_io(int tipo_io, void* solicitud)
     
     if(!agrego) {
         agregar_a_cola_exit(pcb_solicita_io);
+        update_pcb(pcb_solicita_io);
         log_info(logger_kernel, "Finaliza el proceso <%d> - Motivo: %s", pcb_solicita_io->pid, obtener_motivo_exit(INVALID_INTERFACE));
     }else {
         log_info(logger_kernel, "PID: <%d> - Bloqueado por: <%s>", pcb_solicita_io->pid, nombre_interfaz);
