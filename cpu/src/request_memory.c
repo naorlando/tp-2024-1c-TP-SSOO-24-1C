@@ -58,8 +58,13 @@ int read_from_memory(uint32_t pid, uint32_t logical_address, void *memory_value,
         uint32_t bytes_a_leer = (remaining_bytes < bytes_disponibles) ? remaining_bytes : bytes_disponibles;
 
         // Leer los bytes desde la memoria
+        log_info(logger_cpu, "PID: <%d> - OBTENER MARCO - Página: <%d> - Marco: <%d>", pid, dir_logica->num_pagina, frame);
         _data_read(pid, dir_logica, frame, (uint8_t *)memory_value + bytes_read, bytes_a_leer);
 
+        // Obtener Marco: “PID: <PID> - OBTENER MARCO - Página: <NUMERO_PAGINA> - Marco: <NUMERO_MARCO>”.
+        // Lectura/Escritura Memoria: “PID: <PID> - Acción: <LEER / ESCRIBIR> - Dirección Física: <DIRECCION_FISICA> - Valor: <VALOR LEIDO / ESCRITO>”
+        log_info(logger_cpu, "PID: <%d> - Acción: <LEER> - Dirección Física: <%d> - Valor: <%d>", pid, frame, *(uint8_t *)memory_value);
+        
         // Actualizar contadores
         bytes_read += bytes_a_leer;
         remaining_bytes -= bytes_a_leer;
@@ -131,7 +136,10 @@ int write_into_memory(uint32_t pid, uint32_t logical_address, void *write_value,
 
         memcpy(valor_asignable, write_value + offset, bytes_a_escribir);
 
+        log_info(logger_cpu, "PID: <%d> - OBTENER MARCO - Página: <%d> - Marco: <%d>", pid, dir_logica->num_pagina, frame);
         _write_data(pid, dir_logica, frame, valor_asignable, bytes_a_escribir);
+        // Lectura/Escritura Memoria: “PID: <PID> - Acción: <LEER / ESCRIBIR> - Dirección Física: <DIRECCION_FISICA> - Valor: <VALOR LEIDO / ESCRITO>”
+        log_info(logger_cpu, "PID: <%d> - Acción: <ESCRIBIR> - Dirección Física: <%d> - Valor: <%d>", pid, frame, *(uint8_t *)write_value);
 
         // Actualizar contadores
         bytes_written += bytes_a_escribir;
