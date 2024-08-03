@@ -25,10 +25,10 @@ int fd_kernel;
 
 char *server_port;
 
-void init()
+void init(char* path)
 {
     _iniciar_logger();
-    _iniciar_config();
+    _iniciar_config(path);
     _inicar_espacio_memoria();
     _iniciar_tabla_procesos();
     _iniciar_dictionarios();
@@ -55,9 +55,9 @@ void _iniciar_logger()
     }
 }
 
-void _iniciar_config()
+void _iniciar_config(char *path)
 {
-    config_memoria = config_create("/home/utnso/tp-2024-1c-TP-SSOO-24-1C/memoria/cfg/memoria.config");
+    config_memoria = config_create(path);
 
     if (config_memoria == NULL)
     {

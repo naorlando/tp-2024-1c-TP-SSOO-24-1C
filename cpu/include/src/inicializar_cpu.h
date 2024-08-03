@@ -10,9 +10,9 @@
 #include <variables_globales.h>
 #include "cpu_syncro.h"
 
-void init();
+void init(char* path);
 void _iniciar_logger();
-void _iniciar_config();
+void _iniciar_config(char* path);
 void _init_cpu_registers();
 void imprimir_config();
 

@@ -11,7 +11,7 @@
 // Inicializa el módulo de memoria configurando los logs, la configuración y la tabla de procesos.
 // Pre: Ninguna.
 // Post: Los logs, la configuración y la tabla de procesos están inicializados y listos para usar.
-void init();
+void init(char* path);
 
 // Inicializa los loggers para el módulo de memoria.
 // Pre: Ninguna.
@@ -21,7 +21,7 @@ void _iniciar_logger();
 // Carga la configuración del módulo de memoria desde un archivo.
 // Pre: El archivo de configuración debe existir y ser accesible.
 // Post: La configuración está cargada y almacenada en memoria_config.
-void _iniciar_config();
+void _iniciar_config(char* path);
 
 
 void _inicar_espacio_memoria();

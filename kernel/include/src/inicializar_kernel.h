@@ -14,9 +14,9 @@
 
 
 
-void init();
+void init(char* path);
 void _iniciar_logger();
-void _iniciar_config();
+void _iniciar_config(char* path);
 void imprimir_config();
 void _init_table_pcb();
 void initialize_lists();

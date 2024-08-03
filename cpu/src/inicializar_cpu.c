@@ -37,9 +37,9 @@ char* memoria_port;
 uint32_t page_size;
 
 
-void init(){
+void init(char* path) {
     _iniciar_logger();
-    _iniciar_config();
+    _iniciar_config(path);
     _init_cpu_registers();
     inicializar_TLB(cpu_config->CANTIDAD_ENTRADAS_TLB, &TLB_list);
     imprimir_config();
@@ -83,8 +83,8 @@ void _iniciar_logger(){
     }
 }
 
-void _iniciar_config(){
-    config_cpu = config_create("/home/utnso/tp-2024-1c-TP-SSOO-24-1C/cpu/cfg/cpu.config");
+void _iniciar_config(char* path){
+    config_cpu = config_create(path);
 
     if(config_cpu == NULL){
         perror("No se pudo crear el archivo de configuracion para el modulo de cpu");

@@ -66,10 +66,10 @@ t_list *COLA_RETORNO_PCB;
 t_PCB *EXECUTE;
 t_list *LISTA_COLAS_DISPOSITIVOS;
 
-void init()
+void init(char* path_config)
 {
     _iniciar_logger();
-    _iniciar_config();
+    _iniciar_config(path_config);
     _init_table_pcb();
     imprimir_config();
     initialize_lists();
@@ -99,9 +99,9 @@ void _iniciar_logger()
     }
 }
 
-void _iniciar_config()
+void _iniciar_config(char* path_config)
 {
-    config_kernel = config_create("/home/utnso/tp-2024-1c-TP-SSOO-24-1C/kernel/cfg/kernel.config");
+    config_kernel = config_create(path_config);
 
     if (config_kernel == NULL)
     {
