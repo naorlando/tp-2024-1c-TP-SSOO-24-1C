@@ -124,24 +124,11 @@ bool eliminar_archivo(uint32_t pid,t_dialfs *fs, char *nombre) {
         return false;
     }
 
-    // Obtener el bloque inicial del archivo
-    uint32_t bloque_inicial = get_bloque_inicial_archivo(fs, nombre);
-    if (bloque_inicial == (uint32_t)-1) {
+
+    // Truncar el archivo a tamaño 0 antes de eliminarlo
+    if (!truncar_archivo(pid, fs, nombre, 0)) {
+        log_error(logger_entradasalida, "Error al truncar el archivo %s antes de eliminarlo.", nombre);
         return false;
-    }
-
-    // Obtener el tamaño del archivo
-    uint32_t tamanio_archivo = get_tamanio_archivo(fs, nombre);
-    if (tamanio_archivo == (uint32_t)-1) {
-        return false;
-    }
-
-    // Calcular el número de bloques necesarios
-    uint32_t bloques_necesarios = (tamanio_archivo + fs->block_size - 1) / fs->block_size;
-
-    // Liberar los bloques en el bitmap
-    for (uint32_t i = 0; i < bloques_necesarios; i++) {
-        set_block_as_free(fs->path_bitmap, bloque_inicial + i);
     }
 
     // Eliminar el archivo de datos
@@ -156,11 +143,6 @@ bool eliminar_archivo(uint32_t pid,t_dialfs *fs, char *nombre) {
     }
     list_remove_and_destroy_by_condition(fs->archivos, match_archivo, (void *)free_archivo_dialfs);
 
-    // Compactar el sistema de archivos después de eliminar el archivo
-    if (!compactar(pid,fs, NULL, bloque_inicial, tamanio_archivo)) {
-        log_error(logger_entradasalida, "Error al compactar el sistema de archivos después de eliminar %s.", nombre);
-        return false;
-    }
 
     return true;
 }
@@ -239,12 +221,23 @@ bool truncar_archivo(uint32_t pid, t_dialfs *fs, char *nombre, uint32_t nuevo_ta
 
     uint32_t bloques_actuales = (tamanio_actual > 0) ? ((tamanio_actual + fs->block_size - 1) / fs->block_size) : 1; 
     uint32_t nuevos_bloques = (nuevo_tamanio + fs->block_size - 1) / fs->block_size;
-    //TODO CUANDO EL TRUNCATE ES MENOR AL BLQOEU ASIGNADO
+
+
     if (nuevos_bloques < bloques_actuales) { // Caso cuando se quiere achicar el archivo
-        for (uint32_t i = nuevos_bloques; i < bloques_actuales; i++) {
-            set_block_as_free(fs->path_bitmap, bloque_inicial + i);
+        if (!compactar(pid, fs, archivo, bloque_inicial, tamanio_actual)) {
+                log_error(logger_entradasalida, "No se pudo compactar el archivo %s.", nombre);
+                return false;
         }
-        write_metadata(archivo->path_archivo, bloque_inicial, nuevo_tamanio);
+        uint32_t nuevo_bloque_inicial = bloque_inicial_archivo(archivo->path_archivo);
+        if (nuevo_bloque_inicial == (uint32_t)-1) {
+            return false;
+        } 
+        
+        write_metadata(archivo->path_archivo, nuevo_bloque_inicial, nuevo_tamanio);
+
+        for (uint32_t i = bloques_actuales - 1; (int32_t)i >= (int32_t)nuevos_bloques; i--) {
+            set_block_as_free(fs->path_bitmap, nuevo_bloque_inicial + i);
+        }
 
         //TODO: Se debe compactar en este caso
     } else if (nuevos_bloques > bloques_actuales) { // Caso cuando se quiere agrandar el archivo
@@ -289,19 +282,6 @@ bool truncar_archivo(uint32_t pid, t_dialfs *fs, char *nombre, uint32_t nuevo_ta
         write_metadata(archivo->path_archivo, bloque_inicial, nuevo_tamanio);
         return true;
     }
-
-
-
-    // Actualizar el tamaño en la metadata del archivo
-    // FILE *metadata_file = fopen(archivo->path_archivo, "r+");
-    // if (metadata_file == NULL) {
-    //     perror("No se pudo abrir el archivo de metadata");
-    //     return false;
-    // }
-
-    // fprintf(metadata_file, "TAMANIO_ARCHIVO=%u\n", nuevo_tamanio);
-    // fclose(metadata_file);
-
     return true;
 }
 
