@@ -53,15 +53,8 @@ int read_from_memory(uint32_t pid, uint32_t logical_address, void *memory_value,
             }
         }
 
-        uint32_t bytes_disponibles = 0;
-        if (dir_logica->desplazamiento_pagina == 0)
-        {
-            bytes_disponibles = page_size - (dir_logica->desplazamiento_pagina);
-        }
-        else
-        {
-            bytes_disponibles = (page_size - dir_logica->desplazamiento_pagina) + 1;
-        }
+        uint32_t bytes_disponibles = page_size - (dir_logica->desplazamiento_pagina);
+
         uint32_t bytes_a_leer = (remaining_bytes < bytes_disponibles) ? remaining_bytes : bytes_disponibles;
 
         // Leer los bytes desde la memoria
@@ -233,6 +226,7 @@ void copiar_cadena(uint32_t origen, uint32_t destino, int tamano)
     if (read_from_memory(pcb_execute->pid, origen, memory_value, cant_paginas_origen, tamano))
     {
 
+        char *value = (char *)memory_value;
         if (!write_into_memory(pcb_execute->pid, destino, memory_value, cant_paginas_destino, tamano))
         {
             log_error(logger_cpu, "Error COPY_STRING en pegar la información");
